@@ -7,16 +7,25 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.9",
-        "laravel/tinker": "^2.9"
+        "laravel/socialite": "^5.15",
+        "laravel/tinker": "^2.9",
+        "livewire/livewire": "^3.4",
+        "livewire/volt": "^1.0",
+        "socialiteproviders/facebook": "^4.1",
+        "socialiteproviders/github": "^4.1",
+        "socialiteproviders/google": "^4.1",
+        "wire-elements/livewire-strict": "^2.0"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.23",
-        "laravel/pint": "^1.13",
+        "laravel/breeze": "^2.1",
+        "laravel/pint": "^1.17",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "pestphp/pest": "^2.35",
-        "pestphp/pest-plugin-laravel": "^2.4"
+        "pestphp/pest": "^2.0",
+        "pestphp/pest-plugin-laravel": "^2.0"
     },
     "autoload": {
         "psr-4": {
