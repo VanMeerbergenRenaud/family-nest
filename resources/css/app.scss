@@ -1,0 +1,31 @@
+/*
+ * Styles of the FamilyNest app :
+
+    1. Basics
+    2. Pages
+    3. Components
+    4. Forms
+*/
+
+/*-------------------------
+        1. Basics
+------------------------- */
+@import "basics/reset";
+@import "basics/variables";
+@import "basics/foundations";
+
+/*-------------------------
+        2. Pages
+------------------------- */
+@import "pages/errors"; // all error pages (404, etc.)
+
+/*-------------------------
+        3. Components
+------------------------- */
+@import "components/modal";
+
+/*-------------------------
+        4. Forms
+------------------------- */
+@import "forms/inputs";
+@import "forms/textareas";

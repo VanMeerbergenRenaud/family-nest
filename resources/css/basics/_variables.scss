@@ -1,0 +1,42 @@
+/* --------------------------------
+            Variables
+ -------------------------------- */
+
+/*--------- Breakpoints --------- */
+$mw-small: 48rem; // 768px => mobile
+$mw-medium: 64rem; // 1024px => tablet
+$mw-large: 85.375rem; // 1366px => laptop
+$mw-xlarge: 120rem; // 1920px => desktop
+$mw-xxlarge: 160rem; // 2560px => monitor
+
+/*---------- Font families ----------- */
+$font-family-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "Helvetica Neue", "Arial", "sans-serif";
+$font-family-secondary: "Poppins", sans-serif;
+
+/*----------- Colors -----------*/
+
+/* 1. Basics */
+$white: #FFFFFF;
+$black: #000000;
+$transparent: transparent;
+
+/* 2.States */
+$red: #EF4444FF;
+$gray: #a69494;
+$green: #3a8562;
+$blue: #6386E3;
+$blue-save: #6C8DE4;
+$blue-dark: #3F4353;
+
+/* 3. Variants */
+$white-500: #fcfcfc;
+$gray-500: #80838e;
+$blue-500: #5a8ddf;
+
+/*---------- Borders ----------*/
+$border: 1px solid #dde2e9;
+$border-focus: 1px solid #33b0e0;
+$border-transparent: 1px solid transparent;
+
+/*---------- Shadows ----------*/
+$shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)
