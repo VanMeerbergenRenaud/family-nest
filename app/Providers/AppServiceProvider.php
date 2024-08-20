@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use WireElements\LivewireStrict\LivewireStrict;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +12,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        /* Livewire strict locked all the properties by default */
+        // LivewireStrict::lockProperties(); // globally
+        // LivewireStrict::lockProperties(shouldLockProperties: app()->isLocal()); // locally only
     }
 
     /**
