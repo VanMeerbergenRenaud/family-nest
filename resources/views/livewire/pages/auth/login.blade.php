@@ -67,19 +67,19 @@ $login = function () {
 
         <div>
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" title="Vers la page d’inscription" wire:navigate>
-                    {{ __('S’inscrire') }}
+                <a href="{{ route('register') }}" class="simple-link" title="Vers la page d’inscription" wire:navigate>
+                    {{ __('Pas encore de compte ?') }}
                 </a>
             @endif
 
             @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" title="Vers la page de réinitialisation du mot de passe" wire:navigate>
+                <a href="{{ route('password.request') }}" class="simple-link" title="Vers la page de réinitialisation du mot de passe" wire:navigate>
                     {{ __('Mot de passe oublié ?') }}
                 </a>
             @endif
 
             <button type="submit">
-                {{ __('Se souvenir de moi') }}
+                {{ __('Se connecter') }}
             </button>
         </div>
     </form>

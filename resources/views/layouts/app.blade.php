@@ -7,6 +7,9 @@
 
         <title>{{ config('app.name', 'FamilyNest') }}</title>
 
+        <!-- CDN -->
+        <script defer src="https://unpkg.com/@alpinejs/ui@3.13.1-beta.0/dist/cdn.min.js"></script>
+
         <!-- Scripts -->
         @livewireStyles
         @vite(['resources/css/app.scss', 'resources/js/app.js'])

@@ -19,7 +19,7 @@ input[type="checkbox"] {
 .field {
     margin: 0;
     padding: 0;
-    max-width: $mw-small;
+    max-width: $bp-xs;
 
     &__label {
         margin-bottom: 0.5rem;

@@ -72,7 +72,7 @@ $register = function () {
         </div>
 
         <div>
-            <a href="{{ route('login') }}" title="Vers la page de connexion" wire:navigate>
+            <a href="{{ route('login') }}" class="simple-link" title="Vers la page de connexion" wire:navigate>
                 {{ __('Déjà inscrit ?') }}
             </a>
 

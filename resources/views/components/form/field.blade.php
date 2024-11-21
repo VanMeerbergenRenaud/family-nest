@@ -23,9 +23,9 @@
     >
 
     @error($model)
-        <ul class="field__error">
+        <ul class="field-error">
             @foreach ($errors->get($model) as $error)
-                <li class="field__error__item">{{ $error }}</li>
+                <li class="field-error__item">{{ $error }}</li>
             @endforeach
         </ul>
     @enderror

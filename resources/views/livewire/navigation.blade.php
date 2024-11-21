@@ -19,7 +19,7 @@ $logout = function (Logout $logout) {
     <p>{{ auth()->user()->email }}</p>
 
     <a href="{{ route('dashboard') }}" title="Vers le tableau de bord" wire:navigate>
-        {{ __('Dashboard') }}
+        {{ __('Tableau de bord') }}
     </a>
 
     <a href="{{ route('profile') }}" title="Vers le profil" wire:navigate>

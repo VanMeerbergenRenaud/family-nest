@@ -1,5 +1,5 @@
-<div class="dialog__footer">
-    <div class="dialog__footer__buttons">
+<div class="modal__footer">
+    <div class="modal__footer__content">
         {{ $slot }}
     </div>
 </div>
