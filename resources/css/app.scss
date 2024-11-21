@@ -10,14 +10,15 @@
 /*-------------------------
         1. Basics
 ------------------------- */
-@import "basics/reset";
 @import "basics/variables";
-@import "basics/foundations";
+@import "basics/reset";
+@import "basics/main";
 
 /*-------------------------
         2. Pages
 ------------------------- */
 @import "pages/errors"; // all error pages (404, etc.)
+@import "pages/profile";
 
 /*-------------------------
         3. Components
@@ -27,5 +28,6 @@
 /*-------------------------
         4. Forms
 ------------------------- */
+@import "forms/field-error";
 @import "forms/inputs";
 @import "forms/textareas";
