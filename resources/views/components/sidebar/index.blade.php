@@ -1,20 +1,35 @@
-@props(['isSidebarOpen' => false, 'title' => 'Titre de la sidebar'])
+@props([
+    'isSidebarOpen' => false,
+])
 
-<aside class="sidebar {{ $isSidebarOpen ? 'sidebar--open' : 'sidebar--closed' }}">
-    <div class="sidebar__overlay" wire:click="toggleSidebar" tabindex="-1"></div>
-    <div class="sidebar__container" role="dialog" aria-modal="true" aria-label="{{ $title }}">
+<aside
+    role="complementary"
+    aria-hidden="{{ $isSidebarOpen ? 'false' : 'true' }}"
+    class="sidebar {{ $isSidebarOpen ? 'sidebar--open' : 'sidebar--closed' }}"
+    x-on:keydown.escape.window="isOpen = false; $wire.set('isSidebarOpen', false)"
+>
+    <!-- Overlay -->
+    <div class="sidebar__overlay" wire:click="toggleSidebar" tabindex="-1" aria-label="Fermer la sidebar"></div>
+
+    <!-- Container -->
+    <div class="sidebar__container">
         <div class="sidebar__container__content">
-            <div class="sidebar__container__content__header">
-                <button wire:click="$set('isSidebarOpen', false)" class="close">
-                    <x-svg.cross/>
-                </button>
 
-                <h2 class="title">{{ $title }}</h2>
+            <!-- Header -->
+            <div class="sidebar__container__content__header">
+                {{ $header }}
             </div>
 
+            <!-- Body -->
             <div class="sidebar__container__content__body">
                 {{ $content }}
             </div>
+
+            <!-- Footer -->
+            <div class="sidebar__container__content__footer">
+                {{ $footer }}
+            </div>
+
         </div>
     </div>
 </aside>
