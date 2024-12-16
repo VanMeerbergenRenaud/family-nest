@@ -5,34 +5,39 @@
     <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}"/>
 
     {{-- Bouton pour ouvrir la sidebar --}}
-    <button wire:click="toggleSidebar" aria-expanded="{{ $isSidebarOpen ? 'true' : 'false' }}" aria-controls="sidebar">
+    <button wire:click="toggleSidebar" aria-expanded="{{ $isSidebarOpen ? 'true' : 'false' }}" aria-controls="sidebar" class="px-3 h-8 flex items-center rounded-lg relative text-zinc-500 hover:text-zinc-800 text-zinc-800 hover:bg-zinc-100 bg-zinc-200">
         Ouvrir la sidebar
     </button>
 
     {{-- Sidebar --}}
     <x-sidebar :isSidebarOpen="$isSidebarOpen">
         <x-slot name="header">
-            <button wire:click="$set('isSidebarOpen', false)" class="close" aria-label="Fermer la sidebar">
+            <button wire:click="$set('isSidebarOpen', false)" class="absolute top-3 right-3 p-2.5 text-0 cursor-pointer rounded-full hover:bg-gray-200" aria-label="Fermer la sidebar">
                 <x-svg.cross/>
             </button>
 
-            <h2 class="title">Titre de la sidebar</h2>
+            <h2 class="pr-14 text-xl font-semibold">Titre de la sidebar</h2>
         </x-slot>
 
         <x-slot name="content">
-            Contenu de la sidebar
+            <p>Contenu de la sidebar</p>
         </x-slot>
 
         <x-slot name="footer">
-            <div class="sidebar__container__content__footer__content">
+            <div class="flex justify-end flex-wrap gap-2 gap-x-4">
                 <x-sidebar.close>
-                    <button type="button" class="cancel">
-                        Annuler
+                    <button type="button" class="px-3 h-8 flex items-center rounded-lg relative text-zinc-500 hover:text-zinc-800 text-zinc-800 hover:bg-zinc-100 bg-zinc-200">
+                        <div class="flex-1 text-sm font-medium leading-none whitespace-nowrap">
+                            Annuler
+                        </div>
                     </button>
                 </x-sidebar.close>
 
-                <button class="save">
-                    Valider
+                <button
+                   class="px-3 h-8 flex items-center rounded-lg relative text-zinc-500 hover:text-zinc-800 text-zinc-800 hover:bg-zinc-100 bg-zinc-200">
+                    <div class="flex-1 text-sm font-medium leading-none whitespace-nowrap">
+                        Valider
+                    </div>
                 </button>
             </div>
         </x-slot>
