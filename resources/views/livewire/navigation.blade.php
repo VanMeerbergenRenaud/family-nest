@@ -10,23 +10,21 @@ $logout = function (Logout $logout) {
 
 ?>
 
-<nav role="navigation" style="display: flex; align-items: center; flex-direction: row; gap: 2rem;">
+<nav role="navigation"
+     aria-label="Navigation principale"
+     class="mb-4 flex items-center flex-wrap bg-white-500 p-6 gap-6 border-b border-gray-200"
+>
     <a href="{{ route('dashboard') }}" title="Retour à l'accueil" wire:navigate>
         <x-app-logo />
     </a>
 
-    <p>{{ auth()->user()->name }}</p>
-    <p>{{ auth()->user()->email }}</p>
-
-    <a href="{{ route('dashboard') }}" title="Vers le tableau de bord" wire:navigate>
-        {{ __('Tableau de bord') }}
-    </a>
-
-    <a href="{{ route('profile') }}" title="Vers le profil" wire:navigate>
+    <a href="{{ route('profile') }}" title="Vers le profil" wire:navigate
+       class="inline text-inherit font-medium underline-offset-[6px] decoration-zinc-800/20 hover:decoration-current underline text-zinc-800">
         {{ __('Profil') }}
     </a>
 
-    <button type="button" wire:click="logout">
+    <button type="button" wire:click="logout"
+            class="inline text-inherit font-medium underline-offset-[6px] decoration-zinc-800/20 hover:decoration-current underline text-zinc-800">
         {{ __('Se déconnecter') }}
     </button>
 </nav>

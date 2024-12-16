@@ -14,13 +14,17 @@
         @livewireStyles
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     </head>
-    <body>
-        <div>
+    <body class="mx-auto p-0 min-h-screen max-w-[160rem] text-base font-normal text-black bg-gray-50 scroll-smooth antialiased">
+        <header>
             <livewire:navigation />
+        </header>
 
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+        <main>
+            {{ $slot }}
+        </main>
+
+        <footer>
+            Footer
+        </footer>
     </body>
 </html>

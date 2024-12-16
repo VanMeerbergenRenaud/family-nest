@@ -48,64 +48,62 @@ $sendVerification = function () {
 
 ?>
 
-<section>
-    <header>
-        <h2 role="heading" aria-level="2">
+<section class="p-6 bg-white rounded-lg">
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-900" role="heading" aria-level="2">
             {{ __('Informations du profil') }}
         </h2>
 
-        <p>
+        <p class="text-sm text-gray-600">
             {{ __("Mettez à jour les informations de votre compte et votre adresse email.") }}
         </p>
-    </header>
+    </div>
 
     <form wire:submit="updateProfileInformation">
         @csrf
 
-        <div>
-            <x-form.field
-                label="Nom"
-                name="name"
-                model="name"
-                autocomplete="name"
-                required
-            />
+        <div class="mb-8 flex flex-col gap-4">
+            <x-form.field label="Nom" name="last_name" model="last_name" placeholder="John Doe"/>
+            <x-form.field label="Prénom" name="first_name" model="first_name" placeholder="John"/>
+            <x-form.field label="Adresse email" name="email" model="email" type="email"
+                          placeholder="renseignez votre adresse email"/>
         </div>
 
-        <div>
-            <x-form.field
-                label="Adresse email"
-                name="email"
-                type="email"
-                model="email"
-                autocomplete="email"
-                required
-            />
-
             @if (auth()->user() instanceof MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
-                <div>
+            <div class="mt-2 text-sm text-gray-600">
                     <p>
                         {{ __('Cette nouvelle adresse email n’a pas encore été vérifiée.') }}
 
-                        <button type="button" wire:click.prevent="sendVerification">
+                        <button type="button" wire:click.prevent="sendVerification"
+                                class="text-indigo-600 hover:text-indigo-900">
                             {{ __('Cliquez ici pour envoyer un lien de vérification.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p>
+                    <p class="mt-2 text-sm text-green-600">
                             {{ __('Un nouveau lien de vérification a été envoyé à l’adresse email que vous avez fournie lors de votre inscription.') }}
                         </p>
                     @endif
                 </div>
             @endif
-        </div>
 
-        <div>
-            <button type="submit">{{ __('Sauvegarder') }}</button>
+            <div class="flex justify-start mt-6">
+                <button type="button"
+                        class="mr-4 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    {{ __('Annuler') }}
+                </button>
+
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    {{ __('Sauvegarder') }}
+                </button>
 
             <x-action-message on="profile-updated">
-                {{ __('Profil mis à jour.') }}
+                <p class="text-sm text-gray-800">{{ __('Profil mis à jour.') }}</p>
+                <button type="button" @click="actionMessage = false" class="text-gray-600 hover:text-gray-800">
+                    <x-svg.cross/>
+                </button>
             </x-action-message>
         </div>
     </form>

@@ -1,7 +1,6 @@
 @props([
     'label',
     'name',
-    'type' => 'text',
     'model' => '',
     'placeholder' => '',
 ])
@@ -11,15 +10,14 @@
         {{ ucfirst($label) }}
     </label>
 
-    <input
+    <textarea
         id="{{ $name }}"
         name="{{ $name }}"
-        type="{{ $type }}"
         wire:model.blur="{{ $model }}"
         placeholder="{{ $placeholder }}"
-        class="m-0 px-3 py-2 block w-full text-[0.94rem] font-normal text-gray-600 border border-gray-300 rounded-md"
+        class="my-1.5 px-3 block w-[calc(100%-1.55rem)] font-sans text-sm text-gray-900 resize-none"
         {{ $attributes }}
-    >
+    ></textarea>
 
     @error($model)
         <ul class="my-2 flex flex-col gap-3 font-medium text-red-500">

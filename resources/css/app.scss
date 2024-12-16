@@ -1,33 +1,15 @@
-/*
- * Styles of the FamilyNest app :
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-    1. Basics
-    2. Pages
-    3. Components
-    4. Forms
-*/
+img, video {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: cover;
+}
 
-/*-------------------------
-        1. Basics
-------------------------- */
-@import "basics/variables";
-@import "basics/reset";
-@import "basics/main";
-
-/*-------------------------
-        2. Pages
-------------------------- */
-@import "pages/errors"; // all error pages (404, etc.)
-@import "pages/profile";
-
-/*-------------------------
-        3. Components
-------------------------- */
-@import "components/modal";
-
-/*-------------------------
-        4. Forms
-------------------------- */
-@import "forms/field-error";
-@import "forms/inputs";
-@import "forms/textareas";
+svg {
+    width: 1rem;
+    height: auto;
+}
