@@ -7,15 +7,26 @@
 
         <title>{{ config('app.name', 'FamilyNest') }}</title>
 
+        <!-- CDN -->
+        <script defer src="https://unpkg.com/@alpinejs/ui@3.13.1-beta.0/dist/cdn.min.js"></script>
+
         <!-- Scripts -->
         @livewireStyles
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     </head>
-    <body>
-        <a href="{{ route('welcome') }}" title="Retour à l'accueil" wire:navigate>
-            <x-app-logo />
-        </a>
+    <body class="mx-auto p-0 min-h-screen max-w-[160rem] text-base font-normal text-black bg-gray-50 scroll-smooth antialiased">
+        <header>
+            <a href="{{ route('welcome') }}" title="Retour à l'accueil" wire:navigate>
+                <x-app-logo />
+            </a>
+        </header>
 
-        {{ $slot }}
+        <main>
+            {{ $slot }}
+        </main>
+
+        <footer>
+            Footer
+        </footer>
     </body>
 </html>
