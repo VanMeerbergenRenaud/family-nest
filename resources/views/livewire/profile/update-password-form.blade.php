@@ -40,41 +40,40 @@ $updatePassword = function () {
 
 ?>
 
-<section>
-    <header>
-        <h2 role="heading" aria-level="2">
+<section class="p-6 bg-white rounded-lg max-w-[64rem]">
+    <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-900" role="heading" aria-level="2">
             {{ __('Mettre à jour le mot de passe') }}
         </h2>
-        <p>
+
+        <p class="text-sm text-gray-600">
             {{ __('Soyez sûr de choisir un mot de passe sécurisé.') }}
         </p>
-        <span>
+
+        <span class="block mt-4 text-sm text-indigo-950">
             {{ __('Le mot de passe doit contenir au moins 8 caractères.') }}
         </span>
-    </header>
+    </div>
 
     <form wire:submit="updatePassword">
         @csrf
 
-        <div>
+        <div class="mb-8 flex flex-col gap-4">
+
             <x-form.field-password
                 label="Mot de passe actuel"
                 name="update_password_current_password"
                 model="current_password"
                 required
             />
-        </div>
 
-        <div>
             <x-form.field-password
                 label="Nouveau mot de passe"
                 name="update_password_password"
                 model="password"
                 required
             />
-        </div>
 
-        <div>
             <x-form.field-password
                 label="Confirmer le nouveau mot de passe"
                 name="update_password_password_confirmation"
@@ -83,11 +82,22 @@ $updatePassword = function () {
             />
         </div>
 
-        <div>
-            <button type="submit">{{ __('Sauvegarder') }}</button>
+        <div class="flex justify-start mt-6">
+            <button type="button"
+                    class="mr-4 inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {{ __('Annuler') }}
+            </button>
+
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                {{ __('Sauvegarder') }}
+            </button>
 
             <x-action-message on="password-updated">
-                {{ __('Mot de passe mis à jour.') }}
+                <p>{{ __('Mot de passe mis à jour.') }}</p>
+                <button type="button" @click="actionMessage = false" class="text-gray-600 hover:text-gray-800">
+                    <x-svg.cross/>
+                </button>
             </x-action-message>
         </div>
     </form>
