@@ -1,43 +1,40 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title')</title>
+    <title>@yield('title', 'Erreur')</title>
 
-        <!-- Scripts -->
-        @livewireStyles
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body>
-        <div class="error__page">
-            <div class="error__page__container">
-                <div class="error__page__container__content">
-                    <div class="error__page__container__content__icon">
-                        @yield('icon')
-                    </div>
+    <!-- Scripts -->
+    @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-[#EFEFEF]">
+<div class="flex flex-col items-center justify-center min-h-screen py-16 bg-[#E8E8E8]">
+        @yield('icon')
 
-                    <div class="error__page__container__content__code">
-                        @yield('code')
-                    </div>
+    <h1 class="mt-8 text-[#CD475E] font-semibold text-8xl tracking-[-0.0625rem] leading-[150%]">
+        @yield('code')
+    </h1>
+    <p class="text-[#191E2C] max-w-[40rem] mb-6 font-medium text-3xl tracking-[-0.0625rem] leading-[100%]">
+        @yield('description')
+    </p>
+    <p class="text-[#666] max-w-[40rem] text-center text-base leading-[135%]">
+        @yield('message')
+    </p>
 
-                    <div class="error__page__container__content__message">
-                        @yield('message')
-                    </div>
-                </div>
-                <div class="error__page__container__content__links">
-                    <a href="{{ url()->previous() }}" class="link-secondary">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 8H1M1 8L8 15M1 8L8 1" stroke="#344054" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        {{ __('Retour') }}
-                    </a>
-                    <a href="{{ route('dashboard') }}" class="link-primary">
-                        {{ __('Retourner à l’accueil') }}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </body>
+    <div class="mt-12 inline-flex items-center gap-[1rem]">
+        <a href="{{ url()->previous() }}"
+           class="flex py-[0.75rem] px-[2rem] justify-center items-center gap-2 rounded-lg bg-[#F7F7F7] text-[#191E2C] hover:bg-gray-100">
+            <x-svg.arrow-left />
+            Retour en arrière
+        </a>
+        <a href="{{ route('dashboard') }}"
+           class="flex py-[0.75rem] px-[2rem] justify-center items-center gap-2 rounded-lg bg-[#191E2C] text-white hover:bg-[#0D0F14]">
+            Aller à l'accueil
+        </a>
+    </div>
+</div>
+</body>
 </html>
