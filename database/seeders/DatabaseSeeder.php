@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -59,6 +60,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'cedric.test@gmail.com',
             'password' => bcrypt('password_1'),
             'avatar' => asset('img/avatar_placeholder.png'),
+        ]);
+
+        /* Invoices */
+        Invoice::factory(12)->create([
+            'user_id' => 1,
         ]);
     }
 }

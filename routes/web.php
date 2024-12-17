@@ -15,4 +15,12 @@ Volt::route('profile', 'pages.profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Volt::route('invoices', 'pages.invoice-manager')
+    ->middleware(['auth'])
+    ->name('invoices');
+
+Volt::route('invoices.create', 'pages.create-invoice')
+    ->middleware(['auth'])
+    ->name('invoices.create');
+
 require __DIR__.'/auth.php';
