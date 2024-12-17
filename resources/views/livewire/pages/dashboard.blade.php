@@ -4,6 +4,15 @@
 
     <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}"/>
 
+    {{-- Lien vers les factures --}}
+    <a href="{{ route('invoices') }}" class="simple-link" title="Vers les factures" wire:navigate>
+        {{ __('Voir les factures') }}
+    </a>
+
+    <a href="{{ route('invoices.create') }}" class="simple-link" title="Ajouter une facture" wire:navigate>
+        {{ __('Ajouter une facture') }}
+    </a>
+
     {{-- Bouton pour ouvrir la sidebar --}}
     <button wire:click="toggleSidebar" aria-expanded="{{ $isSidebarOpen ? 'true' : 'false' }}" aria-controls="sidebar" class="px-3 h-8 flex items-center rounded-lg relative text-zinc-500 hover:text-zinc-800 text-zinc-800 hover:bg-zinc-100 bg-zinc-200">
         Ouvrir la sidebar
