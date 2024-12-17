@@ -46,15 +46,15 @@ $deleteUser = function (Logout $logout) {
         </x-modal.open>
 
         <x-modal.panel>
-            <form wire:submit.prevent="deleteUser" class="form">
+            <form wire:submit.prevent="deleteUser">
                 @csrf
 
-                <div class="form__content">
-                    <h3 role="heading" aria-level="3" class="form__content__heading">
+                <div class="flex flex-col gap-4 p-8">
+                    <h3 role="heading" aria-level="3" class="text-lg font-semibold">
                         {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}
                     </h3>
 
-                    <p class="text">
+                    <p class="mb-2 text-sm text-gray-600">
                         {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente. Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
                     </p>
 
@@ -71,12 +71,12 @@ $deleteUser = function (Logout $logout) {
 
                 <x-modal.footer>
                     <x-modal.close>
-                        <button type="button" class="cancel">
+                        <button type="button">
                             {{ __('Annuler') }}
                         </button>
                     </x-modal.close>
 
-                    <button type="submit" class="delete">
+                    <button type="submit">
                         {{ __('Supprimer le compte') }}
                     </button>
                 </x-modal.footer>

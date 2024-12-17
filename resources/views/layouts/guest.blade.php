@@ -21,11 +21,11 @@
             </a>
         </header>
 
-        <main>
+        <main class="min-h-[100vh]">
             {{ $slot }}
         </main>
 
-        <footer>
+        <footer class="w-full bg-gray-100 p-4 text-center">
             Footer
         </footer>
     </body>
