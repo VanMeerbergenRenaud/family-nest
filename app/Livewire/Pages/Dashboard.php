@@ -12,7 +12,7 @@ class Dashboard extends Component
 
     public function toggleSidebar()
     {
-        $this->isSidebarOpen = !$this->isSidebarOpen;
+        $this->isSidebarOpen = ! $this->isSidebarOpen;
     }
 
     public function openModal()

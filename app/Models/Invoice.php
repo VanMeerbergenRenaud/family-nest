@@ -29,7 +29,7 @@ class Invoice extends Model
     protected function filePath(): Attribute
     {
         return Attribute::make(
-            get: fn ($value) => asset('storage/' . $value),
+            get: fn ($value) => asset('storage/'.$value),
         );
     }
 

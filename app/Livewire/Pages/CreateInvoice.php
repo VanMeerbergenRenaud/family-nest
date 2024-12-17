@@ -13,7 +13,39 @@ class CreateInvoice extends Component
     use WithFileUploads;
 
     #[Validate]
-    public $name, $issuer, $type, $category, $website, $amount, $is_variable = false, $is_family_related = false, $issued_date, $payment_reminder, $payment_frequency, $status = 'unpaid', $payment_method, $priority = 'medium', $notes, $tags = [], $tagInput = '';
+    public $name;
+
+    public $issuer;
+
+    public $type;
+
+    public $category;
+
+    public $website;
+
+    public $amount;
+
+    public $is_variable = false;
+
+    public $is_family_related = false;
+
+    public $issued_date;
+
+    public $payment_reminder;
+
+    public $payment_frequency;
+
+    public $status = 'unpaid';
+
+    public $payment_method;
+
+    public $priority = 'medium';
+
+    public $notes;
+
+    public $tags = [];
+
+    public $tagInput = '';
 
     public $uploadedFile;
 
@@ -40,7 +72,7 @@ class CreateInvoice extends Component
 
     protected $messages = [
         'name.required' => 'Le nom de la facture est obligatoire.',
-        'issuer.required' => "Le nom du fournisseur est obligatoire.",
+        'issuer.required' => 'Le nom du fournisseur est obligatoire.',
         'type.required' => 'Le type de facture est obligatoire.',
         'amount.required' => 'Le montant est obligatoire.',
         'amount.numeric' => 'Le montant doit être un nombre.',
@@ -48,7 +80,7 @@ class CreateInvoice extends Component
         'issued_date.required' => "La date d'émission est obligatoire.",
         'issued_date.date' => "La date d'émission doit être une date valide.",
         'status.required' => 'Le statut de la facture est obligatoire.',
-        'status.in' => "Le statut de la facture doit être parmi : non-payée, payée, en retard, ou partiellement payée.",
+        'status.in' => 'Le statut de la facture doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
         'priority.required' => 'La priorité est obligatoire.',
         'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
         'website.url' => "L'URL du site web du fournisseur n'est pas valide.",
@@ -60,7 +92,7 @@ class CreateInvoice extends Component
 
     public function addTag()
     {
-        if (!empty($this->tagInput)) {
+        if (! empty($this->tagInput)) {
             $this->tags[] = $this->tagInput;
             $this->tagInput = '';
         }

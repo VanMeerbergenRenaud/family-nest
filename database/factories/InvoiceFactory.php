@@ -39,7 +39,7 @@ class InvoiceFactory extends Factory
             'payment_method' => $this->faker->randomElement($paidMethods),
             'priority' => $this->faker->randomElement($priorities),
             'notes' => $this->faker->paragraph(),
-            'tags' => $this->faker->randomElements($tags, rand(1,4)), // Sélectionne 1 à 3 tags aléatoires
+            'tags' => $this->faker->randomElements($tags, rand(1, 4)), // Sélectionne 1 à 3 tags aléatoires
         ];
     }
 }
