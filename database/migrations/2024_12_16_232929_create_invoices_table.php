@@ -32,7 +32,7 @@ return new class extends Migration
             $table->json('tags')->nullable(); // JSON format for tags
             // Foreign keys
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            /*$table->foreignId('invoice_file_id')->constrained()->cascadeOnDelete();*/
+            /* $table->foreignId('invoice_file_id')->constrained()->cascadeOnDelete(); */
             $table->timestamps();
         });
     }

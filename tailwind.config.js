@@ -4,11 +4,12 @@ export default {
         "./resources/**/*.blade.php",
         "./resources/**/*.js",
     ],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-      require('@tailwindcss/forms'),
-  ],
+    theme: {
+        extend: {},
+    },
+    darkMode: 'class',
+    plugins: [
+        require('@tailwindcss/forms'),
+    ],
 }
 
