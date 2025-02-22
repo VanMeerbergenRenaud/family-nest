@@ -22,20 +22,23 @@ $login = function () {
 
 ?>
 
-<div>
+<x-auth-template title="Connexion" description="Entrez vos information pour vous connectez." showSocialLogin>
+
     <!-- Session Status -->
     @if (session('status'))
-        <div>
+        <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-4 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-center">
+            <x-svg.success class="h-4 w-4" />
             {{ session('status') }}
-        </div>
+        </p>
     @endif
 
+    <!-- Formulaire d'inscription -->
     <form wire:submit="login">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-form.field
+        <div class="flex flex-col gap-4">
+            <!-- Email -->
+             <x-form.field
                 label="Adresse e-mail"
                 name="email"
                 type="email"
@@ -44,10 +47,8 @@ $login = function () {
                 autocomplete="email"
                 required
             />
-        </div>
 
-        <!-- Password -->
-        <div>
+            <!-- Password -->
             <x-form.field-password
                 label="Mot de passe"
                 name="password"
@@ -57,30 +58,31 @@ $login = function () {
             />
         </div>
 
-        <!-- Remember Me -->
-        <div>
-            <label for="remember">
-                <input wire:model="form.remember" id="remember" type="checkbox">
-                <span>{{ __('Se souvenir de moi') }}</span>
-            </label>
+        <div class="mt-6 md:px-2 flex items-center justify-between">
+            <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" class="ml-3 text-sm-medium underline" title="Vers la page de réinitialisation de mot de passe" wire:navigate>
+                    {{ __("Mot de passe oublié ?") }}
+                </a>
+            @endif
         </div>
 
-        <div>
-            @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="simple-link" title="Vers la page d’inscription" wire:navigate>
-                    {{ __('Pas encore de compte ?') }}
-                </a>
-            @endif
-
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="simple-link" title="Vers la page de réinitialisation du mot de passe" wire:navigate>
-                    {{ __('Mot de passe oublié ?') }}
-                </a>
-            @endif
-
-            <button type="submit">
-                {{ __('Se connecter') }}
+        <div class="mt-8 mb-5">
+            <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium bg-[#292A2B] text-white hover:bg-black">
+                {{ __("Se connecter") }}
             </button>
         </div>
+
+        <!-- Lien inscription -->
+        @if (Route::has('register'))
+            <div class="text-sm-regular text-center text-dark-gray">
+                {{ __("Pas encore membre ?") }}
+                <a href="{{ route('register') }}"
+                   class="text-sm-medium text-black custom-underline-link"
+                   title="Vers la page de connexion" wire:navigate>
+                    {{ __("Créer un compte") }}
+                </a>
+            </div>
+        @endif
     </form>
-</div>
+</x-auth-template>

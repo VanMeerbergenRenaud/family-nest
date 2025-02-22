@@ -19,12 +19,14 @@ $register = function () {
 
 ?>
 
-<div>
+<x-auth-template title="Inscription" description="Entrez vos informations pour vous créer un compte." showSocialLogin>
+
+    <!-- Formulaire d'inscription -->
     <form wire:submit="register">
         @csrf
 
-        <!-- Name -->
-        <div>
+        <div class="flex flex-col gap-4">
+            <!-- Name -->
             <x-form.field
                 label="Nom"
                 name="name"
@@ -34,10 +36,8 @@ $register = function () {
                 autofocus
                 required
             />
-        </div>
 
-        <!-- Email Address -->
-        <div>
+            <!-- Email -->
             <x-form.field
                 label="Adresse e-mail"
                 name="email"
@@ -47,10 +47,8 @@ $register = function () {
                 autocomplete="email"
                 required
             />
-        </div>
 
-        <!-- Password -->
-        <div>
+            <!-- Password -->
             <x-form.field-password
                 label="Mot de passe"
                 name="password"
@@ -58,27 +56,44 @@ $register = function () {
                 autocomplete="new-password"
                 required
             />
+
+            <!-- Confirm Password -->
+            {{--<div>
+                <x-form.field-password
+                    label="Confirmer le mot de passe"
+                    name="password_confirmation"
+                    model="form.password_confirmation"
+                    autocomplete="new-password"
+                    required
+                />
+            </div>--}}
         </div>
 
-        <!-- Confirm Password -->
-        <div>
-            <x-form.field-password
-                label="Confirmer le mot de passe"
-                name="password_confirmation"
-                model="form.password_confirmation"
-                autocomplete="new-password"
-                required
-            />
+        <div class="mt-6 md:px-2 flex items-center justify-between">
+            <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
+            @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" class="ml-3 text-sm-medium underline" title="Vers la page de réinitialisation de l'adresse mail" wire:navigate>
+                    {{ __('Adresse mail oubliée ?') }}
+                </a>
+            @endif
         </div>
 
-        <div>
-            <a href="{{ route('login') }}" class="simple-link" title="Vers la page de connexion" wire:navigate>
-                {{ __('Déjà inscrit ?') }}
-            </a>
-
-            <button type="submit">
-                {{ __('S’inscrire') }}
+        <div class="mt-8 mb-5">
+            <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium bg-[#292A2B] text-white hover:bg-black">
+                {{ __('S\'inscrire') }}
             </button>
         </div>
+
+        <!-- Lien connexion -->
+        @if (Route::has('login'))
+            <div class="text-sm-regular text-center text-dark-gray">
+                {{ __('Déjà un compte ?') }}
+                <a href="{{ route('login') }}"
+                   class="text-sm-medium text-black custom-underline-link"
+                   title="Vers la page de connexion" wire:navigate>
+                    {{ __('Se connecter') }}
+                </a>
+            </div>
+        @endif
     </form>
-</div>
+</x-auth-template>

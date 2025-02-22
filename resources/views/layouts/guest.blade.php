@@ -12,18 +12,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="mx-auto p-0 min-h-screen max-w-[160rem] text-base font-normal text-black bg-gray-50 scroll-smooth antialiased">
-        <header>
-            <a href="{{ route('welcome') }}" title="Retour à l'accueil" wire:navigate>
-                <x-app-logo />
-            </a>
-        </header>
-
         <main class="min-h-[100vh]">
             {{ $slot }}
         </main>
-
-        <footer class="w-full bg-gray-100 p-4 text-center">
-            Footer
-        </footer>
     </body>
 </html>

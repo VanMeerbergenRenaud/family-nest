@@ -62,12 +62,15 @@ $resetPassword = function () {
 
 ?>
 
-<div>
+<x-auth-template title="Réinitialisation du mot de passe">
+
+    <!-- Formulaire de réinitialisation -->
     <form wire:submit="resetPassword">
         @csrf
 
-        <!-- Email Address -->
-        <div>
+        <div class="flex flex-col gap-4">
+
+            <!-- Adresse mail -->
             <x-form.field
                 label="Adresse e-mail"
                 name="email"
@@ -78,10 +81,8 @@ $resetPassword = function () {
                 autofocus
                 required
             />
-        </div>
 
-        <!-- Password -->
-        <div>
+            <!-- Mot de passe -->
             <x-form.field-password
                 label="Mot de passe"
                 name="password"
@@ -89,10 +90,8 @@ $resetPassword = function () {
                 autocomplete="new-password"
                 required
             />
-        </div>
 
-        <!-- Confirm Password -->
-        <div>
+            <!-- Confirmation du mot de passe -->
             <x-form.field-password
                 label="Confirmer le mot de passe"
                 name="password_confirmation"
@@ -102,10 +101,8 @@ $resetPassword = function () {
             />
         </div>
 
-        <div>
-            <button type="submit">
-                {{ __('Réinitialiser le mot de passe') }}
-            </button>
-        </div>
+        <button type="submit" class="mt-8 px-4 py-2.5 rounded-md text-sm-medium bg-[#364153] text-gray-100">
+            {{ __('Réinitialiser le mot de passe') }}
+        </button>
     </form>
-</div>
+</x-auth-template>

@@ -32,29 +32,32 @@ $confirmPassword = function () {
 
 ?>
 
-<div>
-    <p>
-        {{ __('Il s’agit d’une zone sécurisée de l’application. Veuillez confirmer votre mot de passe avant de continuer.') }}
-    </p>
+<x-auth-template title="Mot de passe oublié">
+    <div class="text-md-regular text-gray-700 px-4 mt-[-1rem]">
 
-    <form wire:submit="confirmPassword">
-        @csrf
+        <!-- Description -->
+        <p>
+            {{ __('Il s’agit d’une zone sécurisée de l’application. Veuillez confirmer votre mot de passe avant de continuer.') }}
+        </p>
 
-        <!-- Password -->
-        <div>
-            <x-form.field-password
-                label="Mot de passe"
-                name="password"
-                model="password"
-                autocomplete="current-password"
-                required
-            />
-        </div>
+        <!-- Formulaire de confirmation -->
+        <form wire:submit="confirmPassword" class="mt-4">
+            @csrf
 
-        <div>
-            <button type="submit">
+            <div class="flex flex-col gap-4">
+                <!-- Mot de passe -->
+                <x-form.field-password
+                    label="Mot de passe"
+                    name="password"
+                    model="password"
+                    autocomplete="current-password"
+                    required
+                />
+            </div>
+
+            <button type="submit" class="mt-4 px-4 py-2.5 rounded-md text-sm-medium bg-[#364153] text-gray-100">
                 {{ __('Confirmer') }}
             </button>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
+</x-auth-template>
