@@ -11,4 +11,4 @@
 @endsection
 @section('code', '404')
 @section('description', __('Oups page non trouvée'))
-@section('message', __('FamilyNest peut aider pour beaucoup de choses, mais trouver cette page n’en fait pas partie.'))
+@section('message', __('FamilyNest peut aider pour beaucoup de choses, mais trouver cette page n’en fait pas partie. Nous nous excusons pour tout problème que cela pourrait causer.'))
