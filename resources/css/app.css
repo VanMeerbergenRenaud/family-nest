@@ -1,15 +1,338 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-img, video {
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    object-fit: cover;
+@source "../views";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-opensans: "Open Sans", sans-serif;
+    --font-satoshi: "Satoshi", "sans-serif";
+
+    --color-light-white: #fafafa;
+    --color-blue-dark: #364153;
+    --color-dark: #334054;
+
+    --color-border-gray: #dde2e9;
+    --color-border-link: #d0d5dd;
+    --color-border-focus: #33b0e0;
 }
 
-svg {
-    width: 1rem;
-    height: 1rem;
+@layer base {
+    body {
+        @apply mx-auto p-0 min-h-screen max-w-[160rem] text-base font-normal scroll-smooth text-black bg-white dark:text-white dark:bg-black;
+    }
+
+    main {
+        @apply m-0 p-0;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply text-lg font-semibold text-[min(2.5rem,3vw)];
+    }
+
+    p, span {
+        @apply text-base font-normal;
+    }
+
+    a, button {
+        @apply text-base font-normal leading-6 cursor-pointer;
+    }
+
+    img, video {
+        @apply w-full max-w-full h-auto object-cover;
+    }
+
+    svg {
+        @apply min-w-4 h-auto;
+    }
+
+    input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
+        @apply outline-0 focus:ring-2 focus:ring-blue-500;
+    }
+}
+
+@layer components {
+    .test {
+        @apply block bg-black text-white;
+
+        @variant dark {
+            @variant hover {
+                @apply bg-blue-500 text-black;
+            }
+        }
+    }
+
+    /* Bg login */
+
+
+    /* Effet de surlignement custom */
+    .custom-underline-link {
+        @apply relative transition-all ease-in-out rounded-md;
+
+        /* Styles 'before' (1ère partie du soulignement) */
+        @apply before:transition-[width]
+        before:ease-in-out
+        before:duration-400
+        before:absolute
+        before:bg-gray-600
+        before:origin-center
+        before:h-[0.1rem]
+        before:w-0
+        before:bottom-[-2px]
+        before:left-[50%]
+        before:rounded-r-lg;
+
+        /* Styles 'after' (2ème partie du soulignement) */
+        @apply after:rounded-l-lg
+        after:transition-[width]
+        after:ease-in-out
+        after:duration-400
+        after:absolute
+        after:bg-gray-600
+        after:origin-center
+        after:h-[0.1rem]
+        after:w-0
+        after:bottom-[-2px]
+        after:right-[50%];
+
+        /* Styles hover */
+        @apply hover:before:w-[50%] hover:after:w-[50%];
+    }
+
+    .display-2xl-regular {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-normal;
+        /* 72px / 90px / -2% / Regular */
+    }
+
+    .display-2xl-medium {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-medium;
+        /* 72px / 90px / -2% / Medium */
+    }
+
+    .display-2xl-semibold {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-semibold;
+        /* 72px / 90px / -2% / Semibold */
+    }
+
+    .display-2xl-bold {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-bold;
+        /* 72px / 90px / -2% / Bold */
+    }
+
+    .display-xl-regular {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-normal;
+        /* 60px / 72px / -2% / Regular */
+    }
+
+    .display-xl-medium {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-medium;
+        /* 60px / 72px / -2% / Medium */
+    }
+
+    .display-xl-semibold {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-semibold;
+        /* 60px / 72px / -2% / Semibold */
+    }
+
+    .display-xl-bold {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-bold;
+        /* 60px / 72px / -2% / Bold */
+    }
+
+    .display-lg-regular {
+        @apply text-5xl leading-[3.75rem] tracking-[-0.02em] font-normal;
+        /* 48px / 60px / -2% / Regular */
+    }
+
+    .display-lg-medium {
+        @apply text-5xl leading-[3.75rem] tracking-[-0.02em] font-medium;
+        /* 48px / 60px / -2% / Medium */
+    }
+
+    .display-lg-semibold {
+        @apply text-5xl leading-[3.75rem] tracking-[-0.02em] font-semibold;
+        /* 48px / 60px / -2% / Semibold */
+    }
+
+    .display-lg-bold {
+        @apply text-5xl leading-[3.75rem] tracking-[-0.02em] font-bold;
+        /* 48px / 60px / -2% / Bold */
+    }
+
+    .display-md-regular {
+        @apply text-4xl leading-[2.75rem] tracking-[-0.02em] font-normal;
+        /* 36px / 44px / -2% / Regular */
+    }
+
+    .display-md-medium {
+        @apply text-4xl leading-[2.75rem] tracking-[-0.02em] font-medium;
+        /* 36px / 44px / -2% / Medium */
+    }
+
+    .display-md-semibold {
+        @apply text-4xl leading-[2.75rem] tracking-[-0.02em] font-semibold;
+        /* 36px / 44px / -2% / Semibold */
+    }
+
+    .display-md-bold {
+        @apply text-4xl leading-[2.75rem] tracking-[-0.02em] font-bold;
+        /* 36px / 44px / -2% / Bold */
+    }
+
+    .display-sm-regular {
+        @apply text-3xl leading-[2.375rem] font-normal;
+        /* 30px / 38px / Regular */
+    }
+
+    .display-sm-medium {
+        @apply text-3xl leading-[2.375rem] font-medium;
+        /* 30px / 38px / Medium */
+    }
+
+    .display-sm-semibold {
+        @apply text-3xl leading-[2.375rem] font-semibold;
+        /* 30px / 38px / Semibold */
+    }
+
+    .display-sm-bold {
+        @apply text-3xl leading-[2.375rem] font-bold;
+        /* 30px / 38px / Bold */
+    }
+
+    .display-xs-regular {
+        @apply text-2xl leading-[2rem] font-normal;
+        /* 24px / 32px / Regular */
+    }
+
+    .display-xs-medium {
+        @apply text-2xl leading-[2rem] font-medium;
+        /* 24px / 32px / Medium */
+    }
+
+    .display-xs-semibold {
+        @apply text-2xl leading-[2rem] font-semibold;
+        /* 24px / 32px / Semibold */
+    }
+
+    .display-xs-bold {
+        @apply text-2xl leading-[2rem] font-bold;
+        /* 24px / 32px / Bold */
+    }
+
+    .text-xl-regular {
+        @apply text-xl leading-normal font-normal;
+        /* 20px / 30px / Regular */
+    }
+
+    .text-xl-medium {
+        @apply text-xl leading-normal font-medium;
+        /* 20px / 30px / Medium */
+    }
+
+    .text-xl-semibold {
+        @apply text-xl leading-normal font-semibold;
+        /* 20px / 30px / Semibold */
+    }
+
+    .text-xl-bold {
+        @apply text-xl leading-normal font-bold;
+        /* 20px / 30px / Bold */
+    }
+
+    .text-lg-regular {
+        @apply text-lg leading-relaxed font-normal;
+        /* 18px / 28px / Regular */
+    }
+
+    .text-lg-medium {
+        @apply text-lg leading-relaxed font-medium;
+        /* 18px / 28px / Medium */
+    }
+
+    .text-lg-semibold {
+        @apply text-lg leading-relaxed font-semibold;
+        /* 18px / 28px / Semibold */
+    }
+
+    .text-lg-bold {
+        @apply text-lg leading-relaxed font-bold;
+        /* 18px / 28px / Bold */
+    }
+
+    .text-md-regular {
+        @apply text-base leading-normal font-normal;
+        /* 16px / 24px / Regular */
+    }
+
+    .text-md-medium {
+        @apply text-base leading-normal font-medium;
+        /* 16px / 24px / Medium */
+    }
+
+    .text-md-semibold {
+        @apply text-base leading-normal font-semibold;
+        /* 16px / 24px / Semibold */
+    }
+
+    .text-md-bold {
+        @apply text-base leading-normal font-bold;
+        /* 16px / 24px / Bold */
+    }
+
+    .text-sm-regular {
+        @apply text-sm leading-snug font-normal;
+        /* 14px / 20px / Regular (text-sm est 0.875rem = 14px) */
+    }
+
+    .text-sm-medium {
+        @apply text-sm leading-snug font-medium;
+        /* 14px / 20px / Medium */
+    }
+
+    .text-sm-semibold {
+        @apply text-sm leading-snug font-semibold;
+        /* 14px / 20px / Semibold */
+    }
+
+    .text-sm-bold {
+        @apply text-sm leading-snug font-bold;
+        /* 14px / 20px / Bold */
+    }
+
+    .text-xs-regular {
+        @apply text-xs leading-normal font-normal;
+        /* 12px / 18px / Regular (text-xs est 0.75rem = 12px) */
+    }
+
+    .text-xs-medium {
+        @apply text-xs leading-normal font-medium;
+        /* 12px / 18px / Medium */
+    }
+
+    .text-xs-semibold {
+        @apply text-xs leading-normal font-semibold;
+        /* 12px / 18px / Semibold */
+    }
+
+    .text-xs-bold {
+        @apply text-xs leading-normal font-bold;
+        /* 12px / 18px / Bold */
+    }
+}
+
+@utility flex-center {
+    @apply flex justify-center items-center;
+}
+
+@utility scrollbar-hidden {
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Sidebar exception for small height devices */
+@media (min-height: 765px) {
+    .custom-mt-auto {
+        margin-top: auto;
+    }
 }

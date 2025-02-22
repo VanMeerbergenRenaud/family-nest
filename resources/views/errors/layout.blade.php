@@ -1,28 +1,42 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title')</title>
+    <title>@yield('title')</title>
 
-        <!-- Scripts -->
-        @livewireStyles
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
-    <body>
-        <div class="flex flex-col items-center justify-center min-h-screen py-16 bg-[#E8E8E8]">
-            @yield('icon')
+    <!-- Scripts -->
+    @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-200">
+<div class="flex-center flex-col min-h-screen px-8 py-16 bg-gray-200">
+    @yield('icon')
 
-            <h1 class="mt-8 text-[#CD475E] font-semibold text-8xl tracking-[-0.0625rem] leading-[150%]">
-                @yield('code')
-            </h1>
-            <p class="text-[#191E2C] max-w-[40rem] mb-6 font-medium text-3xl tracking-[-0.0625rem] leading-[100%]">
-                @yield('description')
-            </p>
-            <p class="text-[#666] max-w-[40rem] text-center text-base leading-[135%]">
-                @yield('message')
-            </p>
-        </div>
-    </body>
+    <h1 class="my-8 text-[#CD475E] font-semibold text-8xl tracking-[-0.0625rem]">
+        @yield('code')
+    </h1>
+
+    <p class="mb-8 max-w-[40rem] text-center display-md-medium tracking-[-0.0625rem] text-gray-900">
+        @yield('description')
+    </p>
+
+    <p class="max-w-[40rem] text-center text-md-regular text-gray-500">
+        @yield('message')
+    </p>
+
+    <div class="mt-12 flex-center flex-col gap-4 md:flex-row">
+        <a href="{{ url()->previous() }}"
+           class="flex-center py-3 px-8 gap-2 font-medium rounded-lg bg-gray-100 text-dark hover:bg-gray-50">
+            <x-svg.arrow-left/>
+            Retour en arrière
+        </a>
+        <a href="{{ route('dashboard') }}"
+           class="flex-center py-3 px-8 gap-2 font-medium rounded-lg bg-gray-800 text-white hover:bg-gray-900">
+            Aller à l'accueil
+        </a>
+    </div>
+</div>
+</body>
 </html>

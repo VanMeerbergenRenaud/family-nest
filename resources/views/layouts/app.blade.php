@@ -11,17 +11,13 @@
         @livewireStyles
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="mx-auto p-0 min-h-screen max-w-[160rem] text-base font-normal text-black bg-gray-50 scroll-smooth antialiased">
-        <header>
-            <livewire:navigation />
-        </header>
+    <body class="mx-auto relative h-screen bg-gray-50 dark:bg-gray-900 p-0 min-h-screen max-w-[160rem] text-base font-normal text-black dark:text-white scroll-smooth antialiased">
+            <x-sidebar-menu />
 
-        <main class="min-h-[100vh]">
-            {{ $slot }}
-        </main>
+            <x-theme-switcher class="absolute top-4 right-4" />
 
-        <footer class="w-full bg-gray-100 p-4 text-center">
-            Footer
-        </footer>
+            <main class="flex-1 p-4 lg:ml-64">
+                {{ $slot }}
+            </main>
     </body>
 </html>

@@ -21,8 +21,8 @@ class RegisterForm extends Form
     #[Validate('required|string|min:8|max:255')]
     public string $password = '';
 
-    #[Validate('required|string|min:8|max:255|same:password')]
-    public string $password_confirmation = '';
+    /*#[Validate('required|string|min:8|max:255|same:password')]
+    public string $password_confirmation = '';*/
 
     /**
      * Register a new user.

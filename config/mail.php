@@ -37,6 +37,16 @@ return [
 
     'mailers' => [
 
+        // mailpit
+        'mailpit' => [
+            'transport' => 'smtp',
+            'host' => env('MAILPIT_HOST', '127.0.0.1'),
+            'port' => env('MAILPIT_PORT', 1025),
+            'encryption' => null,
+            'username' => null,
+            'password' => null,
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
@@ -94,7 +104,6 @@ return [
                 'postmark',
             ],
         ],
-
     ],
 
     /*

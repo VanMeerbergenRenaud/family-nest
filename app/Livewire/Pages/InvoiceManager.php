@@ -146,7 +146,7 @@ class InvoiceManager extends Component
         dd($invoice->file_path);
     }
 
-    /*----------- CRUD -----------*/
+    /* ----------- CRUD ----------- */
 
     public function create(): RedirectResponse
     {

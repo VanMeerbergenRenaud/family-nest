@@ -6,8 +6,8 @@
     'placeholder' => '',
 ])
 
-<div class="m-0 p-0 max-w-[24.375rem]">
-    <label for="{{ $name }}" class="mb-2 pl-2 block text-base font-semibold text-gray-800">
+<div class="m-0 p-0 max-w-[30rem]">
+    <label for="{{ $name }}" class="mb-1.5 pl-1 block text-sm-medium text-gray-800">
         {{ ucfirst($label) }}
     </label>
 
@@ -17,14 +17,14 @@
         type="{{ $type }}"
         wire:model.blur="{{ $model }}"
         placeholder="{{ $placeholder }}"
-        class="m-0 px-3 py-2 block w-full text-[0.94rem] font-normal text-gray-600 border border-gray-300 rounded-md"
+        class="m-0 px-3.5 py-2.5 block w-full text-sm-regular text-gray-600 border border-gray-300 rounded-md"
         {{ $attributes }}
     >
 
     @error($model)
         <ul class="my-2 flex flex-col gap-3 font-medium text-red-500">
             @foreach ($errors->get($model) as $error)
-                <li class="pl-2 text-sm font-medium text-red-500 w-max">
+                <li class="pl-2 pr-1 text-sm-medium text-red-500">
                     {{ $error }}
                 </li>
             @endforeach

@@ -28,24 +28,33 @@ $logout = function (Logout $logout) {
 
 ?>
 
-<div>
-    <p>
-        {{ __('Merci de vous être inscrit ! Avant de commencer, pourriez-vous vérifier votre adresse e-mail en cliquant sur le lien que nous venons de vous envoyer par e-mail ? Si vous n’avez pas reçu l’e-mail, nous vous en enverrons un autre avec plaisir.') }}
-    </p>
+<x-auth-template title="Vérification">
+    <div class="text-md-regular text-gray-700 px-4 mt-[-1rem]">
 
-    @if (session('status') == 'verification-link-sent')
+        <!-- Description -->
         <p>
-            {{ __('Un nouveau lien de vérification a été envoyé à l’adresse e-mail que vous avez fournie lors de votre inscription.') }}
+            {{ __('Merci de vous être inscrit ! Avant de commencer, pourriez-vous vérifier votre adresse e-mail en cliquant sur le lien que nous venons de vous envoyer par e-mail ? Si vous n’avez pas reçu l’e-mail, nous vous en enverrons un autre avec plaisir.') }}
         </p>
-    @endif
 
-    <div>
-        <button type="button" wire:click="sendVerification">
-            {{ __('Renvoyer le lien de vérification') }}
-        </button>
+        <!-- Session status -->
+        @if (session('status') == 'verification-link-sent')
+            <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-4 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-center">
+                <x-svg.success class="h-4 w-4" />
+                {{ __('Un nouveau lien de vérification a été envoyé à l’adresse e-mail que vous avez fournie lors de votre inscription.') }}
+            </p>
+        @endif
 
-        <button type="button" wire:click="logout">
-            {{ __('Se déconnecter') }}
-        </button>
+        <!-- Liens de vérification ou de déconnexion -->
+        <div class="mt-3 flex flex-col gap-4">
+            <button type="button" wire:click="sendVerification" class="underline">
+                {{ __('Cliquez ici pour en renvoyer un nouveau.') }}
+            </button>
+
+            <button type="button" wire:click="logout">
+                {{ __('Ou') }}
+                <span class="underline">{{ __('cliquez ici pour vous déconnecter') }}</span>
+            </button>
+        </div>
     </div>
-</div>
+</x-auth-template>
+
