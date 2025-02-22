@@ -46,8 +46,18 @@
         @apply min-w-4 h-auto;
     }
 
-    input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
-        @apply outline-0 focus:ring-2 focus:ring-blue-500;
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+        @apply outline-2 outline-gray-800 dark:outline-gray-400 outline-offset-2 rounded-md;
+    }
+
+    button:disabled,
+    input:read-only,
+    textarea:read-only {
+        @apply opacity-50 cursor-not-allowed;
     }
 }
 
@@ -334,5 +344,11 @@
 @media (min-height: 765px) {
     .custom-mt-auto {
         margin-top: auto;
+    }
+}
+
+@media (inverted-colors) {
+    img, video {
+        filter: invert(100%);
     }
 }
