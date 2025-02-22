@@ -1,5 +1,5 @@
 <div>
     Hello
 
-    <livewire:navigation />
+    <livewire:navigation/>
 </div>

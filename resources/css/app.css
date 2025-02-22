@@ -27,7 +27,7 @@
     }
 
     h1, h2, h3, h4, h5, h6 {
-        @apply text-lg font-semibold text-[min(2.5rem,3vw)];
+
     }
 
     p, span {
@@ -72,8 +72,10 @@
         }
     }
 
-    /* Bg login */
-
+    /* Basic border */
+    .border-gray {
+        @apply border border-gray-300;
+    }
 
     /* Effet de surlignement custom */
     .custom-underline-link {

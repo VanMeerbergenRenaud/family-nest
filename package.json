@@ -7,6 +7,7 @@
         "typescript": "^5.0.0"
     },
     "dependencies": {
+        "@alpinejs/focus": "^3.14.8",
         "@alpinejs/ui": "^3.14.7",
         "@tailwindcss/vite": "^4.0.7"
     },
