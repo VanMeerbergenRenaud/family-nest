@@ -6,15 +6,15 @@
 ])
 
 <li>
-    <a href="{{ $href }}" class="relative flex items-center space-x-2 hover:bg-gray-100 rounded-lg p-2 group">
+    <a href="{{ $href }}" class="relative flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 group">
         {{-- Icon or img --}}
         <div class="flex-shrink-0">
             {{ $slot }}
         </div>
 
         {{-- Text and description --}}
-        <span class="text-sm font-medium text-gray-900 group-hover:text-gray-900">
-            {{ $text }} <span class="text-sm-regular text-gray-400">{{ $description }}</span>
+        <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">
+            {{ $text }} <span class="text-sm-regular text-gray-400 dark:text-gray-400">{{ $description }}</span>
         </span>
 
         {{-- Keyboard shortcut --}}
