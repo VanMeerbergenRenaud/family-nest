@@ -34,13 +34,13 @@
             <div class="flex flex-col gap-4 px-4 pt-5 pb-4 h-[calc(100%-4rem)] min-h-175">
 
                 <!-- Search bar => spotlight -->
-                <button type="button" class="cursor-pointer block relative w-full">
+                <button type="button" class="cursor-pointer block relative w-full" @click="document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <x-heroicon-o-magnifying-glass class="w-5 h-5 text-gray-400 dark:text-gray-500"/>
                     </span>
                     <span
                         class="p-2.5 pl-10 block w-full h-10 text-sm text-gray-500 rounded-lg bg-gray-50 border border-gray-300 placeholder-gray-400 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 text-left">Rechercher...</span>
-                    <span class="absolute inset-y-0 right-0 flex items-center pr-2">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 max-sm:hidden">
                         <span
                             class="bg-gray-100 text-gray-500 rounded-md px-2 py-1 text-xs font-medium dark:bg-gray-700 dark:text-gray-400">
                             ⌘K
@@ -141,12 +141,11 @@
 
                 <x-divider/>
 
-                <!-- Facture add button -->
-                <button type="button"
-                        class="w-full font-semibold rounded-lg text-sm p-2.5 text-center flex items-center justify-center gap-3 text-white bg-purple-500 hover:bg-purple-600 dark:bg-gray-600 dark:hover:bg-gray-700">
+                <!-- Facture link -->
+                <a href="{{ route('invoices.create') }}" class="w-full font-semibold rounded-lg text-sm p-2.5 text-center flex items-center justify-center gap-3 text-white bg-purple-500 hover:bg-purple-600 dark:bg-gray-600 dark:hover:bg-gray-700" wire:navigate>
                     <x-heroicon-o-plus-circle class="w-5 h-5"/>
-                    <span  class="text-sm">Ajouter une facture</span>
-                </button>
+                    <span  class="text-sm-medium">Ajouter une facture</span>
+                </a>
 
                 <!-- Other nav links -->
                 <ul class="font-medium custom-mt-auto">
@@ -282,7 +281,7 @@
             </div>
 
             <!-- Search bar => spotlight -->
-            <button type="button" class="my-1 cursor-pointer block relative">
+            <button type="button" class="my-1 cursor-pointer block relative" @click="document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <x-heroicon-o-magnifying-glass class="w-5 h-5 text-gray-400 dark:text-gray-500"/>
                 </span>
@@ -392,12 +391,11 @@
             {{-- Divider --}}
             <x-divider/>
 
-            <!-- Facture add button -->
-            <button type="button"
-                    class="w-full font-semibold rounded-lg text-sm p-2.5 text-center flex items-center justify-center gap-3 text-white bg-purple-500 hover:bg-purple-600 dark:bg-gray-600 dark:hover:bg-gray-700">
+            <!-- Facture link -->
+            <a href="{{ route('invoices.create') }}" class="w-full font-semibold rounded-lg text-sm p-2.5 text-center flex items-center justify-center gap-3 text-white bg-purple-500 hover:bg-purple-600 dark:bg-gray-600 dark:hover:bg-gray-700" wire:navigate>
                 <x-heroicon-o-plus-circle class="w-5 h-5"/>
-                <span x-show="sidebarOpen" class="text-sm">Ajouter une facture</span>
-            </button>
+                <span x-show="sidebarOpen" class="text-sm-medium">Ajouter une facture</span>
+            </a>
 
             <!-- Other nav links -->
             <ul class="font-medium mt-auto">

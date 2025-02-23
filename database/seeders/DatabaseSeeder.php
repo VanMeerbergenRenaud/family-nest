@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Renaud Vmb',
             'email' => 'renaud.vmb@gmail.com',
             'password' => bcrypt('password'),
+            'avatar' => asset('img/users/renaud_vmb.png'),
         ]);
 
         /* Teachers users */
@@ -24,35 +25,35 @@ class DatabaseSeeder extends Seeder
             'name' => 'Toon Van Den Bos',
             'email' => 'toon.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/toon_van_den_bos.jpeg'),
+            'avatar' => asset('img/users/teachers/toon_van_den_bos.jpeg'),
         ]);
 
         User::factory()->create([
             'name' => 'Dominique Vilain',
             'email' => 'dominique.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/dominique_vilain.jpeg'),
+            'avatar' => asset('img/users/teachers/dominique_vilain.jpeg'),
         ]);
 
         User::factory()->create([
             'name' => 'Myriam Dupont',
             'email' => 'myriam.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/myriam_dupont.jpeg'),
+            'avatar' => asset('img/users/teachers/myriam_dupont.jpeg'),
         ]);
 
         User::factory()->create([
             'name' => 'Daniel Schreurs',
             'email' => 'daniel.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/daniel_schreurs.jpeg'),
+            'avatar' => asset('img/users/teachers/daniel_schreurs.jpeg'),
         ]);
 
         User::factory()->create([
             'name' => 'François Parmentier',
             'email' => 'francois.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/francois_parmentier.jpeg'),
+            'avatar' => asset('img/users/teachers/francois_parmentier.jpeg'),
         ]);
 
         User::factory()->create([

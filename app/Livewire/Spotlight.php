@@ -2,58 +2,48 @@
 
 namespace App\Livewire;
 
+use App\Models\Invoice;
 use App\Models\User;
-use Illuminate\Support\Collection; // Assure-toi d'importer les modèles que tu veux rendre searchable
+use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class Spotlight extends Component
 {
     public bool $spotlightOpen = false;
 
-    public string $search = ''; // Ajoute la propriété $search pour la requête de recherche
+    public string $search = '';
 
-    public Collection $results; // Ajoute la propriété $results pour stocker les résultats de recherche
-
-    public array $suggestions = [ // Tes suggestions actuelles (laisse-les comme elles sont)
-        [
-            'label' => 'Tableau de bord',
-            'action' => '/dashboard', // Remplace par tes actions réelles
-            'shortcut' => 'D',
-        ],
-        [
-            'label' => 'Gérer les utilisateurs',
-            'action' => '/users', // Remplace par tes actions réelles
-            'shortcut' => 'U',
-        ],
-        // ... tes autres suggestions ...
-    ];
+    public Collection $results;
 
     public function mount(): void
     {
-        $this->results = collect(); // Initialise $results comme une collection vide au montage du composant
+        $this->results = collect();
     }
 
-    public function updatedSearch(string $value): void // Méthode Livewire pour la recherche en temps réel
+    public function updatedSearch(string $value): void
     {
-        if (strlen($value) < 2) { // Optionnel : Nombre minimum de caractères pour lancer la recherche
-            $this->results = collect(); // Vide les résultats si la requête est trop courte
+        if (strlen($value) < 2) {
+            $this->results = collect();
 
             return;
         }
 
-        $this->results = collect(); // Réinitialise les résultats à chaque nouvelle recherche
+        // Reset results each time the search query is updated
+        $this->results = collect();
 
-        // Recherche dans différents modèles (adapte à tes modèles Searchable)
-        $userResults = User::search($value)->take(3)->get(); // Recherche les utilisateurs, limite à 3 résultats
+        // Search for users and invoices
+        $userResults = User::search($value)->take(3)->get();
+        $invoiceResults = Invoice::search($value)->take(3)->get();
 
-        // Fusionne les résultats dans la collection $results
-        $this->results = $this->results->concat($userResults);
+        // Concat results into a single collection
+        $this->results = $this->results->concat($userResults)->concat($invoiceResults);
 
-        // Optionnel : Grouper les résultats par type de modèle (pour l'affichage dans le Blade)
+        // Group results by model type
         $this->results = $this->results->groupBy(function ($item) {
             return match (true) {
                 $item instanceof User => 'Utilisateurs',
-                default => 'Autres résultats', // Catégorie par défaut si le modèle n'est pas reconnu
+                $item instanceof Invoice => 'Factures',
+                default => 'Autres résultats',
             };
         });
     }
@@ -62,7 +52,6 @@ class Spotlight extends Component
     {
         return view('livewire.spotlight', [
             'results' => $this->results, // Passe les résultats à la vue Blade
-            'suggestions' => $this->suggestions, // Passe aussi les suggestions (si tu les utilises toujours)
         ]);
     }
 }

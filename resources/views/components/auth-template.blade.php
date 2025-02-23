@@ -30,7 +30,7 @@
             </div>
         </div>
 
-        <div class="container rounded-2xl py-8 px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
+        <div class="container rounded-2xl py-8 px-5 md:px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
 
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)

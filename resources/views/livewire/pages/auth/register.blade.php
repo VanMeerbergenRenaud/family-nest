@@ -79,7 +79,7 @@ $register = function () {
         </div>
 
         <div class="mt-8 mb-5">
-            <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium bg-[#292A2B] text-white hover:bg-black">
+            <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium md:text-[15px] bg-[#292A2B] text-white hover:bg-black">
                 {{ __('S\'inscrire') }}
             </button>
         </div>
