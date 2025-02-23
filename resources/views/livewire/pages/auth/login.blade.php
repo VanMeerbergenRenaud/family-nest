@@ -45,6 +45,7 @@ $login = function () {
                 model="form.email"
                 placeholder="john.doe@gmail.com"
                 autocomplete="email"
+                autofocus
                 required
             />
 
