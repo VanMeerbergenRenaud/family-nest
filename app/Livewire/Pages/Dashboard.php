@@ -6,7 +6,14 @@ use Livewire\Component;
 
 class Dashboard extends Component
 {
-    public $showModal = false;
+    public $user;
+
+    public function mount()
+    {
+        $this->user = auth()->user();
+    }
+
+    /*public $showModal = false;
 
     public $isSidebarOpen = false;
 
@@ -18,10 +25,11 @@ class Dashboard extends Component
     public function openModal()
     {
         $this->showModal = true;
-    }
+    }*/
 
     public function render()
     {
-        return view('livewire.pages.dashboard')->layout('layouts.app');
+        return view('livewire.pages.dashboard')
+            ->layout('layouts.app');
     }
 }

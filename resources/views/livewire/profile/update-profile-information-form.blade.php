@@ -63,8 +63,7 @@ $sendVerification = function () {
         @csrf
 
         <div class="mb-8 flex flex-col gap-4">
-            <x-form.field label="Nom" name="last_name" model="last_name" placeholder="John Doe"/>
-            <x-form.field label="Prénom" name="first_name" model="first_name" placeholder="John"/>
+            <x-form.field label="Nom" name="name" model="name" placeholder="John Doe"/>
             <x-form.field label="Adresse email" name="email" model="email" type="email"
                           placeholder="renseignez votre adresse email"/>
         </div>

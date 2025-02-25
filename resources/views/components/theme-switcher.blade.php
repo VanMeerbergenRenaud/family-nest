@@ -18,16 +18,16 @@
     {{-- Button to toggle the theme --}}
     <button
         type="button"
+        {{ $attributes->merge(['class' => 'absolute right-3.5 top-18 lg:top-4 transition duration-300 ease-in-out bg-gray-300 rounded-full dark:bg-gray-700']) }}
         title="Changer le thème de la page"
         aria-label="Changer le thème de la page"
         @click="toggleTheme()"
         :aria-pressed="theme === 'dark'"
-        class="relative right-3.5 top-15 transition duration-300 ease-in-out bg-gray-300 rounded-full dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:focus:ring-gray-600"
     >
         {{-- Light mode --}}
         <span
             x-show="theme === 'light'"
-            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-gray-700 dark:text-white hover:bg-white/20 focus:outline-none focus:bg-white/20"
+            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-gray-700 dark:text-white hover:bg-white/20"
             data-hs-theme-click-value="dark"
         >
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -41,7 +41,7 @@
         {{-- Dark mode --}}
         <span
             x-show="theme === 'dark'"
-            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-white hover:bg-white/20 focus:outline-none focus:bg-white/20"
+            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-white hover:bg-white/20"
             data-hs-theme-click-value="light"
         >
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
