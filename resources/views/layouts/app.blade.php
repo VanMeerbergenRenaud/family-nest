@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'FamilyNest') }}</title>
-
-        <!-- Scripts -->
-        @livewireStyles
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @include('partials.head')
     </head>
-    <body class="mx-auto relative h-screen bg-gray-50 dark:bg-gray-900 p-0 min-h-screen max-w-[160rem] text-base font-normal text-black dark:text-white scroll-smooth antialiased">
-        <x-sidebar-menu />
+    <body
+        x-data="{ expanded: true }"
+        @sidebar-toggled.window="expanded = $event.detail.expanded"
+    >
+        <livewire:sidebar />
 
-        <livewire:spotlight />
+        {{-- MAIN --}}
+        <main class="flex-1 p-4 basic-transition"
+              :class="{'lg:ml-64': expanded, 'lg:ml-20': !expanded}"
+        >
+            <livewire:spotlight /> {{-- Spotlight search --}}
 
-        <x-theme-switcher class="absolute top-4 right-4" />
+            <livewire:breadcrumb /> {{-- Breadcrumb --}}
 
-        <main class="flex-1 p-4 lg:ml-64">
+            <x-theme-switcher /> {{-- Theme switcher --}}
+
             {{ $slot }}
         </main>
 
