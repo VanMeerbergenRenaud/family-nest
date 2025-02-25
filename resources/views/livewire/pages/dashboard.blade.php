@@ -1,5 +1,3 @@
 <div>
-    Hello
-
-    <livewire:navigation />
+    Salut {{ $user->name ?? 'inconnu' }} !
 </div>

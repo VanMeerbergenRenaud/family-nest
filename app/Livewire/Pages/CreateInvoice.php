@@ -142,6 +142,6 @@ class CreateInvoice extends Component
 
     public function render()
     {
-        return view('livewire.pages.create-invoice');
+        return view('livewire.pages.create-invoice')->layout('layouts.app');
     }
 }

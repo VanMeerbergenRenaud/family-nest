@@ -4,7 +4,15 @@
     'showSocialLogin' => false
 ])
 
-<div class="min-h-screen flex-center bg-gray-100">
+<div class="relative min-h-screen flex-center bg-gray-100">
+    {{-- Arrow go back --}}
+    <div class="absolute top-4 left-4">
+        <a href="{{ url()->previous() }}" title="Retour à l'accueil" wire:navigate class="flex-center p-2 pr-3 rounded-lg bg-[#292A2B] text-white hover:bg-black transition-colors duration-200">
+            <x-svg.arrow-direction direction="left" class="mt-0.5 w-5 h-5 text-white" />
+            <span class="ml-0.5 text-sm-medium">Retour</span>
+        </a>
+    </div>
+
     <div class="bg-white p-1.5 rounded-2xl shadow-md">
         <div class="relative flex-center flex-col rounded-xl w-full h-fit overflow-hidden bg-gradient-to-t from-[#FFFFFF] via-[#F7F9FF] via-35% to-[#EBF1FF]">
             {{-- Background en grille --}}
@@ -13,7 +21,7 @@
             </div>
 
             <!-- Logo -->
-            <div class="my-6 p-4 bg-[#ECF2FF] rounded-full z-2">
+            <div class="my-6 p-4 bg-blue-100 rounded-full z-2">
                 <a href="{{ route('welcome') }}" title="Retour à l'accueil" wire:navigate>
                     <x-app-logo class="w-8 h-8"/>
                 </a>
@@ -30,7 +38,7 @@
             </div>
         </div>
 
-        <div class="container rounded-2xl py-8 px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
+        <div class="container rounded-2xl py-8 px-5 md:px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
 
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
