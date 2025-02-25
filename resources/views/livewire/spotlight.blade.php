@@ -1,7 +1,7 @@
 <div>
     @if ($spotlightOpen)
         <div class="fixed z-50 inset-0 overflow-y-auto"
-             aria-labelledby="spotlight-modal"
+             aria-labelledby="Barre de recherche"
              role="dialog"
              aria-modal="true"
              @keydown.escape.window="$wire.set('spotlightOpen', false)"
@@ -9,16 +9,19 @@
              x-transition:enter-start="opacity-0"
              x-transition:enter-end="opacity-100"
         >
-            <div class="flex justify-center min-h-screen">
-                <div class="fixed inset-0 bg-gray-900 opacity-20 transition-opacity dark:bg-black dark:opacity-30"
-                     aria-hidden="true"></div>
-                <div class="absolute top-1/10 mx-2 md:top-[20vh] rounded-xl transform transition-all ">
+            <div class="flex justify-center min-h-screen" tabindex="-1">
+                {{-- Overlay --}}
+                <div aria-hidden="true"
+                     wire:click="$set('spotlightOpen', false)"
+                     class="fixed inset-0 bg-gray-900 opacity-20 transition-opacity dark:bg-black dark:opacity-30"
+                ></div>
 
-                    <div
-                        class="bg-gray-100 dark:bg-gray-900 rounded-xl w-screen md:max-w-[40rem] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
+                {{-- Content --}}
+                <div class="absolute top-18 md:top-[20vh] max-sm:w-[calc(100vw-2rem)] transform transition-all ">
+                    <div class="bg-gray-100 dark:bg-gray-900 rounded-lg md:rounded-xl md:max-w-[40rem] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
 
                         {{-- Search bar --}}
-                        <div class="relative w-full bg-white dark:bg-gray-800">
+                        <div class="relative bg-white dark:bg-gray-800">
                             <label for="search">
                                 <span class="sr-only">Barre de recherche</span>
                                 <div class="pointer-events-none absolute inset-y-0 left-0 flex-center pl-5">
@@ -31,7 +34,7 @@
                                    aria-label="Search"
                                    placeholder="Rechercher..."
                                    wire:model.live.debounce.300ms="search"
-                                   class="block w-full py-4 pl-12 pr-3 text-md-regular text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-600 dark:bg-gray-800 dark:border-gray-800"
+                                   class="block w-full py-3 pl-13 pr-3 text-md-regular text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-600 dark:bg-gray-800 dark:border-gray-800"
                             />
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 max-sm:hidden">
                                 <x-shortcut key="⌘ K" class="text-gray-500 dark:text-gray-400"/>
@@ -39,7 +42,7 @@
                         </div>
 
                         {{-- Scrollable div --}}
-                        <div class="overflow-y-scroll max-h-[25rem]">
+                        <div class="overflow-y-scroll max-h-[24.5rem]">
                             {{-- Test empty search --}}
                             @if(!empty($search))
                                 <x-divider class="sticky top-0 dark:bg-gray-700" />
@@ -97,7 +100,7 @@
                             @endif
                         </div>
 
-                        <x-divider class="dark:bg-gray-700"/>
+                        <x-divider />
 
                         {{-- Bottom navigation --}}
                         <div class="bg-white dark:bg-gray-800 pl-4.5 pr-3 py-1.5 min-w-[40rem] max-sm:hidden">
@@ -159,9 +162,11 @@
                         </div>
                     </div>
                 </div>
-                <button type="button" wire:click="$set('spotlightOpen', false)" class="absolute top-4 right-4 p-1.5 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
+
+                {{-- Close spotlight --}}
+                {{--<button type="button" wire:click="$set('spotlightOpen', false)" class="absolute top-4 right-4 p-1.5 rounded-md bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
                     <x-svg.cross class="h-4 w-4" />
-                </button>
+                </button>--}}
             </div>
         </div>
     @endif

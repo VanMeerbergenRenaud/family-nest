@@ -19,7 +19,7 @@
 
         {{-- Keyboard shortcut --}}
         @if($shortcut)
-            <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 max-lg:hidden">
                 <x-shortcut :key="$shortcut" />
             </div>
         @endif
