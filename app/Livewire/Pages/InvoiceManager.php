@@ -259,6 +259,6 @@ class InvoiceManager extends Component
     public function render()
     {
         return view('livewire.pages.invoice-manager')
-            ->layout('layouts.app');
+            ->layout('layouts.app-sidebar');
     }
 }

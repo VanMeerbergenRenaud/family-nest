@@ -3,21 +3,14 @@
     <head>
         @include('partials.head')
     </head>
-    <body
-        x-data="{ expanded: true }"
-        @sidebar-toggled.window="expanded = $event.detail.expanded"
-    >
-        <livewire:sidebar />
+    <body>
+        <header>
+            <livewire:breadcrumb /> {{-- Breadcrumb --}}
+        </header>
 
         {{-- MAIN --}}
-        <main class="flex-1 p-4 basic-transition"
-              :class="{'lg:ml-64': expanded, 'lg:ml-20': !expanded}"
-        >
+        <main class="p-4">
             <livewire:spotlight /> {{-- Spotlight search --}}
-
-            <livewire:breadcrumb /> {{-- Breadcrumb --}}
-
-            <x-theme-switcher /> {{-- Theme switcher --}}
 
             {{ $slot }}
         </main>

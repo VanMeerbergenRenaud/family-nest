@@ -66,7 +66,7 @@
 
     {{-- Desktop sidebar menu --}}
     <aside x-data="{sidebarWide: true}"
-           class="hidden lg:flex lg:flex-col lg:fixed w-64 h-full rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800 transition-all duration-400 z-50
+           class="hidden lg:flex lg:flex-col lg:fixed w-64 h-full rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800 basic-transition z-50
            {{ $expanded ? '' : 'lg:w-20' }}
     ">
         <div class="h-full px-4.5 pt-6 pb-4 flex flex-col justify-between gap-4 overflow-y-visible rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800">

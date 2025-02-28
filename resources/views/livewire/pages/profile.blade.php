@@ -3,7 +3,7 @@
 use function Livewire\Volt\layout;
 use Livewire\Volt\Component;
 
-layout('layouts.app');
+layout('layouts.app-sidebar');
 
 ?>
 

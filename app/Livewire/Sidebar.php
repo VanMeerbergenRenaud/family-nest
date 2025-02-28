@@ -18,7 +18,7 @@ class Sidebar extends Component
 
     public function toggleSidebar()
     {
-        $this->expanded = !$this->expanded;
+        $this->expanded = ! $this->expanded;
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
     }
 
