@@ -40,9 +40,9 @@ $updatePassword = function () {
 
 ?>
 
-<section class="p-6 bg-white rounded-lg max-w-[64rem]">
+<section class="p-6">
     <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-900" role="heading" aria-level="2">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-400" role="heading" aria-level="2">
             {{ __('Mettre à jour le mot de passe') }}
         </h2>
 
@@ -50,7 +50,7 @@ $updatePassword = function () {
             {{ __('Soyez sûr de choisir un mot de passe sécurisé.') }}
         </p>
 
-        <span class="block mt-4 text-sm text-indigo-950">
+        <span class="block mt-4 text-sm text-indigo-950 dark:text-pink-500">
             {{ __('Le mot de passe doit contenir au moins 8 caractères.') }}
         </span>
     </div>

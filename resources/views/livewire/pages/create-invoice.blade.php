@@ -1,5 +1,8 @@
 <div>
-    {{-- Formulaire pour créer une facture : multi step  --}}
+    {{-- Etape impérative 1 : Formualire d'importation de la facture --}}
+
+
+    {{-- Etape impérative 2 : Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
         currentStep: 1,
         steps: ['Informations', 'Montant', 'Dates', 'Engagements', 'Paiement', 'Notes', 'Résumé'],
@@ -12,19 +15,23 @@
         goToStep(step) {
             this.currentStep = step;
         }
-    }" class="p-4 m-8 max-w-[900px]">
+    }" class="mx-auto max-w-[70rem]">
 
-        <div class="flex justify-center mb-8 flex-wrap">
+        {{-- Barre de progression avec les étapes --}}
+        <div class="py-4 px-6 rounded-xl max-lg:bg-gray-100 dark:max-lg:bg-gray-800 flex flex-col items-start lg:flex-row lg:items-center max-lg:gap-3 mb-6 space-x-2 overflow-x-scroll scrollbar-hidden">
             <template x-for="(step, index) in steps" :key="index">
-                <div class="flex items-center cursor-pointer" @click="goToStep(index + 1)">
-                    <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-2"
-                         :class="{ 'bg-blue-500 text-white': currentStep === index + 1, 'bg-gray-200 text-gray-500': currentStep !== index + 1 }">
-                        <span x-text="index + 1"></span>
-                    </div>
-                    <span x-text="step" class="text-gray-600"
-                          :class="{ 'font-bold': currentStep === index + 1 }"></span>
-                    <span x-show="index < steps.length - 1" class="mx-4 text-gray-400">
-                        <x-svg.chevron-right class="w-[1.5rem]" />
+                <div class="flex-center cursor-pointer whitespace-nowrap" @click="goToStep(index + 1)">
+                    <span class="w-8 h-8 rounded-full flex-center mr-3"
+                         :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
+                        <span x-text="index + 1" class="text-sm"></span>
+                    </span>
+
+                    <span class="text-md-regular text-slate-700 dark:text-slate-200"
+                         :class="{ 'font-medium underline': currentStep === index + 1 }"
+                         x-text="step"></span>
+
+                    <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
+                        <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
                     </span>
                 </div>
             </template>
@@ -33,211 +40,106 @@
         <form wire:submit.prevent="submit">
             @csrf
 
-            {{-- Étape 1: Informations --}}
-            <div x-show="currentStep === 1">
-                <h2>Étape 1: Informations générales</h2>
-                <p>Choisissez le type de facture que vous venez d'importer.</p>
+            {{-- Facture preview--}}
+            <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-12">
 
-                <x-form.field label="Nom de la facture" name="nom_facture" model="nom_facture" required/>
-            </div>
-
-            {{-- Étape 2: Montant --}}
-            <div x-show="currentStep === 2">
-                <h2>Étape 2: Montant</h2>
-                <x-form.field label="Montant HT" name="montant_ht" model="montant_ht" required/>
-            </div>
-
-            {{-- Étape 3: Dates --}}
-            <div x-show="currentStep === 3">
-                <h2>Étape 3: Dates</h2>
-            </div>
-
-            {{-- Étape 4: Engagements --}}
-            <div x-show="currentStep === 4">
-                <h2>Étape 4: Engagements</h2>
-            </div>
-
-            {{-- Étape 5: Paiement --}}
-            <div x-show="currentStep === 5">
-                <h2>Étape 5: Paiement</h2>
-            </div>
-
-            {{-- Étape 6: Notes --}}
-            <div x-show="currentStep === 6">
-                <h2>Étape 6: Notes</h2>
-            </div>
-
-            {{-- Étape 7: Résumé --}}
-            <div x-show="currentStep === 7">
-                <h2>Étape 7: Résumé</h2>
-            </div>
-
-            {{-- Boutons de Navigation --}}
-            <div class="mt-6 flex justify-between">
-                <button type="button" x-show="currentStep > 1" @click="prevStep"
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                    Précédent
-                </button>
-                <button type="button" x-show="currentStep < steps.length" @click="nextStep"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Suivant
-                </button>
-                <button type="submit" x-show="currentStep === steps.length"
-                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Envoyer
-                </button>
-            </div>
-        </form>
-    </div>
-    {{-- Fin du formulaire pour créer une facture --}}
-
-    <div class="p-8 grid items-center justify-items-center">
-        <form wire:submit.prevent="createInvoice" class="grid gap-8">
-            @csrf
-
-            {{-- Étape 1 : Importer la facture --}}
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <div>
-                    <label for="uploadedFile">Importer une facture</label>
-                    <input type="file" wire:model="uploadedFile" id="uploadedFile">
-                    @error('uploadedFile')
-                    <span>{{ $message }}</span>
-                    @enderror
-
-                    {{-- Todo: Vérifier que ce n'est pas un pdf, fonctionne que pour les img --}}
-                    @if ($uploadedFile)
+                {{-- Image : colonne 1 --}}
+                <div class="max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw]">
+                    @if (!$uploadedFile)
+                        <x-form.field-upload label="Importer une facture" model="uploadedFile" name="uploadedFile" />
+                    @else
                         <img src="{{ $uploadedFile->temporaryUrl() }}"
-                             alt="Image temporaire de la preview de la facture"/>
+                             alt="Image temporaire de la preview de la facture"
+                             class="rounded-2xl h-full min-h-[30rem]"
+                        />
                     @endif
                 </div>
-            </div>
 
-            {{-- Étape 2 : Remplir les informations --}}
-            <div class="form__content">
-                <x-form.field label="Nom de la facture" name="name" model="name"/>
-                <x-form.field label="Fournisseur / Émetteur" name="issuer" model="issuer"/>
-                <x-form.field label="Type de facture" name="type" model="type"/>
-                <x-form.field label="Catégorie de la facture" name="category" model="category"/>
-                <x-form.field label="Site internet du fournisseur" name="website" type="url" model="website"/>
+                {{-- Steps : colonne 2 --}}
+                <div class="mt-6 lg:max-w-[60vw]">
 
-                <div>
-                    <label for="amount">Montant (€)</label>
-                    <input type="text" x-mask:dynamic="$money($input, '.', ' ')" wire:model="amount"
-                           id="amount">
-                    @error('amount') <span>{{ $message }}</span> @enderror
-                </div>
+                    {{-- Étape 1: Informations --}}
+                    <x-invoice-create-step
+                        step="1" title="Étape 1 : Informations générales"
+                        description="Choisissez le type de facture que vous venez d'importer."
+                    >
+                        <x-form.field label="Nom de la facture" name="nom_facture" model="nom_facture"/>
 
-                <div>
-                    <label>Montant variable</label>
-                    <div>
-                        <input type="radio" wire:model="is_variable" id="is_variable_yes" value="1">
-                        <label for="is_variable_yes">Oui</label>
-                    </div>
-                    <div>
-                        <input type="radio" wire:model="is_variable" id="is_variable_no" value="0">
-                        <label for="is_variable_no">Non</label>
-                    </div>
-                </div>
+                        <x-form.select label="Type" name="type_facture" model="type_facture">
+                            <option value="abonnement">Abonnement</option>
+                            <option value="achat_unique">Achat unique</option>
+                        </x-form.select>
 
-                <div>
-                    <label>Associé à un membre de la famille</label>
-                    <div>
-                        <input type="radio" wire:model="is_family_related" id="is_family_related_yes" value="1">
-                        <label for="is_family_related_yes">Oui</label>
-                    </div>
-                    <div>
-                        <input type="radio" wire:model="is_family_related" id="is_family_related_no" value="0">
-                        <label for="is_family_related_no">Non</label>
-                    </div>
-                </div>
+                        <x-form.select label="Catégorie" name="categorie_facture" model="categorie_facture">
+                            <option value="internet_telecom">Internet & télécommunication</option>
+                            <option value="energie">Énergie</option>
+                        </x-form.select>
 
-                <x-form.field
-                    label="Date d'émission"
-                    name="issued_date"
-                    type="date"
-                    model="issued_date"
-                    min="2020-01-01T00:00"
-                    placeholder="{{ now()->format('d-m-Y') }}"
-                />
+                        <x-form.field label="Fournisseur / émetteur de la facture" name="fournisseur_facture"
+                                      model="fournisseur_facture"/>
 
-                <x-form.field label="Rappels de paiement" name="payment_reminder" model="payment_reminder"/>
-                <x-form.field label="Fréquence de paiement" name="payment_frequency" model="payment_frequency"/>
+                        <x-form.field label="Site internet du fournisseur" name="site_fournisseur"
+                                      model="site_fournisseur"/>
+                    </x-invoice-create-step>
 
-                <div>
-                    <label for="status">Statut de la facture</label>
-                    <select wire:model="status" id="status">
-                        <option value="unpaid">Non-payée</option>
-                        <option value="paid">Payée</option>
-                        <option value="late">En retard</option>
-                        <option value="partially_paid">Partiellement payée</option>
-                    </select>
-                    @error('status') <span>{{ $message }}</span> @enderror
-                </div>
+                    {{-- Étape 2: Montant --}}
+                    <x-invoice-create-step
+                        step="2" title="Étape 2 : Montant"
+                        description="Indiquez le montant de la facture et les taxes associées."
+                    >
+                        <x-form.field label="Montant de la facture" name="montant_facture" model="montant_facture"/>
 
-                <div>
-                    <label for="payment_method">Méthode de paiement</label>
-                    <select wire:model.blur="payment_method" id="payment_method">
-                        <option value="cash">Cash</option>
-                        <option value="card">Bancontact</option>
-                        <option value="mastercard">Visa/Mastercard</option>
-                    </select>
-                    @error('payment_method') <span>{{ $message }}</span> @enderror
-                </div>
+                        <x-form.field label="Taxes" name="taxes_facture" model="taxes_facture"/>
+                    </x-invoice-create-step>
 
-                <div>
-                    <label for="priority">Priorité</label>
-                    <select wire:model="priority" id="priority">
-                        <option value="high">Élevée</option>
-                        <option value="medium">Moyenne</option>
-                        <option value="low">Basse</option>
-                    </select>
-                    @error('priority') <span>{{ $message }}</span> @enderror
-                </div>
-
-                <x-form.field-textarea label="Notes" name="notes" model="notes"
-                                       placeholder="Ajoutez des notes ici"/>
-
-                <div class="mb-4 flex flex-col gap-2">
-                    <label for="tagInput" class="block text-sm font-medium text-gray-700">Tags</label>
-                    <div class="mt-1 flex rounded-md">
-                        <input type="text" wire:model="tagInput" id="tagInput"
-                               class="border py-2 px-4 border-b-gray-200 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 focus:ring-indigo-500 focus:border-indigo-500"
-                               placeholder="Ajouter un tag">
-                        <button type="button" wire:click="addTag"
-                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-r-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Ajouter
-                        </button>
+                    {{-- Étape 3: Dates --}}
+                    <div x-show="currentStep === 3">
+                        <h2>Étape 3: Dates</h2>
                     </div>
 
-                    @error('tags') <span class="text-sm text-red-600">{{ $message }}</span> @enderror
-
-                    <div class="mt-2 flex flex-wrap gap-2">
-                        @foreach($tags as $index => $tag)
-                            <span
-                                class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
-                                    {{ $tag }}
-                                    <button type="button" wire:click="removeTag({{ $index }})"
-                                            class="ml-2 inline-flex items-center justify-center h-4 w-4 rounded-full bg-indigo-200 text-indigo-600 hover:bg-indigo-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        <span class="sr-only">Supprimer tag</span>
-                                        <x-svg.cross class="h-3 w-3"/>
-                                    </button>
-                                </span>
-                        @endforeach
+                    {{-- Étape 4: Engagements --}}
+                    <div x-show="currentStep === 4">
+                        <h2>Étape 4: Engagements</h2>
                     </div>
+
+                    {{-- Étape 5: Paiement --}}
+                    <div x-show="currentStep === 5">
+                        <h2>Étape 5: Paiement</h2>
+                    </div>
+
+                    {{-- Étape 6: Notes --}}
+                    <div x-show="currentStep === 6">
+                        <h2>Étape 6: Notes</h2>
+                    </div>
+
+                    {{-- Étape 7: Résumé --}}
+                    <div x-show="currentStep === 7">
+                        <h2>Étape 7: Résumé</h2>
+                    </div>
+
+                    {{-- Boutons de Navigation --}}
+                    <div class="mt-6 border-t-[0.1rem] border-dashed border-gray-200 dark:border-gray-700">
+                        <div class="mt-6 flex justify-between">
+                            <button type="button" x-show="currentStep > 1" @click="prevStep" class="mr-4 inline-flex items-center text-sm-medium rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mr-2 -ml-1 h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                                </svg>
+                                Précédent
+                            </button>
+                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="inline-flex items-center text-sm-medium rounded-lg border border-blue-900 bg-blue-900 px-4 py-2 text-white hover:bg-blue-800 dark:bg-blue-900 dark:border-blue-900 dark:hover:bg-blue-800">
+                                Suivant
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="ml-2 -mr-1 h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                                </svg>
+                            </button>
+                            <button type="submit" x-show="currentStep === steps.length" class="inline-flex items-center text-sm-medium rounded-lg bg-purple-500 px-4 py-2 text-white hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700">
+                                Valider
+                            </button>
+                        </div>
+                    </div>
+                    {{-- Fin colonne 2 --}}
                 </div>
             </div>
-
-            <x-modal.footer>
-                <x-modal.close>
-                    <button type="button" class="cancel">
-                        {{ __('Annuler') }}
-                    </button>
-                </x-modal.close>
-
-                <button type="submit" class="save">
-                    {{ __('Créer') }}
-                </button>
-            </x-modal.footer>
         </form>
     </div>
 </div>

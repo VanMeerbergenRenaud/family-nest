@@ -15,15 +15,17 @@
     --color-border-gray: #dde2e9;
     --color-border-link: #d0d5dd;
     --color-border-focus: #33b0e0;
+
+    --color-bg-dark: #1E2030;
 }
 
 @layer base {
     body {
-        @apply mx-auto p-0 relative flex flex-col h-screen min-h-screen max-w-[160rem] text-base font-normal scroll-smooth antialiased bg-gray-50 dark:bg-gray-900 text-black dark:text-white;
+        @apply mx-auto p-0 relative flex flex-col h-screen min-h-screen max-w-[160rem] text-base font-normal scroll-smooth antialiased bg-gray-50 dark:bg-bg-dark text-black dark:text-white;
     }
 
     main {
-        @apply m-0 p-0 bg-gray-50 dark:bg-gray-900;
+        @apply m-0 p-0 bg-gray-50 dark:bg-bg-dark;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -79,6 +81,16 @@
 
     .basic-transition {
         @apply transition-all duration-300 ease-in-out
+    }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .scrollbar-hidden {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
     }
 
     /* Effet de surlignement custom */

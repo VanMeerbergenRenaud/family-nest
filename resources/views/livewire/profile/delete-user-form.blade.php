@@ -26,9 +26,9 @@ $deleteUser = function (Logout $logout) {
 
 ?>
 
-<section class="p-6 bg-white rounded-lg">
+<section class="p-6">
     <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-900" role="heading" aria-level="2">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-400" role="heading" aria-level="2">
             {{ __('Supprimer le compte') }}
         </h2>
 
@@ -54,7 +54,7 @@ $deleteUser = function (Logout $logout) {
                         {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}
                     </h3>
 
-                    <p class="mb-2 text-sm text-gray-600">
+                    <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
                         {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente. Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
                     </p>
 

@@ -1,39 +1,24 @@
 @props([
     'sidebarWide' => null,
-    'menuVariable' => 'mobileMenuOpen',
+    'menuVariable' => 'desktopMenuOpen',
 ])
 
-<ul class="font-medium">
-    <li>
-        <x-sidebar-menu.link route="dashboard" name="Tableau de bord" menuVariable="{{ $menuVariable }}">
-            <x-heroicon-o-home class="text-gray-500 dark:text-gray-400"/>
-        </x-sidebar-menu.link>
-    </li>
+<ul>
+    <x-sidebar-menu.link href="{{ route('dashboard') }}" icon="home" label="Tableau de bord" :menu-variable="$menuVariable" />
 
     @if($sidebarWide === 'false')
-        <li>
-            <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-document class="text-gray-500 dark:text-gray-400"/>
-            </span>
-                <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Factures
-            </span>
-            </a>
-        </li>
+        <x-sidebar-menu.link href="{{ route('invoices') }}" icon="document" label="Factures" :menu-variable="$menuVariable" />
     @else
-        <li x-data="{ dropdownOpen: false }">
+        <li x-data="{ dropdownOpen: false }" class="rounded-lg overflow-visible basic-transition text-gray-700 bg-white dark:text-gray-400 dark:bg-gray-800">
             <button
                 type="button"
                 :aria-expanded="dropdownOpen"
                 @click="dropdownOpen = !dropdownOpen"
-                class="flex items-center w-full overflow-hidden transition-all px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group"
-            >
-                <span class="w-4.5 h-4.5 stroke-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                    <x-heroicon-o-document class="text-gray-500 dark:text-gray-400"/>
+                class="group flex items-center w-full px-3 py-2 h-10 rounded-lg text-gray-700 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                <span class="w-4.5 h-4.5 stroke-2 group-hover:text-gray-900 dark:group-hover:text-gray-100">
+                    <x-heroicon-o-document />
                 </span>
-                <span x-show="{{ $menuVariable }}"
-                      class="ml-2.5 text-gray-700 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
+                    <span x-show="{{ $menuVariable }}" class="ml-2.5 group-hover:text-gray-900 dark:group-hover:text-gray-100">
                     Factures
                 </span>
                 <svg x-show="{{ $menuVariable }}" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -46,7 +31,7 @@
 
             <div x-show="dropdownOpen"
                  x-collapse
-                 class="relative left-0 my-1 w-full"
+                 class="relative left-0 mt-1 mb-2 w-full"
                  style="display: none;"
                  x-transition:enter="transition-opacity duration-150"
                  x-transition:enter-start="opacity-0"
@@ -57,13 +42,13 @@
             >
                 <ul class="ml-5 flex translate-x-px flex-col gap-1 border-l border-gray-200 dark:border-gray-700 px-2.5 py-0.5 group-data-[collapsible=icon]:hidden">
                     <li>
-                        <a href="#" class="flex h-8 -translate-x-px items-center gap-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                        <a href="{{ route('invoices.create') }}" class="flex h-8 -translate-x-px items-center gap-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
                             <span>Payées</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex h-8 -translate-x-px items-center gap-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
-                            <span>Impayées</span>
+                        <a href="{{ route('invoices') }}" class="flex h-8 -translate-x-px items-center gap-2 px-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 text-gray-700 dark:text-gray-400 dark:hover:text-gray-300">
+                            <span>Toutes</span>
                         </a>
                     </li>
                     <li>
@@ -75,54 +60,10 @@
             </div>
         </li>
     @endif
-    <li>
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-swatch class="text-gray-500 dark:text-gray-400"/>
-            </span>
-                    <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Thèmes
-            </span>
-        </a>
-    </li>
-    <li>
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-calendar class="text-gray-500 dark:text-gray-400"/>
-            </span>
-            <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Calendrier
-            </span>
-        </a>
-    </li>
-    <li>
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-archive-box class="text-gray-500 dark:text-gray-400"/>
-            </span>
-            <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Archives
-            </span>
-        </a>
-    </li>
-    <li>
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-tag class="text-gray-500 dark:text-gray-400"/>
-            </span>
-            <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Objectifs
-            </span>
-        </a>
-    </li>
-    <li>
-        <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center px-3 py-2 h-10 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 group">
-            <span class="w-4.5 h-4.5 stroke-2 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
-                <x-heroicon-o-users class="text-gray-500 dark:text-gray-400"/>
-            </span>
-            <span x-show="{{ $menuVariable }}" class="ml-2.5 text-[#344054] dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white link-name">
-                Familles
-            </span>
-        </a>
-    </li>
+
+    <x-sidebar-menu.link href="{{ route('invoices') }}" icon="swatch" label="Thèmes" :menu-variable="$menuVariable" />
+    <x-sidebar-menu.link href="{{ route('invoices') }}" icon="calendar" label="Calendrier" :menu-variable="$menuVariable" />
+    <x-sidebar-menu.link href="{{ route('invoices') }}" icon="archive-box" label="Archives" :menu-variable="$menuVariable" />
+    <x-sidebar-menu.link href="{{ route('invoices') }}" icon="tag" label="Objectifs" :menu-variable="$menuVariable" />
+    <x-sidebar-menu.link href="{{ route('invoices') }}" icon="users" label="Familles" :menu-variable="$menuVariable" />
 </ul>
