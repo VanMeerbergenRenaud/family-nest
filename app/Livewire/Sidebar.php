@@ -14,12 +14,20 @@ class Sidebar extends Component
     public function mount()
     {
         $this->user = auth()->user();
+
+        $storedExpanded = $this->js('localStorage.getItem("sidebarExpanded")');
+
+        if ($storedExpanded) {
+            $this->expanded = $storedExpanded === 'true';
+        }
     }
 
     public function toggleSidebar()
     {
         $this->expanded = ! $this->expanded;
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
+        $expandedStringForJS = $this->expanded ? 'true' : 'false';
+        $this->js("localStorage.setItem('sidebarExpanded', '" . $expandedStringForJS . "')");
     }
 
     public function seeProfile()

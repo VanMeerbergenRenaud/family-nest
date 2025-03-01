@@ -8,7 +8,7 @@
     <div class="flex justify-end items-center max-w-[97vw]">
         <a href="{{ route('invoices.create') }}"
            class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-300 ease-in-out">
-            <x-svg.add2 class="w-4 h-4 mr-2"/>
+            <x-svg.add2 class="w-4 h-4 mr-2" />
             {{ __('Ajouter une facture') }}
         </a>
     </div>
@@ -123,7 +123,7 @@
 
                                 <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})"
                                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100 hover:text-red-600 transition-colors duration-200">
-                                    <x-svg.trash class="w-4 h-4 mr-2 inline-block text-red-500"/>
+                                    <x-svg.trash class="w-4 h-4 inline-block text-red-500"/>
                                     {{ __('Supprimer') }}
                                 </x-menu.item>
 
