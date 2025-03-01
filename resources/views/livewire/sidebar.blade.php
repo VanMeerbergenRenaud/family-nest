@@ -65,66 +65,63 @@
     </aside>
 
     {{-- Desktop sidebar menu --}}
-    <aside x-data="{sidebarWide: true}"
-           class="hidden lg:flex lg:flex-col lg:fixed w-64 h-full rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800 basic-transition z-50
-           {{ $expanded ? '' : 'lg:w-20' }}
-    ">
+    <aside
+        class="hidden lg:flex lg:flex-col lg:fixed h-full rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800 transition-all duration-300 z-50"
+        :class="{ 'lg:w-64': expanded, 'lg:w-20': !expanded }"
+    >
         <div class="h-full px-4.5 pt-6 pb-4 flex flex-col justify-between gap-4 overflow-y-visible rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800">
 
             <!-- Navigation header -->
             <div class="flex items-center justify-between pl-2">
                 <a href="{{ route('dashboard') }}" class="flex items-center" title="Retour à l'accueil" wire:navigate>
                     <x-app-logo class="w-6 h-6"/>
-                    <span x-show="sidebarWide" class="ml-4 text-xl font-bold text-gray-900 dark:text-white">FamilyNest</span>
+                    <span x-show="expanded" class="ml-4 text-xl font-bold text-gray-900 dark:text-white">FamilyNest</span>
                 </a>
                 <button type="button"
                         aria-label="Toggle Sidebar"
                         wire:click="toggleSidebar"
-                        @click="sidebarWide = !sidebarWide"
+                        class="p-2 rounded-lg text-gray-500 cursor-pointer"
+                        :class="{'hover:bg-gray-100 dark:hover:bg-gray-700': expanded}"
                 >
-                    <div x-show="sidebarWide" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:cursor-pointer">
-                        <svg width="20" height="16" class="w-5 h-5 transition-transform duration-300"
-                             viewBox="0 0 20 16"
-                             fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M16.593 8.00004H7.22583M7.22583 8.00004L11.9094 12.6667M7.22583 8.00004L11.9094 3.33337"
-                                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  class="stroke-gray-500 dark:stroke-gray-400"/>
-                            <rect x="0.869629" width="1.00362" height="16" fill="currentColor"
-                                  class="fill-gray-500 dark:fill-gray-400"/>
-                        </svg>
-                    </div>
-                    <div x-show="!sidebarWide" class="p-2 rounded-lg text-gray-500 hover:cursor-pointer">
-                        <svg width="20" height="16" class="ml-6 w-5 h-5 transition-transform duration-300"
-                             viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.34525 8.00004H15.7124M15.7124 8.00004L11.0288 12.6667M15.7124 8.00004L11.0288 3.33337"
-                                  stroke="#374054" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
-                                  class="stroke-gray-500 dark:stroke-gray-400"/>
-                            <rect width="1.00362" height="16" transform="matrix(-1 0 0 1 1.06885 0)"
-                                  class="fill-gray-500 dark:fill-gray-400"/>
-                        </svg>
-                    </div>
+                    <svg x-show="expanded" width="20" height="16" class="w-5 h-5 transition-transform duration-300"
+                         viewBox="0 0 20 16"
+                         fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.593 8.00004H7.22583M7.22583 8.00004L11.9094 12.6667M7.22583 8.00004L11.9094 3.33337"
+                              stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="stroke-gray-500 dark:stroke-gray-400"/>
+                        <rect x="0.869629" width="1.00362" height="16" fill="currentColor"
+                              class="fill-gray-500 dark:fill-gray-400"/>
+                    </svg>
+                    <svg x-show="!expanded" width="20" height="16" class="ml-6 w-5 h-5 transition-transform duration-300"
+                         viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.34525 8.00004H15.7124M15.7124 8.00004L11.0288 12.6667M15.7124 8.00004L11.0288 3.33337"
+                              stroke="#374054" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                              class="stroke-gray-500 dark:stroke-gray-400"/>
+                        <rect width="1.00362" height="16" transform="matrix(-1 0 0 1 1.06885 0)"
+                              class="fill-gray-500 dark:fill-gray-400"/>
+                    </svg>
                 </button>
             </div>
 
             <!-- Search bar => spotlight -->
-            <x-sidebar-menu.search sidebarWide="sidebarWide"/>
+            <x-sidebar-menu.search :expanded="$expanded"/>
 
             <!-- Principal links -->
-            <x-sidebar-menu.links sidebarWide="sidebarWide" menu-variable="sidebarWide"/>
+            <x-sidebar-menu.links :expanded="$expanded"/>
 
             <x-divider/>
 
             <!-- New invoice link -->
-            <x-sidebar-menu.add-invoice sidebarWide="sidebarWide"/>
+            <x-sidebar-menu.add-invoice :expanded="$expanded"/>
 
             <!-- Bottom links -->
-            <x-sidebar-menu.bottom-links sidebarWide="sidebarWide"/>
+            <x-sidebar-menu.bottom-links :expanded="$expanded"/>
 
             <x-divider/>
 
             <!-- User profile dropdown -->
-            <x-sidebar-menu.user-dropdown user="{{ $user }}"/>
+            <x-sidebar-menu.user-dropdown user="{{ $user }}" :expanded="$expanded"/>
         </div>
     </aside>
 </div>
