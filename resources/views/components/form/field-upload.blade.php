@@ -4,7 +4,7 @@
     'model',
 ])
 
-<div class="m-0 p-0 max-w-[30rem]">
+<div class="m-0 p-0 max-w-[45rem]">
     <label for="{{ $name }}" class="mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
     </label>
@@ -24,7 +24,7 @@
                 </span> ou glisser-déposer
             </div>
             <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">
-                SVG, PNG, JPG or GIF (max. 800x400px)
+                PDF, Word, JPEG, PNG (max. 800mb)
             </p>
         </div>
 

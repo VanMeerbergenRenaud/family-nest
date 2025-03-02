@@ -4,7 +4,7 @@
     'model',
 ])
 
-<div class="m-0 p-0 max-w-[30rem]">
+<div class="m-0 p-0 max-w-[45rem]">
     <label for="{{ $name }}" class="mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
     </label>
