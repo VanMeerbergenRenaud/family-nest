@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Enums\InvoiceTypeEnum;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Livewire\Attributes\Validate;
@@ -15,31 +16,33 @@ class CreateInvoice extends Component
     #[Validate]
     public $name;
 
-    public $issuer;
-
     public $type;
 
     public $category;
 
-    public $website;
+    public $issuer_name;
+
+    public $issuer_website;
 
     public $amount;
 
-    public $is_variable = false;
+    public $paid_by;
 
-    public $is_family_related = false;
+    public $associated_members;
 
     public $issued_date;
+
+    public $payment_due_date;
 
     public $payment_reminder;
 
     public $payment_frequency;
 
-    public $status = 'unpaid';
+    public $payment_status = 'unpaid';
 
-    public $payment_method;
+    public $payment_method = 'card';
 
-    public $priority = 'medium';
+    public $priority = 'none';
 
     public $notes;
 
@@ -49,47 +52,124 @@ class CreateInvoice extends Component
 
     public $uploadedFile;
 
+    public $amount_distribution = [];
+
+    public $engagement_id;
+
+    public $engagement_name;
+
+    public $family_members = [];
+
+    public $engagements = [];
+
+    public $availableCategories = [];
+
+    public $is_archived = false;
+
     protected $rules = [
-        'uploadedFile' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240', // 10MB max
+        // Étape d'importation
+        'uploadedFile' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
+        // Étape 1
         'name' => 'required|string|max:255',
-        'issuer' => 'required|string|max:255',
-        'type' => 'required|string|max:255',
+        'type' => 'nullable|string|max:255',
         'category' => 'nullable|string|max:255',
-        'website' => 'nullable|url|max:255',
+        'issuer_name' => 'nullable|string|max:255',
+        'issuer_website' => 'nullable|url|max:255',
+        // Étape 2
         'amount' => 'required|numeric|min:0',
-        'is_variable' => 'boolean',
-        'is_family_related' => 'boolean',
-        'issued_date' => 'required|date',
+        'paid_by' => 'nullable|string|max:255',
+        'associated_members' => 'nullable|string',
+        'amount_distribution' => 'nullable|array',
+        // Étape 3
+        'issued_date' => 'nullable|date',
+        'payment_due_date' => 'nullable|date',
         'payment_reminder' => 'nullable|string|max:255',
         'payment_frequency' => 'nullable|string|max:255',
-        'status' => 'nullable|in:unpaid,paid,late,partially_paid',
-        'payment_method' => 'nullable|in:cash,card,mastercard',
-        'priority' => 'nullable|in:high,medium,low',
+        // Étape 4
+        'engagement_id' => 'nullable|string|max:255',
+        'engagement_name' => 'nullable|string|max:255',
+        // Étape 5
+        'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid',
+        'payment_method' => 'nullable|in:card,cash,transfer',
+        'priority' => 'nullable|in:high,medium,low,none',
+        // Étape 6
         'notes' => 'nullable|string',
         'tags' => 'nullable|array',
         'tagInput' => 'nullable|string',
+        // Archives
+        'is_archived' => 'boolean',
     ];
 
     protected $messages = [
-        'name.required' => 'Le nom de la facture est obligatoire.',
-        'issuer.required' => 'Le nom du fournisseur est obligatoire.',
-        'type.required' => 'Le type de facture est obligatoire.',
-        'amount.required' => 'Le montant est obligatoire.',
-        'amount.numeric' => 'Le montant doit être un nombre.',
-        'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
-        'issued_date.required' => "La date d'émission est obligatoire.",
-        'issued_date.date' => "La date d'émission doit être une date valide.",
-        'status.required' => 'Le statut de la facture est obligatoire.',
-        'status.in' => 'Le statut de la facture doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
-        'priority.required' => 'La priorité est obligatoire.',
-        'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
-        'website.url' => "L'URL du site web du fournisseur n'est pas valide.",
         'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
         'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
         'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, PNG ou JPG.',
         'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
+        'uploadedFile.not_in' => 'Les fichiers CSV ne sont pas acceptés. Veuillez utiliser un format comme PDF, Word, JPEG, PNG ou JPG.',
+        'name.required' => 'Le nom de la facture est obligatoire.',
+        'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
+        'amount.required' => 'Le montant est obligatoire.',
+        'amount.numeric' => 'Le montant doit être un nombre.',
+        'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
+        'amount_distribution.array' => 'La distribution du montant doit être un tableau.',
+        'issued_date.date' => "La date d'émission doit être une date valide.",
+        'payment_due_date.date' => "La date d'échéance doit être une date valide.",
+        'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
+        'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
+        'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
+        'tags.array' => 'Les tags doivent être un tableau.',
     ];
 
+    public function mount()
+    {
+        // $this->engagements = Engagement::where('user_id', auth()->id())->get();
+        $this->engagements = [
+            ['id' => 'abc123', 'name' => 'Abonnement Internet Orange'],
+        ];
+
+        // Si un type est déjà sélectionné, mettre à jour les catégories disponibles
+        if ($this->type) {
+            $this->updateAvailableCategories();
+        }
+    }
+
+    /**
+     * Met à jour les catégories disponibles en fonction du type de facture sélectionné
+     */
+    public function updatedType()
+    {
+        $this->updateAvailableCategories();
+        $this->category = null; // Réinitialiser la catégorie lorsque le type change
+    }
+
+    /**
+     * Met à jour la liste des catégories disponibles en trouvant l'énumération correspondant à la valeur du type sélectionné
+     */
+    private function updateAvailableCategories()
+    {
+        foreach (InvoiceTypeEnum::cases() as $case) {
+            if ($case->value === $this->type) {
+                $this->availableCategories = $case->categories();
+
+                return;
+            }
+        }
+
+        $this->availableCategories = [];
+    }
+
+    /**
+     * Supprime le fichier uploadé
+     */
+    public function removeUploadedFile()
+    {
+        $this->uploadedFile = null;
+        $this->resetValidation('uploadedFile');
+    }
+
+    /**
+     * Permet d'ajouter un tag à la liste des tags
+     */
     public function addTag()
     {
         if (! empty($this->tagInput)) {
@@ -98,12 +178,18 @@ class CreateInvoice extends Component
         }
     }
 
+    /**
+     * Permet de supprimer un tag de la liste des tags
+     */
     public function removeTag($index)
     {
         unset($this->tags[$index]);
         $this->tags = array_values($this->tags); // Réindexer le tableau
     }
 
+    /**
+     * Crée une nouvelle facture
+     */
     public function createInvoice()
     {
         $this->validate();
@@ -113,23 +199,35 @@ class CreateInvoice extends Component
 
             auth()->user()->invoices()->create([
                 'user_id' => auth()->user()->id,
+                /* Étape d'importation */
                 'file_path' => $this->uploadedFile->store('invoices', 'public'),
+                /* Étape 1 */
                 'name' => $this->name,
-                'issuer' => $this->issuer,
                 'type' => $this->type,
                 'category' => $this->category,
-                'website' => $this->website,
-                'amount' => floatval(str_replace(' ', '', $this->amount)), // Convertit en float pour la BDD
-                'is_variable' => $this->is_variable,
-                'is_family_related' => $this->is_family_related,
+                'issuer_name' => $this->issuer_name,
+                'issuer_website' => $this->issuer_website,
+                /* Étape 2 */
+                'amount' => floatval(str_replace(' ', '', $this->amount)),
+                'paid_by' => $this->paid_by,
+                'associated_members' => $this->associated_members,
+                /* Étape 3 */
                 'issued_date' => $this->issued_date,
+                'payment_due_date' => $this->payment_due_date,
                 'payment_reminder' => $this->payment_reminder,
                 'payment_frequency' => $this->payment_frequency,
-                'status' => $this->status,
+                /* Étape 4 */
+                'engagement_id' => $this->engagement_id,
+                'engagement_name' => $this->engagement_name,
+                /* Étape 5 */
+                'payment_status' => $this->payment_status,
                 'payment_method' => $this->payment_method,
                 'priority' => $this->priority,
+                /* Étape 6 */
                 'notes' => $this->notes,
                 'tags' => $this->tags,
+                /* Archives */
+                'is_archived' => $this->is_archived,
             ]);
 
             DB::commit();
@@ -142,6 +240,8 @@ class CreateInvoice extends Component
 
     public function render()
     {
-        return view('livewire.pages.create-invoice')->layout('layouts.app');
+        return view('livewire.pages.create-invoice', [
+            'invoiceTypes' => InvoiceTypeEnum::getTypesOptions(),
+        ])->layout('layouts.app');
     }
 }

@@ -14,17 +14,18 @@ class Invoice extends Model
     use HasFactory, Searchable;
 
     protected $fillable = [
-        'name', 'issuer', 'type', 'category', 'website', 'amount', 'is_variable',
-        'is_family_related', 'issued_date', 'payment_reminder', 'payment_frequency',
-        'status', 'payment_method', 'priority', 'notes', 'tags', 'file_path',
-        // Ajoutez les champs pour la répartition du montant et les engagements si nécessaire
+        'file_path', 'name', 'type', 'category', 'issuer_name', 'issuer_website',
+        'amount', 'paid_by', 'associated_members', 'issued_date', 'payment_due_date',
+        'payment_reminder', 'payment_frequency', 'engagement_id', 'engagement_name',
+        'payment_status', 'payment_method', 'priority', 'notes', 'tags', 'is_archived', 'user_id',
     ];
 
     protected $casts = [
-        'is_variable' => 'boolean',
-        'is_family_related' => 'boolean',
+        'amount' => 'decimal:2',
         'issued_date' => 'date',
-        'tags' => 'array', // Cast le champ JSON en tableau
+        'payment_due_date' => 'date',
+        'tags' => 'array',
+        'is_archived' => 'boolean',
     ];
 
     protected function filePath(): Attribute
