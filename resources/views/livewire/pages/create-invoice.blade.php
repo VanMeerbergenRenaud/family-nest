@@ -127,7 +127,7 @@
                         </x-form.select>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Répartition du
+                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">Répartition du
                                 montant en fonction des membres sélectionnés</label>
                             @if(!empty($amount_distribution))
                                 @foreach($amount_distribution as $member => $percentage)
@@ -163,7 +163,7 @@
                             <!-- Date d'émission -->
                             <div class="space-y-2">
                                 <label for="issued_date"
-                                       class="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                       class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                     Date d'émission
                                     <span class="text-rose-500">*</span>
                                 </label>
@@ -173,7 +173,7 @@
                                         type="date"
                                         id="issued_date"
                                         wire:model="issued_date"
-                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 dark:text-slate-200"
+                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
                                     >
                                 </div>
                             </div>
@@ -181,7 +181,7 @@
                             <!-- Date de paiement -->
                             <div class="space-y-2">
                                 <label for="payment_due_date"
-                                       class="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                       class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                     Date de paiement
                                     <span class="text-rose-500">*</span>
                                     <span class="ml-auto">
@@ -202,7 +202,7 @@
                                         type="date"
                                         id="payment_due_date"
                                         wire:model="payment_due_date"
-                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 dark:text-slate-200"
+                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
                                     >
                                 </div>
                             </div>
@@ -211,7 +211,7 @@
                         <!-- Rappel de paiement -->
                         <div class="space-y-2">
                             <label for="payment_reminder"
-                                   class="text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                                   class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
                                 Rappel de paiement
                             </label>
                             <div class="relative">
@@ -229,7 +229,7 @@
                                     id="payment_reminder"
                                     wire:model="payment_reminder"
                                     placeholder="15/12/2024 + 5 jours à l'avance"
-                                    class="w-full pl-10 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-700 dark:text-slate-200 placeholder-slate-400"
+                                    class="w-full pl-10 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 placeholder-slate-400"
                                 >
                             </div>
                         </div>
@@ -250,8 +250,8 @@
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
 
-                        <x-form.field name="engagement_name" model="engagement_name"
-                                      placeholder="Nom de l'engagement" label="Nom de l'engagement"/>
+                        <x-form.field name="engagement_name" model="engagement_name" placeholder="Nom de l'engagement"
+                                      label="Nom de l'engagement"/>
 
                         <div>
                             <button type="button"
@@ -303,11 +303,12 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags personnalisés</label>
+                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">Tags
+                                personnalisés</label>
                             <div class="flex flex-wrap gap-2 mb-2">
                                 @foreach($tags as $index => $tag)
                                     <div
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                         {{ $tag }}
                                         <button type="button" wire:click="removeTag({{ $index }})"
                                                 class="ml-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">
@@ -350,7 +351,7 @@
 
                                 <x-slot name="actions">
                                     <button type="button"
-                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                                             @click="goToStep(1)">
                                         Retourner au début du formulaire
                                     </button>
@@ -369,67 +370,50 @@
                             <dl>
                                 <div
                                     class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Nom de la facture
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">
+                                        Nom de la facture
                                     </dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         {{ $name ?: 'Non spécifié' }}
-                                        @error('name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Type et catégorie
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Type et catégorie
                                     </dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         {{ $type ?: 'Non spécifié' }} - {{ $category ?: 'Non spécifié' }}
-                                        @error('type')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('category')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Fournisseur</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Fournisseur</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         {{ $issuer_name ?: 'Non spécifié' }}
                                         @if($issuer_website)
                                             <a href="{{ $issuer_website }}" target="_blank"
                                                class="text-indigo-500 hover:text-indigo-700 ml-2">({{ $issuer_website }}
                                                 )</a>
                                         @endif
-                                        @error('issuer_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('issuer_website')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Montant</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Montant</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         {{ $amount ? number_format($amount, 2) . ' €' : 'Non spécifié' }}
-                                        @error('amount')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Répartition du
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Répartition du
                                         montant
                                     </dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         @if(!empty($amount_distribution) && $amount)
                                             <ul class="space-y-2">
                                                 @foreach($amount_distribution as $member => $percentage)
@@ -442,100 +426,66 @@
                                         @else
                                             Non spécifié
                                         @endif
-                                        @error('amount_distribution')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('paid_by')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('associated_members')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Dates</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Dates</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         <p>Date
                                             d'émission: {{ $issued_date ? \Carbon\Carbon::parse($issued_date)->format('d/m/Y') : 'Non spécifiée' }}</p>
                                         <p>Date de
                                             paiement: {{ $payment_due_date ? \Carbon\Carbon::parse($payment_due_date)->format('d/m/Y') : 'Non spécifiée' }}</p>
                                         <p>Rappel: {{ $payment_reminder ?: 'Non spécifié' }}</p>
                                         <p>Fréquence: {{ $payment_frequency ?: 'Non spécifiée' }}</p>
-                                        @error('issued_date')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('payment_due_date')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Engagement</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Engagement</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         <p>ID: {{ $engagement_id ?: 'Non spécifié' }}</p>
                                         <p>Nom: {{ $engagement_name ?: 'Non spécifié' }}</p>
-                                        @error('engagement_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('engagement_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
+                                    </dd>
+                                </div>
+
+                                <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">
+                                        Statut de paiement
+                                    </dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                          {{ $payment_status === 'paid' ? 'bg-green-100 text-green-800' :
+                                           ($payment_status === 'late' ? 'bg-red-100 text-red-800' :
+                                           ($payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')) }}">
+                                        {{ $payment_status === 'paid' ? 'Payée' :
+                                           ($payment_status === 'late' ? 'En retard' :
+                                           ($payment_status === 'partially_paid' ? 'Partiellement payée' : 'Non payée')) }}
+                                    </span>
+                                        <p class="mt-1">Méthode: {{ $payment_method ?
+                                        ($payment_method === 'card' ? 'Carte bancaire' :
+                                        ($payment_method === 'cash' ? 'Espèces' : 'Virement')) : 'Non spécifiée' }}</p>
+                                        <p>Priorité: {{ $priority ?
+                                        ($priority === 'high' ? 'Élevée' :
+                                        ($priority === 'medium' ? 'Moyenne' :
+                                        ($priority === 'low' ? 'Basse' : 'Aucune'))) : 'Non spécifiée' }}</p>
+                                        <p>Archivée: {{ $is_archived ? 'Oui' : 'Non' }}</p>
+                                    </dd>
+                                </div>
+
+                                <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Notes</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                        {{ $notes ?: 'Aucune note' }}
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Statut de
-                                        paiement
-                                    </dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                          {{ $payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                           ($payment_status === 'late' ? 'bg-red-100 text-red-800' :
-                           ($payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-gray-100 text-gray-800')) }}">
-                        {{ $payment_status === 'paid' ? 'Payée' :
-                           ($payment_status === 'late' ? 'En retard' :
-                           ($payment_status === 'partially_paid' ? 'Partiellement payée' : 'Non payée')) }}
-                    </span>
-                                        <p class="mt-1">Méthode: {{ $payment_method ?
-                        ($payment_method === 'card' ? 'Carte bancaire' :
-                        ($payment_method === 'cash' ? 'Espèces' : 'Virement')) : 'Non spécifiée' }}</p>
-                                        <p>Priorité: {{ $priority ?
-                        ($priority === 'high' ? 'Élevée' :
-                        ($priority === 'medium' ? 'Moyenne' :
-                        ($priority === 'low' ? 'Basse' : 'Aucune'))) : 'Non spécifiée' }}</p>
-                                        <p>Archivée: {{ $is_archived ? 'Oui' : 'Non' }}</p>
-                                        @error('payment_status')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('payment_method')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                        @error('priority')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </dd>
-                                </div>
-
-                                <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Notes</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $notes ?: 'Aucune note' }}
-                                        @error('notes')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </dd>
-                                </div>
-
-                                <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Tags</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Tags</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         <div class="flex flex-wrap gap-2">
                                             @forelse($tags as $tag)
                                                 <span
@@ -546,16 +496,13 @@
                                                 Aucun tag
                                             @endforelse
                                         </div>
-                                        @error('tags')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
 
                                 <div
                                     class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-300">Pièce jointe</dt>
-                                    <dd class="mt-1 text-sm text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Pièce jointe</dt>
+                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
                                         @if($uploadedFile)
                                             <div class="flex items-center">
                                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -579,9 +526,6 @@
                                                 Aucune facture importée
                                             </div>
                                         @endif
-                                        @error('uploadedFile')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
                                     </dd>
                                 </div>
                             </dl>
@@ -591,26 +535,16 @@
                     {{-- Boutons de Navigation --}}
                     <div class="my-6 border-t-[0.1rem] border-dashed border-gray-200 dark:border-gray-700">
                         <div class="mt-6 flex justify-between">
-                            <button type="button" x-show="currentStep > 1" @click="prevStep"
-                                    class="mr-4 inline-flex items-center text-sm-medium rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="mr-2 -ml-1 h-5 w-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
-                                </svg>
+                            <button type="button" x-show="currentStep > 1" @click="prevStep" class="button-secondary">
+                                <x-svg.arrows.left class="stroke-white"/>
                                 Précédent
                             </button>
                             <button type="button" x-show="currentStep < steps.length" @click="nextStep"
-                                    class="inline-flex items-center text-sm-medium rounded-lg border border-blue-900 bg-blue-900 px-4 py-2 text-white hover:bg-blue-800 dark:bg-blue-900 dark:border-blue-900 dark:hover:bg-blue-800">
+                                    class="button-primary">
                                 Suivant
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                     stroke-width="1.5" stroke="currentColor" class="ml-2 -mr-1 h-5 w-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                                </svg>
+                                <x-svg.arrows.right class="stroke-gray-700"/>
                             </button>
-                            <button type="submit" x-show="currentStep === steps.length"
-                                    class="inline-flex items-center text-sm-medium rounded-lg bg-purple-500 px-4 py-2 text-white hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-700">
+                            <button type="submit" x-show="currentStep === steps.length" class="button-tertiary">
                                 Valider
                             </button>
                         </div>

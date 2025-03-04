@@ -189,6 +189,136 @@ class InvoiceManager extends Component
         'activeFilter' => ['except' => ''],
     ];
 
+    /* Factures récentes */
+    public $recentInvoices = [];
+
+    // Ajouter ces propriétés à ta classe InvoiceManager
+    public bool $showFolderModal = false;
+    public string $currentFolder = '';
+    public string $folderTitle = '';
+    public $folderInvoices = [];
+
+// Ajouter ces méthodes à ta classe InvoiceManager
+    public function openFolder($folder, $title)
+    {
+        $this->currentFolder = $folder;
+        $this->folderTitle = $title;
+
+        // Récupération des factures selon le dossier sélectionné
+        switch ($folder) {
+            case 'favorites':
+                // Exemple: Factures marquées comme favorites (tu devras adapter selon ta structure de données)
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('is_favorite', true)
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'paid':
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('payment_status', 'paid')
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'unpaid':
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('payment_status', 'unpaid')
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'late':
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('payment_status', 'late')
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'last_week':
+                $lastWeek = now()->subWeek();
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('issued_date', '>=', $lastWeek)
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'high_amount':
+                // Par exemple, montant supérieur à 1000
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('amount', '>=', 1000)
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            case 'high_priority':
+                $this->folderInvoices = auth()->user()->invoices()
+                    ->where('priority', 'high')
+                    ->orderBy($this->sortField, $this->sortDirection)
+                    ->get();
+                break;
+
+            default:
+                $this->folderInvoices = collect();
+                break;
+        }
+
+        $this->showFolderModal = true;
+    }
+
+// Méthode pour obtenir les statistiques des dossiers
+    public function getFolderStats()
+    {
+        return [
+            'favorites' => [
+                'count' => auth()->user()->invoices()->where('is_favorite', true)->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('is_favorite', true)->sum('file_size')),
+            ],
+            'paid' => [
+                'count' => auth()->user()->invoices()->where('payment_status', 'paid')->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('payment_status', 'paid')->sum('file_size')),
+            ],
+            'unpaid' => [
+                'count' => auth()->user()->invoices()->where('payment_status', 'unpaid')->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('payment_status', 'unpaid')->sum('file_size')),
+            ],
+            'late' => [
+                'count' => auth()->user()->invoices()->where('payment_status', 'late')->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('payment_status', 'late')->sum('file_size')),
+            ],
+            'last_week' => [
+                'count' => auth()->user()->invoices()->where('issued_date', '>=', now()->subWeek())->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('issued_date', '>=', now()->subWeek())->sum('file_size')),
+            ],
+            'high_amount' => [
+                'count' => auth()->user()->invoices()->where('amount', '>=', 1000)->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('amount', '>=', 1000)->sum('file_size')),
+            ],
+            'high_priority' => [
+                'count' => auth()->user()->invoices()->where('priority', 'high')->count(),
+                'size' => $this->formatFileSize(auth()->user()->invoices()->where('priority', 'high')->sum('file_size')),
+            ],
+        ];
+    }
+    public function toggleFavorite($invoiceId)
+    {
+        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
+        $invoice->update(['is_favorite' => !$invoice->is_favorite]);
+    }
+    // Méthode utilitaire pour formater la taille des fichiers
+    private function formatFileSize($bytes)
+    {
+        if ($bytes === 0 || $bytes === null) {
+            return '0 KB';
+        }
+
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $i = floor(log($bytes, 1024));
+        $size = round($bytes / pow(1024, $i), 2);
+
+        return $size . ' ' . $units[$i];
+    }
+
     // Appliquer des filtres par défaut
     public function applyFilter($filter)
     {
@@ -376,8 +506,15 @@ class InvoiceManager extends Component
             )
             ->paginate(10);
 
+        $this->recentInvoices = auth()->user()->invoices()
+            ->orderBy('issued_date', 'desc')
+            ->limit(5)
+            ->get();
+
+        $folderStats = $this->getFolderStats();
+
         // Rendu de la vue
-        return view('livewire.pages.invoice-manager', compact('invoices'))
+        return view('livewire.pages.invoice-manager', compact('invoices', 'folderStats'))
             ->layout('layouts.app-sidebar');
     }
 }
