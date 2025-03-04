@@ -9,7 +9,7 @@
     >
         <livewire:sidebar />
 
-        <main class="flex-1 p-4"
+        <main class="flex-1 p-4 lg:px-6"
               :class="{'lg:ml-64': expanded, 'lg:ml-20': !expanded}"
         >
             <livewire:spotlight /> {{-- Spotlight search --}}

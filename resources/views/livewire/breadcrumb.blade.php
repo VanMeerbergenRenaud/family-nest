@@ -1,6 +1,6 @@
 <div>
-    <nav aria-label="breadcrumb" class="flex h-16 px-4 items-center">
-        <span>Breadcrumb</span>
+    <nav aria-label="breadcrumb" class="flex h-16 items-center">
+        <span class="sr-only">Breadcrumb</span>
     </nav>
 
     {{-- Theme switcher --}}

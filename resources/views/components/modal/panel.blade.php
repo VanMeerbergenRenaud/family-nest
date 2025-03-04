@@ -12,8 +12,8 @@
         <div x-dialog:panel x-transition.in x-transition.out.opacity class="mx-auto relative w-full max-w-[40rem] bg-white dark:bg-gray-800 rounded-xl shadow-[0_0_0.5rem_rgba(0,0,0,0.2)] dark:shadow-[0_0_0.5rem_rgba(255,255,255,0.1)] overflow-hidden">
 
             <!-- Panel close button -->
-            <div class="absolute top-0 right-0 p-4 z-30">
-                <button type="button" @click="open = false" class="p-3 text-[#46474C] dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center hover:text-blue-950 dark:hover:text-blue-500 hover:bg-[#ebebf1] dark:hover:bg-gray-600">
+            <div class="absolute top-0 right-0 p-3 z-30">
+                <button type="button" @click="open = false" class="p-2.5 rounded-full flex--center text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
                     <x-svg.cross/>
                 </button>
             </div>
