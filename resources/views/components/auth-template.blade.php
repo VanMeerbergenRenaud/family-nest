@@ -7,8 +7,12 @@
 <div class="relative min-h-screen flex-center bg-gray-100">
     {{-- Arrow go back --}}
     <div class="absolute top-4 left-4">
-        <a href="{{ url()->previous() }}" title="Retour à l'accueil" wire:navigate class="flex-center p-2 pr-3 rounded-lg bg-[#292A2B] text-white hover:bg-black transition-colors duration-200">
-            <x-svg.arrow-direction direction="left" class="mt-0.5 w-5 h-5 text-white" />
+        <a href="{{ route('welcome') }}"
+           title="Retour à l'accueil"
+           wire:navigate
+           class="flex-center p-2 pr-3 rounded-lg bg-gray-800 text-white text-sm-medium"
+        >
+            <x-svg.arrows.left class="w-4 h-4"/>
             <span class="ml-0.5 text-sm-medium">Retour</span>
         </a>
     </div>
@@ -43,12 +47,12 @@
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
                 <div class="space-y-3 md:space-y-0 md:flex md:space-x-4">
-                    <button class="w-full flex-center py-2.5 px-3 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
-                        <x-svg.google class="w-6 h-6 mr-3"/>
+                    <button class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                        <x-svg.google class="mr-2.5"/>
                         Continuer&nbsp;avec&nbsp;Google
                     </button>
-                    <button class="w-full flex-center py-3 px-3 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
-                        <x-svg.apple class="w-6 h-6 mr-3"/>
+                    <button class="w-full flex-center py-3 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                        <x-svg.apple class="mr-2.5"/>
                         Continuer&nbsp;avec&nbsp;Apple
                     </button>
                 </div>

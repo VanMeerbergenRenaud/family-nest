@@ -1,4 +1,4 @@
-<svg width="20" height="20" {{ $attributes }} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg {{ $attributes }}  width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
         d="M9.99999 12.5C11.3807 12.5 12.5 11.3807 12.5 9.99996C12.5 8.61925 11.3807 7.49996 9.99999 7.49996C8.61928 7.49996 7.49999 8.61925 7.49999 9.99996C7.49999 11.3807 8.61928 12.5 9.99999 12.5Z"
         stroke="#6B7281" stroke-width="1.5" stroke-linecap="round"

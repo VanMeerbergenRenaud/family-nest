@@ -22,10 +22,10 @@
                     <x-svg.show />
                 @endif
             </div>
-            <p class="ml-[-0.5rem] text-sm leading-5 font-medium text-gray-900">
+            <p class="ml-2 text-sm leading-5 font-medium text-gray-900">
                 {{ $title }}
             </p>
-            <div class="ml-[-0.5rem] text-gray-500 outline-none" @click="show = false">
+            <div class="ml-2 text-gray-500 outline-none" @click="show = false">
                 <button type="button" wire:click="{{ $method }}" class="p-2 hover:text-gray-600 focus:text-gray-600">
                     <x-svg.cross />
                 </button>
