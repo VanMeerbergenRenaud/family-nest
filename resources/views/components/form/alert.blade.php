@@ -44,19 +44,19 @@
 <div class="my-4 p-4 {{ $settings['bg'] }} border {{ $settings['border'] }} rounded-lg" {{ $attributes }}>
     <div class="flex">
         @if($icon)
-            <div class="flex-shrink-0 {{ $settings['icon'] }}">
+            <div class="flex-shrink-0">
                 @switch($type)
                     @case('success')
-                        <x-svg.success class="h-5 w-5"/>
+                        <x-svg.success class="h-5 w-5 {{ $settings['icon'] }}"/>
                         @break
                     @case('warning')
-                        <x-svg.warning class="h-5 w-5"/>
+                        <x-svg.warning class="h-5 w-5 {{ $settings['icon'] }}"/>
                         @break
                     @case('error')
-                        <x-svg.error class="h-5 w-5"/>
+                        <x-svg.error class="h-5 w-5 {{ $settings['icon'] }}"/>
                         @break
                     @default
-                        <x-svg.info class="h-5 w-5"/>
+                        <x-svg.info class="h-5 w-5 {{ $settings['icon'] }}"/>
                 @endswitch
             </div>
         @endif

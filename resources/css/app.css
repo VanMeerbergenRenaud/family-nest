@@ -48,7 +48,7 @@
     }
 
     svg {
-        @apply w-4 h-4 lg:w-auto lg:h-5 text-gray-600 dark:text-gray-400;
+        @apply w-4 h-4 text-gray-600 dark:text-gray-400;
     }
 
     a:focus-visible,
@@ -146,13 +146,13 @@
         @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-green-400 bg-green-400 hover:bg-green-500 transition-colors;
     }
 
+    .button-rounded {
+        @apply flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full text-gray-700 transition-colors;
+    }
+
     /* Basic border */
     .border-gray {
         @apply border-[#E2E2E2] dark:border-b-gray-500;
-    }
-
-    .basic-transition {
-        @apply transition-all duration-300 ease-in-out;
     }
 
     /* Hide scrollbar for Chrome, Safari and Opera */
