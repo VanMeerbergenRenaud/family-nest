@@ -16,7 +16,7 @@ class Invoice extends Model
         'file_path', 'file_size', 'name', 'type', 'category', 'issuer_name', 'issuer_website',
         'amount', 'paid_by', 'associated_members', 'issued_date', 'payment_due_date',
         'payment_reminder', 'payment_frequency', 'engagement_id', 'engagement_name',
-        'payment_status', 'payment_method', 'priority', 'notes', 'tags', 'is_archived', 'user_id',
+        'payment_status', 'payment_method', 'priority', 'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
     ];
 
     protected $casts = [

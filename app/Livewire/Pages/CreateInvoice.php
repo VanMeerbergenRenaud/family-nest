@@ -67,6 +67,8 @@ class CreateInvoice extends Component
 
     public $is_archived = false;
 
+    public $is_favorite = false;
+
     protected $rules = [
         // Étape d'importation
         'uploadedFile' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
@@ -99,6 +101,8 @@ class CreateInvoice extends Component
         'tagInput' => 'nullable|string',
         // Archives
         'is_archived' => 'boolean',
+        // Favoris
+        'is_favorite' => 'boolean',
     ];
 
     protected $messages = [
@@ -236,6 +240,8 @@ class CreateInvoice extends Component
                 'tags' => $this->tags,
                 /* Archives */
                 'is_archived' => $this->is_archived,
+                /* Favoris */
+                'is_favorite' => $this->is_favorite,
             ]);
 
             DB::commit();

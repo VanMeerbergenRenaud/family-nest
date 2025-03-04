@@ -82,6 +82,9 @@ class InvoiceFactory extends Factory
             /* Archives */
             'is_archived' => $this->faker->boolean(20), // 20% chance d'être archivé
 
+            /* Favorites */
+            'is_favorite' => $this->faker->boolean(6), // 10% chance d'être favori
+
             /* Foreign keys */
             'user_id' => $userId,
         ];

@@ -44,6 +44,8 @@ return new class extends Migration
             $table->json('tags')->nullable(); // JSON format for tags
             /* Archives */
             $table->boolean('is_archived')->default(false); // Facture archivée
+            /* Favorites */
+            $table->boolean('is_favorite')->default(false);
             // Foreign keys
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
