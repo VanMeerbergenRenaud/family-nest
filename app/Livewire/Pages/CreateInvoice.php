@@ -5,6 +5,7 @@ namespace App\Livewire\Pages;
 use App\Enums\InvoiceTypeEnum;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -197,10 +198,17 @@ class CreateInvoice extends Component
         try {
             DB::beginTransaction();
 
+            // Store the file and get its path
+            $filePath = $this->uploadedFile->store('invoices', 'public');
+
+            // Get the file size
+            $fileSize = Storage::disk('public')->size($filePath);
+
             auth()->user()->invoices()->create([
                 'user_id' => auth()->user()->id,
                 /* Étape d'importation */
-                'file_path' => $this->uploadedFile->store('invoices', 'public'),
+                'file_path' => $filePath,
+                'file_size' => $fileSize, // Store the file size
                 /* Étape 1 */
                 'name' => $this->name,
                 'type' => $this->type,

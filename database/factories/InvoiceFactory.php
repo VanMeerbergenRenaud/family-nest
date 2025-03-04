@@ -43,6 +43,7 @@ class InvoiceFactory extends Factory
         return [
             /* Étape upload */
             'file_path' => 'invoices/'.$this->faker->uuid().'.pdf',
+            'file_size' => $this->faker->numberBetween(10000, 5000000), // Random file size between 10KB and 5MB
 
             /* Étape 1 */
             'name' => $this->faker->words(3, true),
@@ -154,6 +155,18 @@ class InvoiceFactory extends Factory
         return $this->state(function (array $attributes) use ($category) {
             return [
                 'category' => $category,
+            ];
+        });
+    }
+
+    /**
+     * Set a specific file size.
+     */
+    public function withFileSize(int $size): self
+    {
+        return $this->state(function (array $attributes) use ($size) {
+            return [
+                'file_size' => $size,
             ];
         });
     }

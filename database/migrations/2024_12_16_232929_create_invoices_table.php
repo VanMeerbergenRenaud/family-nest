@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             /* Step upload */
             $table->string('file_path');
+            $table->unsignedBigInteger('file_size')->nullable(); // New column for file size in bytes
             /* Step 1 */
             $table->string('name');
             $table->string('type')->nullable(); // Type de facture (abonnement, loyer, etc.)

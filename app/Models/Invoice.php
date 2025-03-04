@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
 class Invoice extends Model
@@ -14,7 +13,7 @@ class Invoice extends Model
     use HasFactory, Searchable;
 
     protected $fillable = [
-        'file_path', 'name', 'type', 'category', 'issuer_name', 'issuer_website',
+        'file_path', 'file_size', 'name', 'type', 'category', 'issuer_name', 'issuer_website',
         'amount', 'paid_by', 'associated_members', 'issued_date', 'payment_due_date',
         'payment_reminder', 'payment_frequency', 'engagement_id', 'engagement_name',
         'payment_status', 'payment_method', 'priority', 'notes', 'tags', 'is_archived', 'user_id',
@@ -26,6 +25,7 @@ class Invoice extends Model
         'payment_due_date' => 'date',
         'tags' => 'array',
         'is_archived' => 'boolean',
+        'file_size' => 'integer',
     ];
 
     protected function filePath(): Attribute
@@ -35,13 +35,23 @@ class Invoice extends Model
         );
     }
 
+    /**
+     * Get formatted file size
+     */
+    public function getFormattedFileSizeAttribute()
+    {
+        if (! $this->file_size) {
+            return '0 B';
+        }
+
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power = $this->file_size > 0 ? floor(log($this->file_size, 1024)) : 0;
+
+        return number_format($this->file_size / pow(1024, $power), 2).' '.$units[$power];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function files(): hasOne
-    {
-        return $this->hasOne(InvoiceFile::class);
     }
 }

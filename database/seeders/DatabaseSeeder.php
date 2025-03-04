@@ -64,7 +64,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /* Invoices */
-        Invoice::factory(12)->create([
+        Invoice::factory(20)->create([
             'user_id' => 1,
         ]);
     }
