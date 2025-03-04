@@ -2,22 +2,24 @@
 
 namespace App\Livewire\Pages;
 
-use App\Enums\InvoiceTypeEnum;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Livewire\WithPagination;
 
 class InvoiceManager extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     #[Validate]
     public $name;
 
     public $file_path;
+
+    public $file_size;
 
     public $type;
 
@@ -69,9 +71,6 @@ class InvoiceManager extends Component
 
     public $availableCategories = [];
 
-    // others
-    public $invoices;
-
     public $invoiceId;
 
     public bool $showEditFormModal = false;
@@ -89,10 +88,14 @@ class InvoiceManager extends Component
 
     public bool $deleteWithSuccess = false;
 
+    public bool $downloadNotWorking = false;
+
+    /* Formulaires */
     protected $rules = [
         // Étape d'importation
         'uploadedFile' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
         'file_path' => 'required|string|max:255',
+        'file_size' => 'nullable|integer',
         // Étape 1
         'name' => 'required|string|max:255',
         'type' => 'nullable|string|max:255',
@@ -144,32 +147,166 @@ class InvoiceManager extends Component
         'tags.array' => 'Les tags doivent être un tableau.',
     ];
 
-    public function mount()
+    /* Filtres et colonnes */
+    public $sortField = 'issued_date';
+
+    public $sortDirection = 'desc';
+
+    public $activeFilter = null;
+
+    public array $visibleColumns = [
+        'name' => true,
+        'file_size' => true,
+        'issued_date' => true,
+        'tags' => true,
+        'payment_status' => false,
+        'payment_due_date' => false,
+        'amount' => false,
+        'issuer_name' => false,
+        'type' => false,
+        'category' => false,
+    ];
+
+    public $availableFilters = [
+        'name_asc' => 'Par ordre alphabétique (A-Z)',
+        'name_desc' => 'Par ordre alphabétique (Z-A)',
+        'issued_date_asc' => 'Date d\'ajout (plus ancien)',
+        'issued_date_desc' => 'Date d\'ajout (plus récent)',
+        'payment_due_date_asc' => 'Date de paiement (plus ancien)',
+        'payment_due_date_desc' => 'Date de paiement (plus récent)',
+        'amount_asc' => 'Montant (du moins cher au plus cher)',
+        'amount_desc' => 'Montant (du plus cher au moins cher)',
+        'file_size_asc' => 'Taille du fichier (du petit au grand)',
+        'file_size_desc' => 'Taille du fichier (du grand au petit)',
+        'payment_status_paid' => 'Status: Payé',
+        'payment_status_unpaid' => 'Status: Impayé',
+    ];
+
+    // Définir les paramètres qui doivent être préservés pendant la pagination
+    protected $queryString = [
+        'sortField' => ['except' => 'issued_date'],
+        'sortDirection' => ['except' => 'desc'],
+        'activeFilter' => ['except' => ''],
+    ];
+
+    // Appliquer des filtres par défaut
+    public function applyFilter($filter)
     {
-        $this->amount = '0.00';
-        $this->loadInvoices();
+        // Si le filtre est déjà actif, on le désactive
+        if ($this->activeFilter === $filter) {
+            $this->activeFilter = null;
+            $this->resetSort();
+
+            return;
+        }
+
+        $this->activeFilter = $filter;
+
+        // Parser le filtre pour définir le champ et la direction
+        if (in_array($filter, ['payment_status_paid', 'payment_status_unpaid'])) {
+            $this->sortField = 'payment_status'; // Filtres spécifiques
+            $this->sortDirection = 'asc';
+        } else {
+            $parts = explode('_', $filter);
+            $direction = array_pop($parts);
+            $field = implode('_', $parts);
+
+            $this->sortField = $field;
+            $this->sortDirection = $direction;
+        }
+
+        $this->resetPage(); // Réinitialiser la pagination lors de l'application d'un filtre
     }
 
-    public function loadInvoices()
+    // Réinitialiser le tri et les filtres
+    public function resetSort()
     {
-        $this->invoices = auth()->user()->invoices()->get();
+        $this->sortField = 'issued_date';
+        $this->sortDirection = 'desc';
+        $this->activeFilter = null;
+        $this->resetPage();
     }
 
-    public function addTag()
+    // Toggle la visibilité des colonnes
+    public function toggleColumn($column)
     {
-        if (! empty($this->tagInput)) {
-            $this->tags[] = $this->tagInput;
-            $this->tagInput = '';
+        if (isset($this->visibleColumns[$column])) {
+            $this->visibleColumns[$column] = ! $this->visibleColumns[$column];
         }
     }
 
-    public function removeTag($index)
+    // Check si la colonne est visible
+    public function isColumnVisible($column)
     {
-        unset($this->tags[$index]);
-        $this->tags = array_values($this->tags); // Réindexer le tableau
+        return isset($this->visibleColumns[$column]) && $this->visibleColumns[$column];
     }
 
-    // Show the invoice in a modal
+    // Réinitialiser les colonnes aux valeurs par défaut
+    public function resetColumns()
+    {
+        $this->visibleColumns = [
+            'name' => true,
+            'file_size' => true,
+            'issued_date' => true,
+            'tags' => true,
+            'payment_status' => false,
+            'payment_due_date' => false,
+            'amount' => false,
+            'issuer_name' => false,
+            'type' => false,
+            'category' => false,
+        ];
+
+        $this->js('window.location.reload()'); // thanks caleb
+    }
+
+    // Méthode pour définir la colonne de tri et la direction
+    public function sortBy($field)
+    {
+        $this->activeFilter = null; // Reset les filtres actifs lors du tri
+
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+
+        $this->resetPage(); // Réinitialiser la pagination lors du tri
+    }
+
+    // TODO : Télécharger tout les fichiers dans un ordre spécifique
+    public function downloadAllFiles()
+    {
+        dd('Download en cours');
+    }
+
+    // Télécharger la facture
+    public function downloadInvoice($invoiceId)
+    {
+        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
+
+        // Extraire le chemin du fichier sans le préfixe "storage"
+        $filePath = str_replace(asset('storage/'), '', $invoice->file_path);
+
+        // Vérifier si le fichier existe
+        if (! Storage::disk('public')->exists($filePath)) {
+            $this->downloadNotWorking = true;
+
+            return null;
+        }
+
+        // Obtenir le nom du fichier original
+        $fileName = basename($filePath);
+
+        // Générer un nom de fichier plus stylé
+        $downloadName = Str::slug($invoice->name).'_'.$invoice->id.'.'.pathinfo($fileName, PATHINFO_EXTENSION);
+
+        // Télécharger le fichier
+        return Storage::disk('public')->download($filePath, $downloadName);
+    }
+
+    // Afficher la modal de la facture
     public function showFile($id)
     {
         $invoice = auth()->user()->invoices()->findOrFail($id);
@@ -177,140 +314,19 @@ class InvoiceManager extends Component
         $this->showFileModal = true;
     }
 
-    // Download the invoice into the user's computer
-    public function downloadInvoice($id)
-    {
-        $invoice = auth()->user()->invoices()->findOrFail($id);
-
-        dd($invoice->file_path);
-    }
-
-    /* ----------- CRUD ----------- */
-
-    public function create(): RedirectResponse
-    {
-        return Redirect::route('invoices.create');
-    }
-
-    /**
-     * Met à jour la liste des catégories disponibles en trouvant l'énumération correspondant à la valeur du type sélectionné
-     */
-    private function updateAvailableCategories()
-    {
-        foreach (InvoiceTypeEnum::cases() as $case) {
-            if ($case->value === $this->type) {
-                $this->availableCategories = $case->categories();
-
-                return;
-            }
-        }
-
-        $this->availableCategories = [];
-    }
-
+    // Afficher le formulaire d'édition
     public function showEditForm($id)
     {
-        // Récupère la facture de l'utilisateur connecté
-        $invoice = auth()->user()->invoices()->findOrFail($id);
-
-        // Stocke l'ID de la facture
-        $this->invoiceId = $invoice->id;
-        $this->file_path = $invoice->file_path;
-
-        /* Étape 1 - Informations */
-        $this->name = $invoice->name;
-        $this->type = $invoice->type;
-        $this->category = $invoice->category;
-        $this->issuer_name = $invoice->issuer_name;
-        $this->issuer_website = $invoice->issuer_website;
-
-        /* Étape 2 - Montant */
-        $this->amount = $invoice->amount;
-        $this->paid_by = $invoice->paid_by;
-        $this->associated_members = $invoice->associated_members;
-
-        /* Étape 3 - Dates */
-        $this->issued_date = $invoice->issued_date ? $invoice->issued_date->format('Y-m-d') : null;
-        $this->payment_due_date = $invoice->payment_due_date ? $invoice->payment_due_date->format('Y-m-d') : null;
-        $this->payment_reminder = $invoice->payment_reminder;
-        $this->payment_frequency = $invoice->payment_frequency;
-
-        /* Étape 4 - Engagements */
-        $this->engagement_id = $invoice->engagement_id;
-        $this->engagement_name = $invoice->engagement_name;
-
-        /* Étape 5 - Paiement */
-        $this->payment_status = $invoice->payment_status;
-        $this->payment_method = $invoice->payment_method;
-        $this->priority = $invoice->priority;
-        $this->is_archived = $invoice->is_archived;
-
-        /* Étape 6 - Notes et tags */
-        $this->notes = $invoice->notes;
-
-        // Chargement des tags (s'assurer qu'ils sont au bon format)
-        $this->tags = is_array($invoice->tags) ? $invoice->tags : json_decode($invoice->tags, true) ?? [];
-
-        // Si le type est déjà sélectionné, mettre à jour les catégories disponibles
-        if ($this->type) {
-            $this->updateAvailableCategories();
-        }
-
-        // Ouvrir la modal d'édition
         $this->showEditFormModal = true;
     }
 
+    // Mettre à jour la facture
     public function updateInvoice()
     {
-        $this->validate();
-
-        if (! $this->invoiceId) {
-            return;
-        }
-
-        try {
-            DB::beginTransaction();
-
-            auth()->user()->invoices()
-                ->where('id', $this->invoiceId)
-                ->update([
-                    'name' => $this->name,
-                    'file_path' => $this->uploadedFile->store('invoices', 'public'),
-                    'type' => $this->type,
-                    'category' => $this->category,
-                    'issuer_name' => $this->issuer_name,
-                    'issuer_website' => $this->issuer_website,
-                    'amount' => $this->amount,
-                    'paid_by' => $this->paid_by,
-                    'associated_members' => $this->associated_members,
-                    'issued_date' => $this->issued_date,
-                    'payment_due_date' => $this->payment_due_date,
-                    'payment_reminder' => $this->payment_reminder,
-                    'payment_frequency' => $this->payment_frequency,
-                    'engagement_id' => $this->engagement_id,
-                    'engagement_name' => $this->engagement_name,
-                    'payment_status' => $this->payment_status,
-                    'payment_method' => $this->payment_method,
-                    'priority' => $this->priority,
-                    'notes' => $this->notes,
-                    'tags' => json_encode($this->tags),
-                    'is_archived' => $this->is_archived,
-                ]);
-
-            DB::commit();
-
-            $this->editWithSuccess = true;
-            $this->reset('showEditFormModal');
-
-            sleep(1);
-
-            $this->loadInvoices();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error($e->getMessage());
-        }
+        dd('Update en cours');
     }
 
+    // Afficher le formulaire de suppression
     public function showDeleteForm($id)
     {
         $invoice = auth()->user()->invoices()->findOrFail($id);
@@ -318,6 +334,7 @@ class InvoiceManager extends Component
         $this->showDeleteFormModal = true;
     }
 
+    // Supprimer la facture
     public function deleteInvoice()
     {
         $invoice = auth()->user()->invoices()->findOrFail($this->invoiceId);
@@ -341,40 +358,26 @@ class InvoiceManager extends Component
         }
     }
 
-    private function resetForm()
-    {
-        $this->invoiceId = null;
-        $this->name = null;
-        $this->type = null;
-        $this->category = null;
-        $this->issuer_name = null;
-        $this->issuer_website = null;
-        $this->amount = null;
-        $this->paid_by = null;
-        $this->associated_members = null;
-        $this->amount_distribution = [];
-        $this->issued_date = null;
-        $this->payment_due_date = null;
-        $this->payment_reminder = null;
-        $this->payment_frequency = null;
-        $this->engagement_id = null;
-        $this->engagement_name = null;
-        $this->payment_status = 'unpaid';
-        $this->payment_method = 'card';
-        $this->priority = 'none';
-        $this->is_archived = false;
-        $this->notes = null;
-        $this->tags = [];
-        $this->tagInput = '';
-        $this->uploadedFile = null;
-
-        // Réinitialiser la validation
-        $this->resetValidation();
-    }
-
     public function render()
     {
-        return view('livewire.pages.invoice-manager')
+        // Récupération des factures avec filtres
+        $invoices = auth()->user()->invoices()
+            ->when(
+                $this->activeFilter === 'payment_status_paid',
+                fn ($query) => $query->where('payment_status', 'paid')
+            )
+            ->when(
+                $this->activeFilter === 'payment_status_unpaid',
+                fn ($query) => $query->where('payment_status', 'unpaid')
+            )
+            ->when(
+                $this->sortField,
+                fn ($query) => $query->orderBy($this->sortField, $this->sortDirection)
+            )
+            ->paginate(10);
+
+        // Rendu de la vue
+        return view('livewire.pages.invoice-manager', compact('invoices'))
             ->layout('layouts.app-sidebar');
     }
 }
