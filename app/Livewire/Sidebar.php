@@ -27,7 +27,7 @@ class Sidebar extends Component
         $this->expanded = ! $this->expanded;
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
         $expandedStringForJS = $this->expanded ? 'true' : 'false';
-        $this->js("localStorage.setItem('sidebarExpanded', '" . $expandedStringForJS . "')");
+        $this->js("localStorage.setItem('sidebarExpanded', '".$expandedStringForJS."')");
     }
 
     public function seeProfile()
