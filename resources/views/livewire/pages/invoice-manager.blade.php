@@ -445,7 +445,7 @@
                         @if($visibleColumns['file_size'])
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('file_size')" class="flex items-center">
-                                    <span>Taille du fichier</span>
+                                    <span class="w-fit">Taille du fichier</span>
                                     @if ($sortField === 'file_size')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                              xmlns="http://www.w3.org/2000/svg">

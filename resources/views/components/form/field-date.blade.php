@@ -14,14 +14,15 @@
         @endif
     </label>
 
-    <textarea
+    <input
         id="{{ $name }}"
         name="{{ $name }}"
+        type="date"
         wire:model.blur="{{ $model }}"
         placeholder="{{ $placeholder }}"
-        class="m-0 px-3 py-2 block w-full min-h-32 resize-none bg-white placeholder:text-[0.9375rem] text-gray-700 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+        class="m-0 px-3.5 py-2.5 block w-full appearance-none bg-white placeholder:text-[0.9375rem] text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
         {{ $attributes }}
-    ></textarea>
+    >
 
     @error($model)
     <ul class="my-2 flex flex-col gap-3 font-medium text-red-500 dark:text-red-400">

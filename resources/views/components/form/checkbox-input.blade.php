@@ -9,7 +9,7 @@
     <input id="{{ $name }}"
            model="{{ $model }}"
            type="checkbox"
-           class="h-4 w-4 cursor-pointer transition-all appearance-none rounded border border-slate-300 checked:bg-slate-800 checked:border-slate-800 dark:checked:bg-gray-300 dark:border-slate-400"
+           class="h-4 w-4 cursor-pointer transition-all appearance-none rounded border border-slate-200 checked:bg-slate-800 checked:border-slate-800 dark:checked:bg-gray-300 dark:border-slate-400"
         {{ $checked ? 'checked' : '' }}
         {{ $attributes }}
     />

@@ -53,8 +53,6 @@ class CreateInvoice extends Component
 
     public $uploadedFile;
 
-    public $amount_distribution = [];
-
     public $engagement_id;
 
     public $engagement_name;
@@ -82,7 +80,6 @@ class CreateInvoice extends Component
         'amount' => 'required|numeric|min:0',
         'paid_by' => 'nullable|string|max:255',
         'associated_members' => 'nullable|string',
-        'amount_distribution' => 'nullable|array',
         // Étape 3
         'issued_date' => 'nullable|date',
         'payment_due_date' => 'nullable|date',
@@ -116,7 +113,6 @@ class CreateInvoice extends Component
         'amount.required' => 'Le montant est obligatoire.',
         'amount.numeric' => 'Le montant doit être un nombre.',
         'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
-        'amount_distribution.array' => 'La distribution du montant doit être un tableau.',
         'issued_date.date' => "La date d'émission doit être une date valide.",
         'payment_due_date.date' => "La date d'échéance doit être une date valide.",
         'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',

@@ -2,11 +2,15 @@
     'label',
     'name',
     'model' => '',
+    'asterix' => false
 ])
 
 <div class="m-0 p-0 max-w-[45rem]" x-data="{ show: false }">
-    <label for="{{ $name }}" class="mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
+    <label for="{{ $name }}" class="relative mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
+        @if($asterix)
+            <span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>
+        @endif
     </label>
 
     <input
@@ -15,7 +19,7 @@
         type="password"
         wire:model.blur="{{ $model }}"
         placeholder="••••••••"
-        class="m-0 px-3 py-2 block w-full text-sm-regular text-gray-600 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+        class="m-0 px-3 py-2 block w-full placeholder:text-[0.9375rem] text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
         x-bind:type="show ? 'text' : 'password'"
         {{ $attributes }}
     >

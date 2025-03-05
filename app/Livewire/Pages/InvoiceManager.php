@@ -148,7 +148,7 @@ class InvoiceManager extends Component
     ];
 
     /* Filtres et colonnes */
-    public $sortField = 'issued_date';
+    public $sortField = 'name';
 
     public $sortDirection = 'desc';
 
@@ -184,7 +184,7 @@ class InvoiceManager extends Component
 
     // Définir les paramètres qui doivent être préservés pendant la pagination
     protected $queryString = [
-        'sortField' => ['except' => 'issued_date'],
+        'sortField' => ['except' => 'name'],
         'sortDirection' => ['except' => 'desc'],
         'activeFilter' => ['except' => ''],
     ];
@@ -194,11 +194,14 @@ class InvoiceManager extends Component
 
     // Ajouter ces propriétés à ta classe InvoiceManager
     public bool $showFolderModal = false;
+
     public string $currentFolder = '';
+
     public string $folderTitle = '';
+
     public $folderInvoices = [];
 
-// Ajouter ces méthodes à ta classe InvoiceManager
+    // Ajouter ces méthodes à ta classe InvoiceManager
     public function openFolder($folder, $title)
     {
         $this->currentFolder = $folder;
@@ -266,7 +269,7 @@ class InvoiceManager extends Component
         $this->showFolderModal = true;
     }
 
-// Méthode pour obtenir les statistiques des dossiers
+    // Méthode pour obtenir les statistiques des dossiers
     public function getFolderStats()
     {
         return [
@@ -300,11 +303,13 @@ class InvoiceManager extends Component
             ],
         ];
     }
+
     public function toggleFavorite($invoiceId)
     {
         $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $invoice->update(['is_favorite' => !$invoice->is_favorite]);
+        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
     }
+
     // Méthode utilitaire pour formater la taille des fichiers
     private function formatFileSize($bytes)
     {
@@ -316,7 +321,7 @@ class InvoiceManager extends Component
         $i = floor(log($bytes, 1024));
         $size = round($bytes / pow(1024, $i), 2);
 
-        return $size . ' ' . $units[$i];
+        return $size.' '.$units[$i];
     }
 
     // Appliquer des filtres par défaut
@@ -351,7 +356,7 @@ class InvoiceManager extends Component
     // Réinitialiser le tri et les filtres
     public function resetSort()
     {
-        $this->sortField = 'issued_date';
+        $this->sortField = 'name';
         $this->sortDirection = 'desc';
         $this->activeFilter = null;
         $this->resetPage();
@@ -507,7 +512,7 @@ class InvoiceManager extends Component
             ->paginate(10);
 
         $this->recentInvoices = auth()->user()->invoices()
-            ->orderBy('issued_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 

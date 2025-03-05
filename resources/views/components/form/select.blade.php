@@ -2,11 +2,15 @@
     'name',
     'label',
     'model',
+    'asterix' => false,
 ])
 
 <div class="m-0 p-0 max-w-[45rem]">
-    <label for="{{ $name }}" class="mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
+    <label for="{{ $name }}" class="relative mb-1.5 pl-1 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
+        @if($asterix)
+            <span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>
+        @endif
     </label>
 
     <div class="relative">
@@ -14,7 +18,7 @@
             id="{{ $name }}"
             name="{{ $name }}"
             wire:model.blur="{{ $model }}"
-            class="appearance-none m-0 px-3.5 py-2.5 block w-full text-sm-regular text-gray-600 border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+            class="appearance-none bg-white m-0 px-3.5 py-2.5 block w-full text-sm text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
             {{ $attributes }}
         >
             {{ $slot }}

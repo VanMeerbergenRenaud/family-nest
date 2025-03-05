@@ -1,5 +1,4 @@
 <div>
-
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,
@@ -45,7 +44,7 @@
                 {{-- Image : colonne 1 --}}
                 <div class="max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
                     @if (!$uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="uploadedFile" name="uploadedFile"/>
+                        <x-form.field-upload label="Importer une facture" model="uploadedFile" name="uploadedFile" :asterix="true" />
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -73,11 +72,9 @@
                         description="Choisissez le type de facture que vous venez d'importer."
                         class="grid grid-cols-1 gap-4"
                     >
-                        <x-form.field label="Nom *" name="name" model="name"
-                                      placeholder="ex : Facture Internet - Octobre 2024"/>
+                        <x-form.field label="Nom" name="name" model="name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
 
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 ">
-
                             <x-form.select label="Type*" name="type" model="type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
@@ -94,7 +91,7 @@
 
                             <x-form.field label="Fournisseur / émetteur de la facture*" name="issuer_name"
                                           model="issuer_name" placeholder="Nom du fournisseur"/>
-                            <x-form.field label="Site internet du fournisseur *" name="issuer_website"
+                            <x-form.field label="Site internet du fournisseur" name="issuer_website"
                                           model="issuer_website" placeholder="www.monfournisseur.com"/>
                         </div>
 
@@ -106,52 +103,23 @@
                         description="Choisissez le type de facture que vous venez d'importer."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
-                        <x-form.field label="Montant total à payer *" name="amount" model="amount" type="number"
-                                      step="1"/>
+                        <x-form.field label="Montant total à payer" name="amount" model="amount" type="number"
+                                      placeholder="0.00" asterix="true" />
 
-                        <x-form.select name="paid_by" model="paid_by" wire:change="calculateDistribution"
-                                       label="Qui paye la facture *">
-                            <option value="0" disabled>Sélectionner la personne</option>
+                        <x-form.select name="paid_by" model="paid_by" label="Qui paye la facture">
+                            <option value="" disabled>Sélectionner une personne</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member }}">{{ $member }}</option>
                             @endforeach
                         </x-form.select>
 
                         <x-form.select name="associated_members" model="associated_members"
-                                       wire:change="calculateDistribution"
                                        label="Associé aux membres de la famille">
-                            <option value="">Sélectionner...</option>
+                            <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member }}">{{ $member }}</option>
                             @endforeach
                         </x-form.select>
-
-                        <div>
-                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">Répartition du
-                                montant en fonction des membres sélectionnés</label>
-                            @if(!empty($amount_distribution))
-                                @foreach($amount_distribution as $member => $percentage)
-                                    <div class="mt-2">
-                                        <label>{{ $member }} : {{ $percentage }}%
-                                            ({{ number_format(($percentage / 100) * $amount, 2) }} €)</label>
-                                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                            <div class="bg-purple-600 h-2.5 rounded-full"
-                                                 style="width: {{ $percentage }}%"></div>
-                                        </div>
-                                        <input type="range"
-                                               min="0"
-                                               max="100"
-                                               step="5"
-                                               value="{{ $percentage }}"
-                                               wire:change="adjustDistribution('{{ $member }}', $event.target.value)"
-                                               class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-gray-500">Veuillez sélectionner les membres concernés par cette
-                                    facture.</p>
-                            @endif
-                        </div>
                     </x-invoice-create-step>
 
                     {{-- Étape 3: Dates importantes --}}
@@ -159,103 +127,39 @@
                         step="3" title="Étape 3 : Dates importantes"
                         description="Indiquez les dates importantes concernant cette facture."
                     >
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Date d'émission -->
-                            <div class="space-y-2">
-                                <label for="issued_date"
-                                       class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                    Date d'émission
-                                    <span class="text-rose-500">*</span>
-                                </label>
-                                <div class="relative">
-
-                                    <input
-                                        type="date"
-                                        id="issued_date"
-                                        wire:model="issued_date"
-                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
-                                    >
-                                </div>
-                            </div>
-
-                            <!-- Date de paiement -->
-                            <div class="space-y-2">
-                                <label for="payment_due_date"
-                                       class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                    Date de paiement
-                                    <span class="text-rose-500">*</span>
-                                    <span class="ml-auto">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                             stroke="currentColor"
-                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                             class="w-4 h-4 text-slate-400 hover:text-slate-600 cursor-help"
-                                             x-tooltip="Date limite à laquelle le paiement doit être effectué">
-                                            <circle cx="12" cy="12" r="10"></circle>
-                                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                                        </svg>
-                                    </span>
-                                </label>
-                                <div class="relative">
-
-                                    <input
-                                        type="date"
-                                        id="payment_due_date"
-                                        wire:model="payment_due_date"
-                                        class="w-full pl-3 pr-2 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
-                                    >
-                                </div>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <x-form.field-date label="Date d'émission" name="issued_date" model="issued_date" />
+                            <x-form.field-date label="Date de paiement" name="payment_due_date" model="payment_due_date"/>
+                            <x-form.field-date label="Rappel de paiement" name="payment_reminder" model="payment_reminder"/>
+                            <x-form.select name="payment_frequency" model="payment_frequency" label="Fréquence de paiement">
+                                <option value="" disabled>Sélectionner une fréquence</option>
+                                <option value="monthly">Mensuel</option>
+                                <option value="quarterly">Trimestriel</option>
+                                <option value="annually">Annuel</option>
+                                <option value="one_time">Ponctuel</option>
+                            </x-form.select>
                         </div>
 
-                        <!-- Rappel de paiement -->
-                        <div class="space-y-2">
-                            <label for="payment_reminder"
-                                   class="text-sm-medium text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                                Rappel de paiement
-                            </label>
-                            <div class="relative">
-                                <div
-                                    class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
-                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                         stroke-linejoin="round" class="w-5 h-5">
-                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                                    </svg>
-                                </div>
-                                <input
-                                    type="text"
-                                    id="payment_reminder"
-                                    wire:model="payment_reminder"
-                                    placeholder="15/12/2024 + 5 jours à l'avance"
-                                    class="w-full pl-10 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 placeholder-slate-400"
-                                >
-                            </div>
-                        </div>
-
-                        <x-form.select name="payment_frequency" model="payment_frequency" label="Fréquence de paiement">
-                            <option value="">Sélectionner...</option>
-                            <option value="monthly">Mensuel</option>
-                            <option value="quarterly">Trimestriel</option>
-                            <option value="annually">Annuel</option>
-                            <option value="one_time">Ponctuel</option>
-                        </x-form.select>
                     </x-invoice-create-step>
 
                     {{-- Étape 4: Association à des engagements --}}
                     <x-invoice-create-step
                         step="4" title="Étape 4 : Association à des engagements"
                         description="Associez cette facture à un engagement existant ou créez-en un nouveau."
-                        class="grid grid-cols-1 lg:grid-cols-2 gap-4"
+                        class="flex flex-col gap-4"
                     >
+                        <x-form.select name="engagement_id" model="engagement_id" label="Engagement existant">
+                            <option value="" disabled>Sélectionner un engagement existant</option>
+                            @foreach($engagements as $engagement)
+                                <option value="{{ $engagement['id'] }}">{{ $engagement['name'] }}</option>
+                            @endforeach
+                        </x-form.select>
 
-                        <x-form.field name="engagement_name" model="engagement_name" placeholder="Nom de l'engagement"
-                                      label="Nom de l'engagement"/>
+                        <div class="flex items-end gap-4">
+                            <x-form.field name="engagement_name" model="engagement_name"
+                                          placeholder="Nom de l'engagement" label="Nom de l'engagement"/>
 
-                        <div>
-                            <button type="button"
-                                    class="w-full px-4 py-2 bg-blue-900 text-white">
+                            <button type="button" class="button-tertiary border border-slate-200">
                                 Créer un nouvel engagement
                             </button>
                         </div>
@@ -267,7 +171,7 @@
                         description="Indiquez le statut actuel de paiement de cette facture."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
-                        <x-form.select name="payment_status" model="payment_status" label="Statut de la facture *">
+                        <x-form.select name="payment_status" model="payment_status" label="Statut de la facture">
                             <option value="unpaid">Non payée</option>
                             <option value="paid">Payée</option>
                             <option value="late">En retard</option>
@@ -296,19 +200,28 @@
                         description="Ajoutez des notes et des tags pour mieux organiser vos factures."
                     >
 
-                        <x-form.field-textarea label="Notes (détail / commentaire important)" name="notes" model="notes"
-                                               placeholder="Inscrivez votre message ici..." class="border-gray"/>
-                        <div class="text-right text-xs text-gray-500 mt-1">
-                            Montant de caractère maximum <span>{{ strlen($notes) }}</span>/500
+                        <x-form.field-textarea label="Notes (détail / commentaire important)" name="notes" model="notes" placeholder="Inscrivez votre message ici..."/>
+
+                        <div class="text-right text-xs text-gray-500 mt-1 mr-2">
+                            Montant de caractère maximum <span class="text-sm">{{ strlen($notes) }}</span>/500
                         </div>
 
-                        <div>
-                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">Tags
-                                personnalisés</label>
-                            <div class="flex flex-wrap gap-2 mb-2">
+                        <div class="mt-2">
+                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">
+                                Tags personnalisés
+                            </label>
+                            <div class="flex mt-2">
+                                <input type="text" wire:model="tagInput" wire:keydown.enter.prevent="addTag"
+                                       class="flex-1 block w-full text-sm-regular rounded-l-md bg-white border border-slate-200 dark:border-gray-600 dark:text-white p-3 focus:outline-0"
+                                       placeholder="Ajouter un tag...">
+                                <button type="button" wire:click="addTag"
+                                        class="inline-flex items-center px-4 py-2 text-sm-medium bg-white border border-l-0 border-slate-200 rounded-r-md bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
+                                    Ajouter un tag
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-1.5 ml-2">
                                 @foreach($tags as $index => $tag)
-                                    <div
-                                        class="inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                    <div class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                         {{ $tag }}
                                         <button type="button" wire:click="removeTag({{ $index }})"
                                                 class="ml-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">
@@ -316,15 +229,6 @@
                                         </button>
                                     </div>
                                 @endforeach
-                            </div>
-                            <div class="flex mt-2">
-                                <input type="text" wire:model="tagInput" wire:keydown.enter.prevent="addTag"
-                                       class="flex-1 block w-full focus:outline-0"
-                                       placeholder="Ajouter un tag...">
-                                <button type="button" wire:click="addTag"
-                                        class="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
-                                    Ajouter un tag
-                                </button>
                             </div>
                         </div>
                     </x-invoice-create-step>
@@ -334,15 +238,13 @@
                         description="Vérifiez les informations avant d'enregistrer la facture."
                     >
                         <!-- Affichage des erreurs de validation -->
-                        @if ($errors->any())
+                        @if($errors->any())
                             <x-form.alert type="warning" title="Attention : corrections requises">
                                 Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
-                                Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections
-                                nécessaires.
+                                Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
                             </x-form.alert>
 
-                            <x-form.alert type="error"
-                                          title="Veuillez corriger les erreurs suivantes avant de continuer :">
+                            <x-form.alert type="error" title="Veuillez corriger les erreurs suivantes avant de continuer :">
                                 <ul class="space-y-1 list-disc list-inside">
                                     @foreach ($errors->all() as $error)
                                         <li>{{ $error }}</li>
@@ -351,183 +253,168 @@
 
                                 <x-slot name="actions">
                                     <button type="button"
-                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm-medium text-white bg-red-600 hover:bg-red-700"
                                             @click="goToStep(1)">
                                         Retourner au début du formulaire
                                     </button>
                                 </x-slot>
                             </x-form.alert>
+                        @elseif(empty($uploadedFile))
+                            <x-form.alert type="warning" title="Aucune facture importée">
+                                Veuillez importer une facture pour commencer.
+                            </x-form.alert>
                         @else
                             <x-form.alert type="success" title="Prêt à soumettre">
-                                Toutes les informations sont complètes. Vous pouvez maintenant enregistrer cette
-                                facture.
+                                Toutes les informations sont complètes. Vous pouvez maintenant enregistrer cette facture.
                             </x-form.alert>
                         @endif
 
                         <!-- Résumé du formulaire -->
-                        <div
-                            class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                             <dl>
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">
-                                        Nom de la facture
-                                    </dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $name ?: 'Non spécifié' }}
-                                    </dd>
-                                </div>
+                                <x-invoices.summary-item label="Nom de la facture" :alternateBackground="true">
+                                    {{ $name ?: 'Non spécifié' }}
+                                </x-invoices.summary-item>
 
-                                <div
-                                    class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Type et catégorie
-                                    </dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $type ?: 'Non spécifié' }} - {{ $category ?: 'Non spécifié' }}
-                                    </dd>
-                                </div>
+                                <x-invoices.summary-item label="Type et catégorie">
+                                    {{ $type ?: 'Non spécifié' }} - {{ $category ?: 'Non spécifié' }}
+                                </x-invoices.summary-item>
 
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Fournisseur</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $issuer_name ?: 'Non spécifié' }}
-                                        @if($issuer_website)
-                                            <a href="{{ $issuer_website }}" target="_blank"
-                                               class="text-indigo-500 hover:text-indigo-700 ml-2">({{ $issuer_website }}
-                                                )</a>
+                                <x-invoices.summary-item label="Fournisseur" :alternateBackground="true">
+                                    {{ $issuer_name ?: 'Non spécifié' }}
+                                    @if($issuer_website)
+                                        <a href="{{ $issuer_website }}" target="_blank"
+                                           class="text-indigo-500 text-sm-regular hover:text-indigo-700 ml-0.5">
+                                            ({{ $issuer_website }})
+                                        </a>
+                                    @endif
+                                </x-invoices.summary-item>
+
+                                <x-invoices.summary-item label="Montant">
+                                    {{ $amount ? number_format($amount, 2) . ' €' : 'Non spécifié' }}
+                                </x-invoices.summary-item>
+
+                                <x-invoices.summary-item label="Répartition du montant" :alternateBackground="true">
+                                    @if(!empty($amount))
+                                        @if($paid_by)
+                                            Payée par : {{ $paid_by }}
                                         @endif
-                                    </dd>
-                                </div>
-
-                                <div
-                                    class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Montant</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $amount ? number_format($amount, 2) . ' €' : 'Non spécifié' }}
-                                    </dd>
-                                </div>
-
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Répartition du
-                                        montant
-                                    </dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        @if(!empty($amount_distribution) && $amount)
-                                            <ul class="space-y-2">
-                                                @foreach($amount_distribution as $member => $percentage)
-                                                    <li>
-                                                        {{ $member }}: {{ $percentage }}%
-                                                        ({{ number_format(($percentage / 100) * $amount, 2) }} €)
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            Non spécifié
+                                        @if($associated_members)
+                                            Associée à : {{ $associated_members }}
                                         @endif
-                                    </dd>
-                                </div>
+                                    @else
+                                        Non spécifié
+                                    @endif
+                                </x-invoices.summary-item>
 
-                                <div
-                                    class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Dates</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        <p>Date
-                                            d'émission: {{ $issued_date ? \Carbon\Carbon::parse($issued_date)->format('d/m/Y') : 'Non spécifiée' }}</p>
-                                        <p>Date de
-                                            paiement: {{ $payment_due_date ? \Carbon\Carbon::parse($payment_due_date)->format('d/m/Y') : 'Non spécifiée' }}</p>
-                                        <p>Rappel: {{ $payment_reminder ?: 'Non spécifié' }}</p>
-                                        <p>Fréquence: {{ $payment_frequency ?: 'Non spécifiée' }}</p>
-                                    </dd>
-                                </div>
+                                <x-invoices.summary-item label="Dates">
+                                    <div class="flex flex-col gap-1.5">
+                                        <p class="text-sm-regular">
+                                            Émission: <span class="text-sm-medium">
+                                            {{ $issued_date ? \Carbon\Carbon::parse($issued_date)->format('d/m/Y') : 'Non spécifiée' }}
+                                        </span>
+                                        </p>
+                                        <p class="text-sm-regular">
+                                            Paiement: <span class="text-sm-medium">
+                                            {{ $payment_due_date ? \Carbon\Carbon::parse($payment_due_date)->format('d/m/Y') : 'Non spécifiée' }}
+                                        </span>
+                                        </p>
+                                        <p class="text-sm-regular">
+                                            Rappel: <span class="text-sm-medium">
+                                            {{ $payment_reminder ? \Carbon\Carbon::parse($payment_reminder)->format('d/m/Y') : 'Non spécifié' }}
+                                        </span>
+                                        </p>
+                                        <p class="text-sm-regular">
+                                            Fréquence: <span class="text-sm-medium">
+                                            {{ $payment_frequency
+                                                ? ($payment_frequency === 'monthly' ? 'Mensuel'
+                                                : ($payment_frequency === 'quarterly' ? 'Trimestriel'
+                                                : ($payment_frequency === 'annually' ? 'Annuel' : 'Ponctuel')))
+                                                : 'Non spécifiée' }}
+                                        </span>
+                                        </p>
+                                    </div>
+                                </x-invoices.summary-item>
 
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Engagement</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        <p>ID: {{ $engagement_id ?: 'Non spécifié' }}</p>
-                                        <p>Nom: {{ $engagement_name ?: 'Non spécifié' }}</p>
-                                    </dd>
-                                </div>
+                                <x-invoices.summary-item label="Engagement" :alternateBackground="true">
+                                    {{ $engagement_name ?: 'Non spécifié' }}
+                                </x-invoices.summary-item>
 
-                                <div class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">
-                                        Statut de paiement
-                                    </dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
+                                <x-invoices.summary-item label="Statut de paiement">
                                     <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                          {{ $payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                                           ($payment_status === 'late' ? 'bg-red-100 text-red-800' :
-                                           ($payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800')) }}">
-                                        {{ $payment_status === 'paid' ? 'Payée' :
-                                           ($payment_status === 'late' ? 'En retard' :
-                                           ($payment_status === 'partially_paid' ? 'Partiellement payée' : 'Non payée')) }}
+                                          {{ $payment_status === 'paid'
+                                                ? 'bg-green-100 text-green-800'
+                                                : ($payment_status === 'late' ? 'bg-red-100 text-red-800'
+                                                : ($payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800'
+                                                : 'bg-gray-100 text-gray-800')) }}"
+                                    >
+                                        {{ $payment_status === 'paid' ? 'Payée'
+                                        : ($payment_status === 'late' ? 'En retard'
+                                        : ($payment_status === 'partially_paid' ? 'Partiellement payée'
+                                        : 'Non payée')) }}
                                     </span>
-                                        <p class="mt-1">Méthode: {{ $payment_method ?
-                                        ($payment_method === 'card' ? 'Carte bancaire' :
-                                        ($payment_method === 'cash' ? 'Espèces' : 'Virement')) : 'Non spécifiée' }}</p>
-                                        <p>Priorité: {{ $priority ?
-                                        ($priority === 'high' ? 'Élevée' :
-                                        ($priority === 'medium' ? 'Moyenne' :
-                                        ($priority === 'low' ? 'Basse' : 'Aucune'))) : 'Non spécifiée' }}</p>
-                                        <p>Archivée: {{ $is_archived ? 'Oui' : 'Non' }}</p>
-                                    </dd>
-                                </div>
+                                    <div class="mt-1 ml-1 flex flex-col gap-1.5">
+                                        <p class="text-sm-regular">
+                                            Méthode: <span class="text-sm-medium">
+                                                {{ $payment_method
+                                                    ? ($payment_method === 'card' ? 'Carte bancaire'
+                                                    : ($payment_method === 'cash' ? 'Espèces' : 'Virement'))
+                                                    : 'Non spécifiée' }}
+                                            </span>
+                                        </p>
+                                        <p class="text-sm-regular">
+                                            Priorité: <span class="text-sm-medium">
+                                                {{ $priority
+                                                    ? ($priority === 'high' ? 'Élevée'
+                                                    : ($priority === 'medium' ? 'Moyenne'
+                                                    : ($priority === 'low' ? 'Basse' : 'Aucune')))
+                                                    : 'Non spécifiée' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                </x-invoices.summary-item>
 
-                                <div class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Notes</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        {{ $notes ?: 'Aucune note' }}
-                                    </dd>
-                                </div>
+                                <x-invoices.summary-item label="Notes" :alternateBackground="true">
+                                    {{ $notes ?: 'Aucune note' }}
+                                </x-invoices.summary-item>
 
-                                <div
-                                    class="bg-white dark:bg-gray-800 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Tags</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        <div class="flex flex-wrap gap-2">
-                                            @forelse($tags as $tag)
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                                    {{ $tag }}
-                                                </span>
-                                            @empty
-                                                Aucun tag
-                                            @endforelse
+                                <x-invoices.summary-item label="Tags">
+                                    <div class="flex flex-wrap gap-2">
+                                        @forelse($tags as $tag)
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                                {{ $tag }}
+                                            </span>
+                                        @empty
+                                            Aucun tag
+                                        @endforelse
+                                    </div>
+                                </x-invoices.summary-item>
+
+                                <x-invoices.summary-item label="Pièce jointe" :alternateBackground="true">
+                                    @if($uploadedFile)
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20"
+                                                 fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                      clip-rule="evenodd"/>
+                                            </svg>
+                                            Facture importée avec succès
                                         </div>
-                                    </dd>
-                                </div>
-
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-900 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                    <dt class="text-sm-medium text-gray-500 dark:text-gray-300">Pièce jointe</dt>
-                                    <dd class="mt-1 text-sm-medium text-gray-900 dark:text-white sm:mt-0 sm:col-span-2">
-                                        @if($uploadedFile)
-                                            <div class="flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                     class="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20"
-                                                     fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                                Facture importée avec succès
-                                            </div>
-                                        @else
-                                            <div class="flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg"
-                                                     class="h-5 w-5 mr-2 text-red-500" viewBox="0 0 20 20"
-                                                     fill="currentColor">
-                                                    <path fill-rule="evenodd"
-                                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                          clip-rule="evenodd"/>
-                                                </svg>
-                                                Aucune facture importée
-                                            </div>
-                                        @endif
-                                    </dd>
-                                </div>
+                                    @else
+                                        <div class="flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                 class="h-5 w-5 mr-2 text-red-500" viewBox="0 0 20 20"
+                                                 fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                      clip-rule="evenodd"/>
+                                            </svg>
+                                            Aucune facture importée
+                                        </div>
+                                    @endif
+                                </x-invoices.summary-item>
                             </dl>
                         </div>
                     </x-invoice-create-step>
