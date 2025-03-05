@@ -147,7 +147,7 @@
                                         <x-svg.download class="w-4 h-4"/>
                                         {{ __('Télécharger') }}
                                     </x-menu.item>
-                                    <x-menu.item wire:click="showEditForm({{ $invoice->id }})">
+                                    <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
                                         <x-svg.edit class="w-4 h-4"/>
                                         {{ __('Modifier') }}
                                     </x-menu.item>
@@ -784,7 +784,7 @@
                                                 <x-svg.download class="w-4 h-4"/>
                                                 {{ __('Télécharger') }}
                                             </x-menu.item>
-                                            <x-menu.item wire:click="showEditForm({{ $invoice->id }})">
+                                            <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
                                                 <x-svg.edit class="w-4 h-4"/>
                                                 {{ __('Modifier') }}
                                             </x-menu.item>
@@ -867,7 +867,7 @@
                                             </x-menu.button>
                                             <x-menu.items
                                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 z-20">
-                                                <x-menu.item wire:click="showEditForm({{ $invoice->id }})">
+                                                <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
                                                     <x-svg.edit class="w-4 h-4"/>
                                                     {{ __('Modifier') }}
                                                 </x-menu.item>
@@ -1048,37 +1048,6 @@
                         </x-modal.close>
                     </div>
                 </x-modal.footer>
-            </x-modal.panel>
-        </x-modal>
-    @endif
-
-    <!-- Modale de modification d'une facture -->
-    @if($showEditFormModal)
-        <x-modal wire:model="showEditFormModal">
-            <x-modal.panel>
-                <div class="sticky top-0 p-5 px-8 max-w-full text-xl font-bold border-b border-[#dde2e9] bg-white z-10">
-                    {{ __('Modifier votre facture juste ici 👇') }}
-                </div>
-
-                <form wire:submit.prevent="updateInvoice">
-                    @csrf
-
-                    <div class="flex flex-col gap-4 p-8">
-                        Formulaire d'édition de la facture
-                    </div>
-
-                    <x-modal.footer>
-                        <x-modal.close>
-                            <button type="button" class="button-secondary">
-                                {{ __('Annuler') }}
-                            </button>
-                        </x-modal.close>
-
-                        <button type="submit" class="button-tertiary">
-                            {{ __('Mettre à jour') }}
-                        </button>
-                    </x-modal.footer>
-                </form>
             </x-modal.panel>
         </x-modal>
     @endif

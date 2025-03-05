@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Pages;
 
-use Illuminate\Support\Facades\DB;
+use App\Livewire\Forms\InvoiceForm;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
@@ -14,7 +14,8 @@ class InvoiceManager extends Component
 {
     use WithFileUploads, WithPagination;
 
-    #[Validate]
+    public InvoiceForm $form;
+
     public $name;
 
     public $file_path;
@@ -73,8 +74,6 @@ class InvoiceManager extends Component
 
     public $invoiceId;
 
-    public bool $showEditFormModal = false;
-
     public bool $showDeleteFormModal = false;
 
     public $fileUrl;
@@ -89,63 +88,6 @@ class InvoiceManager extends Component
     public bool $deleteWithSuccess = false;
 
     public bool $downloadNotWorking = false;
-
-    /* Formulaires */
-    protected $rules = [
-        // Étape d'importation
-        'uploadedFile' => 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
-        'file_path' => 'required|string|max:255',
-        'file_size' => 'nullable|integer',
-        // Étape 1
-        'name' => 'required|string|max:255',
-        'type' => 'nullable|string|max:255',
-        'category' => 'nullable|string|max:255',
-        'issuer_name' => 'nullable|string|max:255',
-        'issuer_website' => 'nullable|url|max:255',
-        // Étape 2
-        'amount' => 'required|numeric|min:0',
-        'paid_by' => 'nullable|string|max:255',
-        'associated_members' => 'nullable|string',
-        'amount_distribution' => 'nullable|array',
-        // Étape 3
-        'issued_date' => 'nullable|date',
-        'payment_due_date' => 'nullable|date',
-        'payment_reminder' => 'nullable|string|max:255',
-        'payment_frequency' => 'nullable|string|max:255',
-        // Étape 4
-        'engagement_id' => 'nullable|string|max:255',
-        'engagement_name' => 'nullable|string|max:255',
-        // Étape 5
-        'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid',
-        'payment_method' => 'nullable|in:card,cash,transfer',
-        'priority' => 'nullable|in:high,medium,low,none',
-        // Étape 6
-        'notes' => 'nullable|string',
-        'tags' => 'nullable|array',
-        'tagInput' => 'nullable|string',
-        // Archives
-        'is_archived' => 'boolean',
-    ];
-
-    protected $messages = [
-        'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
-        'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
-        'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, PNG ou JPG.',
-        'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
-        'uploadedFile.not_in' => 'Les fichiers CSV ne sont pas acceptés. Veuillez utiliser un format comme PDF, Word, JPEG, PNG ou JPG.',
-        'name.required' => 'Le nom de la facture est obligatoire.',
-        'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
-        'amount.required' => 'Le montant est obligatoire.',
-        'amount.numeric' => 'Le montant doit être un nombre.',
-        'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
-        'amount_distribution.array' => 'La distribution du montant doit être un tableau.',
-        'issued_date.date' => "La date d'émission doit être une date valide.",
-        'payment_due_date.date' => "La date d'échéance doit être une date valide.",
-        'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
-        'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
-        'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
-        'tags.array' => 'Les tags doivent être un tableau.',
-    ];
 
     /* Filtres et colonnes */
     public $sortField = 'name';
@@ -449,16 +391,18 @@ class InvoiceManager extends Component
         $this->showFileModal = true;
     }
 
-    // Afficher le formulaire d'édition
-    public function showEditForm($id)
+    // Rediriger vers la page d'édition de la facture
+    public function showEditPage($invoiceId)
     {
-        $this->showEditFormModal = true;
+        return Redirect::route('invoices.edit', $invoiceId);
     }
 
     // Mettre à jour la facture
     public function updateInvoice()
     {
-        dd('Update en cours');
+        $this->form->update();
+
+        return Redirect::route('invoices');
     }
 
     // Afficher le formulaire de suppression
@@ -472,25 +416,18 @@ class InvoiceManager extends Component
     // Supprimer la facture
     public function deleteInvoice()
     {
-        $invoice = auth()->user()->invoices()->findOrFail($this->invoiceId);
+        $this->form->delete($this->invoiceId);
 
-        try {
-            DB::beginTransaction();
+        $this->deleteWithSuccess = true;
+        $this->showDeleteFormModal = false;
 
-            $invoice->delete();
+        sleep(1);
+    }
 
-            DB::commit();
-
-            $this->deleteWithSuccess = true;
-            $this->showDeleteFormModal = false;
-
-            sleep(1);
-
-            $this->loadInvoices();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error($e->getMessage());
-        }
+    // Archive ou désarchive la facture
+    public function archiveInvoice()
+    {
+        dd('Archive en cours');
     }
 
     public function render()

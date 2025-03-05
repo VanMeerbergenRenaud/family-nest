@@ -1,4 +1,14 @@
 <div>
+
+    @if($isEditMode)
+        <div class="mx-auto max-w-[65rem] p-3 mb-8 rounded-md bg-blue-100 border-l-4 border-blue-500 text-blue-700">
+            <div class="flex-center">
+                <x-svg.edit class="w-5 h-5 mr-2 text-blue-700" />
+                <span class="font-medium">Mode édition de la facture</span>
+            </div>
+        </div>
+    @endif
+
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,
@@ -35,16 +45,16 @@
             </template>
         </div>
 
-        <form wire:submit.prevent="createInvoice">
+        <form wire:submit.prevent="updateInvoice">
             @csrf
 
             {{-- Facture preview--}}
             <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-10">
 
                 {{-- Image : colonne 1 --}}
-                <div class="max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
-                    @if (!$form->uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
+                <div class="mt-8 max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
+                    @if (!$form->uploadedFile && !$form->existingFilePath)
+                        <x-form.field-upload label="Importer une nouvelle facture" model="form.uploadedFile" name="form.uploadedFile" />
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -54,11 +64,21 @@
                             >
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
+
                             <!-- Aperçu de l'image -->
-                            <img src="{{ $form->uploadedFile->temporaryUrl() }}"
-                                 alt="Image temporaire de la preview de la facture"
-                                 class="rounded-2xl h-full min-h-[30rem] border border-slate-200"
-                            />
+                            @if($form->uploadedFile)
+                                <!-- Nouvellement téléchargé -->
+                                <img src="{{ $form->uploadedFile->temporaryUrl() }}"
+                                     alt="Nouvelle facture"
+                                     class="rounded-2xl h-full min-h-[30rem] border border-slate-200"
+                                />
+                            @else
+                                <!-- Fichier existant -->
+                                <img src="{{ $form->existingFilePath }}"
+                                     alt="Facture actuelle"
+                                     class="rounded-2xl h-full min-h-[30rem] border border-slate-200"
+                                />
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -112,8 +132,7 @@
                             @endforeach
                         </x-form.select>
 
-                        <x-form.select name="form.associated_members" model="form.associated_members"
-                                       label="Associé aux membres de la famille">
+                        <x-form.select name="form.associated_members" model="form.associated_members" label="Associé aux membres de la famille">
                             <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member }}">{{ $member }}</option>
@@ -172,8 +191,7 @@
                         </x-form.select>
 
 
-                        <x-form.select name="form.payment_method" model="form.payment_method"
-                                       label="Méthode de paiement utilisée">
+                        <x-form.select name="form.payment_method" model="form.payment_method" label="Méthode de paiement utilisée">
                             <option value="card">Carte bancaire</option>
                             <option value="cash">Espèces</option>
                             <option value="transfer">Virement</option>
@@ -252,7 +270,7 @@
                                     </button>
                                 </x-slot>
                             </x-form.alert>
-                        @elseif(empty($form->uploadedFile))
+                        @elseif(empty($form->uploadedFile && $form->existingFilePath) || !$form->uploadedFile)
                             <x-form.alert type="warning" title="Aucune facture importée">
                                 Veuillez importer une facture pour commencer.
                             </x-form.alert>

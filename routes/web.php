@@ -1,5 +1,8 @@
 <?php
 
+use App\Livewire\Pages\CreateInvoice;
+use App\Livewire\Pages\EditInvoice;
+use App\Livewire\Pages\InvoiceManager;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -15,13 +18,12 @@ Volt::route('settings/profile', 'pages.profile')
     ->middleware(['auth'])
     ->name('profile');
 
-Volt::route('invoices', 'pages.invoice-manager')
-    ->middleware(['auth'])
-    ->name('invoices');
-
-Volt::route('invoices.create', 'pages.create-invoice')
-    ->middleware(['auth'])
-    ->name('invoices.create');
+/* Routes invoices */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/invoices', InvoiceManager::class)->name('invoices');
+    Route::get('/invoices/create', CreateInvoice::class)->name('invoices.create');
+    Route::get('/invoices/{id}/edit', EditInvoice::class)->name('invoices.edit');
+});
 
 /* Routes themes, calendar, archives, goals, family */
 Volt::route('themes', 'pages.themes')
