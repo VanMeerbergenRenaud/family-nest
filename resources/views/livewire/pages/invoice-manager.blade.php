@@ -118,7 +118,7 @@
             @else
                 @foreach($recentInvoices as $invoice)
                     <div
-                        class="p-4 min-w-68 w-auto h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        class="p-4 min-w-72 w-auto h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="flex items-center justify-between gap-4">
                             <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                 <x-svg.file-size class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
@@ -134,8 +134,8 @@
                             </div>
                             {{-- Menu d'action --}}
                             <x-menu>
-                                <x-menu.button class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                    <x-svg.dots class="w-5 h-5 rotate-90"/>
+                                <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
+                                    <x-svg.dots class="w-5 h-5 text-gray-500 rotate-90"/>
                                 </x-menu.button>
                                 <x-menu.items
                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
@@ -862,9 +862,8 @@
                                             </h3>
                                         </div>
                                         <x-menu>
-                                            <x-menu.button
-                                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-                                                <x-svg.dots class="w-5 h-5"/>
+                                            <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
+                                                <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                             </x-menu.button>
                                             <x-menu.items
                                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 z-20">

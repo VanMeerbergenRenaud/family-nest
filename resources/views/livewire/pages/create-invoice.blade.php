@@ -39,10 +39,10 @@
             @csrf
 
             {{-- Facture preview--}}
-            <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-12">
+            <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-10">
 
                 {{-- Image : colonne 1 --}}
-                <div class="max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
+                <div class="mt-8 max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
                     @if (!$uploadedFile)
                         <x-form.field-upload label="Importer une facture" model="uploadedFile" name="uploadedFile" :asterix="true" />
                     @else
@@ -50,14 +50,14 @@
                             <!-- Button de suppression de l'image -->
                             <button type="button"
                                     wire:click="removeUploadedFile"
-                                    class="absolute top-3 right-3 z-2 bg-red-400 hover:bg-red-500 text-gray-200 rounded-full p-1 shadow-md transition-colors duration-200"
+                                    class="absolute top-3 right-3 z-2 bg-red-300 hover:bg-red-400 rounded-full p-1 transition-colors duration-200"
                             >
-                                <x-svg.cross/>
+                                <x-svg.cross class="text-red-600" />
                             </button>
                             <!-- Aperçu de l'image -->
                             <img src="{{ $uploadedFile->temporaryUrl() }}"
                                  alt="Image temporaire de la preview de la facture"
-                                 class="rounded-2xl h-full min-h-[30rem]"
+                                 class="rounded-2xl h-full min-h-[30rem] border border-slate-200"
                             />
                         </div>
                     @endif
