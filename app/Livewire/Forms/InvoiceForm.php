@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\InvoiceTypeEnum;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Form;
@@ -24,6 +25,8 @@ class InvoiceForm extends Form
     public $issuer_website;
 
     public $amount;
+
+    public $currency = 'EUR';
 
     public $paid_by;
 
@@ -76,6 +79,7 @@ class InvoiceForm extends Form
             'issuer_website' => 'nullable|url|max:255',
             // Étape 2
             'amount' => 'required|numeric|min:0',
+            'currency' => 'nullable|string|size:3',// 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
             'associated_members' => 'nullable|string',
             // Étape 3
@@ -152,6 +156,9 @@ class InvoiceForm extends Form
             // Get the file size
             $fileSize = Storage::disk('public')->size($filePath);
 
+            // Normaliser le montant avant stockage
+            $amount = $this->normalizeAmount($this->amount);
+
             $invoice = auth()->user()->invoices()->create([
                 'user_id' => auth()->user()->id,
                 /* Étape d'importation */
@@ -164,7 +171,8 @@ class InvoiceForm extends Form
                 'issuer_name' => $this->issuer_name,
                 'issuer_website' => $this->issuer_website,
                 /* Étape 2 */
-                'amount' => floatval(str_replace(' ', '', $this->amount)),
+                'amount' => $amount,
+                'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
                 'associated_members' => $this->associated_members,
                 /* Étape 3 */
@@ -214,7 +222,10 @@ class InvoiceForm extends Form
         $this->category = $invoice->category;
         $this->issuer_name = $invoice->issuer_name;
         $this->issuer_website = $invoice->issuer_website;
-        $this->amount = $invoice->amount;
+        $this->amount = is_numeric($invoice->amount)
+            ? (float)$invoice->amount
+            : null;
+        $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
         $this->associated_members = $invoice->associated_members;
         $this->issued_date = $invoice->issued_date;
@@ -271,6 +282,9 @@ class InvoiceForm extends Form
                 $fileSize = $invoice->file_size;
             }
 
+            // Normaliser le montant avant stockage
+            $amount = $this->normalizeAmount($this->amount);
+
             $invoice->update([
                 /* Étape d'importation */
                 'file_path' => $filePath,
@@ -282,7 +296,8 @@ class InvoiceForm extends Form
                 'issuer_name' => $this->issuer_name,
                 'issuer_website' => $this->issuer_website,
                 /* Étape 2 */
-                'amount' => floatval(str_replace(' ', '', $this->amount)),
+                'amount' => $amount,
+                'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
                 'associated_members' => $this->associated_members,
                 /* Étape 3 */
@@ -353,5 +368,66 @@ class InvoiceForm extends Form
 
             return false;
         }
+    }
+
+    public function getFormattedReminderAttribute()
+    {
+        if (!$this->payment_reminder) {
+            return 'Non spécifié';
+        }
+
+        if (str_contains($this->payment_reminder, '_days')) {
+            $days = str_replace('_days', '', $this->payment_reminder);
+            return $days . ' jours avant échéance';
+        }
+
+        // Si c'est une date valide
+        try {
+            return Carbon::parse($this->payment_reminder)->format('d/m/Y');
+        } catch (\Exception $e) {
+            return $this->payment_reminder;
+        }
+    }
+
+    private function normalizeAmount($amount)
+    {
+        // Si le montant est vide ou null, retourner 0 ou null selon votre préférence
+        if ($amount === null || $amount === '') {
+            return null; // ou return 0; si vous préférez
+        }
+
+        // Si le montant est déjà un nombre, le retourner directement
+        if (is_numeric($amount)) {
+            return (float) $amount;
+        }
+
+        // Convertir en chaîne si ce n'est pas déjà le cas
+        $amount = (string) $amount;
+
+        // Supprimer les espaces
+        $amount = str_replace(' ', '', $amount);
+
+        // Remplacer la virgule française par un point pour la conversion en float
+        $amount = str_replace(',', '.', $amount);
+
+        // Gérer le cas où il y aurait plusieurs points
+        $parts = explode('.', $amount);
+        if (count($parts) > 2) {
+            // Garder le premier comme partie entière et le reste comme partie décimale
+            $integerPart = $parts[0];
+            $decimalPart = implode('', array_slice($parts, 1));
+            $amount = $integerPart . '.' . $decimalPart;
+        }
+
+        // S'assurer que la valeur est un nombre valide
+        $result = (float) $amount;
+
+        // Vérifier si la conversion a produit un nombre valide
+        if (is_nan($result) || !is_finite($result)) {
+            return null; // ou une valeur par défaut
+        }
+
+        // Convertir en float et arrondir à 2 décimales
+        return round($result, 2);
     }
 }

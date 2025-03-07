@@ -54,6 +54,7 @@ class InvoiceFactory extends Factory
 
             /* Étape 2 */
             'amount' => $this->faker->randomFloat(2, 10, 1000),
+            'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
             'paid_by' => $this->faker->name(),
             'associated_members' => json_encode([
                 $this->faker->name(),

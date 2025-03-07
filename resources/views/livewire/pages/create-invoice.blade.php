@@ -103,12 +103,19 @@
                         description="Choisissez le type de facture que vous venez d'importer."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
-                        <x-form.field label="Montant total à payer" name="form.amount" model="form.amount" type="number" placeholder="0.00" asterix="true" />
+                        <x-form.field-currency
+                            label="Montant total à payer"
+                            name="form.amount"
+                            model="form.amount"
+                            defaultCurrency="EUR"
+                            placeholder="0,00"
+                            asterix="true"
+                        />
 
                         <x-form.select name="form.paid_by" model="form.paid_by" label="Qui paye la facture">
                             <option value="" disabled>Sélectionner une personne</option>
                             @foreach($family_members as $member)
-                                <option value="{{ $member }}">{{ $member }}</option>
+                                <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach
                         </x-form.select>
 
@@ -116,7 +123,7 @@
                                        label="Associé aux membres de la famille">
                             <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
-                                <option value="{{ $member }}">{{ $member }}</option>
+                                <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach
                         </x-form.select>
                     </x-invoice-create-step>
@@ -284,7 +291,25 @@
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Montant">
-                                    {{ $form->amount ? number_format($form->amount, 2) . ' €' : 'Non spécifié' }}
+                                    @if($form->amount !== null && $form->amount !== '')
+                                        <span class="text-sm-medium">{{ number_format((float)$form->amount, 2, ',', ' ') }}</span>
+
+                                        @php
+                                            $currencySymbols = [
+                                                'EUR' => '€',
+                                                'USD' => '$',
+                                                'GBP' => '£',
+                                                'JPY' => '¥',
+                                                'CHF' => 'CHF',
+                                                'CAD' => '$'
+                                            ];
+                                            $symbol = $currencySymbols[$form->currency] ?? $form->currency;
+                                        @endphp
+
+                                        <span class="ml-1 text-sm-medium">{{ $symbol }} ({{ $form->currency ?? 'EUR' }})</span>
+                                    @else
+                                        Non spécifié
+                                    @endif
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Répartition du montant" :alternateBackground="true">

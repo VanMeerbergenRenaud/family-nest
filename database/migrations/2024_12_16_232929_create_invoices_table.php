@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('issuer_website')->nullable(); // Site web de l'émetteur
             /* Step 2 */
             $table->decimal('amount', 10, 2); // Montant de la facture
+            $table->string('currency', 3)->default('EUR'); // Devise de la facture
             $table->string('paid_by')->nullable(); // Personne qui paie la facture
             $table->string('associated_members')->nullable(); // Membre(s) associé à la facture
             // Todo : Distribution du montant entre les membres

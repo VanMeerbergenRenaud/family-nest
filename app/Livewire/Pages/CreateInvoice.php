@@ -20,13 +20,13 @@ class CreateInvoice extends Component
 
     public function mount()
     {
-        // Normalement -> auth()->user()->engagements();
+        $this->family_members = auth()->user()->get();
+
         $this->engagements = [
             ['id' => 'abc123', 'name' => 'Abonnement Internet Orange'],
         ];
     }
 
-    // Met à jour les catégories disponibles en fonction du type de facture sélectionné
     public function updatedFormType()
     {
         $this->form->updateAvailableCategories();
@@ -53,7 +53,6 @@ class CreateInvoice extends Component
         $this->form->tags = array_values($this->form->tags); // Réindexer le tableau
     }
 
-    // Enregistre la facture depuis le formulaire InvoiceForm
     public function createInvoice()
     {
         $invoice = $this->form->store();

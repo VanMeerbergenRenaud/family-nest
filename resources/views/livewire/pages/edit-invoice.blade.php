@@ -123,19 +123,28 @@
                         description="Choisissez le type de facture que vous venez d'importer."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
-                        <x-form.field label="Montant total à payer" name="form.amount" model="form.amount" type="number" placeholder="0.00" asterix="true" />
+                        <x-form.field-currency
+                            label="Montant total à payer"
+                            name="form.amount"
+                            model="form.amount"
+                            defaultCurrency="EUR"
+                            placeholder="0,00"
+                            asterix="true"
+                            :initialValue="$form->amount"
+                        />
 
                         <x-form.select name="form.paid_by" model="form.paid_by" label="Qui paye la facture">
                             <option value="" disabled>Sélectionner une personne</option>
                             @foreach($family_members as $member)
-                                <option value="{{ $member }}">{{ $member }}</option>
+                                <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach
                         </x-form.select>
 
-                        <x-form.select name="form.associated_members" model="form.associated_members" label="Associé aux membres de la famille">
+                        <x-form.select name="form.associated_members" model="form.associated_members"
+                                       label="Associé aux membres de la famille">
                             <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
-                                <option value="{{ $member }}">{{ $member }}</option>
+                                <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach
                         </x-form.select>
                     </x-invoice-create-step>
@@ -149,7 +158,7 @@
                             <x-form.field-date label="Date d'émission" name="form.issued_date" model="form.issued_date" />
                             <x-form.field-date label="Date de paiement" name="form.payment_due_date" model="form.payment_due_date"/>
                             <x-form.field-date label="Rappel de paiement" name="form.payment_reminder" model="form.payment_reminder"/>
-                            <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
+                            <x-form.select label="Fréquence de paiement" name="form.payment_frequency" model="form.payment_frequency">
                                 <option value="" disabled>Sélectionner une fréquence</option>
                                 <option value="monthly">Mensuel</option>
                                 <option value="quarterly">Trimestriel</option>
@@ -231,7 +240,7 @@
                                 </button>
                             </div>
                             <div class="flex flex-wrap gap-2 mt-1.5 ml-2">
-                                @foreach($form->tags as $index => $tag)
+                                @foreach($tags as $index => $tag)
                                     <div class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                         {{ $tag }}
                                         <button type="button" wire:click="removeTag({{ $index }})"
@@ -302,7 +311,25 @@
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Montant">
-                                    {{ $form->amount ? number_format($form->amount, 2) . ' €' : 'Non spécifié' }}
+                                    @if($form->amount !== null && $form->amount !== '')
+                                        <span class="text-sm-medium">{{ number_format((float)$form->amount, 2, ',', ' ') }}</span>
+
+                                        @php
+                                            $currencySymbols = [
+                                                'EUR' => '€',
+                                                'USD' => '$',
+                                                'GBP' => '£',
+                                                'JPY' => '¥',
+                                                'CHF' => 'CHF',
+                                                'CAD' => '$'
+                                            ];
+                                            $symbol = $currencySymbols[$form->currency] ?? $form->currency;
+                                        @endphp
+
+                                        <span class="ml-1 text-sm-medium">{{ $symbol }} ({{ $form->currency ?? 'EUR' }})</span>
+                                    @else
+                                        Non spécifié
+                                    @endif
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Répartition du montant" :alternateBackground="true">
@@ -332,8 +359,8 @@
                                         </p>
                                         <p class="text-sm-regular">
                                             Rappel: <span class="text-sm-medium">
-                                            {{ $form->payment_reminder ? \Carbon\Carbon::parse($form->payment_reminder)->format('d/m/Y') : 'Non spécifié' }}
-                                        </span>
+                                                {{ $form->getFormattedReminderAttribute() }}
+                                            </span>
                                         </p>
                                         <p class="text-sm-regular">
                                             Fréquence: <span class="text-sm-medium">
@@ -391,7 +418,7 @@
 
                                 <x-invoices.summary-item label="Tags">
                                     <div class="flex flex-wrap gap-2">
-                                        @forelse($form->tags as $tag)
+                                        @forelse($tags as $tag)
                                             <span class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                                 {{ $tag }}
                                             </span>

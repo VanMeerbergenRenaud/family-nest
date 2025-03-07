@@ -4,6 +4,7 @@ namespace App\Livewire\Pages;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -14,15 +15,15 @@ class EditInvoice extends Component
 
     public InvoiceForm $form;
 
-    public $family_members = [];
-
-    public $engagements = [];
+    public $isEditMode = true;
 
     public $invoiceOriginalFilePath = null;
-
     public $fileWasRemoved = false;
 
-    public $isEditMode = true;
+    public $tags = [];
+    public $associated_members = [];
+    public $family_members = [];
+    public $engagements = [];
 
     public function mount($id)
     {
@@ -30,18 +31,18 @@ class EditInvoice extends Component
 
         $this->invoiceOriginalFilePath = $invoice->file_path;
 
+        $this->family_members = auth()->user()->get();
+
+        // Décoder les chaînes JSON en tableaux PHP
+        $this->tags = is_string($invoice->tags)
+            ? json_decode($invoice->tags, true)
+            : $invoice->tags;
+
         $this->engagements = [
             ['id' => 'abc123', 'name' => 'Abonnement Internet Orange'],
         ];
     }
 
-    public function updatedFormType()
-    {
-        $this->form->updateAvailableCategories();
-        $this->form->category = null;
-    }
-
-    // Enregistre la facture depuis le formulaire InvoiceForm
     public function updateInvoice()
     {
         $this->validate();
@@ -60,9 +61,6 @@ class EditInvoice extends Component
         return false;
     }
 
-    /**
-     * Supprime le fichier uploadé (pour la prévisualisation)
-     */
     public function removeUploadedFile()
     {
         // Si nous utilisons la nouvelle approche avec existingFilePath
@@ -78,6 +76,12 @@ class EditInvoice extends Component
     {
         $this->invoiceOriginalFilePath = null;
         $this->fileWasRemoved = true;
+    }
+
+    public function updatedFormType()
+    {
+        $this->form->updateAvailableCategories();
+        $this->form->category = null;
     }
 
     public function addTag()
