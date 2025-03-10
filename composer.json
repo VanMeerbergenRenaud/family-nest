@@ -6,6 +6,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-zip": "*",
+        "algolia/scout-extended": "^3.1",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "laravel/framework": "^11.9",
         "laravel/scout": "^10.13",
@@ -15,11 +17,9 @@
         "livewire/volt": "^1.0",
         "meilisearch/meilisearch-php": "^1.13",
         "socialiteproviders/facebook": "^4.1",
-        "socialiteproviders/github": "^4.1",
         "socialiteproviders/google": "^4.1",
         "symfony/http-client": "^7.2",
-        "wire-elements/livewire-strict": "^2.0",
-        "ext-zip": "*"
+        "wire-elements/livewire-strict": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.13",

@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'driver' => env('SCOUT_DRIVER', 'meilisearch'),
+    'driver' => env('SCOUT_DRIVER', 'algolia'),
 
     /*
     |--------------------------------------------------------------------------
@@ -114,7 +114,7 @@ return [
 
     'algolia' => [
         'id' => env('ALGOLIA_APP_ID', ''),
-        'secret' => env('ALGOLIA_SECRET', ''),
+        'secret' => env('ALGOLIA_API_KEY', ''),
         'index-settings' => [
             //             'users' => [
             //                 'searchableAttributes' => ['id', 'name', 'email'],
