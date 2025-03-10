@@ -416,12 +416,7 @@ class Index extends Component
     // Supprimer la facture
     public function deleteInvoice()
     {
-        $this->form->delete($this->invoiceId);
-
-        $this->deleteWithSuccess = true;
-        $this->showDeleteFormModal = false;
-
-        sleep(1);
+        dd('Suppression en cours');
     }
 
     // Archive ou désarchive la facture

@@ -6,6 +6,7 @@ use App\Enums\InvoiceTypeEnum;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class InvoiceForm extends Form
@@ -14,7 +15,13 @@ class InvoiceForm extends Form
 
     public $existingFilePath = null;
 
+    #[Validate]
+    public $uploadedFile;
+
+    #[Validate]
     public $name;
+
+    public $reference;
 
     public $type;
 
@@ -24,6 +31,7 @@ class InvoiceForm extends Form
 
     public $issuer_website;
 
+    #[Validate]
     public $amount;
 
     public $currency = 'EUR';
@@ -52,8 +60,6 @@ class InvoiceForm extends Form
 
     public $tagInput = '';
 
-    public $uploadedFile;
-
     public $engagement_id;
 
     public $engagement_name;
@@ -73,6 +79,7 @@ class InvoiceForm extends Form
                 : 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
             // Étape 1
             'name' => 'required|string|max:255',
+            'reference' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',
             'category' => 'nullable|string|max:255',
             'issuer_name' => 'nullable|string|max:255',
@@ -166,6 +173,7 @@ class InvoiceForm extends Form
                 'file_size' => $fileSize, // Store the file size
                 /* Étape 1 */
                 'name' => $this->name,
+                'reference' => $this->reference,
                 'type' => $this->type,
                 'category' => $this->category,
                 'issuer_name' => $this->issuer_name,
@@ -218,6 +226,7 @@ class InvoiceForm extends Form
         $this->uploadedFile = null;
 
         $this->name = $invoice->name;
+        $this->reference = $invoice->reference;
         $this->type = $invoice->type;
         $this->category = $invoice->category;
         $this->issuer_name = $invoice->issuer_name;
@@ -291,6 +300,7 @@ class InvoiceForm extends Form
                 'file_size' => $fileSize,
                 /* Étape 1 */
                 'name' => $this->name,
+                'reference' => $this->reference,
                 'type' => $this->type,
                 'category' => $this->category,
                 'issuer_name' => $this->issuer_name,
@@ -332,27 +342,86 @@ class InvoiceForm extends Form
         }
     }
 
-    // Supprimer la facture
-    public function delete($invoiceId = null)
+    // Archiver la facture au lieu de la supprimer
+    public function archive($invoiceId = null)
     {
         $id = $invoiceId ?? $this->invoice_id;
 
         if (empty($id)) {
-            throw new \Exception('Impossible de supprimer une facture sans ID');
+            throw new \Exception('Impossible d\'archiver une facture sans ID');
         }
 
         try {
             DB::beginTransaction();
 
             $invoice = auth()->user()->invoices()->findOrFail($id);
+            $invoice->update(['is_archived' => true]);
+
+            DB::commit();
+
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+// Récupérer une facture archivée
+    public function restore($invoiceId)
+    {
+        if (empty($invoiceId)) {
+            throw new \Exception('Impossible de restaurer une facture sans ID');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $invoice = auth()->user()->invoices()->withTrashed()->findOrFail($invoiceId);
+
+            // Si la facture est archivée, on la désarchive
+            if ($invoice->is_archived) {
+                $invoice->update(['is_archived' => false]);
+            }
+
+            // Si la facture a été soft-deleted, on la restaure
+            if ($invoice->trashed()) {
+                $invoice->restore();
+            }
+
+            DB::commit();
+
+            return $invoice;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    // Supprimer définitivement la facture (à utiliser avec précaution)
+    public function forceDelete($invoiceId = null)
+    {
+        $id = $invoiceId ?? $this->invoice_id;
+
+        if (empty($id)) {
+            throw new \Exception('Impossible de supprimer définitivement une facture sans ID');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $invoice = auth()->user()->invoices()->withTrashed()->findOrFail($id);
 
             // Supprimer le fichier associé s'il existe
             if ($invoice->file_path && Storage::disk('public')->exists($invoice->file_path)) {
                 Storage::disk('public')->delete($invoice->file_path);
             }
 
-            // Supprimer la facture
-            $result = $invoice->delete();
+            // Supprimer définitivement la facture
+            $result = $invoice->forceDelete();
 
             DB::commit();
 
@@ -364,7 +433,7 @@ class InvoiceForm extends Form
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de la suppression de la facture: '.$e->getMessage());
+            \Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
 
             return false;
         }
@@ -392,9 +461,9 @@ class InvoiceForm extends Form
 
     private function normalizeAmount($amount)
     {
-        // Si le montant est vide ou null, retourner 0 ou null selon votre préférence
+        // Si le montant est vide ou null, retourner null
         if ($amount === null || $amount === '') {
-            return null; // ou return 0; si vous préférez
+            return null;
         }
 
         // Si le montant est déjà un nombre, le retourner directement
@@ -405,30 +474,13 @@ class InvoiceForm extends Form
         // Convertir en chaîne si ce n'est pas déjà le cas
         $amount = (string) $amount;
 
-        // Supprimer les espaces
+        // Supprimer les espaces (que le mask ajoute comme séparateurs de milliers)
         $amount = str_replace(' ', '', $amount);
 
-        // Remplacer la virgule française par un point pour la conversion en float
+        // Convertir la virgule en point (format standard pour PHP)
         $amount = str_replace(',', '.', $amount);
 
-        // Gérer le cas où il y aurait plusieurs points
-        $parts = explode('.', $amount);
-        if (count($parts) > 2) {
-            // Garder le premier comme partie entière et le reste comme partie décimale
-            $integerPart = $parts[0];
-            $decimalPart = implode('', array_slice($parts, 1));
-            $amount = $integerPart.'.'.$decimalPart;
-        }
-
-        // S'assurer que la valeur est un nombre valide
-        $result = (float) $amount;
-
-        // Vérifier si la conversion a produit un nombre valide
-        if (is_nan($result) || ! is_finite($result)) {
-            return null; // ou une valeur par défaut
-        }
-
-        // Convertir en float et arrondir à 2 décimales
-        return round($result, 2);
+        // Conversion en float et arrondi
+        return round((float) $amount, 2);
     }
 }

@@ -26,7 +26,13 @@ class Invoice extends Model
         'payment_due_date' => 'date',
         'tags' => 'array',
         'is_archived' => 'boolean',
+        'is_favorite' => 'boolean',
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     protected function filePath(): Attribute
     {
@@ -48,8 +54,15 @@ class Invoice extends Model
         return number_format($this->file_size / pow(1024, $power), 2).' '.$units[$power];
     }
 
-    public function user(): BelongsTo
+    // Scope pour récupérer les factures archivées
+    public function scopeArchived($query)
     {
-        return $this->belongsTo(User::class);
+        return $query->where('is_archived', true);
+    }
+
+    // Scope pour récupérer les factures non archivées (actives)
+    public function scopeActive($query)
+    {
+        return $query->where('is_archived', false);
     }
 }

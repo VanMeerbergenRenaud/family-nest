@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Pages\Invoices\Archived;
 use App\Livewire\Pages\Invoices\Create;
 use App\Livewire\Pages\Invoices\Edit;
 use App\Livewire\Pages\Invoices\Index;
@@ -23,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices', Index::class)->name('invoices');
     Route::get('/invoices/create', Create::class)->name('invoices.create');
     Route::get('/invoices/{id}/edit', Edit::class)->name('invoices.edit');
+    Route::get('/invoices/archived', Archived::class)->name('invoices.archived');
 });
 
 /* Routes themes, calendar, archives, goals, family */
@@ -33,10 +35,6 @@ Volt::route('themes', 'pages.themes')
 Volt::route('calendar', 'pages.calendar')
     ->middleware(['auth'])
     ->name('calendar');
-
-Volt::route('archives', 'pages.archives')
-    ->middleware(['auth'])
-    ->name('archives');
 
 Volt::route('goals', 'pages.goals')
     ->middleware(['auth'])
