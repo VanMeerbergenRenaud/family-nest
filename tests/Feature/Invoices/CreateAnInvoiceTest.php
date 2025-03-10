@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\Invoices;
 
-use App\Livewire\Pages\CreateInvoice;
+use App\Livewire\Pages\Invoices\Create;
 use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-
 use function Pest\Laravel\assertDatabaseHas;
 
 it('permet de créer une facture complète avec succès', function () {
@@ -23,7 +22,7 @@ it('permet de créer une facture complète avec succès', function () {
     $file = UploadedFile::fake()->image('facture.jpg');
 
     // Livewire test
-    Livewire::test(CreateInvoice::class)
+    Livewire::test(Create::class)
         // Étape 1: Upload du fichier
         ->set('form.uploadedFile', $file)
 

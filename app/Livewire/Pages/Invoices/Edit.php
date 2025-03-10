@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Pages;
+namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
-class EditInvoice extends Component
+class Edit extends Component
 {
     use WithFileUploads;
 
@@ -103,7 +103,7 @@ class EditInvoice extends Component
 
     public function render()
     {
-        return view('livewire.pages.edit-invoice', [
+        return view('livewire.pages.invoices.edit', [
             'invoiceTypes' => InvoiceTypeEnum::getTypesOptions(),
         ])->layout('layouts.app');
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Pages;
+namespace App\Livewire\Pages\Invoices;
 
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\Redirect;
@@ -10,7 +10,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-class InvoiceManager extends Component
+class Index extends Component
 {
     use WithFileUploads, WithPagination;
 
@@ -134,7 +134,7 @@ class InvoiceManager extends Component
     /* Factures récentes */
     public $recentInvoices = [];
 
-    // Ajouter ces propriétés à ta classe InvoiceManager
+    // Ajouter ces propriétés à ta classe Index
     public bool $showFolderModal = false;
 
     public string $currentFolder = '';
@@ -143,7 +143,7 @@ class InvoiceManager extends Component
 
     public $folderInvoices = [];
 
-    // Ajouter ces méthodes à ta classe InvoiceManager
+    // Ajouter ces méthodes à ta classe Index
     public function openFolder($folder, $title)
     {
         $this->currentFolder = $folder;
@@ -456,7 +456,7 @@ class InvoiceManager extends Component
         $folderStats = $this->getFolderStats();
 
         // Rendu de la vue
-        return view('livewire.pages.invoice-manager', compact('invoices', 'folderStats'))
+        return view('livewire.pages.invoices.index', compact('invoices', 'folderStats'))
             ->layout('layouts.app-sidebar');
     }
 }
