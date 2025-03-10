@@ -4,7 +4,6 @@ namespace App\Livewire\Pages;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -18,11 +17,15 @@ class EditInvoice extends Component
     public $isEditMode = true;
 
     public $invoiceOriginalFilePath = null;
+
     public $fileWasRemoved = false;
 
     public $tags = [];
+
     public $associated_members = [];
+
     public $family_members = [];
+
     public $engagements = [];
 
     public function mount($id)

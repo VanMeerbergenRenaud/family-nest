@@ -15,8 +15,7 @@
         }" class="mx-auto max-w-[70rem]">
 
         {{-- Barre de progression avec les étapes --}}
-        <div
-            class="py-4 px-6 rounded-xl max-lg:bg-gray-100 dark:max-lg:bg-gray-800 flex flex-col items-start lg:flex-row lg:items-center max-lg:gap-3 mb-6 space-x-2 overflow-x-scroll scrollbar-hidden">
+        <div class="py-4 px-6 rounded-xl max-lg:bg-gray-100 dark:max-lg:bg-gray-800 flex flex-col items-start lg:flex-row lg:items-center max-lg:gap-3 mb-6 space-x-2 overflow-x-scroll scrollbar-hidden">
             <template x-for="(step, index) in steps" :key="index">
                 <div class="flex-center cursor-pointer whitespace-nowrap" @click="goToStep(index + 1)">
                     <span class="w-8 h-8 rounded-full flex-center mr-3"
@@ -42,9 +41,11 @@
             <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-10">
 
                 {{-- Image : colonne 1 --}}
-                <div class="max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw] relative">
+                <div class="relative max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw]">
                     @if (!$form->uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
+                        <div class="mt-8">
+                            <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
+                        </div>
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -120,7 +121,7 @@
                         </x-form.select>
 
                         <x-form.select name="form.associated_members" model="form.associated_members"
-                                       label="Associé aux membres de la famille">
+                                       label="Associé à un membre de la famille">
                             <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member->name }}">{{ $member->name }}</option>
@@ -315,10 +316,14 @@
                                 <x-invoices.summary-item label="Répartition du montant" :alternateBackground="true">
                                     @if(!empty($form->amount))
                                         @if($form->paid_by)
-                                            Payée par : {{ $form->paid_by }}
+                                            <span class="block">
+                                                <span class="text-sm-regular">Payée par :&nbsp;</span><span class="text-sm-medium">{{ $form->paid_by }}</span>
+                                            </span>
                                         @endif
                                         @if($form->associated_members)
-                                            Associée à : {{ $form->associated_members }}
+                                            <span class="block">
+                                                <span class="text-sm-regular">Associée à :&nbsp;</span><span class="text-sm-medium">{{ $form->associated_members }}</span>
+                                            </span>
                                         @endif
                                     @else
                                         Non spécifié
@@ -393,7 +398,7 @@
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Notes" :alternateBackground="true">
-                                    {{ $form->notes ?: 'Aucune note' }}
+                                    <span class="text-sm-regular">{{ $form->notes ?: 'Aucune note' }}</span>
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Tags">

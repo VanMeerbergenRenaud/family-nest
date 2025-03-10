@@ -79,7 +79,7 @@ class InvoiceForm extends Form
             'issuer_website' => 'nullable|url|max:255',
             // Étape 2
             'amount' => 'required|numeric|min:0',
-            'currency' => 'nullable|string|size:3',// 3 pour le code ISO
+            'currency' => 'nullable|string|size:3', // 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
             'associated_members' => 'nullable|string',
             // Étape 3
@@ -223,7 +223,7 @@ class InvoiceForm extends Form
         $this->issuer_name = $invoice->issuer_name;
         $this->issuer_website = $invoice->issuer_website;
         $this->amount = is_numeric($invoice->amount)
-            ? (float)$invoice->amount
+            ? (float) $invoice->amount
             : null;
         $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
@@ -372,13 +372,14 @@ class InvoiceForm extends Form
 
     public function getFormattedReminderAttribute()
     {
-        if (!$this->payment_reminder) {
+        if (! $this->payment_reminder) {
             return 'Non spécifié';
         }
 
         if (str_contains($this->payment_reminder, '_days')) {
             $days = str_replace('_days', '', $this->payment_reminder);
-            return $days . ' jours avant échéance';
+
+            return $days.' jours avant échéance';
         }
 
         // Si c'est une date valide
@@ -416,14 +417,14 @@ class InvoiceForm extends Form
             // Garder le premier comme partie entière et le reste comme partie décimale
             $integerPart = $parts[0];
             $decimalPart = implode('', array_slice($parts, 1));
-            $amount = $integerPart . '.' . $decimalPart;
+            $amount = $integerPart.'.'.$decimalPart;
         }
 
         // S'assurer que la valeur est un nombre valide
         $result = (float) $amount;
 
         // Vérifier si la conversion a produit un nombre valide
-        if (is_nan($result) || !is_finite($result)) {
+        if (is_nan($result) || ! is_finite($result)) {
             return null; // ou une valeur par défaut
         }
 

@@ -141,7 +141,7 @@
                         </x-form.select>
 
                         <x-form.select name="form.associated_members" model="form.associated_members"
-                                       label="Associé aux membres de la famille">
+                                       label="Associé à un membre de la famille">
                             <option value="" disabled>Sélectionner un membre</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member->name }}">{{ $member->name }}</option>
@@ -293,11 +293,11 @@
                         <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                             <dl>
                                 <x-invoices.summary-item label="Nom de la facture" :alternateBackground="true">
-                                    {{ $form->name ?: 'Non spécifié' }}
+                                    {{ ucfirst($form->name) ?: 'Non spécifié' }}
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Type et catégorie">
-                                    {{ $form->type ?: 'Non spécifié' }} - {{ $form->category ?: 'Non spécifié' }}
+                                    {{ ucfirst($form->type) ?: 'Non spécifié' }} - {{ ucfirst($form->category) ?: 'Non spécifié' }}
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Fournisseur" :alternateBackground="true">
@@ -335,10 +335,14 @@
                                 <x-invoices.summary-item label="Répartition du montant" :alternateBackground="true">
                                     @if(!empty($form->amount))
                                         @if($form->paid_by)
-                                            Payée par : {{ $form->paid_by }}
+                                            <span class="block">
+                                                <span class="text-sm-regular">Payée par :&nbsp;</span><span class="text-sm-medium">{{ $form->paid_by }}</span>
+                                            </span>
                                         @endif
                                         @if($form->associated_members)
-                                            Associée à : {{ $form->associated_members }}
+                                            <span class="block">
+                                                <span class="text-sm-regular">Associée à :&nbsp;</span><span class="text-sm-medium">{{ $form->associated_members }}</span>
+                                            </span>
                                         @endif
                                     @else
                                         Non spécifié
@@ -413,7 +417,7 @@
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Notes" :alternateBackground="true">
-                                    {{ $form->notes ?: 'Aucune note' }}
+                                    <span class="text-sm-regular">{{ $form->notes ?: 'Aucune note' }}</span>
                                 </x-invoices.summary-item>
 
                                 <x-invoices.summary-item label="Tags">

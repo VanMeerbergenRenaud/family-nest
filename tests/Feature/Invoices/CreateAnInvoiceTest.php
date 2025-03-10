@@ -11,7 +11,6 @@ use Livewire\Livewire;
 
 use function Pest\Laravel\assertDatabaseHas;
 
-
 it('permet de créer une facture complète avec succès', function () {
     $user = User::factory()->create();
 
@@ -88,5 +87,5 @@ it('permet de créer une facture complète avec succès', function () {
     expect($invoice->tags)->toContain('internet', 'eau');
 
     // Vérifier que le fichier a été stocké
-    Storage::disk('public')->assertExists('invoices/' . $file->hashName());
+    Storage::disk('public')->assertExists('invoices/'.$file->hashName());
 });
