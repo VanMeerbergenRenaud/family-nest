@@ -32,7 +32,7 @@ class Sidebar extends Component
 
     public function seeProfile()
     {
-        return redirect()->route('profile');
+        $this->redirectRoute('profile');
     }
 
     public function seeShortcut()
@@ -57,7 +57,7 @@ class Sidebar extends Component
 
     public function seeArchives()
     {
-        dd('Voir les archives');
+        $this->redirectRoute('invoices.archived');
     }
 
     public function logout()

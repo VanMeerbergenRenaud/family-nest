@@ -4,6 +4,7 @@
     'name' => '',
     'asterix' => false,
     'placeholder' => '0,00',
+    'initialValue' => null,
     'currencies' => [
         'EUR' => ['symbol' => '€', 'name' => 'Euro'],
         'USD' => ['symbol' => '$', 'name' => 'Dollar US'],
@@ -17,61 +18,65 @@
 
 @php
     $id = $name ?? uniqid('currency-field-');
+    $symbols = json_encode(array_combine(array_keys($currencies), array_column($currencies, 'symbol')));
 @endphp
 
 <div class="m-0 p-0 max-w-[45rem]" wire:key="{{ $id }}">
     @if($label)
         <label for="{{ $id }}" class="relative mb-1.5 pl-2 block text-sm-medium text-gray-800 dark:text-gray-200">
-            {{ ucfirst($label) }}
-            @if($asterix)
-                <span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>
-            @endif
+            {{ ucfirst($label) }}@if($asterix)<span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>@endif
         </label>
     @endif
 
     <div
         x-data="{
-            // Données de base
-            value: $wire.get('{{ $model }}'),
-            displayValue: '',
+            amount: '',
+            numericValue: {{ is_numeric($initialValue) ? $initialValue : 'null' }},
             currency: $wire.get('form.currency') || '{{ $defaultCurrency }}',
+            symbols: {{ $symbols }},
 
-            // Initialisation
+            // Initialiser les valeurs
             init() {
-                // Format initial
-                this.formatDisplay();
+                // Si une valeur initiale est fournie, l'utiliser pour formater l'affichage
+                if (this.numericValue !== null) {
+                    this.formatDisplayFromNumeric();
+                }
 
-                // Écouter les changements
+                // Observer les changements de valeur venant de Livewire
                 $wire.$watch('{{ $model }}', (val) => {
-                    this.value = val;
-                    this.formatDisplay();
+                    this.numericValue = val;
+                    this.formatDisplayFromNumeric();
                 });
             },
 
-            // Formater pour affichage
-            formatDisplay() {
-                if (this.value === null || this.value === undefined) {
-                    this.displayValue = '';
+            // Formater la valeur numérique pour l'affichage
+            formatDisplayFromNumeric() {
+                if (this.numericValue === null || this.numericValue === undefined || this.numericValue === '') {
+                    this.amount = '';
                     return;
                 }
 
-                // Formater avec espaces comme séparateur de milliers et virgule pour les décimales
-                let num = Number(this.value).toFixed(2);
+                // Formater avec le format français (virgule comme séparateur décimal)
+                let num = parseFloat(this.numericValue).toFixed(2);
                 let [int, dec] = num.split('.');
+
+                // Ajouter les séparateurs de milliers
                 int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-                this.displayValue = int + ',' + dec;
+
+                // Assembler avec virgule
+                this.amount = int + ',' + dec;
             },
 
-            // Traiter la saisie de l'utilisateur
-            updateValue() {
-                if (!this.displayValue) {
-                    this.value = null;
+            // Mettre à jour Livewire lors de la sortie du champ
+            updateLivewire() {
+                if (!this.amount) {
+                    this.numericValue = null;
                     $wire.set('{{ $model }}', null);
                     return;
                 }
 
-                // Convertir en nombre
-                let parsed = this.displayValue
+                // Nettoyer et convertir en nombre
+                let parsed = this.amount
                     .replace(/\s/g, '')     // Supprimer les espaces
                     .replace(/,/g, '.')     // Remplacer virgules par points
                     .replace(/[^\d.]/g, '') // Garder seulement chiffres et points
@@ -79,47 +84,22 @@
 
                 let num = parseFloat(parsed);
                 if (!isNaN(num)) {
-                    this.value = num;
+                    this.numericValue = num;
                     $wire.set('{{ $model }}', num);
-                    this.formatDisplay(); // Reformater pour l'affichage
                 }
-            },
-
-            // Obtenir le symbole actuel
-            getSymbol() {
-                return '{{ $currencies['EUR']['symbol'] }}'
-                    .replace('EUR', this.currency)
-                    .replace('€', this.getCurrencySymbol());
-            },
-
-            // Récupérer le symbole de la devise actuelle
-            getCurrencySymbol() {
-                const symbols = {
-                    'EUR': '€',
-                    'USD': '$',
-                    'GBP': '£',
-                    'JPY': '¥',
-                    'CHF': 'CHF',
-                    'CAD': '$'
-                };
-                return symbols[this.currency] || '';
-            },
-
-            // Changer la devise
-            setCurrency(code) {
-                this.currency = code;
-                $wire.set('form.currency', code);
             }
         }"
     >
         <div class="relative flex items-center justify-between rounded-md bg-white border border-slate-200 dark:border-gray-600">
-            <span class="pl-3 rounded-l-md text-gray-500 dark:text-gray-300" x-text="getSymbol()"></span>
+            <span class="pl-3 rounded-l-md text-gray-500 dark:text-gray-300" x-text="symbols[currency]"></span>
+
             <input
                 type="text"
                 id="{{ $id }}"
                 name="{{ $name }}"
-                x-model="displayValue"
-                @blur="updateValue()"
+                x-model="amount"
+                x-mask:dynamic="$money($input, ',', ' ', 2)"
+                @blur="updateLivewire()"
                 class="rounded-0 p-2.5 border-0 flex-grow w-[calc(100%-1.5rem)] text-sm-regular focus:outline-0 text-gray-700 dark:bg-gray-700 dark:text-white"
                 placeholder="{{ $placeholder }}"
             />
@@ -134,7 +114,7 @@
 
                 <x-menu.items class="mt-2 w-72 max-h-80 overflow-y-scroll rounded-md shadow-lg bg-white dark:bg-gray-800 z-20">
                     @foreach($currencies as $code => $currencyInfo)
-                        <x-menu.item @click="setCurrency('{{ $code }}')">
+                        <x-menu.item @click="currency = '{{ $code }}'; $wire.set('form.currency', '{{ $code }}')">
                             <span class="relative w-full flex items-center gap-3">
                                 <span class="min-w-8 text-sm-medium text-gray-900 dark:text-white">{{ $code }}</span>
                                 <span class="min-w-10 text-center text-sm-medium text-gray-500 dark:text-gray-400">{{ $currencyInfo['symbol'] }}</span>
@@ -150,27 +130,10 @@
             </x-menu>
         </div>
 
-        <!-- Aperçu du montant formaté -->
-        {{--<div class="mt-1 pl-4 text-sm text-gray-500 dark:text-gray-400" x-show="value !== null && value !== undefined">
-            <span class="text-sm-medium">Aperçu: </span>
-            <span class="text-sm-medium" x-text="
-                new Intl.NumberFormat(
-                    currency === 'EUR' ? 'fr-FR' : 'en-US',
-                    {
-                        style: 'currency',
-                        currency: currency,
-                        minimumFractionDigits: 2
-                    }
-                ).format(value || 0)
-            "></span>
-        </div>--}}
-
         @error($model)
         <ul class="my-2 flex flex-col gap-2 font-medium text-red-500 dark:text-red-400">
             @foreach ($errors->get($model) as $error)
-                <li class="pl-2 pr-1 text-sm-medium text-red-500 dark:text-red-400">
-                    {{ $error }}
-                </li>
+                <li class="pl-2 pr-1 text-sm-medium text-red-500 dark:text-red-400">{{ $error }}</li>
             @endforeach
         </ul>
         @enderror

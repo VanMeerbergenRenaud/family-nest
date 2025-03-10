@@ -54,7 +54,7 @@ class Edit extends Component
             $updatedInvoice = $this->form->update();
 
             if ($updatedInvoice) {
-                return redirect()->route('invoices');
+                $this->redirectRoute('invoices');
             }
         } catch (\Exception $e) {
             DB::rollBack();

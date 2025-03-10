@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 it('permet de créer une facture complète avec succès', function () {

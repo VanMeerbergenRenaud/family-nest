@@ -15,9 +15,10 @@
     <a href="{{ $href }}"
        wire:current="{{ $activeColor }}"
        class="group flex items-center rounded-lg px-3 py-2 h-10"
+       {{ $attributes }}
     >
         <span class="w-4.5 h-4.5 stroke-2 {{ $groupColor }}">
-            <x-dynamic-component :component="'heroicon-o-'.$icon" />
+            <x-dynamic-component :component="'heroicon-o-'.$icon" class="text-current" />
         </span>
         <span x-show="expanded" class="ml-2.5 {{ $groupColor }}">
             {{ $label }}

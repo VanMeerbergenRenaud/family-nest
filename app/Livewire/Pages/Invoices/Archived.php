@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Pages\Invoices;
 
-use App\Livewire\Forms\InvoiceForm;
 use Livewire\Component;
 use Livewire\WithPagination;
 

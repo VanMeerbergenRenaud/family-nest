@@ -15,24 +15,76 @@
         }" class="mx-auto max-w-[70rem]">
 
         {{-- Barre de progression avec les étapes --}}
-        <div class="py-4 px-6 rounded-xl max-lg:bg-gray-100 dark:max-lg:bg-gray-800 flex flex-col items-start lg:flex-row lg:items-center max-lg:gap-3 mb-6 space-x-2 overflow-x-scroll scrollbar-hidden">
-            <template x-for="(step, index) in steps" :key="index">
-                <div class="flex-center cursor-pointer whitespace-nowrap" @click="goToStep(index + 1)">
-                    <span class="w-8 h-8 rounded-full flex-center mr-3"
-                          :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
-                        <span x-text="index + 1" class="text-sm"></span>
-                    </span>
+        <div class="mb-2 lg:mb-6">
 
-                    <span class="text-md-regular text-slate-700 dark:text-slate-200"
-                          :class="{ 'font-medium underline': currentStep === index + 1 }"
-                          x-text="step"></span>
+            <!-- Navigation desktop -->
+            <div class="hidden lg:flex lg:flex-row lg:items-center lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2 lg:overflow-x-scroll lg:scrollbar-hidden">
+                <template x-for="(step, index) in steps" :key="index">
+                    <div class="flex-center cursor-pointer whitespace-nowrap" @click="goToStep(index + 1)">
+                        <span class="w-8 h-8 rounded-full flex-center mr-3"
+                              :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
+                            <span x-text="index + 1" class="text-sm"></span>
+                        </span>
+                        <span class="text-md-regular text-slate-700 dark:text-slate-200"
+                              :class="{ 'font-medium underline': currentStep === index + 1 }"
+                              x-text="step"></span>
 
-                    <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
-                        <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
-                    </span>
-                </div>
-            </template>
+                        <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
+                            <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
+                        </span>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Navigation mobile -->
+            <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 md:max-w-[60vw] mx-auto">
+
+                <button
+                    @click="currentStep > 1 ? prevStep() : null"
+                    :class="{'opacity-50 cursor-not-allowed': currentStep <= 1, 'cursor-pointer': currentStep > 1}"
+                    class="p-2"
+                >
+                    <x-svg.arrows.left class="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </button>
+
+                <!-- Menu déroulant des étapes -->
+                <x-menu>
+                    <x-menu.button class="button-primary min-w-56 justify-center">
+                        <span class="font-medium" x-text="`Étape ${currentStep} : ${steps[currentStep-1]}`"></span>
+                        <x-svg.arrows.right class="ml-1 rotate-90" />
+                    </x-menu.button>
+
+                    <x-menu.items class="mt-2 w-56">
+                        <template x-for="(step, index) in steps" :key="index">
+                            <x-menu.item @click="goToStep(index + 1)">
+                        <span class="relative w-full flex items-center">
+                            <span class="w-6 h-6 rounded-full flex-center mr-2"
+                                  :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
+                                <span x-text="index + 1" class="text-xs"></span>
+                            </span>
+                            <span class="text-sm text-gray-700 dark:text-gray-200" x-text="step"></span>
+                            <!-- Icône de vérification pour l'étape active -->
+                            <svg x-show="currentStep === index + 1" class="h-4 w-4 absolute right-0"
+                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </span>
+                            </x-menu.item>
+                        </template>
+                    </x-menu.items>
+                </x-menu>
+
+                <button
+                    @click="currentStep < steps.length ? nextStep() : null"
+                    :class="{'opacity-50 cursor-not-allowed': currentStep >= steps.length, 'cursor-pointer': currentStep < steps.length}"
+                    class="p-2"
+                >
+                    <x-svg.arrows.right class="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                </button>
+            </div>
         </div>
+
+        <x-divider class="mt-4 md:max-w-[60vw] mx-auto lg:hidden" />
 
         <form wire:submit.prevent="createInvoice">
             @csrf
@@ -73,9 +125,11 @@
                         description="Choisissez le type de facture que vous venez d'importer."
                         class="grid grid-cols-1 gap-4"
                     >
-                        <x-form.field label="Nom" name="form.name" model="form.name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
-
-                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 ">
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
+                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
+                            <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="123909833" />
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
@@ -238,38 +292,6 @@
                         step="7" title="Étape 7 : Résumé"
                         description="Vérifiez les informations avant d'enregistrer la facture."
                     >
-                        <!-- Affichage des erreurs de validation -->
-                        @if($errors->any())
-                            <x-form.alert type="warning" title="Attention : corrections requises">
-                                Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
-                                Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
-                            </x-form.alert>
-
-                            <x-form.alert type="error" title="Veuillez corriger les erreurs suivantes avant de continuer :">
-                                <ul class="space-y-1 list-disc list-inside">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-
-                                <x-slot name="actions">
-                                    <button type="button"
-                                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm-medium text-white bg-red-600 hover:bg-red-700"
-                                            @click="goToStep(1)">
-                                        Retourner au début du formulaire
-                                    </button>
-                                </x-slot>
-                            </x-form.alert>
-                        @elseif(empty($form->uploadedFile))
-                            <x-form.alert type="warning" title="Aucune facture importée">
-                                Veuillez importer une facture pour commencer.
-                            </x-form.alert>
-                        @else
-                            <x-form.alert type="success" title="Prêt à soumettre">
-                                Toutes les informations sont complètes. Vous pouvez maintenant enregistrer cette facture.
-                            </x-form.alert>
-                        @endif
-
                         <!-- Résumé du formulaire -->
                         <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
                             <dl>
@@ -440,6 +462,69 @@
                                 </x-invoices.summary-item>
                             </dl>
                         </div>
+
+                        <!-- Affichage des erreurs de validation -->
+                        @if($errors->any())
+                            <x-form.alert type="warning" title="Attention : corrections requises">
+                                Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
+                                Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
+                            </x-form.alert>
+
+                            <x-form.alert type="error" title="Veuillez corriger les erreurs suivantes avant de continuer :">
+                                <ul class="mt-4 space-y-3 list-inside">
+                                    @php
+                                        $fieldToStep = [
+                                            'fichier' => 1,
+                                            'nom' => 1,
+                                            'référence' => 1,
+                                            'type' => 1,
+                                            'catégorie' => 1,
+                                            'fournisseur' => 1,
+                                            'site internet' => 1,
+                                            'montant' => 2,
+                                            'devise' => 2,
+                                            'payée par' => 2,
+                                            'date d\'émission' => 3,
+                                            'date de paiement' => 3,
+                                            'rappel de paiement' => 3,
+                                            'fréquence' => 3,
+                                            'engagement' => 4,
+                                            'statut' => 5,
+                                            'méthode de paiement' => 5,
+                                            'priorité' => 5,
+                                            'notes' => 6,
+                                            'tags' => 6,
+                                        ];
+                                    @endphp
+
+                                    @foreach ($errors->all() as $error)
+                                        @php
+                                            $step = 1;
+                                            foreach ($fieldToStep as $field => $fieldStep) {
+                                                if (stripos($error, $field) !== false) {
+                                                    $step = $fieldStep;
+                                                    break;
+                                                }
+                                            }
+                                        @endphp
+                                        <li class="flex items-center justify-between">
+                                            <span class="text-sm-medium text-red-600">{{ $error }}</span>
+                                            <button type="button" @click="goToStep({{ $step }})" class="ml-4 px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-md flex-shrink-0 whitespace-nowrap">
+                                                Aller à l'étape {{ $step }}
+                                            </button>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </x-form.alert>
+                        @elseif(empty($form->uploadedFile))
+                            <x-form.alert type="warning" title="Aucune facture importée">
+                                Veuillez importer une facture pour commencer.
+                            </x-form.alert>
+                        @else
+                            <x-form.alert type="success" title="Prêt à soumettre">
+                                Toutes les informations sont complètes. Vous pouvez maintenant enregistrer cette facture.
+                            </x-form.alert>
+                        @endif
                     </x-invoice-create-step>
 
                     {{-- Boutons de Navigation --}}
@@ -458,6 +543,12 @@
                                 Valider
                             </button>
                         </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="submit" x-show="currentStep < steps.length" class="button-tertiary">
+                            Tout valider
+                        </button>
                     </div>
                     {{-- Fin colonne 2 --}}
                 </div>

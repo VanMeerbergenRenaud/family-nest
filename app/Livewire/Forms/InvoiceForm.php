@@ -368,7 +368,7 @@ class InvoiceForm extends Form
         }
     }
 
-// Récupérer une facture archivée
+    // Récupérer une facture archivée
     public function restore($invoiceId)
     {
         if (empty($invoiceId)) {

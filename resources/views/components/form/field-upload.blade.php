@@ -11,7 +11,7 @@
             <x-svg.download class="w-5 h-5 mb-2"/>
             <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
                 <span
-                    class="font-semibold text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">
+                    class="text-md-semibold text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">
                     Clic pour importer
                 </span> ou glisser déposer
             </p>
