@@ -151,7 +151,7 @@
         </div>
 
         <!-- Aperçu du montant formaté -->
-        <div class="mt-1 pl-4 text-sm text-gray-500 dark:text-gray-400" x-show="value !== null && value !== undefined">
+        {{--<div class="mt-1 pl-4 text-sm text-gray-500 dark:text-gray-400" x-show="value !== null && value !== undefined">
             <span class="text-sm-medium">Aperçu: </span>
             <span class="text-sm-medium" x-text="
                 new Intl.NumberFormat(
@@ -163,7 +163,7 @@
                     }
                 ).format(value || 0)
             "></span>
-        </div>
+        </div>--}}
 
         @error($model)
         <ul class="my-2 flex flex-col gap-2 font-medium text-red-500 dark:text-red-400">
