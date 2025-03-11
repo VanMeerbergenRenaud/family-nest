@@ -6,7 +6,7 @@
     'asterix' => false,
 ])
 
-<div class="m-0 p-0 max-w-[45rem]">
+<div {{ $attributes->merge(['class' => 'm-0 p-0 max-w-[45rem]']) }}>
     <label for="{{ $name }}" class="relative mb-1.5 pl-2 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
         @if($asterix)

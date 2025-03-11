@@ -394,7 +394,7 @@ class Index extends Component
     // Rediriger vers la page d'édition de la facture
     public function showEditPage($invoiceId)
     {
-        return Redirect::route('invoices.edit', $invoiceId);
+        $this->redirectRoute('invoices.edit', $invoiceId);
     }
 
     // Mettre à jour la facture
@@ -402,7 +402,7 @@ class Index extends Component
     {
         $this->form->update();
 
-        return Redirect::route('invoices');
+        $this->redirectRoute('invoices');
     }
 
     // Afficher le formulaire de suppression

@@ -115,6 +115,7 @@
     }
 
     /* Buttons
+        0. Classic => hover:bg-gray-200
         1. Primary => white
         2. Secondary => gray
         3. Tertiary => indigo
@@ -122,6 +123,11 @@
         5. Warning => yellow
         6. Success => green
     */
+
+    .button-classic {
+        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-200 transition-colors;
+    }
+
     .button-primary {
         @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-gray-700 border border-gray-200 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600;
     }

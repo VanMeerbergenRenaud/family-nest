@@ -47,6 +47,7 @@ class InvoiceFactory extends Factory
 
             /* Étape 1 */
             'name' => $this->faker->words(3, true),
+            'reference' => $this->faker->bothify('INV-#####-???'),
             'type' => $this->faker->randomElement($types),
             'category' => $this->faker->randomElement($categories),
             'issuer_name' => $this->faker->company(),
@@ -78,7 +79,8 @@ class InvoiceFactory extends Factory
 
             /* Étape 6 */
             'notes' => $this->faker->paragraph(),
-            'tags' => json_encode($this->faker->words($this->faker->numberBetween(1, 5))),
+            // Ne pas encoder les tags ici car ils seront encodés automatiquement plus tard
+            'tags' => $this->faker->words($this->faker->numberBetween(1, 5)),
 
             /* Archives */
             'is_archived' => $this->faker->boolean(20), // 20% chance d'être archivé

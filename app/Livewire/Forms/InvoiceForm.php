@@ -85,7 +85,7 @@ class InvoiceForm extends Form
             'issuer_name' => 'nullable|string|max:255',
             'issuer_website' => 'nullable|url|max:255',
             // Étape 2
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
             'associated_members' => 'nullable|string',
@@ -102,7 +102,7 @@ class InvoiceForm extends Form
             'payment_method' => 'nullable|in:card,cash,transfer',
             'priority' => 'nullable|in:high,medium,low,none',
             // Étape 6
-            'notes' => 'nullable|string',
+            'notes' => 'nullable|string|min:3|max:500',
             'tags' => 'nullable|array',
             'tagInput' => 'nullable|string',
             // Archives
@@ -119,12 +119,12 @@ class InvoiceForm extends Form
             'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
             'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, PNG ou JPG.',
             'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
-            'uploadedFile.not_in' => 'Les fichiers CSV ne sont pas acceptés. Veuillez utiliser un format comme PDF, Word, JPEG, PNG ou JPG.',
             'name.required' => 'Le nom de la facture est obligatoire.',
             'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
             'amount.required' => 'Le montant est obligatoire.',
             'amount.numeric' => 'Le montant doit être un nombre.',
             'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
+            'amount.max' => 'Le montant doit être inférieur à 999 999 999,99. À moins que vous ne soyez John D. Rockefeller, auquel cas nous vous suggérons de nous contactez !',
             'issued_date.date' => "La date d'émission doit être une date valide.",
             'payment_due_date.date' => "La date d'échéance doit être une date valide.",
             'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
@@ -197,7 +197,7 @@ class InvoiceForm extends Form
                 'priority' => $this->priority,
                 /* Étape 6 */
                 'notes' => $this->notes,
-                'tags' => $this->tags,
+                'tags' => json_encode($this->tags),
                 /* Archives */
                 'is_archived' => $this->is_archived,
                 /* Favoris */
@@ -324,7 +324,7 @@ class InvoiceForm extends Form
                 'priority' => $this->priority,
                 /* Étape 6 */
                 'notes' => $this->notes,
-                'tags' => $this->tags,
+                'tags' => json_encode($this->tags),
                 /* Archives */
                 'is_archived' => $this->is_archived,
                 /* Favoris */

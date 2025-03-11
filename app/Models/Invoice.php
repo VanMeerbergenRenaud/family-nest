@@ -65,4 +65,24 @@ class Invoice extends Model
     {
         return $query->where('is_archived', false);
     }
+
+    // Configuration pour Algolia
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'reference' => $this->reference,
+            'type' => $this->type,
+            'category' => $this->category,
+            'issuer_name' => $this->issuer_name,
+            'tags' => $this->tags,
+            'is_archived' => $this->is_archived,
+        ];
+    }
+
+    // NB: Seules les factures non archivées peuvent être indexées
+    public function shouldBeSearchable(): bool
+    {
+        return !$this->is_archived;
+    }
 }

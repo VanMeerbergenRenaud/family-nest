@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('file_size')->nullable(); // New column for file size in bytes
             /* Step 1 */
             $table->string('name');
+            $table->string('reference')->nullable(); // Référence de la facture
             $table->string('type')->nullable(); // Type de facture (abonnement, loyer, etc.)
             $table->string('category')->nullable(); // Catégorie de facture (téléphonique, logement, etc.)
             $table->string('issuer_name')->nullable();  // Émetteur de la facture

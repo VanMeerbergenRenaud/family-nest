@@ -1,4 +1,6 @@
 <div>
+    <h1 class="sr-only">Créer une facture</h1>
+
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,
@@ -18,9 +20,9 @@
         <div class="mb-2 lg:mb-6">
 
             <!-- Navigation desktop -->
-            <div class="hidden lg:flex lg:flex-row lg:items-center lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2 lg:overflow-x-scroll lg:scrollbar-hidden">
+            <div class="hidden lg:flex-center lg:flex-row lg:flex-wrap lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2">
                 <template x-for="(step, index) in steps" :key="index">
-                    <div class="flex-center cursor-pointer whitespace-nowrap" @click="goToStep(index + 1)">
+                    <div class="flex-center cursor-pointer whitespace-nowrap mb-4" @click="goToStep(index + 1)">
                         <span class="w-8 h-8 rounded-full flex-center mr-3"
                               :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
                             <span x-text="index + 1" class="text-sm"></span>
@@ -89,15 +91,13 @@
         <form wire:submit.prevent="createInvoice">
             @csrf
 
-            {{-- Facture preview--}}
-            <div class="max-lg:flex-center gap-4 lg:grid lg:grid-cols-[30vw_auto] lg:gap-10">
+            {{-- Invoice form --}}
+            <div class="lg:px-4 max-lg:mt-4 mx-auto grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-x-10 lg:gap-y-0">
 
                 {{-- Image : colonne 1 --}}
-                <div class="relative max-lg:hidden overflow-hidden flex-center max-h-[75vh] max-w-[30vw]">
+                <div class="relative flex-center overflow-hidden max-h-[75vh] lg:max-w-[30vw]">
                     @if (!$form->uploadedFile)
-                        <div class="mt-8">
-                            <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
-                        </div>
+                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -117,17 +117,17 @@
                 </div>
 
                 {{-- Steps : colonne 2 --}}
-                <div class="mt-6 lg:max-w-[60vw]">
+                <div class="bg-gray-50 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-gray">
 
                     {{-- Étape 1: Informations générales --}}
                     <x-invoice-create-step
                         step="1" title="Étape 1 : Informations générales"
-                        description="Choisissez le type de facture que vous venez d'importer."
-                        class="grid grid-cols-1 gap-4"
+                        description="Ajoutez les informations de base concernant cette facture."
+                        class="grid grid-cols-1 gap-4 "
                     >
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
                             <x-form.field label="Nom" name="form.name" model="form.name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
-                            <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="123909833" />
+                            <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="INV-12345" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
@@ -144,7 +144,7 @@
                                 @endforeach
                             </x-form.select>
 
-                            <x-form.field label="Fournisseur / émetteur de la facture*" name="form.issuer_name"
+                            <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name"
                                           model="form.issuer_name" placeholder="Nom du fournisseur"/>
                             <x-form.field label="Site internet du fournisseur" name="form.issuer_website"
                                           model="form.issuer_website" placeholder="www.monfournisseur.com"/>
@@ -206,7 +206,7 @@
                     <x-invoice-create-step
                         step="4" title="Étape 4 : Association à des engagements"
                         description="Associez cette facture à un engagement existant ou créez-en un nouveau."
-                        class="flex items-end gap-4"
+                        class="flex flex-wrap items-end gap-y-3 gap-x-4"
                     >
                         <x-form.select name="form.engagement_id" model="form.engagement_id" label="Engagement existant">
                             <option value="" disabled>Sélectionner un engagement existant</option>
@@ -254,7 +254,6 @@
                         step="6" title="Étape 6 : Notes et tags personnalisés"
                         description="Ajoutez des notes et des tags pour mieux organiser vos factures."
                     >
-
                         <x-form.field-textarea label="Notes (détail / commentaire important)" name="form.notes" model="form.notes" placeholder="Inscrivez votre message ici..."/>
 
                         <div class="text-right text-xs text-gray-500 mt-1 mr-2">
@@ -262,29 +261,55 @@
                         </div>
 
                         <div class="mt-2">
-                            <label class="block text-sm-medium text-gray-700 dark:text-gray-300">
+                            <label for="tags" class="relative mb-1.5 pl-2 block text-sm font-medium text-gray-800 dark:text-gray-200">
                                 Tags personnalisés
                             </label>
-                            <div class="flex mt-2">
-                                <input type="text" wire:model="form.tagInput" wire:keydown.enter.prevent="addTag"
-                                       class="flex-1 block w-full text-sm-regular rounded-l-md bg-white border border-slate-200 dark:border-gray-600 dark:text-white p-3 focus:outline-0"
-                                       placeholder="Ajouter un tag...">
+
+                            <div class="flex mt-2 relative">
+                                <input type="text"
+                                       name="tags"
+                                       id="tags"
+                                       wire:model.live.debounce.300ms="form.tagInput"
+                                       placeholder="Ajouter un tag..."
+                                       class="flex-1 block w-full text-sm-regular rounded-l-md bg-white border border-slate-200 dark:border-gray-600 dark:text-white p-3 pl-4 focus:outline-0"
+                                >
                                 <button type="button" wire:click="addTag"
-                                        class="inline-flex items-center px-4 py-2 text-sm-medium bg-white border border-l-0 border-slate-200 rounded-r-md bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
+                                        class="inline-flex items-center px-4 py-2 text-sm-medium bg-white border border-l-0 border-slate-200 rounded-r-md hover:bg-gray-50 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
                                     Ajouter un tag
                                 </button>
-                            </div>
-                            <div class="flex flex-wrap gap-2 mt-1.5 ml-2">
-                                @foreach($form->tags as $index => $tag)
-                                    <div class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                        {{ $tag }}
-                                        <button type="button" wire:click="removeTag({{ $index }})"
-                                                class="ml-2 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">
-                                            <x-svg.cross class="h-4 w-4"/>
-                                        </button>
+
+                                <!-- Menu déroulant pour les suggestions -->
+                                @if($showTagSuggestions && count($tagSuggestions) > 0)
+                                    <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
+                                        <ul class="p-1.5" x-data="{selectedIndex: -1}">
+                                            @foreach($tagSuggestions as $index => $tag)
+                                                <li wire:key="tag-suggestion-{{ $index }}"
+                                                    x-bind:class="{'bg-indigo-50 dark:bg-indigo-900': selectedIndex === {{ $index }}}"
+                                                    wire:click="selectTag('{{ $tag }}')"
+                                                    class="px-4 py-2 rounded-md text-sm-regular text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900 cursor-pointer flex items-center">
+                                                    <x-svg.tag class="mr-2 text-indigo-500"/>
+                                                    {{ $tag }}
+                                                </li>
+                                            @endforeach
+                                        </ul>
                                     </div>
-                                @endforeach
+                                @endif
                             </div>
+
+                            {{-- Tags ajoutés --}}
+                            @if(count($form->tags) > 0)
+                                <ul class="flex flex-wrap gap-2.5 mt-1.5 ml-2">
+                                    @foreach($form->tags as $index => $tag)
+                                        <li class="mt-2 inline-flex items-center pl-3.5 pr-2.5 pt-1 pb-1.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                            <span class="text-sm-regular">{{ $tag }}</span>
+                                            <button type="button" wire:click="removeTag({{ $index }})"
+                                                    class="relative top-0.25 ml-1.5 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">
+                                                <x-svg.cross class="h-4 w-4 text-indigo-700" />
+                                            </button>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </div>
                     </x-invoice-create-step>
 
@@ -426,7 +451,7 @@
                                 <x-invoices.summary-item label="Tags">
                                     <div class="flex flex-wrap gap-2">
                                         @forelse($form->tags as $tag)
-                                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                            <span class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                                 {{ $tag }}
                                             </span>
                                         @empty
@@ -462,96 +487,213 @@
                                 </x-invoices.summary-item>
                             </dl>
                         </div>
-
-                        <!-- Affichage des erreurs de validation -->
-                        @if($errors->any())
-                            <x-form.alert type="warning" title="Attention : corrections requises">
-                                Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
-                                Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
-                            </x-form.alert>
-
-                            <x-form.alert type="error" title="Veuillez corriger les erreurs suivantes avant de continuer :">
-                                <ul class="mt-4 space-y-3 list-inside">
-                                    @php
-                                        $fieldToStep = [
-                                            'fichier' => 1,
-                                            'nom' => 1,
-                                            'référence' => 1,
-                                            'type' => 1,
-                                            'catégorie' => 1,
-                                            'fournisseur' => 1,
-                                            'site internet' => 1,
-                                            'montant' => 2,
-                                            'devise' => 2,
-                                            'payée par' => 2,
-                                            'date d\'émission' => 3,
-                                            'date de paiement' => 3,
-                                            'rappel de paiement' => 3,
-                                            'fréquence' => 3,
-                                            'engagement' => 4,
-                                            'statut' => 5,
-                                            'méthode de paiement' => 5,
-                                            'priorité' => 5,
-                                            'notes' => 6,
-                                            'tags' => 6,
-                                        ];
-                                    @endphp
-
-                                    @foreach ($errors->all() as $error)
-                                        @php
-                                            $step = 1;
-                                            foreach ($fieldToStep as $field => $fieldStep) {
-                                                if (stripos($error, $field) !== false) {
-                                                    $step = $fieldStep;
-                                                    break;
-                                                }
-                                            }
-                                        @endphp
-                                        <li class="flex items-center justify-between">
-                                            <span class="text-sm-medium text-red-600">{{ $error }}</span>
-                                            <button type="button" @click="goToStep({{ $step }})" class="ml-4 px-3 py-1 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-md flex-shrink-0 whitespace-nowrap">
-                                                Aller à l'étape {{ $step }}
-                                            </button>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </x-form.alert>
-                        @elseif(empty($form->uploadedFile))
-                            <x-form.alert type="warning" title="Aucune facture importée">
-                                Veuillez importer une facture pour commencer.
-                            </x-form.alert>
-                        @else
-                            <x-form.alert type="success" title="Prêt à soumettre">
-                                Toutes les informations sont complètes. Vous pouvez maintenant enregistrer cette facture.
-                            </x-form.alert>
-                        @endif
                     </x-invoice-create-step>
 
                     {{-- Boutons de Navigation --}}
-                    <div class="my-6 border-t-[0.1rem] border-dashed border-gray-200 dark:border-gray-700">
-                        <div class="mt-6 flex justify-between">
+                    <div class="mt-6 border-t-[0.1rem] w-full border-dashed border-gray-200 dark:border-gray-700">
+                        <div class="mt-4 flex flex-wrap justify-between gap-4">
                             <button type="button" x-show="currentStep > 1" @click="prevStep" class="button-secondary">
                                 <x-svg.arrows.left class="stroke-white"/>
                                 Précédent
                             </button>
-                            <button type="button" x-show="currentStep < steps.length" @click="nextStep"
-                                    class="button-primary">
+                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="ml-auto button-primary">
                                 Suivant
                                 <x-svg.arrows.right class="stroke-gray-700"/>
+                            </button>
+                            <button type="submit" x-show="currentStep < steps.length" class="button-tertiary">
+                                Tout valider
                             </button>
                             <button type="submit" x-show="currentStep === steps.length" class="button-tertiary">
                                 Valider
                             </button>
                         </div>
                     </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" x-show="currentStep < steps.length" class="button-tertiary">
-                            Tout valider
-                        </button>
-                    </div>
                     {{-- Fin colonne 2 --}}
                 </div>
+            </div>
+
+            {{-- Gestions des messages d'erreurs --}}
+            <div class="my-6 lg:px-4 mx-auto max-lg:max-w-[35rem] max-lg:flex-center max-lg:flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-0">
+                <!-- Affichage des erreurs de validation -->
+                @if($errors->any())
+                    <x-form.alert type="warning" title="Attention : corrections requises">
+                        <p class="text-sm-regular">
+                            Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
+                            Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
+                        </p>
+
+                        @php
+                            // Calculer le pourcentage de progression même en cas d'erreur
+                            $requiredFields = ['uploadedFile', 'name', 'amount'];
+                            $filledFields = 0;
+
+                            if (!empty($form->uploadedFile) || !empty($form->existingFilePath)) $filledFields++;
+                            if (!empty($form->name)) $filledFields++;
+                            if (isset($form->amount) && $form->amount !== null && $form->amount !== '') $filledFields++;
+
+                            $progressPercentage = round(($filledFields / count($requiredFields)) * 100);
+                        @endphp
+
+                        <div class="mt-4">
+                            <p class="flex justify-between mb-1">
+                                <span class="text-xs-medium">Progression du formulaire</span>
+                                <span class="text-xs-medium">{{ $progressPercentage }}%</span>
+                            </p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-orange-400 h-2.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
+                            </div>
+                        </div>
+                        <p class="text-xs mt-2">
+                            Veuillez corriger les erreurs ci-contre avant de continuer.
+                        </p>
+                    </x-form.alert>
+
+                    <x-form.alert type="error" title="Veuillez corriger les erreurs suivantes avant de continuer :" layout="header">
+                        <div class="flex flex-col gap-2">
+                            @php
+                                $fieldToStep = [
+                                    'fichier' => 1,
+                                    'nom' => 1,
+                                    'référence' => 1,
+                                    'type' => 1,
+                                    'catégorie' => 1,
+                                    'fournisseur' => 1,
+                                    'site internet' => 1,
+                                    'montant' => 2,
+                                    'devise' => 2,
+                                    'payée par' => 2,
+                                    'date d\'émission' => 3,
+                                    'date de paiement' => 3,
+                                    'rappel de paiement' => 3,
+                                    'fréquence' => 3,
+                                    'engagement' => 4,
+                                    'statut' => 5,
+                                    'méthode de paiement' => 5,
+                                    'priorité' => 5,
+                                    'notes' => 6,
+                                    'tags' => 6,
+                                ];
+
+                                $errorsByStep = [];
+
+                                // Grouper les erreurs par étape
+                                foreach ($errors->all() as $error) {
+                                    $step = 1;
+                                    foreach ($fieldToStep as $field => $fieldStep) {
+                                        if (stripos($error, $field) !== false) {
+                                            $step = $fieldStep;
+                                            break;
+                                        }
+                                    }
+                                    if (!isset($errorsByStep[$step])) {
+                                        $errorsByStep[$step] = [];
+                                    }
+                                    $errorsByStep[$step][] = $error;
+                                }
+
+                                // Trier par numéro d'étape
+                                ksort($errorsByStep);
+                            @endphp
+
+                            @foreach ($errorsByStep as $step => $stepErrors)
+                                <div class="flex items-center justify-between border-b border-red-100">
+                                    <p class="pl-2 text-sm-bold text-red-600">Étape {{ $step }}</p>
+                                    <button type="button" @click="goToStep({{ $step }})" class="button-classic text-red-600 pr-3 py-1.5 hover:bg-red-100">
+                                        Aller à cette étape
+                                        <x-svg.arrows.right class="text-red-600" />
+                                    </button>
+                                </div>
+                                <ul class="pl-5 space-y-2 list-disc">
+                                    @foreach ($stepErrors as $error)
+                                        <li class="text-sm-regular text-red-600">{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            @endforeach
+                        </div>
+                    </x-form.alert>
+                    {{-- Pas d'image importé --}}
+                @elseif(empty($form->uploadedFile) && empty($form->existingFilePath))
+                    <x-form.alert type="warning" title="Aucune facture importée">
+                        <p class="text-sm-regular">
+                            Veuillez importer une facture pour commencer.
+                        </p>
+
+                        <div class="mt-4">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs-medium">Progression du formulaire</span>
+                                <span class="text-xs-medium">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0"></div>
+                            </div>
+                            <p class="text-xs mt-2">Commencez par importez votre facture pour continuer votre progression</p>
+                        </div>
+                    </x-form.alert>
+                    {{-- Image importé mais champs obligatoires vides --}}
+                @else
+                    @php
+                        // Calcul dynamique du pourcentage de progression
+                        $requiredFields = ['uploadedFile', 'name', 'amount'];
+                        $optionalFields = ['type', 'category', 'issuer_name', 'payment_due_date', 'payment_method'];
+
+                        $filledRequired = 0;
+                        $filledOptional = 0;
+
+                        // Vérifier les champs obligatoires
+                        if (!empty($form->uploadedFile)) $filledRequired++;
+                        if (!empty($form->name)) $filledRequired++;
+                        if (isset($form->amount) && $form->amount !== '') $filledRequired++;
+
+                        // Vérifier les champs optionnels pour bonus de progression
+                        if (!empty($form->type)) $filledOptional++;
+                        if (!empty($form->category)) $filledOptional++;
+                        if (!empty($form->issuer_name)) $filledOptional++;
+                        if (!empty($form->payment_due_date)) $filledOptional++;
+                        if (!empty($form->payment_method)) $filledOptional++;
+
+                        // Calcul du pourcentage (70% pour les champs obligatoires + 30% pour les champs optionnels)
+                        $requiredPercentage = ($filledRequired / count($requiredFields)) * 70;
+                        $optionalPercentage = ($filledOptional / count($optionalFields)) * 30;
+                        $totalPercentage = round($requiredPercentage + $optionalPercentage);
+
+                        // Garantir que le pourcentage est entre 0 et 100
+                        $totalPercentage = max(0, min(100, $totalPercentage));
+
+                        // Déterminer le type d'alerte et la couleur en fonction du pourcentage
+                        $alertType = $totalPercentage == 100 ? 'success' : 'inProgress';
+                        $barColor = $totalPercentage == 100 ? 'bg-green-600' : 'bg-orange-500';
+                        $alertTitle = $totalPercentage == 100 ? 'Prêt à soumettre' : 'Champs obligatoires non remplis';
+                    @endphp
+
+                    <x-form.alert type="{{ $alertType }}" title="{{ $alertTitle }}">
+                        <p class="text-sm-regular">
+                            @if($totalPercentage == 100)
+                                Toutes les informations requises sont complètes. Vous pouvez maintenant enregistrer cette facture si vous le souhaitez.
+                            @else
+                                Veuillez remplir tous les champs obligatoires pour enregistrer votre facture.
+                            @endif
+                        </p>
+
+                        <div class="mt-4">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-xs-medium">Progression du formulaire</span>
+                                <span class="text-xs-medium">{{ $totalPercentage }}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="{{ $barColor }} h-2.5 rounded-full" style="width: {{ $totalPercentage }}%"></div>
+                            </div>
+                            <p class="text-xs mt-2">
+                                @if($totalPercentage == 100)
+                                    Félicitations ! Vous avez complété tous les champs nécessaires.
+                                @elseif($totalPercentage >= 70)
+                                    Vous avez rempli tous les champs obligatoires ! Complétez les champs restants pour une meilleure expérience.
+                                @elseif($totalPercentage > 0)
+                                    Continuez en remplissant les champs obligatoires suivis d'un astérisque *.
+                                @endif
+                            </p>
+                        </div>
+                    </x-form.alert>
+                @endif
             </div>
         </form>
     </div>
