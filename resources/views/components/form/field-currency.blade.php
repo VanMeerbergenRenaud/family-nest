@@ -90,7 +90,7 @@
             }
         }"
     >
-        <div class="relative flex items-center justify-between rounded-md bg-white border border-slate-200 dark:border-gray-600">
+        <div class="relative flex items-center justify-between rounded-md bg-white border border-slate-200 dark:border-gray-600 @error($name) input-invalid @enderror">
             <span class="pl-3 rounded-l-md text-gray-500 dark:text-gray-300" x-text="symbols[currency]"></span>
 
             <input

@@ -6,7 +6,7 @@
 ])
 
 <x-form.field-base :label="$label" :name="$name" :model="$model" :asterix="$asterix">
-    <div class="relative">
+    <div class="relative @error($name) input-invalid @enderror">
         <select
             id="{{ $name }}"
             name="{{ $name }}"
