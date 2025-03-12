@@ -13,10 +13,9 @@ class InvoiceForm extends Form
 {
     public $invoice_id; // ID pour suivre la facture si on veut la modifier
 
-    public $existingFilePath = null;
-
     #[Validate]
     public $uploadedFile;
+    public $existingFilePath = null;
 
     #[Validate]
     public $name;
@@ -117,8 +116,8 @@ class InvoiceForm extends Form
         return [
             'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
             'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
-            'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, PNG ou JPG.',
-            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
+            'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, JPG ou PNG.',
+            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 M0.',
             'name.required' => 'Le nom de la facture est obligatoire.',
             'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
             'amount.required' => 'Le montant est obligatoire.',

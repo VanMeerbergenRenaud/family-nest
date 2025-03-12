@@ -4,7 +4,6 @@ namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
-use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
@@ -26,9 +25,6 @@ class Create extends Component
 
     // Indique si le menu d'autocomplétion est visible
     public $showTagSuggestions = false;
-
-    // Pour le débogage
-    public $searchDebug = '';
 
     public function mount()
     {
@@ -81,7 +77,6 @@ class Create extends Component
     public function updatedFormTagInput()
     {
         $this->tagSuggestions = [];
-        $this->searchDebug = '';
 
         // Ne pas chercher si la saisie est trop courte
         if (strlen($this->form->tagInput) < 2) {
@@ -91,7 +86,6 @@ class Create extends Component
 
         // Utiliser directement la recherche en base de données qui est adaptée au format de stockage actuel
         $this->tagSuggestions = $this->searchTagsWithDatabase($this->form->tagInput);
-        $this->searchDebug = 'Recherche en DB: ' . count($this->tagSuggestions) . ' résultats';
 
         $this->showTagSuggestions = count($this->tagSuggestions) > 0;
     }

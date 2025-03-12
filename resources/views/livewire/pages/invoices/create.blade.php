@@ -18,26 +18,6 @@
 
         {{-- Barre de progression avec les étapes --}}
         <div class="mb-2 lg:mb-6">
-
-            <!-- Navigation desktop -->
-            <div class="hidden lg:flex-center lg:flex-row lg:flex-wrap lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2">
-                <template x-for="(step, index) in steps" :key="index">
-                    <div class="flex-center cursor-pointer whitespace-nowrap mb-4" @click="goToStep(index + 1)">
-                        <span class="w-8 h-8 rounded-full flex-center mr-3"
-                              :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
-                            <span x-text="index + 1" class="text-sm"></span>
-                        </span>
-                        <span class="text-md-regular text-slate-700 dark:text-slate-200"
-                              :class="{ 'font-medium underline': currentStep === index + 1 }"
-                              x-text="step"></span>
-
-                        <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
-                            <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
-                        </span>
-                    </div>
-                </template>
-            </div>
-
             <!-- Navigation mobile -->
             <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 md:max-w-[60vw] mx-auto">
 
@@ -84,6 +64,25 @@
                     <x-svg.arrows.right class="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 </button>
             </div>
+
+            <!-- Navigation desktop -->
+            <div class="hidden lg:flex-center lg:flex-row lg:flex-wrap lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2">
+                <template x-for="(step, index) in steps" :key="index">
+                    <div class="flex-center cursor-pointer whitespace-nowrap mb-4" @click="goToStep(index + 1)">
+                        <span class="w-8 h-8 rounded-full flex-center mr-3"
+                              :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
+                            <span x-text="index + 1" class="text-sm"></span>
+                        </span>
+                        <span class="text-md-regular text-slate-700 dark:text-slate-200"
+                              :class="{ 'font-medium underline': currentStep === index + 1 }"
+                              x-text="step"></span>
+
+                        <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
+                            <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
+                        </span>
+                    </div>
+                </template>
+            </div>
         </div>
 
         <x-divider class="mt-4 md:max-w-[60vw] mx-auto lg:hidden" />
@@ -117,7 +116,7 @@
                 </div>
 
                 {{-- Steps : colonne 2 --}}
-                <div class="bg-gray-50 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-gray">
+                <div class="bg-slate-100 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-slate-200">
 
                     {{-- Étape 1: Informations générales --}}
                     <x-invoice-create-step
@@ -529,7 +528,7 @@
 
                             if (!empty($form->uploadedFile) || !empty($form->existingFilePath)) $filledFields++;
                             if (!empty($form->name)) $filledFields++;
-                            if (isset($form->amount) && $form->amount !== null && $form->amount !== '') $filledFields++;
+                            if (isset($form->amount) && $form->amount !== '') $filledFields++;
 
                             $progressPercentage = round(($filledFields / count($requiredFields)) * 100);
                         @endphp
@@ -544,7 +543,7 @@
                             </div>
                         </div>
                         <p class="text-xs mt-2">
-                            Veuillez corriger les erreurs ci-contre avant de continuer.
+                            Veuillez corriger les erreurs ci-contre avant de tout valider.
                         </p>
                     </x-form.alert>
 
@@ -611,7 +610,7 @@
                             @endforeach
                         </div>
                     </x-form.alert>
-                    {{-- Pas d'image importé --}}
+                {{-- Pas d'image importé --}}
                 @elseif(empty($form->uploadedFile) && empty($form->existingFilePath))
                     <x-form.alert type="warning" title="Aucune facture importée">
                         <p class="text-sm-regular">
@@ -629,12 +628,12 @@
                             <p class="text-xs mt-2">Commencez par importez votre facture pour continuer votre progression</p>
                         </div>
                     </x-form.alert>
-                    {{-- Image importé mais champs obligatoires vides --}}
+                {{-- Image importé mais champs obligatoires vides --}}
                 @else
                     @php
                         // Calcul dynamique du pourcentage de progression
                         $requiredFields = ['uploadedFile', 'name', 'amount'];
-                        $optionalFields = ['type', 'category', 'issuer_name', 'payment_due_date', 'payment_method'];
+                        $optionalFields = ['type', 'category', 'issuer_name', 'issuer_website', 'paid_by','associated_members','issued_date','payment_due_date','payment_reminder','payment_frequency','payment_status','payment_method','priority','notes','tags'];
 
                         $filledRequired = 0;
                         $filledOptional = 0;
@@ -648,8 +647,18 @@
                         if (!empty($form->type)) $filledOptional++;
                         if (!empty($form->category)) $filledOptional++;
                         if (!empty($form->issuer_name)) $filledOptional++;
+                        if (!empty($form->issuer_website)) $filledOptional++;
+                        if (!empty($form->paid_by)) $filledOptional++;
+                        if (!empty($form->associated_members)) $filledOptional++;
+                        if (!empty($form->issued_date)) $filledOptional++;
                         if (!empty($form->payment_due_date)) $filledOptional++;
+                        if (!empty($form->payment_reminder)) $filledOptional++;
+                        if (!empty($form->payment_frequency)) $filledOptional++;
+                        if (!empty($form->payment_status)) $filledOptional++;
                         if (!empty($form->payment_method)) $filledOptional++;
+                        if (!empty($form->priority)) $filledOptional++;
+                        if (!empty($form->notes)) $filledOptional++;
+                        if (!empty($form->tags)) $filledOptional++;
 
                         // Calcul du pourcentage (70% pour les champs obligatoires + 30% pour les champs optionnels)
                         $requiredPercentage = ($filledRequired / count($requiredFields)) * 70;

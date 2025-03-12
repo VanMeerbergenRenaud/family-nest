@@ -29,6 +29,7 @@ it('permet de créer une facture complète avec succès', function () {
 
         // Étape 2: Informations générales
         ->set('form.name', 'Facture Internet Mars 2024')
+        ->set('form.reference', 'INV-1023')
         ->set('form.type', 'abonnement')
         ->set('form.category', 'internet')
         ->set('form.issuer_name', 'Orange')

@@ -18,7 +18,7 @@
     {{-- Button to toggle the theme --}}
     <button
         type="button"
-        {{ $attributes->merge(['class' => 'absolute right-3.5 top-18 lg:top-4 transition duration-300 ease-in-out bg-gray-300 rounded-full dark:bg-gray-700']) }}
+        {{ $attributes->merge(['class' => 'relative transition duration-300 ease-in-out bg-gray-300 rounded-full dark:bg-gray-700']) }}
         title="Changer le thème de la page"
         aria-label="Changer le thème de la page"
         @click="toggleTheme()"
@@ -27,7 +27,7 @@
         {{-- Light mode --}}
         <span
             x-show="theme === 'light'"
-            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-gray-700 dark:text-white hover:bg-white/20"
+            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/40 rounded-full text-sm text-gray-700 dark:text-white hover:bg-white/20"
             data-hs-theme-click-value="dark"
         >
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -35,13 +35,12 @@
                  stroke-linejoin="round">
                 <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
             </svg>
-            <span class="hidden sm:inline">Mode Sombre</span>
         </span>
 
         {{-- Dark mode --}}
         <span
             x-show="theme === 'dark'"
-            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/10 rounded-full text-sm text-white hover:bg-white/20"
+            class="inline-flex items-center gap-x-2 py-2 px-3 bg-white/40 rounded-full text-sm text-white hover:bg-white/20"
             data-hs-theme-click-value="light"
         >
             <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -57,7 +56,6 @@
                 <path d="m6.34 17.66-1.41 1.41"></path>
                 <path d="m19.07 4.93-1.41 1.41"></path>
             </svg>
-            <span class="hidden sm:inline">Mode Clair</span>
         </span>
     </button>
 </div>
