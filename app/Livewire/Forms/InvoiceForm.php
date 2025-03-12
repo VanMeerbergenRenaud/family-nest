@@ -117,7 +117,7 @@ class InvoiceForm extends Form
             'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
             'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
             'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, JPG ou PNG.',
-            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 M0.',
+            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
             'name.required' => 'Le nom de la facture est obligatoire.',
             'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
             'amount.required' => 'Le montant est obligatoire.',
@@ -156,10 +156,24 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            // Store the file and get its path
+            // Vérifier que le fichier existe
+            if (!$this->uploadedFile) {
+                throw new \Exception('Aucun fichier fourni');
+            }
+
+            // Obtenir les informations du fichier
+            $fileName = $this->uploadedFile->getClientOriginalName();
+            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+            // Stocker le fichier et récupérer son chemin
             $filePath = $this->uploadedFile->store('invoices', 'public');
 
-            // Get the file size
+            // Vérifier que le stockage a réussi
+            if (!$filePath) {
+                throw new \Exception('Échec du stockage du fichier');
+            }
+
+            // Récupérer la taille du fichier
             $fileSize = Storage::disk('public')->size($filePath);
 
             // Normaliser le montant avant stockage
@@ -169,8 +183,8 @@ class InvoiceForm extends Form
                 'user_id' => auth()->user()->id,
                 /* Étape d'importation */
                 'file_path' => $filePath,
-                'file_size' => $fileSize, // Store the file size
-                /* Étape 1 */
+                'file_size' => $fileSize,
+                // Autres champs...
                 'name' => $this->name,
                 'reference' => $this->reference,
                 'type' => $this->type,
@@ -208,7 +222,7 @@ class InvoiceForm extends Form
             return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
+            \Log::error('Erreur lors de la création de la facture: ' . $e->getMessage());
 
             return false;
         }
@@ -231,7 +245,7 @@ class InvoiceForm extends Form
         $this->issuer_name = $invoice->issuer_name;
         $this->issuer_website = $invoice->issuer_website;
         $this->amount = is_numeric($invoice->amount)
-            ? (float) $invoice->amount
+            ? (float)$invoice->amount
             : null;
         $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
@@ -284,7 +298,7 @@ class InvoiceForm extends Form
                 }
                 $filePath = null;
                 $fileSize = 0;
-            }// Si l'utilisateur n'a rien changé
+            } // Si l'utilisateur n'a rien changé
             else {
                 $filePath = $invoice->file_path;
                 $fileSize = $invoice->file_size;
@@ -361,7 +375,7 @@ class InvoiceForm extends Form
             return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
+            \Log::error('Erreur lors de l\'archivage de la facture: ' . $e->getMessage());
 
             return false;
         }
@@ -394,7 +408,7 @@ class InvoiceForm extends Form
             return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
+            \Log::error('Erreur lors de la restauration de la facture: ' . $e->getMessage());
 
             return false;
         }
@@ -432,7 +446,7 @@ class InvoiceForm extends Form
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
+            \Log::error('Erreur lors de la suppression définitive de la facture: ' . $e->getMessage());
 
             return false;
         }
@@ -440,14 +454,14 @@ class InvoiceForm extends Form
 
     public function getFormattedReminderAttribute()
     {
-        if (! $this->payment_reminder) {
+        if (!$this->payment_reminder) {
             return 'Non spécifié';
         }
 
         if (str_contains($this->payment_reminder, '_days')) {
             $days = str_replace('_days', '', $this->payment_reminder);
 
-            return $days.' jours avant échéance';
+            return $days . ' jours avant échéance';
         }
 
         // Si c'est une date valide
@@ -467,11 +481,11 @@ class InvoiceForm extends Form
 
         // Si le montant est déjà un nombre, le retourner directement
         if (is_numeric($amount)) {
-            return (float) $amount;
+            return (float)$amount;
         }
 
         // Convertir en chaîne si ce n'est pas déjà le cas
-        $amount = (string) $amount;
+        $amount = (string)$amount;
 
         // Supprimer les espaces (que le mask ajoute comme séparateurs de milliers)
         $amount = str_replace(' ', '', $amount);
@@ -480,6 +494,52 @@ class InvoiceForm extends Form
         $amount = str_replace(',', '.', $amount);
 
         // Conversion en float et arrondi
-        return round((float) $amount, 2);
+        return round((float)$amount, 2);
+    }
+
+    /**
+     * Récupère les informations du fichier importé
+     *
+     * @return array|null
+     */
+    public function getFileInfo()
+    {
+        if (!$this->uploadedFile) {
+            return null;
+        }
+
+        $fileName = $this->uploadedFile->getClientOriginalName();
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $fileSize = round($this->uploadedFile->getSize() / 1024, 2); // Taille en KB
+        $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']);
+        $isPdf = $fileExtension === 'pdf';
+        $isDocx = $fileExtension === 'docx';
+
+        return [
+            'name' => $fileName,
+            'extension' => $fileExtension,
+            'size' => $fileSize,
+            'sizeFormatted' => $this->formatFileSize($this->uploadedFile->getSize()),
+            'isImage' => $isImage,
+            'isPdf' => $isPdf,
+            'isDocx' => $isDocx,
+        ];
+    }
+
+    /**
+     * Formate la taille d'un fichier en KB, MB, etc.
+     *
+     * @param int $bytes
+     * @return string
+     */
+    private function formatFileSize($bytes)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, 2) . ' ' . $units[$pow];
     }
 }

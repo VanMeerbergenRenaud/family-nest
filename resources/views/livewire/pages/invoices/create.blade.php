@@ -85,8 +85,6 @@
             </div>
         </div>
 
-        <x-divider class="mt-4 md:max-w-[60vw] mx-auto lg:hidden" />
-
         <form wire:submit.prevent="createInvoice">
             @csrf
 
@@ -102,15 +100,59 @@
                             <!-- Button de suppression de l'image -->
                             <button type="button"
                                     wire:click="removeUploadedFile"
-                                    class="absolute top-3 right-3 z-2"
+                                    class="absolute top-2.5 right-2.5 z-2"
                             >
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
-                            <!-- Aperçu de l'image -->
-                            <img src="{{ $form->uploadedFile->temporaryUrl() }}"
-                                 alt="Image temporaire de la preview de la facture"
-                                 class="rounded-2xl h-full min-h-[30rem] border border-slate-200"
-                            />
+
+                            <!-- Détection du type de fichier et affichage approprié -->
+                            @php
+                                $fileName = $form->uploadedFile->getClientOriginalName();
+                                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                                $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']);
+                                $isPdf = $fileExtension === 'pdf';
+                                $isDocx = $fileExtension === 'docx';
+                                $fileSize = round($form->uploadedFile->getSize() / 1024, 2); // Conversion en KB
+                            @endphp
+
+                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
+                                <!-- Aperçu pour les images -->
+                                @if ($isImage)
+                                    <img src="{{ $form->uploadedFile->temporaryUrl() }}"
+                                         alt="Aperçu de la facture"
+                                         class="bg-gray-100 rounded-xl max-h-[50vh]"
+                                    />
+                                @else
+                                    <!-- Icône pour les PDF -->
+                                    @if ($isPdf)
+                                        <div class="w-24 h-24 mb-5 flex-center bg-red-100 rounded-full">
+                                            <x-svg.pdf class="w-12 h-12 text-gray-600" />
+                                        </div>
+                                        <!-- Icône pour les DOCX -->
+                                    @elseif ($isDocx)
+                                        <div class="w-24 h-24 mb-5 flex-center bg-blue-100 rounded-full">
+                                            <x-svg.docx class="w-12 h-12 text-gray-600" />
+                                        </div>
+                                        <!-- Icône générique pour les autres types de fichiers -->
+                                    @else
+                                        <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
+                                            <x-svg.img class="w-12 h-12 text-gray-600" />
+                                        </div>
+                                    @endif
+                                @endif
+
+                                <!-- Informations sur le fichier -->
+                                <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
+                                    <h3 class="text-md-medium text-gray-800 truncate">{{ $fileName }}</h3>
+                                    <p class="flex-center space-x-2 text-gray-600">
+                                        <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
+                                        <span class="text-sm-regular">{{ $fileSize }} KB</span>
+                                    </p>
+                                    <p class="mt-3 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
+                                        Import du fichier validé
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -461,6 +503,11 @@
 
                                 <x-invoices.summary-item label="Pièce jointe" :alternateBackground="true">
                                     @if($form->uploadedFile)
+                                        @php
+                                            $fileName = $form->uploadedFile->getClientOriginalName();
+                                            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+                                            $fileSize = round($form->uploadedFile->getSize() / 1024, 2); // Conversion en KB
+                                        @endphp
                                         <div class="flex items-center">
                                             <svg xmlns="http://www.w3.org/2000/svg"
                                                  class="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20"
@@ -469,7 +516,10 @@
                                                       d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                                       clip-rule="evenodd"/>
                                             </svg>
-                                            Facture importée avec succès
+                                            <div>
+                                                <span class="text-sm-medium">{{ $fileName }}</span>
+                                                <span class="text-xs text-gray-500 ml-2">({{ strtoupper($fileExtension) }}, {{ $fileSize }} KB)</span>
+                                            </div>
                                         </div>
                                     @else
                                         <div class="flex items-center">
