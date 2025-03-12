@@ -152,7 +152,7 @@ return [
     'string' => 'Le champ :attribute doit être une chaîne de caractères.',
     'timezone' => 'Le champ :attribute doit être un fuseau horaire valide.',
     'unique' => 'Le champ :attribute a déjà été utilisé.',
-    'uploaded' => 'Le :attribute n\'a pas pu être téléchargé. Veuillez vérifier sa taille et son format.',
+    'uploaded' => 'Le document n\'a pas pu être téléchargé. Veuillez vérifier sa taille et son format.',
     'uppercase' => 'Le champ :attribute doit être en majuscules.',
     'url' => 'Le champ :attribute doit être une URL valide.',
     'ulid' => 'Le champ :attribute doit être un ULID valide.',
@@ -172,13 +172,6 @@ return [
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
-        ],
-        'form.uploadedFile' => [
-            'uploaded' => 'Le document de facture n\'a pas pu être importé. Veuillez vérifier que sa taille ne dépasse pas 10 Mo.',
-            'required' => 'Veuillez sélectionner un document de facture.',
-            'file' => 'Vous devez sélectionner un fichier valide.',
-            'mimes' => 'Le document doit être au format PDF, Word, JPEG, JPG ou PNG.',
-            'max' => 'Le document ne doit pas dépasser 10 Mo.',
         ],
     ],
 
@@ -205,7 +198,5 @@ return [
         'starting_at' => 'de la date de début',
         'ending_at' => 'de la date de fin',
         'duration' => 'de la durée',
-        // invoices fields
-        'form.uploadedFile' => 'document de la facture',
     ],
 ];

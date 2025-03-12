@@ -264,13 +264,13 @@
                             {{-- Filtres alphabétiques --}}
                             <button wire:click="applyFilter('name_asc')"
                                     class="button-rounded {{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }}">
-                                <x-svg-atoz class="w-3.5 h-3.5"/>
+                                <x-svg.atoz class="w-3.5 h-3.5"/>
                                 A → Z
                             </button>
 
                             <button wire:click="applyFilter('name_desc')"
                                     class="button-rounded {{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }}">
-                                <x-svg-atoz class="w-3.5 h-3.5 rotate-180"/>
+                                <x-svg.atoz class="w-3.5 h-3.5 rotate-180"/>
                                 Z → A
                             </button>
                         </div>

@@ -17,7 +17,7 @@
         <div class="flex-center flex-col p-10 min-h-[25rem]">
             <x-svg.download class="w-5 h-5 mb-5"/>
 
-            <p class="mb-2">
+            <p class="mb-4">
                 <span class="text-md-medium text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500">
                     Clic pour importer
                 </span>
@@ -26,11 +26,11 @@
                 </span>
             </p>
 
-            <p class="text-xs text-center text-gray-500 dark:text-gray-400">
+            <p class="text-xs text-center max-w-48 text-gray-500 dark:text-gray-400">
                 PDF, DOCX, PNG, JPG ou JPEG (MAX. 10 Mo)
             </p>
 
-            <div class="mt-3 flex flex-wrap justify-center gap-1">
+            <div class="mt-3 flex flex-wrap justify-center gap-2">
                 <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">PDF</span>
                 <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">DOCX</span>
                 <span class="px-2 py-1 bg-green-200 text-green-800 text-xs rounded-full">IMG</span>
