@@ -25,6 +25,7 @@ class Invoice extends Model
         'issued_date' => 'date',
         'payment_due_date' => 'date',
         'tags' => 'array',
+        'associated_members' => 'array',
         'is_archived' => 'boolean',
         'is_favorite' => 'boolean',
     ];
@@ -83,6 +84,6 @@ class Invoice extends Model
     // NB: Seules les factures non archivées peuvent être indexées
     public function shouldBeSearchable(): bool
     {
-        return !$this->is_archived;
+        return ! $this->is_archived;
     }
 }

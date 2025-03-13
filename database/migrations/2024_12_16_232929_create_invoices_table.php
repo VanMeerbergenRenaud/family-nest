@@ -28,7 +28,8 @@ return new class extends Migration
             $table->string('currency', 3)->default('EUR'); // Devise de la facture
             $table->string('paid_by')->nullable(); // Personne qui paie la facture
             $table->string('associated_members')->nullable(); // Membre(s) associé à la facture
-            // Todo : Distribution du montant entre les membres
+            $table->json('share_amounts')->nullable(); // Montants partagés entre les membres
+            $table->json('share_percentages')->nullable(); // Pourcentage partagé entre les membres
             /* Step 3 */
             $table->date('issued_date')->nullable(); // Date d'émission de la facture
             $table->date('payment_due_date')->nullable(); // Date d'échéance du paiement

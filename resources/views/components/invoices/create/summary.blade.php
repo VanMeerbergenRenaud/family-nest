@@ -5,7 +5,7 @@
 <div {{ $attributes }} class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
         <x-invoices.create.summary-item label="Nom de la facture" :alternateBackground="true">
-            {{ $form->name ?: 'Non spécifié' }}
+            {{ ucfirst($form->name) ?: 'Non spécifié' }}
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Type et catégorie">
@@ -16,7 +16,9 @@
             {{ $form->issuer_name ?: 'Non spécifié' }}
             @if($form->issuer_website)
                 <a href="{{ $form->issuer_website }}" target="_blank"
-                   class="text-indigo-500 text-sm-regular hover:text-indigo-700 ml-0.5">
+                   title="Visiter le site de l'émetteur"
+                   class="text-indigo-500 text-sm-regular hover:text-indigo-700 ml-0.5"
+                >
                     ({{ $form->issuer_website }})
                 </a>
             @endif
@@ -48,14 +50,18 @@
             @if(!empty($form->amount))
                 @if($form->paid_by)
                     <span class="block">
-                        <span class="text-sm-regular">Payée par :&nbsp;</span><span
-                            class="text-sm-medium">{{ $form->paid_by }}</span>
+                        <span class="text-sm-regular">Payée par :</span>
+                        <span class="text-sm-medium">{{ $form->paid_by }}</span>
                     </span>
                 @endif
                 @if($form->associated_members)
                     <span class="block">
-                        <span class="text-sm-regular">Associée à :&nbsp;</span><span
-                            class="text-sm-medium">{{ $form->associated_members }}</span>
+                        <span class="text-sm-regular">Associée à :</span>
+                        @foreach($form->associated_members as $member)
+                            <span class="text-sm-medium">
+                                {{ $member }}@if(!$loop->last), @endif
+                            </span>
+                        @endforeach
                     </span>
                 @endif
             @else
@@ -132,19 +138,24 @@
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Notes" :alternateBackground="true">
-            <span class="text-sm-regular">{{ $form->notes ?: 'Aucune note' }}</span>
+            @if(!empty($form->notes))
+                <span class="text-sm-regular">{{ $form->notes }}</span>
+            @else
+                <span class="text-sm-medium">{{ __('Aucune') }}</span>
+            @endif
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Tags">
             <div class="flex flex-wrap gap-2">
-                @forelse($form->tags as $tag)
-                    <span
-                        class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                        {{ $tag }}
-                    </span>
-                @empty
-                    Aucun tag
-                @endforelse
+                @if(empty($form->tags))
+                   <span class="text-sm-medium">Aucun</span>
+                @else
+                    @foreach($form->tags as $tag)
+                        <span class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                            {{ $tag }}
+                        </span>
+                    @endforeach
+                @endif
             </div>
         </x-invoices.create.summary-item>
 

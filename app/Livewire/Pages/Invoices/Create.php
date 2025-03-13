@@ -6,7 +6,6 @@ use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redirect;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -35,8 +34,12 @@ class Create extends Component
         ];
 
         // Initialiser le tableau des tags s'il est null
-        if (!is_array($this->form->tags)) {
+        if (! is_array($this->form->tags)) {
             $this->form->tags = [];
+        }
+
+        if (! is_array($this->form->associated_members)) {
+            $this->form->associated_members = [];
         }
     }
 
@@ -52,11 +55,23 @@ class Create extends Component
         $this->resetValidation('form.uploadedFile');
     }
 
+    // Méthode pour mettre à jour les montants partagés
+    public function updateShareAmounts()
+    {
+        $this->form->updateShareAmounts();
+    }
+
+    // Méthode pour mettre à jour les pourcentages
+    public function updateShareFromPercentage($percentage, $member)
+    {
+        $this->form->updateShareFromPercentage($percentage, $member);
+    }
+
     public function addTag()
     {
         if (! empty($this->form->tagInput)) {
             // Vérifier si le tag n'existe pas déjà
-            if (!in_array($this->form->tagInput, $this->form->tags)) {
+            if (! in_array($this->form->tagInput, $this->form->tags)) {
                 $this->form->tags[] = $this->form->tagInput;
             }
             $this->form->tagInput = '';
@@ -71,9 +86,7 @@ class Create extends Component
         $this->form->tags = array_values($this->form->tags); // Réindexer le tableau
     }
 
-    /**
-     * Méthode pour rechercher des suggestions de tags
-     */
+    // Méthode pour rechercher des suggestions de tags
     public function updatedFormTagInput()
     {
         $this->tagSuggestions = [];
@@ -81,6 +94,7 @@ class Create extends Component
         // Ne pas chercher si la saisie est trop courte
         if (strlen($this->form->tagInput) < 2) {
             $this->showTagSuggestions = false;
+
             return;
         }
 
@@ -90,9 +104,7 @@ class Create extends Component
         $this->showTagSuggestions = count($this->tagSuggestions) > 0;
     }
 
-    /**
-     * Méthode de recherche en base de données adaptée au double encodage JSON
-     */
+    // Méthode de recherche en base de données adaptée au double encodage JSON
     private function searchTagsWithDatabase($query)
     {
         if (empty($query)) {
@@ -126,7 +138,7 @@ class Create extends Component
                 // Maintenant décoder le JSON
                 $tagsArray = json_decode($tagsJson, true);
 
-                if (!is_array($tagsArray)) {
+                if (! is_array($tagsArray)) {
                     // Si ce n'est toujours pas un tableau, essayer une autre approche
                     $tagsArray = json_decode($invoice->tags, true);
                 }
@@ -141,7 +153,8 @@ class Create extends Component
                 }
             } catch (\Exception $e) {
                 // Si le JSON est invalide, enregistrer l'erreur et continuer
-                Log::warning('Erreur de décodage JSON pour les tags: ' . $e->getMessage() . ' - Tags: ' . $invoice->tags);
+                Log::warning('Erreur de décodage JSON pour les tags: '.$e->getMessage().' - Tags: '.$invoice->tags);
+
                 continue;
             }
         }
@@ -155,12 +168,10 @@ class Create extends Component
         return $filteredTags;
     }
 
-    /**
-     * Sélectionner un tag suggéré
-     */
+    // Sélectionner un tag suggéré
     public function selectTag($tag)
     {
-        if (!in_array($tag, $this->form->tags)) {
+        if (! in_array($tag, $this->form->tags)) {
             $this->form->tags[] = $tag;
         }
         $this->form->tagInput = '';
@@ -173,7 +184,7 @@ class Create extends Component
         $invoice = $this->form->store();
 
         if ($invoice) {
-            return Redirect::route('invoices');
+            $this->redirectRoute('invoices');
         }
     }
 

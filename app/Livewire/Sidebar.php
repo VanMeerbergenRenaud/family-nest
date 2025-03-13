@@ -28,6 +28,7 @@ class Sidebar extends Component
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
         $expandedStringForJS = $this->expanded ? 'true' : 'false';
         $this->js("localStorage.setItem('sidebarExpanded', '".$expandedStringForJS."')");
+
     }
 
     public function seeProfile()
@@ -63,7 +64,7 @@ class Sidebar extends Component
     public function logout()
     {
         app(Logout::class)->__invoke();
-        $this->redirect('/', navigate: true);
+        $this->redirectRoute('welcome');
     }
 
     public function render()

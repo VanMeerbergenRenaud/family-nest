@@ -3,7 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\InvoiceTypeEnum;
-use Carbon\Carbon;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
@@ -11,23 +11,27 @@ use Livewire\Form;
 
 class InvoiceForm extends Form
 {
-    public $invoice_id; // ID pour suivre la facture si on veut la modifier
+    public Invoice $invoice;
 
     #[Validate]
     public $uploadedFile;
+
     public $existingFilePath = null;
 
     #[Validate]
     public $name;
 
+    #[Validate]
     public $reference;
 
     public $type;
 
     public $category;
 
+    #[Validate]
     public $issuer_name;
 
+    #[Validate]
     public $issuer_website;
 
     #[Validate]
@@ -37,14 +41,18 @@ class InvoiceForm extends Form
 
     public $paid_by;
 
-    public $associated_members;
+    public $associated_members = [];
 
+    #[Validate]
     public $issued_date;
 
+    #[Validate]
     public $payment_due_date;
 
+    #[Validate]
     public $payment_reminder;
 
+    #[Validate]
     public $payment_frequency;
 
     public $payment_status = 'unpaid';
@@ -53,8 +61,10 @@ class InvoiceForm extends Form
 
     public $priority = 'none';
 
+    #[Validate]
     public $notes;
 
+    #[Validate]
     public $tags = [];
 
     public $tagInput = '';
@@ -87,7 +97,8 @@ class InvoiceForm extends Form
             'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
-            'associated_members' => 'nullable|string',
+            'associated_members' => 'nullable|array',
+            'amount_distribution' => 'nullable|array',
             // Étape 3
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
@@ -157,19 +168,15 @@ class InvoiceForm extends Form
             DB::beginTransaction();
 
             // Vérifier que le fichier existe
-            if (!$this->uploadedFile) {
+            if (! $this->uploadedFile) {
                 throw new \Exception('Aucun fichier fourni');
             }
-
-            // Obtenir les informations du fichier
-            $fileName = $this->uploadedFile->getClientOriginalName();
-            $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
             // Stocker le fichier et récupérer son chemin
             $filePath = $this->uploadedFile->store('invoices', 'public');
 
             // Vérifier que le stockage a réussi
-            if (!$filePath) {
+            if (! $filePath) {
                 throw new \Exception('Échec du stockage du fichier');
             }
 
@@ -195,7 +202,8 @@ class InvoiceForm extends Form
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
-                'associated_members' => $this->associated_members,
+                'associated_members' => $this->associated_members ?? null,
+                'amount_distribution' => $this->amount_distribution ?? null,
                 /* Étape 3 */
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
@@ -210,7 +218,7 @@ class InvoiceForm extends Form
                 'priority' => $this->priority,
                 /* Étape 6 */
                 'notes' => $this->notes,
-                'tags' => json_encode($this->tags),
+                'tags' => $this->tags ?? null,
                 /* Archives */
                 'is_archived' => $this->is_archived,
                 /* Favoris */
@@ -222,47 +230,43 @@ class InvoiceForm extends Form
             return $invoice;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de la création de la facture: ' . $e->getMessage());
+            \Log::error('Erreur lors de la création de la facture: '.$e->getMessage());
 
             return false;
         }
     }
 
     // Récupérer la facture
-    public function setInvoice($invoiceId)
+    public function setInvoice(Invoice $invoice)
     {
-        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
+        $this->invoice = $invoice;
 
-        $this->invoice_id = $invoice->id;
-
-        $this->existingFilePath = $invoice->file_path;
+        $this->existingFilePath = $this->invoice->file_path;
         $this->uploadedFile = null;
 
-        $this->name = $invoice->name;
-        $this->reference = $invoice->reference;
-        $this->type = $invoice->type;
-        $this->category = $invoice->category;
-        $this->issuer_name = $invoice->issuer_name;
-        $this->issuer_website = $invoice->issuer_website;
-        $this->amount = is_numeric($invoice->amount)
-            ? (float)$invoice->amount
-            : null;
-        $this->currency = $invoice->currency ?? 'EUR';
-        $this->paid_by = $invoice->paid_by;
-        $this->associated_members = $invoice->associated_members;
-        $this->issued_date = $invoice->issued_date;
-        $this->payment_due_date = $invoice->payment_due_date;
-        $this->payment_reminder = $invoice->payment_reminder;
-        $this->payment_frequency = $invoice->payment_frequency;
-        $this->engagement_id = $invoice->engagement_id;
-        $this->engagement_name = $invoice->engagement_name;
-        $this->payment_status = $invoice->payment_status;
-        $this->payment_method = $invoice->payment_method;
-        $this->priority = $invoice->priority;
-        $this->notes = $invoice->notes;
-        $this->tags = $invoice->tags;
-        $this->is_archived = $invoice->is_archived;
-        $this->is_favorite = $invoice->is_favorite;
+        $this->name = $this->invoice->name;
+        $this->reference = $this->invoice->reference;
+        $this->type = $this->invoice->type;
+        $this->category = $this->invoice->category;
+        $this->issuer_name = $this->invoice->issuer_name;
+        $this->issuer_website = $this->invoice->issuer_website;
+        $this->amount = is_numeric($this->invoice->amount) ? (float) $this->invoice->amount : null;
+        $this->currency = $this->invoice->currency ?? 'EUR';
+        $this->paid_by = $this->invoice->paid_by;
+        $this->associated_members = $this->invoice->associated_members;
+        $this->issued_date = $this->invoice->issued_date;
+        $this->payment_due_date = $this->invoice->payment_due_date;
+        $this->payment_reminder = $this->invoice->payment_reminder;
+        $this->payment_frequency = $this->invoice->payment_frequency;
+        $this->engagement_id = $this->invoice->engagement_id;
+        $this->engagement_name = $this->invoice->engagement_name;
+        $this->payment_status = $this->invoice->payment_status;
+        $this->payment_method = $this->invoice->payment_method;
+        $this->priority = $this->invoice->priority;
+        $this->notes = $this->invoice->notes;
+        $this->tags = $this->invoice->tags;
+        $this->is_archived = $this->invoice->is_archived;
+        $this->is_favorite = $this->invoice->is_favorite;
 
         $this->updateAvailableCategories();
 
@@ -272,7 +276,7 @@ class InvoiceForm extends Form
     // Modifier la facture
     public function update()
     {
-        if (empty($this->invoice_id)) {
+        if (empty($this->invoice)) {
             throw new \Exception('Impossible de mettre à jour une facture sans son ID');
         }
 
@@ -281,7 +285,7 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            $invoice = auth()->user()->invoices()->findOrFail($this->invoice_id);
+            $invoice = auth()->user()->invoices()->findOrFail($this->invoice);
 
             // Si un nouveau fichier est uploadé, supprimer l'ancien et stocker le nouveau
             if ($this->uploadedFile) {
@@ -322,7 +326,8 @@ class InvoiceForm extends Form
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
-                'associated_members' => $this->associated_members,
+                'associated_members' => $this->associated_members ?? null,
+                'amount_distribution' => $this->amount_distribution ?? null,
                 /* Étape 3 */
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
@@ -337,7 +342,7 @@ class InvoiceForm extends Form
                 'priority' => $this->priority,
                 /* Étape 6 */
                 'notes' => $this->notes,
-                'tags' => json_encode($this->tags),
+                'tags' => $this->tags ?? null,
                 /* Archives */
                 'is_archived' => $this->is_archived,
                 /* Favoris */
@@ -356,120 +361,21 @@ class InvoiceForm extends Form
     }
 
     // Archiver la facture au lieu de la supprimer
-    public function archive($invoiceId = null)
+    public function archive($invoiceId)
     {
-        $id = $invoiceId ?? $this->invoice_id;
-
-        if (empty($id)) {
-            throw new \Exception('Impossible d\'archiver une facture sans ID');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $invoice = auth()->user()->invoices()->findOrFail($id);
-            $invoice->update(['is_archived' => true]);
-
-            DB::commit();
-
-            return $invoice;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Erreur lors de l\'archivage de la facture: ' . $e->getMessage());
-
-            return false;
-        }
+        dd('Archiver du formulaire');
     }
 
     // Récupérer une facture archivée
     public function restore($invoiceId)
     {
-        if (empty($invoiceId)) {
-            throw new \Exception('Impossible de restaurer une facture sans ID');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $invoice = auth()->user()->invoices()->withTrashed()->findOrFail($invoiceId);
-
-            // Si la facture est archivée, on la désarchive
-            if ($invoice->is_archived) {
-                $invoice->update(['is_archived' => false]);
-            }
-
-            // Si la facture a été soft-deleted, on la restaure
-            if ($invoice->trashed()) {
-                $invoice->restore();
-            }
-
-            DB::commit();
-
-            return $invoice;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Erreur lors de la restauration de la facture: ' . $e->getMessage());
-
-            return false;
-        }
+        dd('Restaurer du formulaire');
     }
 
     // Supprimer définitivement la facture (à utiliser avec précaution)
-    public function forceDelete($invoiceId = null)
+    public function forceDelete($invoiceId)
     {
-        $id = $invoiceId ?? $this->invoice_id;
-
-        if (empty($id)) {
-            throw new \Exception('Impossible de supprimer définitivement une facture sans ID');
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $invoice = auth()->user()->invoices()->withTrashed()->findOrFail($id);
-
-            // Supprimer le fichier associé s'il existe
-            if ($invoice->file_path && Storage::disk('public')->exists($invoice->file_path)) {
-                Storage::disk('public')->delete($invoice->file_path);
-            }
-
-            // Supprimer définitivement la facture
-            $result = $invoice->forceDelete();
-
-            DB::commit();
-
-            // Réinitialiser le formulaire après suppression
-            if ($id == $this->invoice_id) {
-                $this->reset();
-            }
-
-            return $result;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            \Log::error('Erreur lors de la suppression définitive de la facture: ' . $e->getMessage());
-
-            return false;
-        }
-    }
-
-    public function getFormattedReminderAttribute()
-    {
-        if (!$this->payment_reminder) {
-            return 'Non spécifié';
-        }
-
-        if (str_contains($this->payment_reminder, '_days')) {
-            $days = str_replace('_days', '', $this->payment_reminder);
-
-            return $days . ' jours avant échéance';
-        }
-
-        // Si c'est une date valide
-        try {
-            return Carbon::parse($this->payment_reminder)->format('d/m/Y');
-        } catch (\Exception $e) {
-            return $this->payment_reminder;
-        }
+        dd('Supprimer du formulaire');
     }
 
     private function normalizeAmount($amount)
@@ -481,11 +387,11 @@ class InvoiceForm extends Form
 
         // Si le montant est déjà un nombre, le retourner directement
         if (is_numeric($amount)) {
-            return (float)$amount;
+            return (float) $amount;
         }
 
         // Convertir en chaîne si ce n'est pas déjà le cas
-        $amount = (string)$amount;
+        $amount = (string) $amount;
 
         // Supprimer les espaces (que le mask ajoute comme séparateurs de milliers)
         $amount = str_replace(' ', '', $amount);
@@ -494,24 +400,19 @@ class InvoiceForm extends Form
         $amount = str_replace(',', '.', $amount);
 
         // Conversion en float et arrondi
-        return round((float)$amount, 2);
+        return round((float) $amount, 2);
     }
 
-    /**
-     * Récupère les informations du fichier importé
-     *
-     * @return array|null
-     */
     public function getFileInfo()
     {
-        if (!$this->uploadedFile) {
+        if (! $this->uploadedFile) {
             return null;
         }
 
         $fileName = $this->uploadedFile->getClientOriginalName();
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $fileSize = round($this->uploadedFile->getSize() / 1024, 2); // Taille en KB
-        $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']);
+        $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png']);
         $isPdf = $fileExtension === 'pdf';
         $isDocx = $fileExtension === 'docx';
 
@@ -526,12 +427,6 @@ class InvoiceForm extends Form
         ];
     }
 
-    /**
-     * Formate la taille d'un fichier en KB, MB, etc.
-     *
-     * @param int $bytes
-     * @return string
-     */
     private function formatFileSize($bytes)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -540,6 +435,6 @@ class InvoiceForm extends Form
         $pow = min($pow, count($units) - 1);
         $bytes /= pow(1024, $pow);
 
-        return round($bytes, 2) . ' ' . $units[$pow];
+        return round($bytes, 2).' '.$units[$pow];
     }
 }
