@@ -4,6 +4,7 @@ use App\Livewire\Pages\Invoices\Archived;
 use App\Livewire\Pages\Invoices\Create;
 use App\Livewire\Pages\Invoices\Edit;
 use App\Livewire\Pages\Invoices\Index;
+use App\Livewire\Pages\Invoices\Show;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -24,6 +25,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/invoices', Index::class)->name('invoices');
     Route::get('/invoices/create', Create::class)->name('invoices.create');
     Route::get('/invoices/{id}/edit', Edit::class)->name('invoices.edit');
+    Route::get('/invoices/{id}/show', Show::class)->name('invoices.show');
     Route::get('/invoices/archived', Archived::class)->name('invoices.archived');
 });
 
