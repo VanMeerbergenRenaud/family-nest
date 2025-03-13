@@ -2,83 +2,25 @@
 
 namespace App\Livewire\Pages\Invoices;
 
-use App\Livewire\Forms\InvoiceForm;
-use Illuminate\Support\Facades\Redirect;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 class Index extends Component
 {
-    use WithFileUploads, WithPagination;
+    use WithPagination;
 
-    public InvoiceForm $form;
-
-    public $name;
-
-    public $file_path;
-
-    public $file_size;
-
-    public $type;
-
-    public $category;
-
-    public $issuer_name;
-
-    public $issuer_website;
-
-    public $amount;
-
-    public $paid_by;
-
-    public $associated_members;
-
-    public $issued_date;
-
-    public $payment_due_date;
-
-    public $payment_reminder;
-
-    public $payment_frequency;
-
-    public $payment_status = 'unpaid';
-
-    public $payment_method = 'card';
-
-    public $priority = 'none';
-
-    public $notes;
-
-    public $tags = [];
-
-    public $tagInput = '';
-
-    public $uploadedFile;
-
-    public $amount_distribution = [];
-
-    public $engagement_id;
-
-    public $engagement_name;
-
-    public $family_members = [];
-
-    public $engagements = [];
+    public Invoice $invoiceId;
 
     public $is_archived = false;
 
-    public $availableCategories = [];
-
-    public $invoiceId;
-
-    public bool $showDeleteFormModal = false;
-
     public $fileUrl;
 
-    public bool $showFileModal = false;
+    public bool $showInvoicePreviewModal = false;
+
+    public bool $showDeleteFormModal = false;
 
     /* Notifications */
     public bool $addedWithSuccess = false;
@@ -384,11 +326,18 @@ class Index extends Component
     }
 
     // Afficher la modal de la facture
-    public function showFile($id)
+    public function showInvoiceModal($id)
     {
         $invoice = auth()->user()->invoices()->findOrFail($id);
         $this->fileUrl = $invoice->file_path;
-        $this->showFileModal = true;
+        $this->showInvoicePreviewModal = true;
+    }
+
+    // Rediriger vers la page de la facture
+    public function showInvoicePage($id)
+    {
+        $invoiceId = auth()->user()->invoices()->findOrFail($id)->id;
+        $this->redirectRoute('invoices.show', $invoiceId);
     }
 
     // Rediriger vers la page d'édition de la facture

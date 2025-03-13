@@ -14,6 +14,7 @@
 <li class="rounded-lg overflow-hidden {{ $basicColor }}">
     <a href="{{ $href }}"
        wire:current="{{ $activeColor }}"
+       wire:navigate
        class="group flex items-center rounded-lg px-3 py-2 h-10"
        {{ $attributes }}
     >

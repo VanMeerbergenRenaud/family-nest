@@ -139,10 +139,15 @@
                                 </x-menu.button>
                                 <x-menu.items
                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
-                                    <x-menu.item wire:click="showFile({{ $invoice->id }})">
+                                    <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                         <x-svg.show class="w-4 h-4"/>
-                                        {{ __('Voir la facture') }}
+                                        {{ __('Voir l’aperçu') }}
                                     </x-menu.item>
+                                    <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
+                                        <x-svg.help class="w-4 h-4"/>
+                                        {{ __('Voir en détail') }}
+                                    </x-menu.item>
+                                    <x-divider />
                                     <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                         <x-svg.download class="w-4 h-4"/>
                                         {{ __('Télécharger') }}
@@ -776,10 +781,15 @@
                                         </x-menu.button>
                                         <x-menu.items
                                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
-                                            <x-menu.item wire:click="showFile({{ $invoice->id }})">
+                                            <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                                 <x-svg.show class="w-4 h-4"/>
-                                                {{ __('Voir la facture') }}
+                                                {{ __('Voir l’aperçu') }}
                                             </x-menu.item>
+                                            <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
+                                                <x-svg.help class="w-4 h-4"/>
+                                                {{ __('Voir en détail') }}
+                                            </x-menu.item>
+                                            <x-divider />
                                             <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                                 <x-svg.download class="w-4 h-4"/>
                                                 {{ __('Télécharger') }}
@@ -966,8 +976,8 @@
         </x-modal>
     @endif
 
-    @if($showFileModal)
-        <x-modal wire:model="showFileModal">
+    @if($showInvoicePreviewModal)
+        <x-modal wire:model="showInvoicePreviewModal">
             <x-modal.panel class="max-w-4xl">
                 <p class="sticky top-0 p-5 px-8 max-w-full text-xl font-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                     {{ __('Aperçu du fichier') }}

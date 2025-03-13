@@ -9,4 +9,5 @@
         </div>
     @endif
 
+    Ma facture : {{ $form->invoice->id }} : {{ $form->invoice->name ?: 'Non spécifié' }}
 </div>

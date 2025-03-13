@@ -302,7 +302,7 @@
                     >
 
                         <!-- Résumé du formulaire -->
-                        <x-invoices.create.summary :form=$form />
+                        <x-invoices.create.summary :form="$form" />
 
                     </x-invoices.create.form-step>
 

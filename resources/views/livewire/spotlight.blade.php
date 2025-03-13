@@ -85,7 +85,7 @@
                                                     </x-spotlight.result>
                                                 @endif
                                                 @if ($result instanceof \App\Models\Invoice)
-                                                    <x-spotlight.result href="#" text="{{ $result->name }}" description="({{ $result->amount }}€)" shortcut="⌘ I">
+                                                    <x-spotlight.result href="{{ route('invoices.show', $result) }}" text="{{ $result->name }}" description="({{ $result->amount }}€)">
                                                         <x-svg.invoice class="h-5 w-5 text-gray-600 dark:text-gray-500"/>
                                                     </x-spotlight.result>
                                                 @endif
