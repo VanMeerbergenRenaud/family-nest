@@ -5,18 +5,12 @@ namespace App\Livewire\Forms;
 use App\Enums\InvoiceTypeEnum;
 use App\Models\Invoice;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class InvoiceForm extends Form
 {
-    public Invoice $invoice;
-
-    #[Validate]
-    public $uploadedFile;
-
-    public $existingFilePath = null;
+    public ?Invoice $invoice = null;
 
     #[Validate]
     public $name;
@@ -55,11 +49,11 @@ class InvoiceForm extends Form
     #[Validate]
     public $payment_frequency;
 
-    public $payment_status = 'unpaid';
+    public $payment_status;
 
-    public $payment_method = 'card';
+    public $payment_method;
 
-    public $priority = 'none';
+    public $priority;
 
     #[Validate]
     public $notes;
@@ -82,10 +76,6 @@ class InvoiceForm extends Form
     public function rules()
     {
         return [
-            // Étape d'importation
-            'uploadedFile' => $this->existingFilePath
-                ? 'nullable|file|mimes:pdf,docx,jpeg,png,jpg|max:10240'
-                : 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
             // Étape 1
             'name' => 'required|string|max:255',
             'reference' => 'nullable|string|max:255',
@@ -98,7 +88,6 @@ class InvoiceForm extends Form
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
             'associated_members' => 'nullable|array',
-            'amount_distribution' => 'nullable|array',
             // Étape 3
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
@@ -125,10 +114,6 @@ class InvoiceForm extends Form
     public function messages()
     {
         return [
-            'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
-            'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
-            'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, JPG ou PNG.',
-            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
             'name.required' => 'Le nom de la facture est obligatoire.',
             'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
             'amount.required' => 'Le montant est obligatoire.',
@@ -167,61 +152,40 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            // Vérifier que le fichier existe
-            if (! $this->uploadedFile) {
-                throw new \Exception('Aucun fichier fourni');
-            }
-
-            // Stocker le fichier et récupérer son chemin
-            $filePath = $this->uploadedFile->store('invoices', 'public');
-
-            // Vérifier que le stockage a réussi
-            if (! $filePath) {
-                throw new \Exception('Échec du stockage du fichier');
-            }
-
-            // Récupérer la taille du fichier
-            $fileSize = Storage::disk('public')->size($filePath);
-
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
             $invoice = auth()->user()->invoices()->create([
                 'user_id' => auth()->user()->id,
-                /* Étape d'importation */
-                'file_path' => $filePath,
-                'file_size' => $fileSize,
-                // Autres champs...
+                // Informations générales
                 'name' => $this->name,
                 'reference' => $this->reference,
                 'type' => $this->type,
                 'category' => $this->category,
                 'issuer_name' => $this->issuer_name,
                 'issuer_website' => $this->issuer_website,
-                /* Étape 2 */
+                // Détails financiers
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
                 'associated_members' => $this->associated_members ?? null,
-                'amount_distribution' => $this->amount_distribution ?? null,
-                /* Étape 3 */
+                // Dates
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
                 'payment_reminder' => $this->payment_reminder,
                 'payment_frequency' => $this->payment_frequency,
-                /* Étape 4 */
+                // Engagement
                 'engagement_id' => $this->engagement_id,
                 'engagement_name' => $this->engagement_name,
-                /* Étape 5 */
+                // Statut de paiement
                 'payment_status' => $this->payment_status,
                 'payment_method' => $this->payment_method,
                 'priority' => $this->priority,
-                /* Étape 6 */
+                // Notes et tags
                 'notes' => $this->notes,
                 'tags' => $this->tags ?? null,
-                /* Archives */
+                // Archives et favoris
                 'is_archived' => $this->is_archived,
-                /* Favoris */
                 'is_favorite' => $this->is_favorite,
             ]);
 
@@ -240,9 +204,6 @@ class InvoiceForm extends Form
     public function setInvoice(Invoice $invoice)
     {
         $this->invoice = $invoice;
-
-        $this->existingFilePath = $this->invoice->file_path;
-        $this->uploadedFile = null;
 
         $this->name = $this->invoice->name;
         $this->reference = $this->invoice->reference;
@@ -276,7 +237,7 @@ class InvoiceForm extends Form
     // Modifier la facture
     public function update()
     {
-        if (empty($this->invoice)) {
+        if (! $this->invoice) {
             throw new \Exception('Impossible de mettre à jour une facture sans son ID');
         }
 
@@ -285,73 +246,45 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            $invoice = auth()->user()->invoices()->findOrFail($this->invoice);
-
-            // Si un nouveau fichier est uploadé, supprimer l'ancien et stocker le nouveau
-            if ($this->uploadedFile) {
-                if ($invoice->file_path && Storage::disk('public')->exists($invoice->file_path)) {
-                    Storage::disk('public')->delete($invoice->file_path);
-                }
-
-                $filePath = $this->uploadedFile->store('invoices', 'public');
-                $fileSize = Storage::disk('public')->size($filePath);
-            } // Si l'utilisateur a supprimé l'image, mais n'en a pas uploadé une nouvelle
-            elseif ($this->existingFilePath === null && $invoice->file_path) {
-                if (Storage::disk('public')->exists($invoice->file_path)) {
-                    Storage::disk('public')->delete($invoice->file_path);
-                }
-                $filePath = null;
-                $fileSize = 0;
-            } // Si l'utilisateur n'a rien changé
-            else {
-                $filePath = $invoice->file_path;
-                $fileSize = $invoice->file_size;
-            }
-
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
-            $invoice->update([
-                /* Étape d'importation */
-                'file_path' => $filePath,
-                'file_size' => $fileSize,
-                /* Étape 1 */
+            $this->invoice->update([
+                // Informations générales
                 'name' => $this->name,
                 'reference' => $this->reference,
                 'type' => $this->type,
                 'category' => $this->category,
                 'issuer_name' => $this->issuer_name,
                 'issuer_website' => $this->issuer_website,
-                /* Étape 2 */
+                // Détails financiers
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
                 'associated_members' => $this->associated_members ?? null,
-                'amount_distribution' => $this->amount_distribution ?? null,
-                /* Étape 3 */
+                // Dates
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
                 'payment_reminder' => $this->payment_reminder,
                 'payment_frequency' => $this->payment_frequency,
-                /* Étape 4 */
+                // Engagement
                 'engagement_id' => $this->engagement_id,
                 'engagement_name' => $this->engagement_name,
-                /* Étape 5 */
+                // Statut de paiement
                 'payment_status' => $this->payment_status,
                 'payment_method' => $this->payment_method,
                 'priority' => $this->priority,
-                /* Étape 6 */
+                // Notes et tags
                 'notes' => $this->notes,
                 'tags' => $this->tags ?? null,
-                /* Archives */
+                // Archives et favoris
                 'is_archived' => $this->is_archived,
-                /* Favoris */
                 'is_favorite' => $this->is_favorite,
             ]);
 
             DB::commit();
 
-            return $invoice;
+            return $this->invoice;
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error($e->getMessage());
@@ -401,40 +334,5 @@ class InvoiceForm extends Form
 
         // Conversion en float et arrondi
         return round((float) $amount, 2);
-    }
-
-    public function getFileInfo()
-    {
-        if (! $this->uploadedFile) {
-            return null;
-        }
-
-        $fileName = $this->uploadedFile->getClientOriginalName();
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        $fileSize = round($this->uploadedFile->getSize() / 1024, 2); // Taille en KB
-        $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png']);
-        $isPdf = $fileExtension === 'pdf';
-        $isDocx = $fileExtension === 'docx';
-
-        return [
-            'name' => $fileName,
-            'extension' => $fileExtension,
-            'size' => $fileSize,
-            'sizeFormatted' => $this->formatFileSize($this->uploadedFile->getSize()),
-            'isImage' => $isImage,
-            'isPdf' => $isPdf,
-            'isDocx' => $isDocx,
-        ];
-    }
-
-    private function formatFileSize($bytes)
-    {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
-
-        return round($bytes, 2).' '.$units[$pow];
     }
 }
