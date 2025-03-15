@@ -30,7 +30,7 @@ class Edit extends Component
 
     public function mount($id)
     {
-        $invoice = $this->form->setInvoice($id); // Charge la facture dans le formulaire
+        $invoice = $this->form->setInvoice(auth()->user()->invoices()->findOrFail($id));
 
         $this->invoiceOriginalFilePath = $invoice->file_path;
 

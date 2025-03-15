@@ -1,4 +1,7 @@
-@props(['label', 'alternateBackground' => false])
+@props([
+    'label',
+    'alternateBackground' => false
+])
 
 <div class="{{ $alternateBackground ? 'bg-gray-50 dark:bg-gray-900' : 'bg-white dark:bg-gray-800' }} px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
     <dt class="text-sm-medium text-gray-500 dark:text-gray-300">

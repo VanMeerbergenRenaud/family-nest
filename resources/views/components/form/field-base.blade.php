@@ -10,7 +10,7 @@
     <label for="{{ $name }}" class="relative mb-1.5 pl-2 block text-sm-medium text-gray-800 dark:text-gray-200">
         {{ ucfirst($label) }}
         @if($asterix)
-            <span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>
+            <span aria-hidden="true" class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>
         @endif
     </label>
 

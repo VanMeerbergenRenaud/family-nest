@@ -32,19 +32,15 @@ class InvoiceFactory extends Factory
         $priorities = ['high', 'medium', 'low', 'none'];
         $paymentStatus = ['paid', 'unpaid', 'pending', 'late'];
         $paymentFrequencies = ['monthly', 'quarterly', 'annually', 'one_time'];
-        $paymentReminders = ['1_day', '3_days', '1_week', '2_weeks'];
 
         $users = User::all();
         $userId = $users->count() > 0 ? $users->random()->id : 1;
 
         $issuedDate = $this->faker->dateTimeBetween('-1 year', 'now');
         $paymentDueDate = $this->faker->dateTimeBetween($issuedDate, '+1 month');
+        $paymentReminderDate = $this->faker->dateTimeBetween($issuedDate, $paymentDueDate);
 
         return [
-            /* Étape upload */
-            'file_path' => 'invoices/'.$this->faker->uuid().'.pdf',
-            'file_size' => $this->faker->numberBetween(10000, 5000000), // Random file size between 10KB and 5MB
-
             /* Étape 1 */
             'name' => $this->faker->words(3, true),
             'reference' => $this->faker->bothify('INV-#####-???'),
@@ -57,15 +53,12 @@ class InvoiceFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 10, 1000),
             'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
             'paid_by' => $this->faker->name(),
-            'associated_members' => json_encode([
-                $this->faker->name(),
-                $this->faker->name(),
-            ]),
+            'associated_members' => $this->faker->randomElements(['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Brown'], $this->faker->numberBetween(1, 4)),
 
             /* Étape 3 */
             'issued_date' => Carbon::instance($issuedDate)->format('Y-m-d'),
             'payment_due_date' => Carbon::instance($paymentDueDate)->format('Y-m-d'),
-            'payment_reminder' => $this->faker->randomElement($paymentReminders),
+            'payment_reminder' => Carbon::instance($paymentReminderDate)->format('Y-m-d'),
             'payment_frequency' => $this->faker->randomElement($paymentFrequencies),
 
             /* Étape 4 */
@@ -79,7 +72,6 @@ class InvoiceFactory extends Factory
 
             /* Étape 6 */
             'notes' => $this->faker->paragraph(),
-            // Ne pas encoder les tags ici car ils seront encodés automatiquement plus tard
             'tags' => $this->faker->words($this->faker->numberBetween(1, 5)),
 
             /* Archives */

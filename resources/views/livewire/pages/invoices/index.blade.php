@@ -7,18 +7,20 @@
 
         <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
             {{-- Favoris --}}
-            <a wire:click.prevent="openFolder('favorites', 'Favoris')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer">
+            <button wire:click.prevent="openFolder('favorites', 'Favoris')"
+               class="flex p-5 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer">
                 <div class="flex flex-col">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-blue-100 dark:bg-blue-900">
                         <x-heroicon-o-star class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
                     </div>
-                    <span class="text-md-medium text-gray-900 dark:text-white">Favoris</span>
-                    <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['favorites']['count'] }} Fichiers • {{ $folderStats['favorites']['size'] }}
-                </span>
+                    <p class="pl-1 flex flex-col gap-1">
+                        <span class="text-left text-md-medium text-gray-900 dark:text-white">Favoris</span>
+                        <span class="text-sm-medium text-gray-500 dark:text-gray-400">
+                        {{ $folderStats['favorites']['count'] }} Fichiers • {{ $folderStats['favorites']['amount'] }}€
+                    </span>
+                    </p>
                 </div>
-            </a>
+            </button>
 
             {{-- Payés --}}
             <a wire:click.prevent="openFolder('paid', 'Factures payées')" href="#"
@@ -29,7 +31,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Payés</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['paid']['count'] }} Fichiers • {{ $folderStats['paid']['size'] }}
+                    {{ $folderStats['paid']['count'] }} Fichiers • {{ $folderStats['paid']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -43,7 +45,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Impayés</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['unpaid']['count'] }} Fichiers • {{ $folderStats['unpaid']['size'] }}
+                    {{ $folderStats['unpaid']['count'] }} Fichiers • {{ $folderStats['unpaid']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -57,7 +59,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Retard de paiement</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['late']['count'] }} Fichiers • {{ $folderStats['late']['size'] }}
+                    {{ $folderStats['late']['count'] }} Fichiers • {{ $folderStats['late']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -71,7 +73,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Semaine dernière</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['last_week']['count'] }} Fichiers • {{ $folderStats['last_week']['size'] }}
+                    {{ $folderStats['last_week']['count'] }} Fichiers • {{ $folderStats['last_week']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -85,7 +87,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Montant élevé</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['high_amount']['count'] }} Fichiers • {{ $folderStats['high_amount']['size'] }}
+                    {{ $folderStats['high_amount']['count'] }} Fichiers • {{ $folderStats['high_amount']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -99,7 +101,7 @@
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Priorité élevée</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['high_priority']['count'] }} Fichiers • {{ $folderStats['high_priority']['size'] }}
+                    {{ $folderStats['high_priority']['count'] }} Fichiers • {{ $folderStats['high_priority']['amount'] }}€
                 </span>
                 </div>
             </a>
@@ -117,8 +119,7 @@
                 </div>
             @else
                 @foreach($recentInvoices as $invoice)
-                    <div
-                        class="p-4 min-w-72 w-auto h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="flex items-center justify-between gap-4">
                             <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                 <x-svg.file-size class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
@@ -129,7 +130,7 @@
                                 </h3>
                                 <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
                                     {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->format('j M Y') : 'Date inconnue' }}
-                                    • {{ $invoice->formatted_file_size ?? 'Taille inconnue' }}
+                                    • {{ $invoice->amount ?? 'Montant vide' }} {{ $invoice->currency ?? '€' }}
                                 </p>
                             </div>
                             {{-- Menu d'action --}}
@@ -139,10 +140,15 @@
                                 </x-menu.button>
                                 <x-menu.items
                                     class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
-                                    <x-menu.item wire:click="showFile({{ $invoice->id }})">
+                                    <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                         <x-svg.show class="w-4 h-4"/>
-                                        {{ __('Voir la facture') }}
+                                        {{ __('Voir l’aperçu') }}
                                     </x-menu.item>
+                                    <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
+                                        <x-svg.help class="w-4 h-4"/>
+                                        {{ __('Voir en détail') }}
+                                    </x-menu.item>
+                                    <x-divider />
                                     <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                         <x-svg.download class="w-4 h-4"/>
                                         {{ __('Télécharger') }}
@@ -248,29 +254,16 @@
                                 Prix (+ → -)
                             </button>
 
-                            {{-- Filtres de taille --}}
-                            <button wire:click="applyFilter('file_size_asc')"
-                                    class="button-rounded {{ $activeFilter === 'file_size_asc' ? $activeState : $inactiveState }}">
-                                <x-svg.file-size class="w-3.5 h-3.5"/>
-                                Taille (petit → grand)
-                            </button>
-
-                            <button wire:click="applyFilter('file_size_desc')"
-                                    class="button-rounded {{ $activeFilter === 'file_size_desc' ? $activeState : $inactiveState }}">
-                                <x-svg.file-size class="w-3.5 h-3.5"/>
-                                Taille (grand → petit)
-                            </button>
-
                             {{-- Filtres alphabétiques --}}
                             <button wire:click="applyFilter('name_asc')"
                                     class="button-rounded {{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }}">
-                                <x-svg-atoz class="w-3.5 h-3.5"/>
+                                <x-svg.atoz class="w-3.5 h-3.5"/>
                                 A → Z
                             </button>
 
                             <button wire:click="applyFilter('name_desc')"
                                     class="button-rounded {{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }}">
-                                <x-svg-atoz class="w-3.5 h-3.5 rotate-180"/>
+                                <x-svg.atoz class="w-3.5 h-3.5 rotate-180"/>
                                 Z → A
                             </button>
                         </div>
@@ -298,16 +291,6 @@
                                 label="Nom du fichier"
                                 :checked="isset($visibleColumns['name']) && $visibleColumns['name']"
                                 wire:click="toggleColumn('name')"
-                            />
-                        </x-menu.item>
-
-                        <x-menu.item wire:click="toggleColumn('file_size')">
-                            <x-form.checkbox-input
-                                name="column_file_size"
-                                model="visibleColumns.file_size"
-                                label="Taille du fichier"
-                                :checked="isset($visibleColumns['file_size']) && $visibleColumns['file_size']"
-                                wire:click="toggleColumn('file_size')"
                             />
                         </x-menu.item>
 
@@ -441,27 +424,6 @@
                             </th>
                         @endif
 
-                        {{-- Colonne "Taille du fichier" --}}
-                        @if($visibleColumns['file_size'])
-                            <th scope="col" class="min-w-[150px]">
-                                <button wire:click="sortBy('file_size')" class="flex items-center">
-                                    <span class="w-fit">Taille du fichier</span>
-                                    @if ($sortField === 'file_size')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
-                                </button>
-                            </th>
-                        @endif
-
                         {{-- Colonnes supplémentaires --}}
                         {{-- Type --}}
                         @if($visibleColumns['type'])
@@ -507,7 +469,7 @@
 
                         {{-- Émetteur --}}
                         @if($visibleColumns['issuer_name'])
-                            <th scope="col" class="min-w-[150px]">
+                        <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('issuer_name')" class="flex items-center">
                                     <span>Émetteur</span>
                                     @if ($sortField === 'issuer_name')
@@ -652,13 +614,6 @@
                                 </td>
                             @endif
 
-                            {{-- Taille du fichier --}}
-                            @if($visibleColumns['file_size'])
-                                <td>
-                                    {{ $invoice->formatted_file_size ?? 'N/A' }}
-                                </td>
-                            @endif
-
                             {{-- Type --}}
                             @if($visibleColumns['type'])
                                 <td>
@@ -776,10 +731,15 @@
                                         </x-menu.button>
                                         <x-menu.items
                                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
-                                            <x-menu.item wire:click="showFile({{ $invoice->id }})">
+                                            <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                                 <x-svg.show class="w-4 h-4"/>
-                                                {{ __('Voir la facture') }}
+                                                {{ __('Voir l’aperçu') }}
                                             </x-menu.item>
+                                            <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
+                                                <x-svg.help class="w-4 h-4"/>
+                                                {{ __('Voir en détail') }}
+                                            </x-menu.item>
+                                            <x-divider />
                                             <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                                 <x-svg.download class="w-4 h-4"/>
                                                 {{ __('Télécharger') }}
@@ -966,8 +926,8 @@
         </x-modal>
     @endif
 
-    @if($showFileModal)
-        <x-modal wire:model="showFileModal">
+    @if($showInvoicePreviewModal)
+        <x-modal wire:model="showInvoicePreviewModal">
             <x-modal.panel class="max-w-4xl">
                 <p class="sticky top-0 p-5 px-8 max-w-full text-xl font-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                     {{ __('Aperçu du fichier') }}

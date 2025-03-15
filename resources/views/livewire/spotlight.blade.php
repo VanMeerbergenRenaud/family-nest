@@ -51,15 +51,15 @@
                                         Suggestions
                                     </h3>
                                     <ul role="list" class="flex flex-col gap-1">
-                                        <x-spotlight-result href="#" text="Voir mes factures">
+                                        <x-spotlight.result href="#" text="Voir mes factures">
                                             <x-svg.changelog class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
-                                        </x-spotlight-result>
-                                        <x-spotlight-result href="#" text="Ajouter une nouvelle facture" shortcut="⌘ N">
+                                        </x-spotlight.result>
+                                        <x-spotlight.result href="#" text="Ajouter une nouvelle facture" shortcut="⌘ N">
                                             <x-svg.help class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
-                                        </x-spotlight-result>
-                                        <x-spotlight-result href="#" text="Inviter un membre à la famille">
+                                        </x-spotlight.result>
+                                        <x-spotlight.result href="#" text="Inviter un membre à la famille">
                                             <x-svg.user-plus class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
-                                        </x-spotlight-result>
+                                        </x-spotlight.result>
                                     </ul>
                                 </div>
                             @else
@@ -80,14 +80,14 @@
                                         <ul role="list" class="flex flex-col gap-1">
                                             @foreach ($items as $result)
                                                 @if ($result instanceof \App\Models\User)
-                                                    <x-spotlight-result href="#" text="{{ $result->name }}" description="({{ $result->email }})">
+                                                    <x-spotlight.result href="#" text="{{ $result->name }}" description="({{ $result->email }})">
                                                         <img src="{{ $result->avatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"/>
-                                                    </x-spotlight-result>
+                                                    </x-spotlight.result>
                                                 @endif
                                                 @if ($result instanceof \App\Models\Invoice)
-                                                    <x-spotlight-result href="#" text="{{ $result->name }}" description="({{ $result->amount }}€)" shortcut="⌘ I">
+                                                    <x-spotlight.result href="{{ route('invoices.show', $result) }}" text="{{ $result->name }}" description="({{ $result->amount }}€)">
                                                         <x-svg.invoice class="h-5 w-5 text-gray-600 dark:text-gray-500"/>
-                                                    </x-spotlight-result>
+                                                    </x-spotlight.result>
                                                 @endif
                                             @endforeach
                                         </ul>

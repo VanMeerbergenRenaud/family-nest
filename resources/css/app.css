@@ -161,6 +161,11 @@
         @apply border-[#E2E2E2] dark:border-b-gray-500;
     }
 
+    /* Input invalid */
+    .input-invalid {
+        @apply outline-2 outline-red-600 dark:outline-red-400 outline-offset-2 rounded-md;
+    }
+
     /* Hide scrollbar for Chrome, Safari and Opera */
     .scrollbar-hidden::-webkit-scrollbar {
         display: none;

@@ -4,9 +4,11 @@
 
 <ul>
     <x-sidebar-menu.link href="{{ route('dashboard') }}" icon="home" label="Tableau de bord" :expanded="$expanded" />
-
-    {{-- Invoices --}}
     <x-sidebar-menu.link href="{{ route('invoices') }}" icon="document" label="Factures" :expanded="$expanded" />
+    <x-sidebar-menu.link href="{{ route('calendar') }}" icon="calendar" label="Calendrier" :expanded="$expanded" />
+    <x-sidebar-menu.link href="{{ route('themes') }}" icon="swatch" label="Thèmes" :expanded="$expanded" />
+    <x-sidebar-menu.link href="{{ route('goals') }}" icon="tag" label="Objectifs" :expanded="$expanded" />
+    <x-sidebar-menu.link href="{{ route('family') }}" icon="users" label="Familles" :expanded="$expanded" />
 
     {{-- Dropdown style --}}
     {{--<div x-show="dropdownOpen"
@@ -38,10 +40,4 @@
             </li>
         </ul>
     </div>--}}
-
-    <x-sidebar-menu.link href="{{ route('themes') }}" icon="swatch" label="Thèmes" :expanded="$expanded" />
-    <x-sidebar-menu.link href="{{ route('calendar') }}" icon="calendar" label="Calendrier" :expanded="$expanded" />
-    <x-sidebar-menu.link href="{{ route('invoices.archived') }}" icon="archive-box" label="Archives" :expanded="$expanded" />
-    <x-sidebar-menu.link href="{{ route('goals') }}" icon="tag" label="Objectifs" :expanded="$expanded" />
-    <x-sidebar-menu.link href="{{ route('family') }}" icon="users" label="Familles" :expanded="$expanded" />
 </ul>
