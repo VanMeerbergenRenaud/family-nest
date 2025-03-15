@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Invoice;
+use App\Models\InvoiceFile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -63,9 +64,16 @@ class DatabaseSeeder extends Seeder
             'avatar' => asset('img/avatar_placeholder.png'),
         ]);
 
-        /* Invoices */
-        Invoice::factory(20)->create([
+        /* Invoices pour l'utilisateur 1 avec leurs fichiers associés */
+        $invoices = Invoice::factory(20)->create([
             'user_id' => 1,
         ]);
+
+        // Créer un fichier pour chaque facture
+        foreach ($invoices as $invoice) {
+            InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+        }
     }
 }
