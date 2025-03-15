@@ -9,9 +9,13 @@ class Show extends Component
 {
     public Invoice $invoice;
 
+    public string $file_path;
+
     public function mount($id)
     {
         $this->invoice = auth()->user()->invoices()->findOrFail($id);
+
+        $this->file_path = $this->invoice->file->file_path;
 
         if ($this->invoice->is_archived) {
             $this->redirectRoute('invoices.archived');

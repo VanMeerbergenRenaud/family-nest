@@ -32,7 +32,6 @@ class InvoiceFactory extends Factory
         $priorities = ['high', 'medium', 'low', 'none'];
         $paymentStatus = ['paid', 'unpaid', 'pending', 'late'];
         $paymentFrequencies = ['monthly', 'quarterly', 'annually', 'one_time'];
-        $paymentReminders = ['1_day', '3_days', '1_week', '2_weeks'];
 
         $users = User::all();
         $userId = $users->count() > 0 ? $users->random()->id : 1;
@@ -42,10 +41,6 @@ class InvoiceFactory extends Factory
         $paymentReminderDate = $this->faker->dateTimeBetween($issuedDate, $paymentDueDate);
 
         return [
-            /* Étape upload */
-            'file_path' => 'invoices/'.$this->faker->uuid().'.pdf',
-            'file_size' => $this->faker->numberBetween(10000, 5000000), // Random file size between 10KB and 5MB
-
             /* Étape 1 */
             'name' => $this->faker->words(3, true),
             'reference' => $this->faker->bothify('INV-#####-???'),

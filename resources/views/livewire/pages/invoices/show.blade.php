@@ -1,6 +1,6 @@
 <div class="grid grid-cols-[40vw_auto] mx-auto lg:gap-8">
     <img
-        src="{{ $invoice->file_path ?? asset('img/avatar_placeholder.png') }}"
+        src="{{ $file_path ?? asset('img/avatar_placeholder.png') }}"
         alt="facture"
         class="rounded-xl w-full object-contain"
     >

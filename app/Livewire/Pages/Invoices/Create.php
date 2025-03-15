@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
+use App\Livewire\Forms\InvoiceFileForm;
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -12,6 +13,8 @@ use Livewire\WithFileUploads;
 class Create extends Component
 {
     use WithFileUploads;
+
+    public InvoiceFileForm $fileForm;
 
     public InvoiceForm $form;
 
@@ -49,22 +52,16 @@ class Create extends Component
         $this->form->category = null; // Réinitialiser la catégorie lorsque le type change
     }
 
-    public function removeUploadedFile()
-    {
-        $this->form->uploadedFile = null;
-        $this->resetValidation('form.uploadedFile');
-    }
-
     // Méthode pour mettre à jour les montants partagés
     public function updateShareAmounts()
     {
-        $this->form->updateShareAmounts();
+        // Si vous avez une méthode pour mettre à jour les montants partagés
     }
 
     // Méthode pour mettre à jour les pourcentages
     public function updateShareFromPercentage($percentage, $member)
     {
-        $this->form->updateShareFromPercentage($percentage, $member);
+        // Si vous avez une méthode pour mettre à jour les pourcentages
     }
 
     public function addTag()
@@ -181,11 +178,35 @@ class Create extends Component
 
     public function createInvoice()
     {
-        $invoice = $this->form->store();
+        // Valider les deux formulaires simultanément
+        $fileValidation = $this->fileForm->validate();
+        $formValidation = $this->form->validate();
 
-        if ($invoice) {
-            $this->redirectRoute('invoices');
+        // Si les deux validations passent, procéder à la création
+        if ($fileValidation && $formValidation) {
+            try {
+                // Créer la facture
+                $invoice = $this->form->store();
+
+                if ($invoice) {
+                    // Stocker le fichier associé
+                    $this->fileForm->storeFile($invoice->id);
+
+                    // Redirection
+                    $this->redirectRoute('invoices', $invoice);
+                }
+            } catch (\Exception $e) {
+                session()->flash('error', 'Une erreur est survenue: '.$e->getMessage());
+            }
         }
+    }
+
+    // Méthode pour supprimer le fichier uploadé
+    public function removeUploadedFile()
+    {
+        $this->fileForm->removeFile();
+        // Réinitialiser les erreurs pour le fileForm
+        $this->fileForm->resetErrorBag();
     }
 
     public function render()

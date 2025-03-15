@@ -1,23 +1,102 @@
+@props([
+    'form',
+    'fileForm'
+])
+
 <div class="my-6 lg:px-4 mx-auto max-lg:max-w-[35rem] max-lg:flex-center max-lg:flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-0">
-    <!-- Affichage des erreurs de validation -->
+    @php
+        // Fonction réutilisable pour calculer la progression
+        function calculateProgress($form, $fileForm, $errors) {
+            // Champs requis et optionnels
+            $requiredFields = ['uploadedFile', 'name', 'amount'];
+            $optionalFields = ['type', 'category', 'issuer_name', 'issuer_website', 'issued_date', 'payment_due_date',
+                              'payment_reminder', 'payment_frequency', 'payment_status', 'payment_method',
+                              'priority', 'notes', 'tags'];
+
+            $filledRequired = 0;
+            $filledOptional = 0;
+
+            // Vérifier si fichier est valide (présent ET sans erreur)
+            if ((!empty($fileForm->uploadedFile) || !empty($fileForm->existingFilePath)) &&
+                !$errors->has('fileForm.uploadedFile')) {
+                $filledRequired++;
+            }
+
+            // Vérifier le nom est présent ET sans erreur
+            if (!empty($form->name) && !$errors->has('form.name')) {
+                $filledRequired++;
+            }
+
+            // Vérifier le montant est présent ET sans erreur
+            if (isset($form->amount) && $form->amount !== '' && !$errors->has('form.amount')) {
+                $filledRequired++;
+            }
+
+            // Vérifier les champs optionnels
+            if (!empty($form->type)) $filledOptional++;
+            if (!empty($form->category)) $filledOptional++;
+            if (!empty($form->issuer_name)) $filledOptional++;
+            if (!empty($form->issuer_website)) $filledOptional++;
+            if (!empty($form->issued_date)) $filledOptional++;
+            if (!empty($form->payment_due_date)) $filledOptional++;
+            if (!empty($form->payment_reminder)) $filledOptional++;
+            if (!empty($form->payment_frequency)) $filledOptional++;
+            if (!empty($form->payment_status)) $filledOptional++;
+            if (!empty($form->payment_method)) $filledOptional++;
+            if (!empty($form->priority)) $filledOptional++;
+            if (!empty($form->notes)) $filledOptional++;
+            if (!empty($form->tags) && is_array($form->tags) && count($form->tags) > 0) $filledOptional++;
+
+            // Calcul du pourcentage (70% pour les champs obligatoires + 30% pour les champs optionnels)
+            $requiredPercentage = ($filledRequired / count($requiredFields)) * 70;
+            $optionalPercentage = ($filledOptional / count($optionalFields)) * 30;
+            $totalPercentage = round($requiredPercentage + $optionalPercentage);
+
+            // Garantir que le pourcentage est entre 0 et 100
+            $totalPercentage = max(0, min(100, $totalPercentage));
+
+            return [
+                'percentage' => $totalPercentage,
+                'requiredCount' => $filledRequired,
+                'totalRequired' => count($requiredFields)
+            ];
+        }
+
+        // Calculer une seule fois la progression
+        $progressData = calculateProgress($form, $fileForm, $errors);
+        $progressPercentage = $progressData['percentage'];
+
+        // Déterminer le type d'alerte et la couleur en fonction du pourcentage
+        if ($progressPercentage == 0) {
+            $alertType = 'warning';
+            $barColor = 'bg-gray-400';
+            $alertTitle = 'Aucune information';
+        } elseif ($progressPercentage < 33) {
+            $alertType = 'warning';
+            $barColor = 'bg-red-400';
+            $alertTitle = 'Début de saisie';
+        } elseif ($progressPercentage < 70) {
+            $alertType = $errors->any() ? 'warning' : 'inProgress';
+            $barColor = 'bg-orange-400';
+            $alertTitle = 'En cours de complétion';
+        } elseif ($progressPercentage < 100) {
+            $alertType = $errors->any() ? 'warning' : 'inProgress';
+            $barColor = 'bg-blue-500';
+            $alertTitle = 'Presque terminé';
+        } else {
+            $alertType = $errors->any() ? 'warning' : 'success';
+            $barColor = $errors->any() ? 'bg-orange-500' : 'bg-green-600';
+            $alertTitle = $errors->any() ? 'Corrections requises' : 'Prêt à soumettre';
+        }
+    @endphp
+
+        <!-- Affichage des erreurs de validation -->
     @if($errors->any())
-        <x-form.alert type="warning" title="Attention : corrections requises">
+        <x-form.alert type="{{ $alertType }}" title="Attention : {{ $alertTitle }}">
             <p class="text-sm-regular">
                 Veuillez corriger toutes les erreurs avant de soumettre le formulaire.
                 Vous pouvez naviguer vers les étapes précédentes pour effectuer les corrections nécessaires.
             </p>
-
-            @php
-                // Calculer le pourcentage de progression même en cas d'erreur
-                $requiredFields = ['uploadedFile', 'name', 'amount'];
-                $filledFields = 0;
-
-                if (!empty($form->uploadedFile) || !empty($form->existingFilePath)) $filledFields++;
-                if (!empty($form->name)) $filledFields++;
-                if (isset($form->amount) && $form->amount !== '') $filledFields++;
-
-                $progressPercentage = round(($filledFields / count($requiredFields)) * 100);
-            @endphp
 
             <div class="mt-4">
                 <p class="flex justify-between mb-1">
@@ -25,7 +104,7 @@
                     <span class="text-xs-medium">{{ $progressPercentage }}%</span>
                 </p>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-orange-400 h-2.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
+                    <div class="{{ $barColor }} h-2.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                 </div>
             </div>
             <p class="text-xs mt-2">
@@ -37,6 +116,7 @@
             <div class="flex flex-col gap-2">
                 @php
                     $fieldToStep = [
+                        'uploadedFile' => 1,
                         'fichier' => 1,
                         'nom' => 1,
                         'référence' => 1,
@@ -83,9 +163,10 @@
                 @foreach ($errorsByStep as $step => $stepErrors)
                     <div class="flex items-center justify-between border-b border-red-100">
                         <p class="pl-2 text-sm-bold text-red-600">Étape {{ $step }}</p>
-                        <button type="button" @click="goToStep({{ $step }})" class="button-classic text-red-600 pr-3 py-1.5 hover:bg-red-100">
+                        <button type="button" @click="goToStep({{ $step }})"
+                                class="button-classic text-red-600 pr-3 py-1.5 hover:bg-red-100">
                             Aller à cette étape
-                            <x-svg.arrows.right class="text-red-600" />
+                            <x-svg.arrows.right class="text-red-600"/>
                         </button>
                     </div>
                     <ul class="pl-5 space-y-2 list-disc">
@@ -96,9 +177,9 @@
                 @endforeach
             </div>
         </x-form.alert>
-        {{-- Pas d'image importé --}}
-    @elseif(empty($form->uploadedFile) && empty($form->existingFilePath))
-        <x-form.alert type="warning" title="Aucune facture importée">
+        {{-- Pas d'image importée --}}
+    @elseif(empty($fileForm->uploadedFile) && empty($fileForm->existingFilePath))
+        <x-form.alert type="{{ $alertType }}" title="Aucune facture importée">
             <p class="text-sm-regular">
                 Veuillez importer une facture pour commencer.
             </p>
@@ -106,83 +187,41 @@
             <div class="mt-4">
                 <div class="flex justify-between mb-1">
                     <span class="text-xs-medium">Progression du formulaire</span>
-                    <span class="text-xs-medium">0%</span>
+                    <span class="text-xs-medium">{{ $progressPercentage }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0"></div>
+                    <div class="{{ $barColor }} h-2.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                 </div>
-                <p class="text-xs mt-2">Commencez par importez votre facture pour continuer votre progression</p>
+                <p class="text-xs mt-2">Commencez par importer votre facture pour continuer votre progression</p>
             </div>
         </x-form.alert>
-        {{-- Image importé mais champs obligatoires vides --}}
+        {{-- Image importée mais champs obligatoires vides ou partiellement remplis --}}
     @else
-        @php
-            // Calcul dynamique du pourcentage de progression
-            $requiredFields = ['uploadedFile', 'name', 'amount'];
-            $optionalFields = ['type', 'category', 'issuer_name', 'issuer_website', 'paid_by','associated_members','issued_date','payment_due_date','payment_reminder','payment_frequency','payment_status','payment_method','priority','notes','tags'];
-
-            $filledRequired = 0;
-            $filledOptional = 0;
-
-            // Vérifier les champs obligatoires
-            if (!empty($form->uploadedFile)) $filledRequired++;
-            if (!empty($form->name)) $filledRequired++;
-            if (isset($form->amount) && $form->amount !== '') $filledRequired++;
-
-            // Vérifier les champs optionnels pour bonus de progression
-            if (!empty($form->type)) $filledOptional++;
-            if (!empty($form->category)) $filledOptional++;
-            if (!empty($form->issuer_name)) $filledOptional++;
-            if (!empty($form->issuer_website)) $filledOptional++;
-            if (!empty($form->paid_by)) $filledOptional++;
-            if (!empty($form->associated_members)) $filledOptional++;
-            if (!empty($form->issued_date)) $filledOptional++;
-            if (!empty($form->payment_due_date)) $filledOptional++;
-            if (!empty($form->payment_reminder)) $filledOptional++;
-            if (!empty($form->payment_frequency)) $filledOptional++;
-            if (!empty($form->payment_status)) $filledOptional++;
-            if (!empty($form->payment_method)) $filledOptional++;
-            if (!empty($form->priority)) $filledOptional++;
-            if (!empty($form->notes)) $filledOptional++;
-            if (!empty($form->tags)) $filledOptional++;
-
-            // Calcul du pourcentage (70% pour les champs obligatoires + 30% pour les champs optionnels)
-            $requiredPercentage = ($filledRequired / count($requiredFields)) * 70;
-            $optionalPercentage = ($filledOptional / count($optionalFields)) * 30;
-            $totalPercentage = round($requiredPercentage + $optionalPercentage);
-
-            // Garantir que le pourcentage est entre 0 et 100
-            $totalPercentage = max(0, min(100, $totalPercentage));
-
-            // Déterminer le type d'alerte et la couleur en fonction du pourcentage
-            $alertType = $totalPercentage == 100 ? 'success' : 'inProgress';
-            $barColor = $totalPercentage == 100 ? 'bg-green-600' : 'bg-orange-500';
-            $alertTitle = $totalPercentage == 100 ? 'Prêt à soumettre' : 'Champs obligatoires non remplis';
-        @endphp
-
         <x-form.alert type="{{ $alertType }}" title="{{ $alertTitle }}">
             <p class="text-sm-regular">
-                @if($totalPercentage == 100)
+                @if($progressPercentage == 100)
                     Toutes les informations requises sont complètes. Vous pouvez maintenant enregistrer cette facture si vous le souhaitez.
+                @elseif($progressPercentage >= 70)
+                    Vous avez rempli tous les champs obligatoires ! Complétez les champs restants pour une meilleure expérience.
                 @else
-                    Veuillez remplir tous les champs obligatoires pour enregistrer votre facture.
+                    Veuillez remplir tous les champs obligatoires suivis d'un astérisque *.
                 @endif
             </p>
 
             <div class="mt-4">
                 <div class="flex justify-between mb-1">
                     <span class="text-xs-medium">Progression du formulaire</span>
-                    <span class="text-xs-medium">{{ $totalPercentage }}%</span>
+                    <span class="text-xs-medium">{{ $progressPercentage }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                    <div class="{{ $barColor }} h-2.5 rounded-full" style="width: {{ $totalPercentage }}%"></div>
+                    <div class="{{ $barColor }} h-2.5 rounded-full" style="width: {{ $progressPercentage }}%"></div>
                 </div>
                 <p class="text-xs mt-2">
-                    @if($totalPercentage == 100)
+                    @if($progressPercentage == 100)
                         Félicitations ! Vous avez complété tous les champs nécessaires.
-                    @elseif($totalPercentage >= 70)
-                        Vous avez rempli tous les champs obligatoires ! Complétez les champs restants pour une meilleure expérience.
-                    @elseif($totalPercentage > 0)
+                    @elseif($progressPercentage >= 70)
+                        Encore quelques champs et vous aurez terminé !
+                    @elseif($progressPercentage > 0)
                         Continuez en remplissant les champs obligatoires suivis d'un astérisque *.
                     @endif
                 </p>

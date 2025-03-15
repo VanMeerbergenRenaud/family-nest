@@ -27,8 +27,8 @@
 
                 {{-- Image : colonne 1 --}}
                 <div class="relative flex-center overflow-hidden max-h-[75vh] lg:max-w-[30vw]">
-                    @if (!$form->uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
+                    @if (!$fileForm->uploadedFile)
+                        <x-form.field-upload label="Importer une facture" model="fileForm.uploadedFile" name="fileForm.uploadedFile" :asterix="true" />
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -39,21 +39,22 @@
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
 
-                            <!-- Détection du type de fichier et affichage approprié -->
                             @php
-                                $fileName = $form->uploadedFile->getClientOriginalName();
-                                $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                                $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png']);
-                                $isPdf = $fileExtension === 'pdf';
-                                $isDocx = $fileExtension === 'docx';
-                                $isCsv = $fileExtension === 'csv';
-                                $fileSize = round($form->uploadedFile->getSize() / 1024, 2); // Conversion en KB
+                                $fileInfo = $fileForm->getFileInfo();
+                                $fileName = $fileInfo['name'] ?? '';
+                                $fileExtension = $fileInfo['extension'] ?? '';
+                                $isImage = $fileInfo['isImage'] ?? false;
+                                $isPdf = $fileInfo['isPdf'] ?? false;
+                                $isDocx = $fileInfo['isDocx'] ?? false;
+                                $isCsv = $fileInfo['isCsv'] ?? false;
+                                $fileSize = $fileInfo['size'] ?? 0;
+                                $sizeFormatted = $fileInfo['sizeFormatted'] ?? '';
                             @endphp
 
                             <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
                                 <!-- Aperçu pour les images -->
                                 @if ($isImage)
-                                    <img src="{{ $form->uploadedFile->temporaryUrl() }}"
+                                    <img src="{{ $fileForm->uploadedFile->temporaryUrl() }}"
                                          alt="Aperçu de la facture"
                                          class="bg-gray-100 rounded-xl max-h-[50vh]"
                                     />
@@ -69,8 +70,8 @@
                                             <x-svg.docx class="w-12 h-12 text-gray-600" />
                                         </div>
                                         <!-- Icône pour les CSV -->
-                                    @elseif ($isCsv)
-                                        <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
+                                    @elseif($isCsv)
+                                        <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
                                             <x-svg.csv class="w-12 h-12 text-gray-600" />
                                         </div>
                                         <!-- Icône générique pour les autres types de fichiers -->
@@ -86,9 +87,9 @@
                                     <h2 class="text-md-medium text-gray-800 truncate">{{ $fileName }}</h2>
                                     <p class="flex-center space-x-1.5 text-gray-600">
                                         <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
-                                        <span class="text-sm-regular">{{ $fileSize }} KB</span>
+                                        <span class="text-sm-regular">{{ $sizeFormatted }}</span>
                                     </p>
-                                    @if(!$errors->has('form.uploadedFile'))
+                                    @if(!$errors->has('fileForm.uploadedFile'))
                                         <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
                                             Import du fichier validé
                                         </p>
@@ -211,6 +212,7 @@
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
                         <x-form.select name="form.payment_status" model="form.payment_status" label="Statut de la facture">
+                            <option value="" selected>Sélectionner un statut</option>
                             <option value="unpaid">Non payée</option>
                             <option value="paid">Payée</option>
                             <option value="late">En retard</option>
@@ -219,13 +221,14 @@
 
 
                         <x-form.select name="form.payment_method" model="form.payment_method" label="Méthode de paiement utilisée">
+                            <option value="" selected>Sélectionne un moyen de paiement</option>
                             <option value="card">Carte bancaire</option>
                             <option value="cash">Espèces</option>
                             <option value="transfer">Virement</option>
                         </x-form.select>
 
                         <x-form.select name="form.priority" model="form.priority" label="Étiquette de priorité">
-                            <option value="none">Aucune</option>
+                            <option value="" selected>Sélectionner une priorité</option>
                             <option value="low">Basse</option>
                             <option value="medium">Moyenne</option>
                             <option value="high">Élevée</option>
@@ -302,7 +305,7 @@
                     >
 
                         <!-- Résumé du formulaire -->
-                        <x-invoices.create.summary :form="$form" />
+                        <x-invoices.create.summary :form="$form" :fileForm="$fileForm" />
 
                     </x-invoices.create.form-step>
 
@@ -313,11 +316,11 @@
                                 <x-svg.arrows.left class="stroke-white"/>
                                 Précédent
                             </button>
-                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="ml-auto button-primary">
+                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="ml-auto button-secondary">
                                 Suivant
-                                <x-svg.arrows.right class="stroke-gray-700"/>
+                                <x-svg.arrows.right class="stroke-white"/>
                             </button>
-                            <button type="submit" x-show="currentStep < steps.length" class="button-tertiary">
+                            <button type="submit" x-show="currentStep < steps.length" class="button-primary">
                                 Tout valider
                             </button>
                             <button type="submit" x-show="currentStep === steps.length" class="button-tertiary">
@@ -331,7 +334,7 @@
             </div>
 
             {{-- Gestions des messages d'erreurs --}}
-            <x-invoices.create.alert-errors />
+            <x-invoices.create.alert-errors :form="$form" :fileForm="$fileForm" />
         </form>
     </div>
 </div>

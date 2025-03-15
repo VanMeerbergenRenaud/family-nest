@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            /* Step upload */
-            $table->string('file_path');
-            $table->unsignedBigInteger('file_size')->nullable(); // New column for file size in bytes
+            /* Step upload on table invoice_file */
             /* Step 1 */
             $table->string('name');
             $table->string('reference')->nullable(); // Référence de la facture
@@ -39,9 +37,9 @@ return new class extends Migration
             $table->string('engagement_id')->nullable(); // ID de l'engagement dans le système
             $table->string('engagement_name')->nullable(); // Nom de l'engagement (contrat, abonnement, etc.)
             /* Step 5 */
-            $table->string('payment_status')->default('unpaid'); // Stocké en tant que chaîne pour plus de flexibilité
-            $table->string('payment_method')->default('card'); // Méthode de paiement (carte, espèces, etc.)
-            $table->string('priority')->default('none'); // Priorité de paiement (haute, moyenne, basse)
+            $table->string('payment_status')->nullable(); // Stocké en tant que chaîne pour plus de flexibilité
+            $table->string('payment_method')->nullable(); // Méthode de paiement (carte, espèces, etc.)
+            $table->string('priority')->nullable(); // Priorité de paiement (haute, moyenne, basse)
             /* Step 6 */
             $table->text('notes')->nullable(); // Notes supplémentaires
             $table->json('tags')->nullable(); // JSON format for tags
