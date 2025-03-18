@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Livewire\Breadcrumb;
+use App\Livewire\BreadcrumbDynamic;
 use Illuminate\Support\ServiceProvider;
-use WireElements\LivewireStrict\LivewireStrict;
+use Livewire\Livewire;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Enregistrer les composants Livewire
+        Livewire::component('breadcrumb', Breadcrumb::class);
     }
 }
