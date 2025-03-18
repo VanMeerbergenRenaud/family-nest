@@ -5,7 +5,6 @@ namespace App\Livewire\Pages\Invoices;
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 

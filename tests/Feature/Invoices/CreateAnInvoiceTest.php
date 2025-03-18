@@ -63,7 +63,7 @@ it('permet de créer une facture complète avec succès', function () {
         ->call('createInvoice')
 
         // Vérifier la redirection
-        ->assertRedirect(route('invoices'));
+        ->assertRedirect(route('invoices.index'));
 
     // Vérifier que la facture a été créée en base de données
     assertDatabaseHas('invoices', [

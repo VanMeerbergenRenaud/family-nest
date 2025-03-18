@@ -366,7 +366,7 @@ class Index extends Component
     {
         $this->form->update();
 
-        $this->redirectRoute('invoices');
+        $this->redirectRoute('invoices.index');
     }
 
     // Afficher le formulaire de suppression

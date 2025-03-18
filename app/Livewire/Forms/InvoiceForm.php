@@ -14,6 +14,7 @@ use Livewire\Form;
 class InvoiceForm extends Form
 {
     public ?Invoice $invoice = null;
+
     public ?InvoiceFile $invoiceFile = null;
 
     // Fichier uploadé
@@ -21,10 +22,15 @@ class InvoiceForm extends Form
     public $uploadedFile;
 
     public $existingFilePath = null;
+
     public $fileName = null;
+
     public $filePath = null;
+
     public $fileExtension = null;
+
     public $fileSize = null;
+
     public $is_primary = true;
 
     // Informations générales de la facture
@@ -35,6 +41,7 @@ class InvoiceForm extends Form
     public $reference;
 
     public $type;
+
     public $category;
 
     #[Validate]
@@ -48,7 +55,9 @@ class InvoiceForm extends Form
     public $amount;
 
     public $currency = 'EUR';
+
     public $paid_by;
+
     public $associated_members = [];
 
     // Dates
@@ -66,7 +75,9 @@ class InvoiceForm extends Form
 
     // Statut de paiement
     public $payment_status;
+
     public $payment_method;
+
     public $priority;
 
     // Notes et tags
@@ -80,7 +91,9 @@ class InvoiceForm extends Form
 
     // États
     public $is_archived = false;
+
     public $is_favorite = false;
+
     public $user_id;
 
     // Catégories disponibles
@@ -160,7 +173,7 @@ class InvoiceForm extends Form
     // Traiter le fichier uploadé et récupérer ses informations
     public function processUploadedFile()
     {
-        if (!$this->uploadedFile) {
+        if (! $this->uploadedFile) {
             return false;
         }
 
@@ -169,7 +182,7 @@ class InvoiceForm extends Form
         $this->fileSize = $this->uploadedFile->getSize();
 
         // Par défaut, définir comme fichier principal
-        if (!isset($this->is_primary)) {
+        if (! isset($this->is_primary)) {
             $this->is_primary = true;
         }
 
@@ -179,7 +192,7 @@ class InvoiceForm extends Form
     // Obtenir les informations sur le fichier uploadé
     public function getFileInfo()
     {
-        if (!$this->uploadedFile) {
+        if (! $this->uploadedFile) {
             return null;
         }
 
@@ -225,6 +238,7 @@ class InvoiceForm extends Form
             foreach (InvoiceTypeEnum::cases() as $case) {
                 if ($case->value === $this->type) {
                     $this->availableCategories = $case->categories();
+
                     return;
                 }
             }
@@ -296,11 +310,13 @@ class InvoiceForm extends Form
             }
 
             DB::commit();
+
             return $invoice;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la création de la facture: ' . $e->getMessage());
+            Log::error('Erreur lors de la création de la facture: '.$e->getMessage());
+
             return false;
         }
     }
@@ -308,7 +324,7 @@ class InvoiceForm extends Form
     // Mettre à jour une facture existante et son fichier associé
     public function update()
     {
-        if (!$this->invoice) {
+        if (! $this->invoice) {
             throw new \Exception('Impossible de mettre à jour une facture sans son ID');
         }
 
@@ -393,11 +409,13 @@ class InvoiceForm extends Form
             }
 
             DB::commit();
+
             return $this->invoice;
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la mise à jour de la facture: ' . $e->getMessage());
+            Log::error('Erreur lors de la mise à jour de la facture: '.$e->getMessage());
+
             return false;
         }
     }
@@ -471,19 +489,20 @@ class InvoiceForm extends Form
     // Archiver la facture au lieu de la supprimer
     public function archive()
     {
-        if (!$this->invoice) {
+        if (! $this->invoice) {
             return false;
         }
 
         try {
             $this->invoice->update([
-                'is_archived' => true
+                'is_archived' => true,
             ]);
             $this->is_archived = true;
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'archivage de la facture: ' . $e->getMessage());
+            Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
+
             return false;
         }
     }
@@ -491,19 +510,20 @@ class InvoiceForm extends Form
     // Récupérer une facture archivée
     public function restore()
     {
-        if (!$this->invoice) {
+        if (! $this->invoice) {
             return false;
         }
 
         try {
             $this->invoice->update([
-                'is_archived' => false
+                'is_archived' => false,
             ]);
             $this->is_archived = false;
 
             return true;
         } catch (\Exception $e) {
-            Log::error('Erreur lors de la restauration de la facture: ' . $e->getMessage());
+            Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
+
             return false;
         }
     }
@@ -511,7 +531,7 @@ class InvoiceForm extends Form
     // Supprimer définitivement la facture et ses fichiers
     public function forceDelete()
     {
-        if (!$this->invoice) {
+        if (! $this->invoice) {
             return false;
         }
 
@@ -533,10 +553,12 @@ class InvoiceForm extends Form
             $this->invoice->forceDelete();
 
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la suppression définitive de la facture: ' . $e->getMessage());
+            Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
+
             return false;
         }
     }

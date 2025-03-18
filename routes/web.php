@@ -1,57 +1,78 @@
 <?php
 
+use App\Livewire\Pages\Calendar;
+use App\Livewire\Pages\Dashboard;
+use App\Livewire\Pages\Family;
+use App\Livewire\Pages\Goals;
+use App\Livewire\Pages\HelpCenter;
 use App\Livewire\Pages\Invoices\Archived;
 use App\Livewire\Pages\Invoices\Create;
 use App\Livewire\Pages\Invoices\Edit;
-use App\Livewire\Pages\Invoices\Index;
+use App\Livewire\Pages\Invoices\Index as IndexInvoice;
 use App\Livewire\Pages\Invoices\Show;
+use App\Livewire\Pages\Settings\Apparence;
+use App\Livewire\Pages\Settings\Billing;
+use App\Livewire\Pages\Settings\Danger;
+use App\Livewire\Pages\Settings\Index as IndexSetting;
+use App\Livewire\Pages\Settings\Notification;
+use App\Livewire\Pages\Settings\Profile;
+use App\Livewire\Pages\Settings\Storage;
 use App\Livewire\Pages\Themes;
 use Illuminate\Support\Facades\Route;
-use Livewire\Volt\Volt;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Ici sont définies toutes les routes de l'application web.
+| Les routes sont organisées par catégories pour une meilleure lisibilité.
+|
+*/
+
+// Routes pour les invités
 Route::view('/', 'welcome')
     ->middleware(['guest'])
     ->name('welcome');
 
-Volt::route('dashboard', 'pages.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Routes protégées par authentification
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Page d'accueil
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
-Volt::route('settings/profile', 'pages.profile')
-    ->middleware(['auth'])
-    ->name('profile');
+    // Routes des factures
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', IndexInvoice::class)->name('index');
+        Route::get('/create', Create::class)->name('create');
+        Route::get('/{id}/edit', Edit::class)->name('edit');
+        Route::get('/{id}/show', Show::class)->name('show');
+        Route::get('/archived', Archived::class)->name('archived');
+    });
 
-/* Routes invoices */
-Route::middleware(['auth'])->group(function () {
-    Route::get('/invoices', Index::class)->name('invoices');
-    Route::get('/invoices/create', Create::class)->name('invoices.create');
-    Route::get('/invoices/{id}/edit', Edit::class)->name('invoices.edit');
-    Route::get('/invoices/{id}/show', Show::class)->name('invoices.show');
-    Route::get('/invoices/archived', Archived::class)->name('invoices.archived');
-    // Themes
+    // Routes des thèmes
     Route::get('/themes', Themes::class)->name('themes');
+
+    // Routes de planification
+    Route::get('/calendar', Calendar::class)->name('calendar');
+    Route::get('/goals', Goals::class)->name('goals');
+
+    // Routes familiales
+    Route::get('/family', Family::class)->name('family');
+
+    // Routes des paramètres
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', IndexSetting::class)->name('index');
+        Route::get('/profile', Profile::class)->name('profile');
+        Route::get('/storage', Storage::class)->name('storage');
+        Route::get('/notification', Notification::class)->name('notifications');
+        Route::get('/billing', Billing::class)->name('billing');
+        Route::get('/apparence', Apparence::class)->name('appearance');
+        Route::get('/danger', Danger::class)->name('danger');
+    });
+
+    // Centre d'aide
+    Route::get('/help-center', HelpCenter::class)->name('help-center');
 });
 
-/* Routes themes, calendar, archives, goals, family */
-Volt::route('calendar', 'pages.calendar')
-    ->middleware(['auth'])
-    ->name('calendar');
-
-Volt::route('goals', 'pages.goals')
-    ->middleware(['auth'])
-    ->name('goals');
-
-Volt::route('family', 'pages.family')
-    ->middleware(['auth'])
-    ->name('family');
-
-/* Routes settings, help-center */
-Volt::route('settings', 'pages.settings')
-    ->middleware(['auth'])
-    ->name('settings');
-
-Volt::route('help-center', 'pages.help-center')
-    ->middleware(['auth'])
-    ->name('help-center');
-
+// Inclusion des routes d'authentification
 require __DIR__.'/auth.php';

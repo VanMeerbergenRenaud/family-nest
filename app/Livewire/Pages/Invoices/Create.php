@@ -172,7 +172,7 @@ class Create extends Component
         $invoice = $this->form->store();
 
         if ($invoice) {
-            $this->redirectRoute('invoices', $invoice);
+            $this->redirectRoute('invoices.index', $invoice);
         } else {
             session()->flash('error', 'Une erreur est survenue lors de la création de la facture');
         }

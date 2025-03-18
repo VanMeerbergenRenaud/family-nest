@@ -54,7 +54,7 @@
 
         <x-menu.item wire:click="seeArchives">
             <x-svg.trash/>
-            {{ __('Corbeille') }}
+            {{ __('Mes archives') }}
         </x-menu.item>
 
         <x-menu.item wire:click="logout">

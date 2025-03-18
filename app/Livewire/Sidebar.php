@@ -33,7 +33,7 @@ class Sidebar extends Component
 
     public function seeProfile()
     {
-        $this->redirectRoute('profile');
+        $this->redirectRoute('settings.profile');
     }
 
     public function seeShortcut()
