@@ -15,8 +15,8 @@ class Invoice extends Model
     protected $fillable = [
         'name', 'type', 'category', 'issuer_name', 'issuer_website',
         'amount', 'currency', 'paid_by', 'associated_members', 'issued_date', 'payment_due_date',
-        'payment_reminder', 'payment_frequency', 'engagement_id', 'engagement_name',
-        'payment_status', 'payment_method', 'priority', 'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
+        'payment_reminder', 'payment_frequency', 'payment_status', 'payment_method', 'priority',
+        'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
     ];
 
     protected $casts = [

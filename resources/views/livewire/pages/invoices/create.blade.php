@@ -4,7 +4,7 @@
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,
-            steps: ['Informations', 'Montant', 'Dates', 'Engagements', 'Paiement', 'Notes', 'Résumé'],
+            steps: ['Informations', 'Montant', 'Dates', 'Paiement', 'Notes', 'Résumé'],
             nextStep() {
                 this.currentStep++;
             },
@@ -27,8 +27,8 @@
 
                 {{-- Image : colonne 1 --}}
                 <div class="relative flex-center overflow-hidden max-h-[75vh] lg:max-w-[30vw]">
-                    @if (!$fileForm->uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="fileForm.uploadedFile" name="fileForm.uploadedFile" :asterix="true" />
+                    @if (!$form->uploadedFile)
+                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
                     @else
                         <div class="relative w-full h-full">
                             <!-- Button de suppression de l'image -->
@@ -40,7 +40,7 @@
                             </button>
 
                             @php
-                                $fileInfo = $fileForm->getFileInfo();
+                                $fileInfo = $form->getFileInfo();
                                 $fileName = $fileInfo['name'] ?? '';
                                 $fileExtension = $fileInfo['extension'] ?? '';
                                 $isImage = $fileInfo['isImage'] ?? false;
@@ -54,7 +54,7 @@
                             <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
                                 <!-- Aperçu pour les images -->
                                 @if ($isImage)
-                                    <img src="{{ $fileForm->uploadedFile->temporaryUrl() }}"
+                                    <img src="{{ $form->uploadedFile->temporaryUrl() }}"
                                          alt="Aperçu de la facture"
                                          class="bg-gray-100 rounded-xl max-h-[50vh]"
                                     />
@@ -89,7 +89,7 @@
                                         <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
                                         <span class="text-sm-regular">{{ $sizeFormatted }}</span>
                                     </p>
-                                    @if(!$errors->has('fileForm.uploadedFile'))
+                                    @if(!$errors->has('form.uploadedFile'))
                                         <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
                                             Import du fichier validé
                                         </p>
@@ -133,7 +133,7 @@
                             </x-form.select>
 
                             <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name" model="form.issuer_name" placeholder="Nom du fournisseur"/>
-                            <x-form.field label="Site internet du fournisseur" name="form.issuer_website" model="form.issuer_website" placeholder="www.monfournisseur.com"/>
+                            <x-form.field label="Site internet du fournisseur" name="form.issuer_website" model="form.issuer_website" placeholder="https://monfournisseur.com"/>
                         </div>
 
                     </x-invoices.create.form-step>
@@ -178,7 +178,7 @@
                             <x-form.field-date label="Date de paiement" name="form.payment_due_date" model="form.payment_due_date"/>
                             <x-form.field-date label="Rappel de paiement" name="form.payment_reminder" model="form.payment_reminder"/>
                             <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
-                                <option value="" disabled>Sélectionner une fréquence</option>
+                                <option value="" selected>Sélectionner une fréquence</option>
                                 <option value="monthly">Mensuel</option>
                                 <option value="quarterly">Trimestriel</option>
                                 <option value="annually">Annuel</option>
@@ -187,27 +187,9 @@
                         </div>
                     </x-invoices.create.form-step>
 
-                    {{-- Étape 4: Association à des engagements --}}
+                    {{-- Étape 4: Statut de paiement --}}
                     <x-invoices.create.form-step
-                        step="4" title="Étape 4 : Association à des engagements"
-                        description="Associez cette facture à un engagement existant ou créez-en un nouveau."
-                        class="flex flex-wrap items-end gap-y-3 gap-x-4"
-                    >
-                        <x-form.select name="form.engagement_id" model="form.engagement_id" label="Engagement existant">
-                            <option value="" disabled>Sélectionner un engagement existant</option>
-                            @foreach($engagements as $engagement)
-                                <option value="{{ $engagement['id'] }}">{{ $engagement['name'] }}</option>
-                            @endforeach
-                        </x-form.select>
-
-                        <button type="button" class="button-tertiary border border-slate-200 w-fit">
-                            Créer un nouvel engagement
-                        </button>
-                    </x-invoices.create.form-step>
-
-                    {{-- Étape 5: Statut de paiement --}}
-                    <x-invoices.create.form-step
-                        step="5" title="Étape 5 : Statut de paiement"
+                        step="4" title="Étape 4 : Statut de paiement"
                         description="Indiquez le statut actuel de paiement de cette facture."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
                     >
@@ -235,9 +217,9 @@
                         </x-form.select>
                     </x-invoices.create.form-step>
 
-                    {{-- Étape 6: Notes et tags personnalisés --}}
+                    {{-- Étape 5: Notes et tags personnalisés --}}
                     <x-invoices.create.form-step
-                        step="6" title="Étape 6 : Notes et tags personnalisés"
+                        step="5" title="Étape 5 : Notes et tags personnalisés"
                         description="Ajoutez des notes et des tags pour mieux organiser vos factures."
                     >
                         <x-form.field-textarea label="Notes (détail / commentaire important)" name="form.notes" model="form.notes" placeholder="Inscrivez votre message ici..."/>
@@ -300,12 +282,12 @@
                     </x-invoices.create.form-step>
 
                     <x-invoices.create.form-step
-                        step="7" title="Étape 7 : Résumé"
+                        step="6" title="Étape 6 : Résumé"
                         description="Vérifiez les informations avant d'enregistrer la facture."
                     >
 
                         <!-- Résumé du formulaire -->
-                        <x-invoices.create.summary :form="$form" :fileForm="$fileForm" />
+                        <x-invoices.create.summary :form="$form" />
 
                     </x-invoices.create.form-step>
 
@@ -334,7 +316,7 @@
             </div>
 
             {{-- Gestions des messages d'erreurs --}}
-            <x-invoices.create.alert-errors :form="$form" :fileForm="$fileForm" />
+            <x-invoices.create.alert-errors :form="$form" />
         </form>
     </div>
 </div>

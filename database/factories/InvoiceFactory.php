@@ -62,15 +62,11 @@ class InvoiceFactory extends Factory
             'payment_frequency' => $this->faker->randomElement($paymentFrequencies),
 
             /* Étape 4 */
-            'engagement_id' => $this->faker->bothify('ENGAGE-#####-???'),
-            'engagement_name' => $this->faker->randomElement(['Contrat', 'Abonnement', 'Engagement', 'Prestation']).' '.$this->faker->word(),
-
-            /* Étape 5 */
             'payment_status' => $this->faker->randomElement($paymentStatus),
             'payment_method' => $this->faker->randomElement($paymentMethods),
             'priority' => $this->faker->randomElement($priorities),
 
-            /* Étape 6 */
+            /* Étape 5 */
             'notes' => $this->faker->paragraph(),
             'tags' => $this->faker->words($this->faker->numberBetween(1, 5)),
 

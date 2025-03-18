@@ -98,10 +98,6 @@
             </div>
         </x-invoices.create.summary-item>
 
-        <x-invoices.create.summary-item label="Engagement" :alternateBackground="true">
-            {{ $form->engagement_name ?: 'Non spécifié' }}
-        </x-invoices.create.summary-item>
-
         <x-invoices.create.summary-item label="Statut de paiement">
             <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                   {{ $form->payment_status === 'paid'

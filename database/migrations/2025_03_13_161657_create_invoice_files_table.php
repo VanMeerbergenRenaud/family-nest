@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('file_path');
             $table->string('file_extension');
             $table->unsignedBigInteger('file_size');
+            $table->boolean('is_primary')->default(false);
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });

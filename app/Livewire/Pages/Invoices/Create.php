@@ -3,7 +3,6 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
-use App\Livewire\Forms\InvoiceFileForm;
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,13 +13,9 @@ class Create extends Component
 {
     use WithFileUploads;
 
-    public InvoiceFileForm $fileForm;
-
     public InvoiceForm $form;
 
     public $family_members = [];
-
-    public $engagements = [];
 
     // Propriété pour stocker les suggestions de tags
     public $tagSuggestions = [];
@@ -31,10 +26,6 @@ class Create extends Component
     public function mount()
     {
         $this->family_members = auth()->user()->get();
-
-        $this->engagements = [
-            ['id' => 'abc123', 'name' => 'Abonnement Internet Orange'],
-        ];
 
         // Initialiser le tableau des tags s'il est null
         if (! is_array($this->form->tags)) {
@@ -178,35 +169,19 @@ class Create extends Component
 
     public function createInvoice()
     {
-        // Valider les deux formulaires simultanément
-        $fileValidation = $this->fileForm->validate();
-        $formValidation = $this->form->validate();
+        $invoice = $this->form->store();
 
-        // Si les deux validations passent, procéder à la création
-        if ($fileValidation && $formValidation) {
-            try {
-                // Créer la facture
-                $invoice = $this->form->store();
-
-                if ($invoice) {
-                    // Stocker le fichier associé
-                    $this->fileForm->storeFile($invoice->id);
-
-                    // Redirection
-                    $this->redirectRoute('invoices', $invoice);
-                }
-            } catch (\Exception $e) {
-                session()->flash('error', 'Une erreur est survenue: '.$e->getMessage());
-            }
+        if ($invoice) {
+            $this->redirectRoute('invoices', $invoice);
+        } else {
+            session()->flash('error', 'Une erreur est survenue lors de la création de la facture');
         }
     }
 
-    // Méthode pour supprimer le fichier uploadé
     public function removeUploadedFile()
     {
-        $this->fileForm->removeFile();
-        // Réinitialiser les erreurs pour le fileForm
-        $this->fileForm->resetErrorBag();
+        $this->form->removeFile();
+        $this->form->resetErrorBag('uploadedFile');
     }
 
     public function render()

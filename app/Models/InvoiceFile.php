@@ -17,10 +17,12 @@ class InvoiceFile extends Model
         'file_name',
         'file_extension',
         'file_size',
+        'is_primary',
     ];
 
     protected $casts = [
         'file_size' => 'integer',
+        'is_primary' => 'boolean',
     ];
 
     public function invoice(): BelongsTo

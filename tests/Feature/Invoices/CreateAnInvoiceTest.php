@@ -47,14 +47,12 @@ it('permet de créer une facture complète avec succès', function () {
         ->set('form.payment_reminder', '2024-03-10')
         ->set('form.payment_frequency', 'monthly')
 
-        // Étape 5: Engagement (aucun choisi pour ce test)
-
-        // Étape 6: Statut de paiement
+        // Étape 5: Statut de paiement
         ->set('form.payment_status', 'unpaid')
         ->set('form.payment_method', 'card')
         ->set('form.priority', 'medium')
 
-        // Étape 7: Notes et tags
+        // Étape 6: Notes et tags
         ->set('form.notes', 'Facture mensuelle pour la fibre optique')
 
         // Ajouter deux tags

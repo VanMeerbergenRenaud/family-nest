@@ -42,6 +42,7 @@
             name="{{ $name }}"
             type="file"
             wire:model.blur="{{ $model }}"
+            accept=".pdf,.docx,.jpeg,.jpg,.png"
             class="absolute top-0 left-0 h-full w-full cursor-pointer opacity-0"
             {{ $attributes }}
         >

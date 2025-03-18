@@ -34,13 +34,10 @@ return new class extends Migration
             $table->string('payment_reminder')->nullable(); // Rappel de paiement (1 jour, 1 semaine, 2 semaines)
             $table->string('payment_frequency')->nullable(); // Fréquence de paiement (mensuel, trimestriel, annuel)
             /* Step 4 */
-            $table->string('engagement_id')->nullable(); // ID de l'engagement dans le système
-            $table->string('engagement_name')->nullable(); // Nom de l'engagement (contrat, abonnement, etc.)
-            /* Step 5 */
             $table->string('payment_status')->nullable(); // Stocké en tant que chaîne pour plus de flexibilité
             $table->string('payment_method')->nullable(); // Méthode de paiement (carte, espèces, etc.)
             $table->string('priority')->nullable(); // Priorité de paiement (haute, moyenne, basse)
-            /* Step 6 */
+            /* Step 5 */
             $table->text('notes')->nullable(); // Notes supplémentaires
             $table->json('tags')->nullable(); // JSON format for tags
             /* Archives */

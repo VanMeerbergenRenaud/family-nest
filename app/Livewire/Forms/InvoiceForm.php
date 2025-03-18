@@ -4,14 +4,30 @@ namespace App\Livewire\Forms;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Models\Invoice;
+use App\Models\InvoiceFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class InvoiceForm extends Form
 {
     public ?Invoice $invoice = null;
+    public ?InvoiceFile $invoiceFile = null;
 
+    // Fichier uploadé
+    #[Validate]
+    public $uploadedFile;
+
+    public $existingFilePath = null;
+    public $fileName = null;
+    public $filePath = null;
+    public $fileExtension = null;
+    public $fileSize = null;
+    public $is_primary = true;
+
+    // Informations générales de la facture
     #[Validate]
     public $name;
 
@@ -19,7 +35,6 @@ class InvoiceForm extends Form
     public $reference;
 
     public $type;
-
     public $category;
 
     #[Validate]
@@ -28,15 +43,15 @@ class InvoiceForm extends Form
     #[Validate]
     public $issuer_website;
 
+    // Détails financiers
     #[Validate]
     public $amount;
 
     public $currency = 'EUR';
-
     public $paid_by;
-
     public $associated_members = [];
 
+    // Dates
     #[Validate]
     public $issued_date;
 
@@ -49,12 +64,12 @@ class InvoiceForm extends Form
     #[Validate]
     public $payment_frequency;
 
+    // Statut de paiement
     public $payment_status;
-
     public $payment_method;
-
     public $priority;
 
+    // Notes et tags
     #[Validate]
     public $notes;
 
@@ -63,57 +78,70 @@ class InvoiceForm extends Form
 
     public $tagInput = '';
 
-    public $engagement_id;
-
-    public $engagement_name;
-
+    // États
     public $is_archived = false;
-
     public $is_favorite = false;
+    public $user_id;
 
+    // Catégories disponibles
     public $availableCategories = [];
 
+    // Règles de validation
     public function rules()
     {
         return [
-            // Étape 1
+            // Fichier
+            'uploadedFile' => $this->existingFilePath
+                ? 'nullable|file|mimes:pdf,docx,jpeg,png,jpg|max:10240'
+                : 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
+
+            // Étape 1 - Informations générales
             'name' => 'required|string|max:255',
             'reference' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',
             'category' => 'nullable|string|max:255',
             'issuer_name' => 'nullable|string|max:255',
             'issuer_website' => 'nullable|url|max:255',
-            // Étape 2
+
+            // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
             'paid_by' => 'nullable|string|max:255',
             'associated_members' => 'nullable|array',
-            // Étape 3
+
+            // Étape 3 - Dates
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
             'payment_reminder' => 'nullable|string|max:255',
             'payment_frequency' => 'nullable|string|max:255',
-            // Étape 4
-            'engagement_id' => 'nullable|string|max:255',
-            'engagement_name' => 'nullable|string|max:255',
-            // Étape 5
+
+            // Étape 4 - Statut de paiement
             'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid',
             'payment_method' => 'nullable|in:card,cash,transfer',
             'priority' => 'nullable|in:high,medium,low,none',
-            // Étape 6
+
+            // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',
             'tags' => 'nullable|array',
             'tagInput' => 'nullable|string',
-            // Archives
+
+            // États
             'is_archived' => 'boolean',
-            // Favoris
             'is_favorite' => 'boolean',
         ];
     }
 
+    // Messages d'erreur personnalisés
     public function messages()
     {
         return [
+            // Messages d'erreur pour le fichier
+            'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
+            'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
+            'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, JPG ou PNG.',
+            'uploadedFile.max' => 'Le fichier ne doit pas dépasser 10 Mo.',
+
+            // Messages d'erreur pour les informations facture
             'name.required' => 'Le nom de la facture est obligatoire.',
             'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
             'amount.required' => 'Le montant est obligatoire.',
@@ -129,13 +157,74 @@ class InvoiceForm extends Form
         ];
     }
 
+    // Traiter le fichier uploadé et récupérer ses informations
+    public function processUploadedFile()
+    {
+        if (!$this->uploadedFile) {
+            return false;
+        }
+
+        $this->fileName = $this->uploadedFile->getClientOriginalName();
+        $this->fileExtension = strtolower($this->uploadedFile->getClientOriginalExtension());
+        $this->fileSize = $this->uploadedFile->getSize();
+
+        // Par défaut, définir comme fichier principal
+        if (!isset($this->is_primary)) {
+            $this->is_primary = true;
+        }
+
+        return true;
+    }
+
+    // Obtenir les informations sur le fichier uploadé
+    public function getFileInfo()
+    {
+        if (!$this->uploadedFile) {
+            return null;
+        }
+
+        return [
+            'name' => $this->fileName ?? $this->uploadedFile->getClientOriginalName(),
+            'extension' => $this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension()),
+            'size' => round(($this->fileSize ?? $this->uploadedFile->getSize()) / 1024, 2), // Taille en KB
+            'sizeFormatted' => $this->formatFileSize($this->fileSize ?? $this->uploadedFile->getSize()),
+            'isImage' => in_array($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension()), ['jpg', 'jpeg', 'png']),
+            'isPdf' => ($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension())) === 'pdf',
+            'isDocx' => ($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension())) === 'docx',
+            'isCsv' => ($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension())) === 'csv',
+        ];
+    }
+
+    // Formater la taille du fichier
+    private function formatFileSize($bytes)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+
+        return round($bytes, 2).' '.$units[$pow];
+    }
+
+    // Supprimer le fichier
+    public function removeFile()
+    {
+        $this->uploadedFile = null;
+        $this->existingFilePath = null;
+        $this->fileName = null;
+        $this->filePath = null;
+        $this->fileExtension = null;
+        $this->fileSize = null;
+    }
+
+    // Mettre à jour la liste des catégories disponibles
     public function updateAvailableCategories()
     {
         if ($this->type) {
             foreach (InvoiceTypeEnum::cases() as $case) {
                 if ($case->value === $this->type) {
                     $this->availableCategories = $case->categories();
-
                     return;
                 }
             }
@@ -144,7 +233,7 @@ class InvoiceForm extends Form
         $this->availableCategories = [];
     }
 
-    // Créer la facture
+    // Créer une nouvelle facture avec son fichier associé
     public function store()
     {
         $this->validate();
@@ -155,6 +244,7 @@ class InvoiceForm extends Form
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
+            // Création d'une nouvelle facture
             $invoice = auth()->user()->invoices()->create([
                 'user_id' => auth()->user()->id,
                 // Informations générales
@@ -174,9 +264,6 @@ class InvoiceForm extends Form
                 'payment_due_date' => $this->payment_due_date,
                 'payment_reminder' => $this->payment_reminder,
                 'payment_frequency' => $this->payment_frequency,
-                // Engagement
-                'engagement_id' => $this->engagement_id,
-                'engagement_name' => $this->engagement_name,
                 // Statut de paiement
                 'payment_status' => $this->payment_status,
                 'payment_method' => $this->payment_method,
@@ -189,55 +276,39 @@ class InvoiceForm extends Form
                 'is_favorite' => $this->is_favorite,
             ]);
 
-            DB::commit();
+            // Stocker le fichier associé si présent
+            if ($this->uploadedFile) {
+                // Traiter le fichier
+                $this->processUploadedFile();
 
+                // Stocker le fichier
+                $this->filePath = $this->uploadedFile->store('invoices', 'public');
+
+                // Créer l'enregistrement dans la base de données
+                $this->invoiceFile = InvoiceFile::create([
+                    'invoice_id' => $invoice->id,
+                    'file_path' => $this->filePath,
+                    'file_name' => $this->fileName,
+                    'file_extension' => $this->fileExtension,
+                    'file_size' => $this->fileSize,
+                    'is_primary' => true,
+                ]);
+            }
+
+            DB::commit();
             return $invoice;
+
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Erreur lors de la création de la facture: '.$e->getMessage());
-
+            Log::error('Erreur lors de la création de la facture: ' . $e->getMessage());
             return false;
         }
     }
 
-    // Récupérer la facture
-    public function setInvoice(Invoice $invoice)
-    {
-        $this->invoice = $invoice;
-
-        $this->name = $this->invoice->name;
-        $this->reference = $this->invoice->reference;
-        $this->type = $this->invoice->type;
-        $this->category = $this->invoice->category;
-        $this->issuer_name = $this->invoice->issuer_name;
-        $this->issuer_website = $this->invoice->issuer_website;
-        $this->amount = is_numeric($this->invoice->amount) ? (float) $this->invoice->amount : null;
-        $this->currency = $this->invoice->currency ?? 'EUR';
-        $this->paid_by = $this->invoice->paid_by;
-        $this->associated_members = $this->invoice->associated_members;
-        $this->issued_date = $this->invoice->issued_date;
-        $this->payment_due_date = $this->invoice->payment_due_date;
-        $this->payment_reminder = $this->invoice->payment_reminder;
-        $this->payment_frequency = $this->invoice->payment_frequency;
-        $this->engagement_id = $this->invoice->engagement_id;
-        $this->engagement_name = $this->invoice->engagement_name;
-        $this->payment_status = $this->invoice->payment_status;
-        $this->payment_method = $this->invoice->payment_method;
-        $this->priority = $this->invoice->priority;
-        $this->notes = $this->invoice->notes;
-        $this->tags = $this->invoice->tags;
-        $this->is_archived = $this->invoice->is_archived;
-        $this->is_favorite = $this->invoice->is_favorite;
-
-        $this->updateAvailableCategories();
-
-        return $invoice;
-    }
-
-    // Modifier la facture
+    // Mettre à jour une facture existante et son fichier associé
     public function update()
     {
-        if (! $this->invoice) {
+        if (!$this->invoice) {
             throw new \Exception('Impossible de mettre à jour une facture sans son ID');
         }
 
@@ -249,6 +320,7 @@ class InvoiceForm extends Form
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
+            // Mise à jour de la facture existante
             $this->invoice->update([
                 // Informations générales
                 'name' => $this->name,
@@ -267,9 +339,6 @@ class InvoiceForm extends Form
                 'payment_due_date' => $this->payment_due_date,
                 'payment_reminder' => $this->payment_reminder,
                 'payment_frequency' => $this->payment_frequency,
-                // Engagement
-                'engagement_id' => $this->engagement_id,
-                'engagement_name' => $this->engagement_name,
                 // Statut de paiement
                 'payment_status' => $this->payment_status,
                 'payment_method' => $this->payment_method,
@@ -282,35 +351,197 @@ class InvoiceForm extends Form
                 'is_favorite' => $this->is_favorite,
             ]);
 
-            DB::commit();
+            // Gestion du fichier associé si un nouveau fichier est uploadé
+            if ($this->uploadedFile) {
+                // Traiter le nouveau fichier
+                $this->processUploadedFile();
 
+                // Récupérer l'ancien fichier
+                $oldFile = InvoiceFile::where('invoice_id', $this->invoice->id)
+                    ->where('is_primary', true)
+                    ->first();
+
+                // Supprimer l'ancien fichier du stockage
+                if ($oldFile && Storage::disk('public')->exists($oldFile->getRawOriginal('file_path'))) {
+                    Storage::disk('public')->delete($oldFile->getRawOriginal('file_path'));
+                }
+
+                // Stocker le nouveau fichier
+                $this->filePath = $this->uploadedFile->store('invoices', 'public');
+
+                if ($oldFile) {
+                    // Mettre à jour l'enregistrement de fichier existant
+                    $oldFile->update([
+                        'file_path' => $this->filePath,
+                        'file_name' => $this->fileName,
+                        'file_extension' => $this->fileExtension,
+                        'file_size' => $this->fileSize,
+                    ]);
+
+                    $this->invoiceFile = $oldFile;
+                } else {
+                    // Créer un nouvel enregistrement de fichier
+                    $this->invoiceFile = InvoiceFile::create([
+                        'invoice_id' => $this->invoice->id,
+                        'file_path' => $this->filePath,
+                        'file_name' => $this->fileName,
+                        'file_extension' => $this->fileExtension,
+                        'file_size' => $this->fileSize,
+                        'is_primary' => true,
+                    ]);
+                }
+            }
+
+            DB::commit();
             return $this->invoice;
+
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error($e->getMessage());
-
+            Log::error('Erreur lors de la mise à jour de la facture: ' . $e->getMessage());
             return false;
         }
     }
 
-    // Archiver la facture au lieu de la supprimer
-    public function archive($invoiceId)
+    // Définir les données à partir d'une facture existante
+    public function setFromInvoice(Invoice $invoice)
     {
-        dd('Archiver du formulaire');
+        $this->invoice = $invoice;
+
+        // Informations générales
+        $this->name = $invoice->name;
+        $this->reference = $invoice->reference;
+        $this->type = $invoice->type;
+        $this->category = $invoice->category;
+        $this->issuer_name = $invoice->issuer_name;
+        $this->issuer_website = $invoice->issuer_website;
+
+        // Détails financiers
+        $this->amount = is_numeric($invoice->amount) ? (float) $invoice->amount : null;
+        $this->currency = $invoice->currency ?? 'EUR';
+        $this->paid_by = $invoice->paid_by;
+        $this->associated_members = $invoice->associated_members;
+
+        // Dates
+        $this->issued_date = $invoice->issued_date;
+        $this->payment_due_date = $invoice->payment_due_date;
+        $this->payment_reminder = $invoice->payment_reminder;
+        $this->payment_frequency = $invoice->payment_frequency;
+
+        // Statut de paiement
+        $this->payment_status = $invoice->payment_status;
+        $this->payment_method = $invoice->payment_method;
+        $this->priority = $invoice->priority;
+
+        // Notes et tags
+        $this->notes = $invoice->notes;
+        $this->tags = $invoice->tags;
+
+        // États
+        $this->is_archived = $invoice->is_archived;
+        $this->is_favorite = $invoice->is_favorite;
+
+        // Récupération du fichier associé
+        $invoiceFile = InvoiceFile::where('invoice_id', $invoice->id)
+            ->where('is_primary', true)
+            ->first();
+
+        if ($invoiceFile) {
+            $this->setFromInvoiceFile($invoiceFile);
+        }
+
+        $this->updateAvailableCategories();
+
+        return $this;
+    }
+
+    // Définir les données à partir d'un fichier de facture existant
+    public function setFromInvoiceFile(InvoiceFile $invoiceFile)
+    {
+        $this->invoiceFile = $invoiceFile;
+        $this->existingFilePath = $invoiceFile->getRawOriginal('file_path');
+        $this->filePath = $invoiceFile->file_path;
+        $this->fileName = $invoiceFile->file_name;
+        $this->fileExtension = $invoiceFile->file_extension;
+        $this->fileSize = $invoiceFile->file_size;
+        $this->is_primary = $invoiceFile->is_primary ?? true;
+
+        return $this;
+    }
+
+    // Archiver la facture au lieu de la supprimer
+    public function archive()
+    {
+        if (!$this->invoice) {
+            return false;
+        }
+
+        try {
+            $this->invoice->update([
+                'is_archived' => true
+            ]);
+            $this->is_archived = true;
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'archivage de la facture: ' . $e->getMessage());
+            return false;
+        }
     }
 
     // Récupérer une facture archivée
-    public function restore($invoiceId)
+    public function restore()
     {
-        dd('Restaurer du formulaire');
+        if (!$this->invoice) {
+            return false;
+        }
+
+        try {
+            $this->invoice->update([
+                'is_archived' => false
+            ]);
+            $this->is_archived = false;
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la restauration de la facture: ' . $e->getMessage());
+            return false;
+        }
     }
 
-    // Supprimer définitivement la facture (à utiliser avec précaution)
-    public function forceDelete($invoiceId)
+    // Supprimer définitivement la facture et ses fichiers
+    public function forceDelete()
     {
-        dd('Supprimer du formulaire');
+        if (!$this->invoice) {
+            return false;
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Récupérer tous les fichiers liés
+            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
+
+            // Supprimer chaque fichier physique du stockage
+            foreach ($files as $file) {
+                if (Storage::disk('public')->exists($file->getRawOriginal('file_path'))) {
+                    Storage::disk('public')->delete($file->getRawOriginal('file_path'));
+                }
+                $file->delete();
+            }
+
+            // Supprimer la facture
+            $this->invoice->forceDelete();
+
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur lors de la suppression définitive de la facture: ' . $e->getMessage());
+            return false;
+        }
     }
 
+    // Normaliser le montant avant stockage
     private function normalizeAmount($amount)
     {
         // Si le montant est vide ou null, retourner null

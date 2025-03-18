@@ -30,6 +30,7 @@ class InvoiceFileFactory extends Factory
             'file_path' => $filePath,
             'file_extension' => $extension,
             'file_size' => $fileSize,
+            'is_primary' => $this->faker->boolean(),
         ];
     }
 }
