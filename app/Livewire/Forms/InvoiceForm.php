@@ -3,8 +3,10 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\InvoiceTypeEnum;
+use App\Jobs\CompressPdfJob;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Traits\FormatSizeTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +15,8 @@ use Livewire\Form;
 
 class InvoiceForm extends Form
 {
+    use FormatSizeTrait;
+
     public ?Invoice $invoice = null;
 
     public ?InvoiceFile $invoiceFile = null;
@@ -33,7 +37,7 @@ class InvoiceForm extends Form
 
     public $is_primary = true;
 
-    // Informations générales de la facture
+    // Informations générales
     #[Validate]
     public $name;
 
@@ -50,7 +54,7 @@ class InvoiceForm extends Form
     #[Validate]
     public $issuer_website;
 
-    // Détails financiers
+    // Montants
     #[Validate]
     public $amount;
 
@@ -73,7 +77,7 @@ class InvoiceForm extends Form
     #[Validate]
     public $payment_frequency;
 
-    // Statut de paiement
+    // Paiement
     public $payment_status;
 
     public $payment_method;
@@ -105,8 +109,8 @@ class InvoiceForm extends Form
         return [
             // Fichier
             'uploadedFile' => $this->existingFilePath
-                ? 'nullable|file|mimes:pdf,docx,jpeg,png,jpg|max:10240'
-                : 'required|file|mimes:pdf,docx,jpeg,png,jpg|max:10240',
+                ? 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:102400'
+                : 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:102400',
 
             // Étape 1 - Informations générales
             'name' => 'required|string|max:255',
@@ -148,7 +152,7 @@ class InvoiceForm extends Form
     public function messages()
     {
         return [
-            // Messages d'erreur pour le fichier
+            // Messages d'erreur pour le fichier d'importation
             'uploadedFile.required' => 'Veuillez sélectionner un fichier.',
             'uploadedFile.file' => 'Le fichier doit être un fichier valide.',
             'uploadedFile.mimes' => 'Le fichier doit être au format PDF, Word, JPEG, JPG ou PNG.',
@@ -171,7 +175,7 @@ class InvoiceForm extends Form
     }
 
     // Traiter le fichier uploadé et récupérer ses informations
-    public function processUploadedFile()
+    public function processUploadedFile(): bool
     {
         if (! $this->uploadedFile) {
             return false;
@@ -190,7 +194,7 @@ class InvoiceForm extends Form
     }
 
     // Obtenir les informations sur le fichier uploadé
-    public function getFileInfo()
+    public function getFileInfo(): ?array
     {
         if (! $this->uploadedFile) {
             return null;
@@ -208,20 +212,8 @@ class InvoiceForm extends Form
         ];
     }
 
-    // Formater la taille du fichier
-    private function formatFileSize($bytes)
-    {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
-
-        return round($bytes, 2).' '.$units[$pow];
-    }
-
     // Supprimer le fichier
-    public function removeFile()
+    public function removeFile(): void
     {
         $this->uploadedFile = null;
         $this->existingFilePath = null;
@@ -232,7 +224,7 @@ class InvoiceForm extends Form
     }
 
     // Mettre à jour la liste des catégories disponibles
-    public function updateAvailableCategories()
+    public function updateAvailableCategories(): void
     {
         if ($this->type) {
             foreach (InvoiceTypeEnum::cases() as $case) {
@@ -295,7 +287,7 @@ class InvoiceForm extends Form
                 // Traiter le fichier
                 $this->processUploadedFile();
 
-                // Stocker le fichier
+                // Stocker le fichier sans compression pour l'instant
                 $this->filePath = $this->uploadedFile->store('invoices', 'public');
 
                 // Créer l'enregistrement dans la base de données
@@ -306,7 +298,25 @@ class InvoiceForm extends Form
                     'file_extension' => $this->fileExtension,
                     'file_size' => $this->fileSize,
                     'is_primary' => true,
+                    'compression_status' => null,
+                    'original_size' => null,
+                    'compression_rate' => null,
                 ]);
+
+                // Si c'est un PDF, marquer pour compression et lancer le job en arrière-plan
+                if ($this->fileExtension === 'pdf') {
+                    $this->invoiceFile->update([
+                        'compression_status' => 'pending',
+                        'original_size' => $this->fileSize,
+                    ]);
+
+                    // Dispatch le job de compression
+                    CompressPdfJob::dispatch(
+                        $this->invoiceFile->id,
+                        $this->filePath,
+                        $this->fileSize
+                    );
+                }
             }
 
             DB::commit();

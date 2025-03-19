@@ -41,9 +41,16 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
+
     'facebook' => [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
+    ],
+
+    // I Love PDF
+    'ilovepdf' => [
+        'public_key' => env('ILOVEPDF_PUBLIC_KEY'),
+        'secret_key' => env('ILOVEPDF_SECRET_KEY'),
     ],
 ];

@@ -9,6 +9,7 @@
         "ext-zip": "*",
         "algolia/scout-extended": "^3.1",
         "blade-ui-kit/blade-heroicons": "^2.6",
+        "ilovepdf/ilovepdf-php": "^1.2",
         "laravel/framework": "^11.9",
         "laravel/scout": "^10.13",
         "laravel/socialite": "^5.15",

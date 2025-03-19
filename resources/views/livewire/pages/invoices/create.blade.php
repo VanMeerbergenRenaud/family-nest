@@ -58,17 +58,24 @@
                                          alt="Aperçu de la facture"
                                          class="bg-gray-100 rounded-xl max-h-[50vh]"
                                     />
-                                @else
-                                    <!-- Icône pour les PDF -->
-                                    @if ($isPdf)
-                                        <div class="w-24 h-24 mb-5 flex-center bg-red-100 rounded-full">
-                                            <x-svg.pdf class="w-12 h-12 text-gray-600" />
+                                    <!-- Preview pour les fichiers PDF -->
+                                @elseif ($isPdf)
+                                    <div class="w-full h-[40vh] overflow-hidden rounded-xl">
+                                        <embed src="{{ $form->uploadedFile->temporaryUrl() }}"
+                                               type="application/pdf"
+                                               width="100%"
+                                               height="100%"
+                                               class="rounded-xl"
+                                        />
+                                    </div>
+                                    <!-- Button pour les fichiers Word -->
+                                @elseif ($isDocx)
+                                    <div class="px-4 mb-4 text-center">
+                                        <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
+                                            <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
+                                            <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture</p>
                                         </div>
-                                        <!-- Icône pour les DOCX -->
-                                    @elseif ($isDocx)
-                                        <div class="w-24 h-24 mb-5 flex-center bg-blue-100 rounded-full">
-                                            <x-svg.docx class="w-12 h-12 text-gray-600" />
-                                        </div>
+                                    </div>
                                         <!-- Icône pour les CSV -->
                                     @elseif($isCsv)
                                         <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
@@ -79,7 +86,6 @@
                                         <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
                                             <x-svg.img class="w-12 h-12 text-gray-600" />
                                         </div>
-                                    @endif
                                 @endif
 
                                 <!-- Informations sur le fichier -->
@@ -89,6 +95,7 @@
                                         <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
                                         <span class="text-sm-regular">{{ $sizeFormatted }}</span>
                                     </p>
+
                                     @if(!$errors->has('form.uploadedFile'))
                                         <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
                                             Import du fichier validé

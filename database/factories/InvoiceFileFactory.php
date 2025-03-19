@@ -31,6 +31,9 @@ class InvoiceFileFactory extends Factory
             'file_extension' => $extension,
             'file_size' => $fileSize,
             'is_primary' => $this->faker->boolean(),
+            'compression_status' => $this->faker->randomElement(['null', 'pending', 'completed', 'failed']),
+            'original_size' => $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024),
+            'compression_rate' => $this->faker->randomFloat(2, 0, 100),
         ];
     }
 }
