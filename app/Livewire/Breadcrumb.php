@@ -75,7 +75,7 @@ class Breadcrumb extends Component
         $routeParameters = Route::current()->parameters();
 
         // Si la route n'est pas trouvée, ne rien faire
-        if (!$currentRoute) {
+        if (! $currentRoute) {
             return;
         }
 
@@ -90,6 +90,7 @@ class Breadcrumb extends Component
                 'icon' => $this->homeIcon,
                 'current' => true,
             ];
+
             return;
         }
 
@@ -105,7 +106,7 @@ class Breadcrumb extends Component
         // Pour les routes groupées (comme invoices.* ou settings.*)
         foreach ($this->routeGroups as $groupPrefix => $parentRoutes) {
             if (strpos($currentRoute, $groupPrefix) === 0) {
-                $parentRoute = $groupPrefix . 'index';
+                $parentRoute = $groupPrefix.'index';
 
                 // Si la route actuelle n'est pas la route parent du groupe
                 if ($currentRoute !== $parentRoute) {
@@ -125,13 +126,14 @@ class Breadcrumb extends Component
                         'icon' => null,
                         'current' => true,
                     ];
+
                     return; // On s'arrête ici
                 }
             }
         }
 
         // Pour les routes simples sans groupe (comme calendar, goals, etc.)
-        if (!strpos($currentRoute, '.')) {
+        if (! strpos($currentRoute, '.')) {
             $this->segments[] = [
                 'name' => $currentRoute,
                 'label' => $this->getRouteLabel($currentRoute),
@@ -139,6 +141,7 @@ class Breadcrumb extends Component
                 'icon' => null,
                 'current' => true,
             ];
+
             return;
         }
 

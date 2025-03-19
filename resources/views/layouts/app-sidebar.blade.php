@@ -16,6 +16,8 @@
 
             <livewire:breadcrumb /> {{-- Breadcrumb --}}
 
+            <x-divider class="mb-4 relative -left-8 min-w-[200%]" />
+
             {{ $slot }}
         </main>
 

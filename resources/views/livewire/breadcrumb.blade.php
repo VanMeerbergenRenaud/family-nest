@@ -1,5 +1,7 @@
 <div>
-    <nav class="flex items-center py-2" aria-label="Fil d'Ariane">
+    <nav class="py-3.5 flex items-center" aria-label="Fil d'Ariane"
+         :class="{'lg:ml-2': expanded, 'lg:ml-5': !expanded}"
+    >
         <h2 class="sr-only" role="heading" aria-level="2">Fil d'Ariane</h2>
         <ol class="inline-flex items-center space-x-2">
             @foreach($segments as $index => $segment)
@@ -11,7 +13,7 @@
                     @endif
 
                     @if($segment['current'])
-                        <span class="flex items-center text-indigo-600 font-medium dark:text-indigo-400">
+                        <span class="flex items-center text-gray-800 font-medium dark:text-indigo-400">
                         @if($segment['icon'])
                                 <span class="inline-block">{!! $segment['icon'] !!}</span>
                             @endif

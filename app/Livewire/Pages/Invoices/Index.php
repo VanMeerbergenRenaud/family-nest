@@ -406,6 +406,7 @@ class Index extends Component
                 $this->sortField,
                 fn ($query) => $query->orderBy($this->sortField, $this->sortDirection)
             )
+            ->where('is_archived', false)
             ->paginate(10);
 
         $this->recentInvoices = auth()->user()->invoices()
