@@ -59,7 +59,7 @@
                 <x-divider/>
 
                 <!-- User profile dropdown -->
-                <x-sidebar-menu.user-dropdown user="{{ $user }}"/>
+                <x-sidebar-menu.user-dropdown />
             </div>
         </div>
     </aside>
@@ -121,7 +121,7 @@
             <x-divider/>
 
             <!-- User profile dropdown -->
-            <x-sidebar-menu.user-dropdown user="{{ $user }}" :expanded="$expanded"/>
+            <x-sidebar-menu.user-dropdown  :expanded="$expanded"/>
         </div>
     </aside>
 </div>

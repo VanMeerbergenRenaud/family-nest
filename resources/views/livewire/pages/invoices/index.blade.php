@@ -813,13 +813,13 @@
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d\'émission') }}</p>
                                                 <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                    {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->format('j F Y') : 'Non spécifiée' }}
+                                                    {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->format('j M Y') : 'Non spécifiée' }}
                                                 </p>
                                             </div>
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Échéance') }}</p>
                                                 <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                    {{ $invoice->payment_due_date ? \Carbon\Carbon::parse($invoice->payment_due_date)->format('j F Y') : 'Non spécifiée' }}
+                                                    {{ $invoice->payment_due_date ? \Carbon\Carbon::parse($invoice->payment_due_date)->format('j M Y') : 'Non spécifiée' }}
                                                 </p>
                                             </div>
                                             <div class="space-y-1">
