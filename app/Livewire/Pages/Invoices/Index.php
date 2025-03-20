@@ -74,7 +74,10 @@ class Index extends Component
     {
         $this->currentFolder = $folder;
         $this->folderTitle = $title;
-        $query = auth()->user()->invoices()->with('file');
+
+        $query = auth()->user()->invoices()
+            ->with('file')
+            ->where('is_archived', false);
 
         // Requête commune à tous les dossiers
         switch ($folder) {
@@ -110,7 +113,8 @@ class Index extends Component
     // Méthode pour obtenir les statistiques des dossiers
     public function getFolderStats()
     {
-        $invoice = auth()->user()->invoices;
+        $invoice = auth()->user()->invoices
+            ->where('is_archived', false);
 
         return [
             'favorites' => [
@@ -215,8 +219,9 @@ class Index extends Component
 
     public function toggleFavorite($invoiceId)
     {
-        $this->invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $this->invoice->update(['is_favorite' => ! $this->invoice->is_favorite]);
+        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
+        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
+        $this->showFolderModal = false;
     }
 
     // Implémentations des fonctionnalités manquantes
@@ -252,6 +257,7 @@ class Index extends Component
         $this->invoice = $invoice;
         $this->filePath = $invoice->file->file_path;
         $this->fileExtension = $invoice->file->file_extension;
+        $this->showFolderModal = false;
         $this->showInvoicePreviewModal = true;
     }
 
@@ -268,6 +274,7 @@ class Index extends Component
     public function showArchiveForm($id)
     {
         $this->invoice = auth()->user()->invoices()->findOrFail($id);
+        $this->showFolderModal = false;
         $this->showArchiveFormModal = true;
     }
 

@@ -27,10 +27,14 @@ $logout = function (Logout $logout) {
 };
 
 $directLogin = function () {
-    if (!Auth::user()->hasVerifiedEmail()) {
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-        return;
+    $user = Auth::user();
+
+    if (!$user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
     }
+
+    Auth::login($user);
+    $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
 };
 
 ?>

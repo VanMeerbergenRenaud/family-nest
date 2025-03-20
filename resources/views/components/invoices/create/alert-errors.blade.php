@@ -2,7 +2,7 @@
     'form',
 ])
 
-<div class="my-6 lg:px-4 mx-auto max-lg:max-w-[35rem] max-lg:flex-center max-lg:flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-0">
+<div class="my-6 lg:px-4 mx-auto max-lg:flex-center max-lg:flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-0">
     @php
         // Fonction réutilisable pour calculer la progression
         function calculateProgress($form, $errors) {

@@ -762,23 +762,22 @@
                         <!-- Liste des factures -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             @foreach($folderInvoices as $invoice)
-                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
+                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 hover:shadow-xs transition-shadow duration-200 overflow-hidden">
                                     <!-- En-tête de la carte -->
-                                    <div class="px-4 py-3 border-b border-gray-50 dark:border-gray-800 flex justify-between items-center">
+                                    <div class="px-4 py-3 dark:border-gray-800 flex justify-between items-center">
                                         @php
                                             $extension = $invoice->file->file_extension ?? null;
                                         @endphp
 
-                                        <div class="flex items-center gap-2.5 overflow-hidden">
-                                            <div class="flex-shrink-0  p-1.5 rounded">
+                                        <div class="flex items-center gap-2.5 overflow-hidden pr-2">
+                                            <div class="flex-shrink-0 p-1.5 rounded">
                                                 @if(View::exists('components.svg.file.' . $extension))
                                                     <x-dynamic-component :component="'svg.file.' . $extension" class="w-5 h-5" />
                                                 @else
                                                     <x-svg.file.default class="w-5 h-5" />
                                                 @endif
                                             </div>
-                                            <h3 class="font-medium text-gray-900 dark:text-white truncate"
-                                                title="{{ $invoice->name }}">
+                                            <h3 class="font-medium text-gray-900 dark:text-white truncate">
                                                 {{ $invoice->name }}
                                             </h3>
                                         </div>
@@ -788,12 +787,14 @@
                                                 <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                             </x-menu.button>
                                             <x-menu.items>
-                                                @if($invoice->is_favorite)
-                                                    <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
-                                                        <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                                                <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
+                                                    <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                                                    @if($invoice->is_favorite)
                                                         {{ __('Retirer des favoris') }}
-                                                    </x-menu.item>
-                                                @endif
+                                                    @else
+                                                        {{ __('Mettre en favori') }}
+                                                    @endif
+                                                </x-menu.item>
                                                 <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
                                                     <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
                                                     {{ __('Modifier') }}
@@ -807,7 +808,7 @@
                                     </div>
 
                                     <!-- Corps de la carte -->
-                                    <div class="p-4">
+                                    <div class="p-4 border-t border-b border-slate-100">
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d\'émission') }}</p>
@@ -837,7 +838,7 @@
                                     </div>
 
                                     <!-- Pied de la carte -->
-                                    <div class="border-t border-gray-50 dark:border-gray-800 px-4 py-3 flex justify-between items-center">
+                                    <div class="dark:border-gray-800 px-4 py-3 flex justify-between items-center">
                                         @php
                                             $statusClass = match($invoice->payment_status) {
                                                 'paid' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-100 dark:border-green-800',
@@ -855,8 +856,8 @@
                                             };
                                         @endphp
                                         <span class="px-2.5 py-1 {{ $statusClass }} rounded-full text-xs font-medium border">
-                                {{ $statusText }}
-                            </span>
+                                            {{ $statusText }}
+                                        </span>
 
                                         <div class="flex gap-1">
                                             <button wire:click="showInvoiceModal({{ $invoice->id }})"
@@ -878,7 +879,7 @@
                 </div>
 
                 <!-- Pied de modal -->
-                <x-modal.footer class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 px-6 py-4">
+                <x-modal.footer class="bg-white dark:bg-gray-900 border-t border-slate-200 dark:border-gray-800 px-6 py-4">
                     <div class="flex items-center justify-between w-full">
                         <div class="text-sm text-gray-500 dark:text-gray-400">
                             {{ count($folderInvoices) }} {{ __('factures trouvées') }}
@@ -973,8 +974,8 @@
                                 </h3>
                                 <p class="mt-2 text-md-regular text-gray-500">
                                     {{ __('Êtes-vous sûre de vouloir supprimer la facture') }}
-                                    <strong class="font-semibold"> {{ $invoice->name }}</strong>&nbsp;
-                                    {{ __('? Toutes les données seront supprimées. Cette action est irréversible.') }}
+                                    <strong class="font-semibold"> {{ $invoice->name }}&nbsp;?</strong>
+                                    {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
                                 </p>
                                 <div class="mt-6 mb-2 flex flex-col gap-3">
                                     <label for="confirmation" class="text-sm-medium text-gray-800">

@@ -33,7 +33,7 @@
             {{ __('Raccourcis clavier') }}
         </x-menu.item>
 
-        <x-divider/>
+        <x-menu.divider />
 
         <x-menu.item wire:click="inviteMember">
             <x-svg.user-plus class="group-hover:text-gray-900"/>
@@ -50,7 +50,7 @@
             {{ __('Question au support') }}
         </x-menu.item>
 
-        <x-divider/>
+        <x-menu.divider />
 
         <x-menu.item wire:click="seeArchives">
             <x-svg.trash class="group-hover:text-gray-900"/>

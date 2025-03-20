@@ -14,7 +14,7 @@
             goToStep(step) {
                 this.currentStep = step;
             }
-        }" class="mx-auto max-w-[70rem]">
+        }" class="mx-auto md:max-w-[45rem] lg:max-w-[70rem]">
 
         {{-- Barre de progression avec les étapes --}}
         <x-invoices.create.nav-step />
