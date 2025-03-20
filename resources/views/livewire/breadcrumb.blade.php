@@ -1,5 +1,5 @@
 <div class="relative">
-    <nav class="lg:mt-2.5 py-3.5 flex items-center" aria-label="Fil d'Ariane"
+    <nav class="lg:mt-2.5 py-3.5 flex items-center max-md:hidden" aria-label="Fil d'Ariane"
          :class="{'lg:ml-64 pl-8': expanded, 'lg:mt-4 lg:ml-20 pl-12': !expanded}"
     >
         <h1 class="sr-only" role="heading" aria-level="1">Menu de navigation</h1>

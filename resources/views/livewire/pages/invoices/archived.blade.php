@@ -1,9 +1,9 @@
 <div>
     <h1 class="text-2xl font-bold mb-6 ml-4">Factures archivées</h1>
 
-    @if(empty($archivedInvoices))
-        <div class="bg-white p-6 rounded-lg shadow-md">
-            <p class="text-gray-700">Aucune facture archivée trouvée.</p>
+    @if(!empty($archivedInvoices))
+        <div class="bg-white p-6 rounded-lg">
+            <p class="text-gray-700">Aucune facture archivée pour l'instant.</p>
         </div>
     @else
         <div class="w-full overflow-x-auto rounded-lg border border-gray">

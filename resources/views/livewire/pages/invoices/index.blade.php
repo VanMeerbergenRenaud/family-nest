@@ -84,7 +84,7 @@
 
         <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
             @if($recentInvoices->isEmpty())
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-sm text-center">
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full">
                     <p class="text-gray-500 dark:text-gray-400">{{ __('Aucune facture récente.') }}</p>
                 </div>
             @else

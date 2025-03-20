@@ -21,7 +21,7 @@
     </x-menu.button>
 
     {{-- Dropdown list --}}
-    <x-menu.items class="w-[calc(100vw-2rem)] shadow-lg min-w-45 max-w-100 -mt-8 lg:w-55">
+    <x-menu.items class="w-[calc(100vw-2rem)] !-mt-3.5 lg:w-55">
 
         <x-menu.item wire:click="seeProfile">
             <x-svg.user class="group-hover:text-gray-900"/>
