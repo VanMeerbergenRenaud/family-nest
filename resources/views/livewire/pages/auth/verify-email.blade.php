@@ -26,13 +26,20 @@ $logout = function (Logout $logout) {
     $this->redirect('/', navigate: true);
 };
 
+$directLogin = function () {
+    if (!Auth::user()->hasVerifiedEmail()) {
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        return;
+    }
+};
+
 ?>
 
 <x-auth-template title="Vérification">
     <div class="text-md-regular text-gray-700 px-4 mt-[-1rem]">
 
         <!-- Description -->
-        <p>
+        <p class="pl-2">
             {{ __('Merci de vous être inscrit ! Avant de commencer, pourriez-vous vérifier votre adresse e-mail en cliquant sur le lien que nous venons de vous envoyer par e-mail ? Si vous n’avez pas reçu l’e-mail, nous vous en enverrons un autre avec plaisir.') }}
         </p>
 
@@ -45,14 +52,18 @@ $logout = function (Logout $logout) {
         @endif
 
         <!-- Liens de vérification ou de déconnexion -->
-        <div class="mt-3 flex flex-col gap-4">
-            <button type="button" wire:click="sendVerification" class="underline">
-                {{ __('Cliquez ici pour en renvoyer un nouveau.') }}
+        <div class="mt-5 flex flex flex-wrap gap-2">
+            <button type="button" wire:click="sendVerification" class="button-primary">
+                {{ __('Renvoyer un nouveau.') }}
             </button>
 
-            <button type="button" wire:click="logout">
-                {{ __('Ou') }}
-                <span class="underline">{{ __('cliquez ici pour vous déconnecter') }}</span>
+            <button type="button" wire:click="logout" class="button-secondary">
+                {{ __('Se déconnecter') }}
+            </button>
+
+            {{-- TODO : SUPRESS PROD : Connexion sans vérification --}}
+            <button class="button-tertiary" wire:click="directLogin">
+                {{ __('Se connecter sans vérification') }}
             </button>
         </div>
     </div>
