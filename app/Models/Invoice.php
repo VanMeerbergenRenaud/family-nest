@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
@@ -34,10 +35,17 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relation avec les fichiers de la facture
+    // Obtenir le fichier principal associé à la facture
     public function file(): HasOne
     {
-        return $this->hasOne(InvoiceFile::class);
+        return $this->hasOne(InvoiceFile::class)
+            ->where('is_primary', true);
+    }
+
+    // Obtenir tous les fichiers associés à la facture
+    public function files(): HasMany
+    {
+        return $this->hasMany(InvoiceFile::class);
     }
 
     // Configuration pour Algolia

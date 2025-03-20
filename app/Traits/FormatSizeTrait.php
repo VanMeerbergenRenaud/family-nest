@@ -7,7 +7,7 @@ trait FormatSizeTrait
     /**
      * Format a file size in bytes to a human-readable string
      */
-    private function formatFileSize(int $bytes): string
+    public function formatFileSize(int $bytes): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $bytes = max($bytes, 0);

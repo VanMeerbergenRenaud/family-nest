@@ -221,6 +221,7 @@ class InvoiceForm extends Form
         $this->filePath = null;
         $this->fileExtension = null;
         $this->fileSize = null;
+        $this->is_primary = true;
     }
 
     // Mettre à jour la liste des catégories disponibles
@@ -239,8 +240,8 @@ class InvoiceForm extends Form
         $this->availableCategories = [];
     }
 
-    // Créer une nouvelle facture avec son fichier associé
-    public function store()
+    // Méthode pour créer ou modifier une facture
+    public function saveInvoice()
     {
         $this->validate();
 
@@ -250,9 +251,8 @@ class InvoiceForm extends Form
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
-            // Création d'une nouvelle facture
-            $invoice = auth()->user()->invoices()->create([
-                'user_id' => auth()->user()->id,
+            // Préparation des données communes
+            $invoiceData = [
                 // Informations générales
                 'name' => $this->name,
                 'reference' => $this->reference,
@@ -280,19 +280,42 @@ class InvoiceForm extends Form
                 // Archives et favoris
                 'is_archived' => $this->is_archived,
                 'is_favorite' => $this->is_favorite,
-            ]);
+            ];
 
-            // Stocker le fichier associé si présent
+            // Si c'est une mise à jour ou une création
+            if ($this->invoice) {
+                // Mise à jour
+                $this->invoice->update($invoiceData);
+                $invoice = $this->invoice;
+            } else {
+                // Création
+                $invoiceData['user_id'] = auth()->user()->id;
+                $invoice = auth()->user()->invoices()->create($invoiceData);
+            }
+
+            // Traitement du fichier si présent
             if ($this->uploadedFile) {
                 // Traiter le fichier
                 $this->processUploadedFile();
 
-                // Stocker le fichier sans compression pour l'instant
+                // Stocker le fichier
                 $this->filePath = $this->uploadedFile->store('invoices', 'public');
 
-                // Créer l'enregistrement dans la base de données
-                $this->invoiceFile = InvoiceFile::create([
-                    'invoice_id' => $invoice->id,
+                // Récupérer l'ancien fichier si édition
+                $oldFile = null;
+                if ($this->invoice) {
+                    $oldFile = InvoiceFile::where('invoice_id', $invoice->id)
+                        ->where('is_primary', true)
+                        ->first();
+
+                    // Supprimer l'ancien fichier du stockage si il existe
+                    if ($oldFile && Storage::disk('public')->exists($oldFile->getRawOriginal('file_path'))) {
+                        Storage::disk('public')->delete($oldFile->getRawOriginal('file_path'));
+                    }
+                }
+
+                // Mise à jour ou création de l'enregistrement de fichier
+                $fileData = [
                     'file_path' => $this->filePath,
                     'file_name' => $this->fileName,
                     'file_extension' => $this->fileExtension,
@@ -301,9 +324,19 @@ class InvoiceForm extends Form
                     'compression_status' => null,
                     'original_size' => null,
                     'compression_rate' => null,
-                ]);
+                ];
 
-                // Si c'est un PDF, marquer pour compression et lancer le job en arrière-plan
+                if ($oldFile) {
+                    // Mettre à jour l'enregistrement de fichier existant
+                    $oldFile->update($fileData);
+                    $this->invoiceFile = $oldFile;
+                } else {
+                    // Créer un nouvel enregistrement de fichier
+                    $fileData['invoice_id'] = $invoice->id;
+                    $this->invoiceFile = InvoiceFile::create($fileData);
+                }
+
+                // Si c'est un PDF, marquer pour compression
                 if ($this->fileExtension === 'pdf') {
                     $this->invoiceFile->update([
                         'compression_status' => 'pending',
@@ -325,113 +358,102 @@ class InvoiceForm extends Form
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la création de la facture: '.$e->getMessage());
+            Log::error('Erreur lors du traitement de la facture: '.$e->getMessage());
 
             return false;
         }
     }
 
-    // Mettre à jour une facture existante et son fichier associé
+    public function store()
+    {
+        return $this->saveInvoice();
+    }
+
     public function update()
     {
         if (! $this->invoice) {
             throw new \Exception('Impossible de mettre à jour une facture sans son ID');
         }
 
-        $this->validate();
+        return $this->saveInvoice();
+    }
+
+    public function archive(): bool
+    {
+        if (! $this->invoice) {
+            return false;
+        }
+
+        try {
+            $this->invoice->update([
+                'is_archived' => true,
+            ]);
+            $this->is_archived = true;
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    public function restore(): bool
+    {
+        if (! $this->invoice) {
+            return false;
+        }
+
+        try {
+            $this->invoice->update([
+                'is_archived' => false,
+            ]);
+            $this->is_archived = false;
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    public function forceDelete(): bool
+    {
+        if (! $this->invoice) {
+            return false;
+        }
 
         try {
             DB::beginTransaction();
 
-            // Normaliser le montant avant stockage
-            $amount = $this->normalizeAmount($this->amount);
+            // Récupérer tous les fichiers liés
+            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
 
-            // Mise à jour de la facture existante
-            $this->invoice->update([
-                // Informations générales
-                'name' => $this->name,
-                'reference' => $this->reference,
-                'type' => $this->type,
-                'category' => $this->category,
-                'issuer_name' => $this->issuer_name,
-                'issuer_website' => $this->issuer_website,
-                // Détails financiers
-                'amount' => $amount,
-                'currency' => $this->currency,
-                'paid_by' => $this->paid_by,
-                'associated_members' => $this->associated_members ?? null,
-                // Dates
-                'issued_date' => $this->issued_date,
-                'payment_due_date' => $this->payment_due_date,
-                'payment_reminder' => $this->payment_reminder,
-                'payment_frequency' => $this->payment_frequency,
-                // Statut de paiement
-                'payment_status' => $this->payment_status,
-                'payment_method' => $this->payment_method,
-                'priority' => $this->priority,
-                // Notes et tags
-                'notes' => $this->notes,
-                'tags' => $this->tags ?? null,
-                // Archives et favoris
-                'is_archived' => $this->is_archived,
-                'is_favorite' => $this->is_favorite,
-            ]);
-
-            // Gestion du fichier associé si un nouveau fichier est uploadé
-            if ($this->uploadedFile) {
-                // Traiter le nouveau fichier
-                $this->processUploadedFile();
-
-                // Récupérer l'ancien fichier
-                $oldFile = InvoiceFile::where('invoice_id', $this->invoice->id)
-                    ->where('is_primary', true)
-                    ->first();
-
-                // Supprimer l'ancien fichier du stockage
-                if ($oldFile && Storage::disk('public')->exists($oldFile->getRawOriginal('file_path'))) {
-                    Storage::disk('public')->delete($oldFile->getRawOriginal('file_path'));
+            // Supprimer chaque fichier physique du stockage
+            foreach ($files as $file) {
+                if (Storage::disk('public')->exists($file->getRawOriginal('file_path'))) {
+                    Storage::disk('public')->delete($file->getRawOriginal('file_path'));
                 }
-
-                // Stocker le nouveau fichier
-                $this->filePath = $this->uploadedFile->store('invoices', 'public');
-
-                if ($oldFile) {
-                    // Mettre à jour l'enregistrement de fichier existant
-                    $oldFile->update([
-                        'file_path' => $this->filePath,
-                        'file_name' => $this->fileName,
-                        'file_extension' => $this->fileExtension,
-                        'file_size' => $this->fileSize,
-                    ]);
-
-                    $this->invoiceFile = $oldFile;
-                } else {
-                    // Créer un nouvel enregistrement de fichier
-                    $this->invoiceFile = InvoiceFile::create([
-                        'invoice_id' => $this->invoice->id,
-                        'file_path' => $this->filePath,
-                        'file_name' => $this->fileName,
-                        'file_extension' => $this->fileExtension,
-                        'file_size' => $this->fileSize,
-                        'is_primary' => true,
-                    ]);
-                }
+                $file->delete();
             }
+
+            // Supprimer la facture
+            $this->invoice->forceDelete();
 
             DB::commit();
 
-            return $this->invoice;
-
+            return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la mise à jour de la facture: '.$e->getMessage());
+            Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
 
             return false;
         }
     }
 
     // Définir les données à partir d'une facture existante
-    public function setFromInvoice(Invoice $invoice)
+    public function setFromInvoice(Invoice $invoice): static
     {
         $this->invoice = $invoice;
 
@@ -483,7 +505,7 @@ class InvoiceForm extends Form
     }
 
     // Définir les données à partir d'un fichier de facture existant
-    public function setFromInvoiceFile(InvoiceFile $invoiceFile)
+    public function setFromInvoiceFile(InvoiceFile $invoiceFile): static
     {
         $this->invoiceFile = $invoiceFile;
         $this->existingFilePath = $invoiceFile->getRawOriginal('file_path');
@@ -496,85 +518,8 @@ class InvoiceForm extends Form
         return $this;
     }
 
-    // Archiver la facture au lieu de la supprimer
-    public function archive()
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            $this->invoice->update([
-                'is_archived' => true,
-            ]);
-            $this->is_archived = true;
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    // Récupérer une facture archivée
-    public function restore()
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            $this->invoice->update([
-                'is_archived' => false,
-            ]);
-            $this->is_archived = false;
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    // Supprimer définitivement la facture et ses fichiers
-    public function forceDelete()
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            DB::beginTransaction();
-
-            // Récupérer tous les fichiers liés
-            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
-
-            // Supprimer chaque fichier physique du stockage
-            foreach ($files as $file) {
-                if (Storage::disk('public')->exists($file->getRawOriginal('file_path'))) {
-                    Storage::disk('public')->delete($file->getRawOriginal('file_path'));
-                }
-                $file->delete();
-            }
-
-            // Supprimer la facture
-            $this->invoice->forceDelete();
-
-            DB::commit();
-
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
     // Normaliser le montant avant stockage
-    private function normalizeAmount($amount)
+    private function normalizeAmount($amount): ?float
     {
         // Si le montant est vide ou null, retourner null
         if ($amount === null || $amount === '') {
