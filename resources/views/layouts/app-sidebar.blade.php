@@ -9,14 +9,14 @@
     >
         <livewire:sidebar />
 
+        <livewire:breadcrumb /> {{-- Breadcrumb --}}
+
+        <x-divider class="mb-4 border-b border-b-gray-200" />
+
         <main class="flex-1 p-4 lg:px-6"
               :class="{'lg:ml-64': expanded, 'lg:ml-20': !expanded}"
         >
             <livewire:spotlight /> {{-- Spotlight search --}}
-
-            <livewire:breadcrumb /> {{-- Breadcrumb --}}
-
-            <x-divider class="mb-4 relative -left-8 min-w-[200%]" />
 
             {{ $slot }}
         </main>

@@ -3,8 +3,7 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Models\Invoice;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use App\Models\InvoiceFile;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,26 +11,23 @@ class Index extends Component
 {
     use WithPagination;
 
-    public Invoice $invoiceId;
+    public Invoice $invoice;
 
     public $is_archived = false;
 
-    public $fileUrl;
+    public $filePath;
+
+    public $fileExtension;
 
     public bool $showInvoicePreviewModal = false;
 
-    public bool $showDeleteFormModal = false;
+    public bool $showArchiveFormModal = false;
 
-    /* Notifications */
-    public bool $addedWithSuccess = false;
-
-    public bool $editWithSuccess = false;
-
-    public bool $deleteWithSuccess = false;
+    public bool $archivedWithSuccess = false;
 
     public bool $downloadNotWorking = false;
 
-    /* Filtres et colonnes */
+    // Filtres et colonnes...
     public $sortField = 'name';
 
     public $sortDirection = 'desc';
@@ -50,6 +46,18 @@ class Index extends Component
         'tags' => true,
     ];
 
+    // Ajouter les propriétés pour les modales de dossiers
+    public $recentInvoices = [];
+
+    public bool $showFolderModal = false;
+
+    public string $currentFolder = '';
+
+    public string $folderTitle = '';
+
+    public $folderInvoices = [];
+
+    // Filtres disponibles
     public $availableFilters = [
         'name_asc' => 'Par ordre alphabétique (A-Z)',
         'name_desc' => 'Par ordre alphabétique (Z-A)',
@@ -59,160 +67,83 @@ class Index extends Component
         'payment_due_date_desc' => 'Date de paiement (plus récent)',
         'amount_asc' => 'Montant (du moins cher au plus cher)',
         'amount_desc' => 'Montant (du plus cher au moins cher)',
-        'payment_status_paid' => 'Status: Payé',
-        'payment_status_unpaid' => 'Status: Impayé',
     ];
 
-    // Définir les paramètres qui doivent être préservés pendant la pagination
-    protected $queryString = [
-        'sortField' => ['except' => 'name'],
-        'sortDirection' => ['except' => 'desc'],
-        'activeFilter' => ['except' => ''],
-    ];
-
-    /* Factures récentes */
-    public $recentInvoices = [];
-
-    // Ajouter ces propriétés à ta classe Index
-    public bool $showFolderModal = false;
-
-    public string $currentFolder = '';
-
-    public string $folderTitle = '';
-
-    public $folderInvoices = [];
-
-    // Ajouter ces méthodes à ta classe Index
+    // Méthodes pour le dossier
     public function openFolder($folder, $title)
     {
         $this->currentFolder = $folder;
         $this->folderTitle = $title;
+        $query = auth()->user()->invoices()->with('file');
 
-        // Récupération des factures selon le dossier sélectionné
+        // Requête commune à tous les dossiers
         switch ($folder) {
             case 'favorites':
-                // Exemple: Factures marquées comme favorites (tu devras adapter selon ta structure de données)
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('is_favorite', true)
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('is_favorite', true);
                 break;
-
             case 'paid':
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('payment_status', 'paid')
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('payment_status', 'paid');
                 break;
-
             case 'unpaid':
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('payment_status', 'unpaid')
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('payment_status', 'unpaid');
                 break;
-
             case 'late':
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('payment_status', 'late')
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('payment_status', 'late');
                 break;
-
             case 'last_week':
-                $lastWeek = now()->subWeek();
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('issued_date', '>=', $lastWeek)
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('issued_date', '>=', now()->subWeek());
                 break;
-
-            case 'high_amount':
-                // Par exemple, montant supérieur à 1000
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('amount', '>=', 1000)
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
-                break;
-
             case 'high_priority':
-                $this->folderInvoices = auth()->user()->invoices()
-                    ->where('priority', 'high')
-                    ->with('file')
-                    ->orderBy($this->sortField, $this->sortDirection)
-                    ->get();
+                $query->where('priority', 'high');
                 break;
-
             default:
                 $this->folderInvoices = collect();
-                break;
+                $this->showFolderModal = true;
+
+                return;
         }
 
+        $this->folderInvoices = $query->orderBy($this->sortField, $this->sortDirection)->get();
         $this->showFolderModal = true;
     }
 
     // Méthode pour obtenir les statistiques des dossiers
     public function getFolderStats()
     {
+        $invoice = auth()->user()->invoices;
+
         return [
             'favorites' => [
-                'count' => auth()->user()->invoices()->where('is_favorite', true)->count(),
-                'amount' => auth()->user()->invoices()->where('is_favorite', true)->sum('amount'),
+                'count' => $invoice->where('is_favorite', true)->count(),
+                'amount' => $invoice->where('is_favorite', true)->sum('amount'),
             ],
             'paid' => [
-                'count' => auth()->user()->invoices()->where('payment_status', 'paid')->count(),
-                'amount' => auth()->user()->invoices()->where('payment_status', 'paid')->sum('amount'),
+                'count' => $invoice->where('payment_status', 'paid')->count(),
+                'amount' => $invoice->where('payment_status', 'paid')->sum('amount'),
             ],
             'unpaid' => [
-                'count' => auth()->user()->invoices()->where('payment_status', 'unpaid')->count(),
-                'amount' => auth()->user()->invoices()->where('payment_status', 'unpaid')->sum('amount'),
+                'count' => $invoice->where('payment_status', 'unpaid')->count(),
+                'amount' => $invoice->where('payment_status', 'unpaid')->sum('amount'),
             ],
             'late' => [
-                'count' => auth()->user()->invoices()->where('payment_status', 'late')->count(),
-                'amount' => auth()->user()->invoices()->where('payment_status', 'late')->sum('amount'),
+                'count' => $invoice->where('payment_status', 'late')->count(),
+                'amount' => $invoice->where('payment_status', 'late')->sum('amount'),
             ],
             'last_week' => [
-                'count' => auth()->user()->invoices()->where('issued_date', '>=', now()->subWeek())->count(),
-                'amount' => auth()->user()->invoices()->where('issued_date', '>=', now()->subWeek())->sum('amount'),
-            ],
-            'high_amount' => [
-                'count' => auth()->user()->invoices()->where('amount', '>=', 1000)->count(),
-                'amount' => auth()->user()->invoices()->where('amount', '>=', 1000)->sum('amount'),
+                'count' => $invoice->where('issued_date', '>=', now()->subWeek())->count(),
+                'amount' => $invoice->where('issued_date', '>=', now()->subWeek())->sum('amount'),
             ],
             'high_priority' => [
-                'count' => auth()->user()->invoices()->where('priority', 'high')->count(),
-                'amount' => auth()->user()->invoices()->where('priority', 'high')->sum('amount'),
+                'count' => $invoice->where('priority', 'high')->count(),
+                'amount' => $invoice->where('priority', 'high')->sum('amount'),
             ],
         ];
     }
 
-    /**
-     * Obtenir la taille totale des fichiers pour un ensemble d'IDs de factures
-     */
-    private function getTotalFileSizeByInvoices($invoiceIds)
-    {
-        if (empty($invoiceIds)) {
-            return 0;
-        }
-    }
-
-    public function toggleFavorite($invoiceId)
-    {
-        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
-    }
-
-    // Appliquer des filtres par défaut
+    // Méthodes de filtrage
     public function applyFilter($filter)
     {
-        // Si le filtre est déjà actif, on le désactive
-        if ($this->activeFilter === $filter) {
+        if (empty($filter)) {
             $this->activeFilter = null;
             $this->resetSort();
 
@@ -221,23 +152,16 @@ class Index extends Component
 
         $this->activeFilter = $filter;
 
-        // Parser le filtre pour définir le champ et la direction
-        if (in_array($filter, ['payment_status_paid', 'payment_status_unpaid'])) {
-            $this->sortField = 'payment_status'; // Filtres spécifiques
-            $this->sortDirection = 'asc';
-        } else {
-            $parts = explode('_', $filter);
-            $direction = array_pop($parts);
-            $field = implode('_', $parts);
+        $parts = explode('_', $filter);
+        $direction = array_pop($parts);
+        $field = implode('_', $parts);
 
-            $this->sortField = $field;
-            $this->sortDirection = $direction;
-        }
+        $this->sortField = $field;
+        $this->sortDirection = $direction;
 
-        $this->resetPage(); // Réinitialiser la pagination lors de l'application d'un filtre
+        $this->resetPage();
     }
 
-    // Réinitialiser le tri et les filtres
     public function resetSort()
     {
         $this->sortField = 'name';
@@ -246,7 +170,6 @@ class Index extends Component
         $this->resetPage();
     }
 
-    // Toggle la visibilité des colonnes
     public function toggleColumn($column)
     {
         if (isset($this->visibleColumns[$column])) {
@@ -254,34 +177,31 @@ class Index extends Component
         }
     }
 
-    // Check si la colonne est visible
     public function isColumnVisible($column)
     {
         return isset($this->visibleColumns[$column]) && $this->visibleColumns[$column];
     }
 
-    // Réinitialiser les colonnes aux valeurs par défaut
     public function resetColumns()
     {
         $this->visibleColumns = [
             'name' => true,
             'issued_date' => true,
-            'tags' => true,
-            'payment_status' => false,
-            'payment_due_date' => false,
-            'amount' => false,
-            'issuer_name' => false,
             'type' => false,
             'category' => false,
+            'issuer_name' => false,
+            'amount' => true,
+            'payment_status' => false,
+            'payment_due_date' => false,
+            'tags' => true,
         ];
 
-        $this->js('window.location.reload()'); // thanks caleb
+        $this->js('window.location.reload()');
     }
 
-    // Méthode pour définir la colonne de tri et la direction
     public function sortBy($field)
     {
-        $this->activeFilter = null; // Reset les filtres actifs lors du tri
+        $this->activeFilter = null;
 
         if ($this->sortField === $field) {
             $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
@@ -290,120 +210,85 @@ class Index extends Component
             $this->sortDirection = 'asc';
         }
 
-        $this->resetPage(); // Réinitialiser la pagination lors du tri
+        $this->resetPage();
     }
 
-    // TODO : Télécharger tout les fichiers dans un ordre spécifique
+    public function toggleFavorite($invoiceId)
+    {
+        $this->invoice = auth()->user()->invoices()->findOrFail($invoiceId);
+        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
+    }
+
+    // Implémentations des fonctionnalités manquantes
     public function downloadAllFiles()
     {
-        dd('Download en cours');
+        dd('Download all the files');
     }
 
-    // Télécharger la facture
     public function downloadInvoice($invoiceId)
     {
-        $invoice = auth()->user()->invoices()
-            ->with('file')
-            ->findOrFail($invoiceId);
+        $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
 
-        $primaryFile = $invoice->primaryFile;
+        if (! $invoiceFile) {
+            session()->flash('error', 'Fichier de facture non trouvé.');
 
-        if (! $primaryFile) {
-            $this->downloadNotWorking = true;
-
-            return null;
+            return;
         }
 
-        // Extraire le chemin du fichier sans le préfixe "storage"
-        $filePath = $primaryFile->getRawOriginal('file_path');
+        $filePath = storage_path('app/public/'.$invoiceFile->getRawOriginal('file_path'));
 
-        // Vérifier si le fichier existe
-        if (! Storage::disk('public')->exists($filePath)) {
-            $this->downloadNotWorking = true;
+        if (! file_exists($filePath)) {
+            session()->flash('error', 'Le fichier n\'existe pas sur le serveur.');
 
-            return null;
+            return;
         }
 
-        // Générer un nom de fichier plus stylé
-        $downloadName = Str::slug($invoice->name).'_'.$invoice->id.'.'.$primaryFile->file_extension;
-
-        // Télécharger le fichier
-        return Storage::disk('public')->download($filePath, $downloadName);
+        return response()->download($filePath, $invoiceFile->file_name);
     }
 
-    // Afficher la modal de la facture
     public function showInvoiceModal($id)
     {
-        $invoice = auth()->user()->invoices()
-            ->with('file')
-            ->findOrFail($id);
-
-        $primaryFile = $invoice;
-
-        if ($primaryFile) {
-            $this->fileUrl = $primaryFile->file->file_path;
-            $this->showInvoicePreviewModal = true;
-        } else {
-            $this->downloadNotWorking = true;
-        }
+        $invoice = auth()->user()->invoices()->with('file')->findOrFail($id);
+        $this->invoice = $invoice;
+        $this->filePath = $invoice->file->file_path;
+        $this->fileExtension = $invoice->file->file_extension;
+        $this->showInvoicePreviewModal = true;
     }
 
-    // Rediriger vers la page de la facture
     public function showInvoicePage($id)
     {
-        $invoiceId = auth()->user()->invoices()->findOrFail($id)->id;
-        $this->redirectRoute('invoices.show', $invoiceId);
+        $this->redirectRoute('invoices.show', $id);
     }
 
-    // Rediriger vers la page d'édition de la facture
-    public function showEditPage($invoiceId)
+    public function showEditPage($id)
     {
-        $this->redirectRoute('invoices.edit', $invoiceId);
+        $this->redirectRoute('invoices.edit', $id);
     }
 
-    // Mettre à jour la facture
-    public function updateInvoice()
+    public function showArchiveForm($id)
     {
-        $this->form->update();
-
-        $this->redirectRoute('invoices.index');
+        $this->invoice = auth()->user()->invoices()->findOrFail($id);
+        $this->showArchiveFormModal = true;
     }
 
-    // Afficher le formulaire de suppression
-    public function showDeleteForm($id)
-    {
-        $invoice = auth()->user()->invoices()->findOrFail($id);
-        $this->invoiceId = $invoice->id;
-        $this->showDeleteFormModal = true;
-    }
-
-    // Supprimer la facture
-    public function deleteInvoice()
-    {
-        dd('Suppression en cours');
-    }
-
-    // Archive ou désarchive la facture
     public function archiveInvoice()
     {
-        dd('Archive en cours');
+        try {
+            $this->invoice->update(['is_archived' => true]);
+
+            $this->showArchiveFormModal = false;
+            $this->archivedWithSuccess = true;
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
+        }
     }
 
     public function render()
     {
         // Récupération des factures avec filtres
         $invoices = auth()->user()->invoices()
-            ->with('file') // Charger les fichiers associés
-            ->when(
-                $this->activeFilter === 'payment_status_paid',
-                fn ($query) => $query->where('payment_status', 'paid')
-            )
-            ->when(
-                $this->activeFilter === 'payment_status_unpaid',
-                fn ($query) => $query->where('payment_status', 'unpaid')
-            )
-            ->when(
-                $this->sortField,
+            ->with('file')
+            ->when($this->sortField,
                 fn ($query) => $query->orderBy($this->sortField, $this->sortDirection)
             )
             ->where('is_archived', false)
@@ -411,13 +296,13 @@ class Index extends Component
 
         $this->recentInvoices = auth()->user()->invoices()
             ->with('file')
+            ->where('is_archived', false)
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();
 
         $folderStats = $this->getFolderStats();
 
-        // Rendu de la vue
         return view('livewire.pages.invoices.index', compact('invoices', 'folderStats'))
             ->layout('layouts.app-sidebar');
     }

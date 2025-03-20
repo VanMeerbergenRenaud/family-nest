@@ -16,7 +16,7 @@
                 <x-theme-switcher /> {{-- Theme switcher --}}
             </div>
 
-            <x-divider class="mb-4" />
+            <x-divider class="mb-4 lg:block sm:hidden" />
         </header>
 
         {{-- MAIN --}}

@@ -3,17 +3,17 @@
 ])
 
 @php
-    $linkClass = 'flex items-center p-2 py-1.5 text-gray-700 rounded-lg dark:text-gray-400 group';
+    $linkClass = 'flex items-center w-fit p-2 py-1.5 text-gray-700 rounded-lg dark:text-gray-400 group';
     $activeClass = 'text-indigo-600 dark:text-indigo-500';
     $svgClass = 'w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-50';
 @endphp
 
 <ul class="font-medium custom-mt-auto">
     <li>
-        <a href="#" class="{{ $linkClass }}" onclick="window.location.reload();">
+        <button class="{{ $linkClass }}" onclick="window.location.reload();">
             <x-heroicon-o-arrow-path class="{{ $svgClass }}"/>
             <span x-show="expanded" class="ml-3">Rafraîchir</span>
-        </a>
+        </button>
     </li>
     <li>
         <a href="{{ route('settings.index') }}" class="{{ $linkClass }} @if (request()->routeIs('settings.index')) {{ $activeClass }} @endif" wire:navigate>

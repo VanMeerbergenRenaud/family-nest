@@ -24,41 +24,41 @@
     <x-menu.items class="w-[calc(100vw-2rem)] shadow-lg min-w-45 max-w-100 -mt-8 lg:w-55">
 
         <x-menu.item wire:click="seeProfile">
-            <x-svg.user/>
+            <x-svg.user class="group-hover:text-gray-900"/>
             {{ __('Voir mon profil') }}
         </x-menu.item>
 
         <x-menu.item wire:click="seeShortcut">
-            <x-svg.lightning/>
+            <x-svg.lightning class="group-hover:text-gray-900"/>
             {{ __('Raccourcis clavier') }}
         </x-menu.item>
 
         <x-divider/>
 
         <x-menu.item wire:click="inviteMember">
-            <x-svg.user-plus/>
+            <x-svg.user-plus class="group-hover:text-gray-900"/>
             {{ __('Inviter des membres') }}
         </x-menu.item>
 
         <x-menu.item wire:click="seeUpdates">
-            <x-svg.changelog/>
+            <x-svg.changelog class="group-hover:text-gray-900"/>
             {{ __('Mise à jour') }}
         </x-menu.item>
 
         <x-menu.item wire:click="seeSupport">
-            <x-svg.help/>
+            <x-svg.help class="group-hover:text-gray-900"/>
             {{ __('Question au support') }}
         </x-menu.item>
 
         <x-divider/>
 
         <x-menu.item wire:click="seeArchives">
-            <x-svg.trash/>
+            <x-svg.trash class="group-hover:text-gray-900"/>
             {{ __('Mes archives') }}
         </x-menu.item>
 
         <x-menu.item wire:click="logout">
-            <x-svg.logout/>
+            <x-svg.logout class="group-hover:text-gray-900"/>
             {{ __('Se déconnecter') }}
         </x-menu.item>
 

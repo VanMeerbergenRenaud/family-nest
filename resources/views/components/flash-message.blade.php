@@ -1,6 +1,6 @@
 <div class="fixed top-0 right-0 bottom-0 left-0 flex justify-end items-start p-4 pointer-events-none z-10">
     <div
-        class="max-w-80 w-full bg-white rounded-xl pointer-events-auto"
+        class="max-w-80 w-auto bg-white rounded-xl pointer-events-auto"
         x-data="{ show: true }"
         x-show="show"
         x-init="setTimeout(() => show = false, 3000)"
@@ -10,6 +10,8 @@
             <div class="ml-2 w-4 h-4">
                 @if($icon === 'delete')
                     <x-svg.trash />
+                @elseif($icon === 'archive')
+                    <x-svg.archive />
                 @elseif($icon === 'success')
                     <x-svg.success />
                 @elseif($icon === 'import')

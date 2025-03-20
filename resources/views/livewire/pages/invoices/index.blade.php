@@ -3,108 +3,78 @@
 
     {{-- Section de navigation par dossiers --}}
     <section class="mb-8">
-        <h2 class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Accès rapide</h2>
+        <h2 class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Catégories</h2>
 
-        <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
+        <div class="flex <!--overflow-x-scroll--> gap-4 scrollbar-hidden">
             {{-- Favoris --}}
             <button wire:click.prevent="openFolder('favorites', 'Favoris')"
-               class="flex p-5 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800 cursor-pointer">
-                <div class="flex flex-col">
-                    <div class="mb-3.5 p-3 rounded-lg w-fit bg-blue-100 dark:bg-blue-900">
-                        <x-heroicon-o-star class="w-5 h-5 text-blue-600 dark:text-blue-400"/>
+                    class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800">
+                <div class="flex flex-col text-left">
+                    <div class="mb-3.5 p-3 rounded-lg w-fit bg-gray-200 dark:bg-green-800">
+                        <x-svg.folder class="w-6 h-6 text-green-500 dark:text-green-400" />
                     </div>
-                    <p class="pl-1 flex flex-col gap-1">
-                        <span class="text-left text-md-medium text-gray-900 dark:text-white">Favoris</span>
-                        <span class="text-sm-medium text-gray-500 dark:text-gray-400">
+                    <span class="text-md-medium text-gray-900 dark:text-white">Favoris</span>
+                    <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
                         {{ $folderStats['favorites']['count'] }} Fichiers • {{ $folderStats['favorites']['amount'] }}€
                     </span>
-                    </p>
                 </div>
             </button>
 
             {{-- Payés --}}
-            <a wire:click.prevent="openFolder('paid', 'Factures payées')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-green-100 dark:bg-green-900 cursor-pointer">
-                <div class="flex flex-col">
+            <button wire:click.prevent="openFolder('paid', 'Factures payées')"
+               class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-green-100 dark:bg-green-900">
+                <div class="flex flex-col text-left">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-green-200 dark:bg-green-800">
                         <x-svg.validate class="w-6 h-6 text-green-500 dark:text-green-400"/>
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Payés</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['paid']['count'] }} Fichiers • {{ $folderStats['paid']['amount'] }}€
-                </span>
+                        {{ $folderStats['paid']['count'] }} Fichiers • {{ $folderStats['paid']['amount'] }}€
+                    </span>
                 </div>
-            </a>
+            </button>
 
             {{-- Impayés --}}
-            <a wire:click.prevent="openFolder('unpaid', 'Factures impayées')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-red-50 dark:bg-red-900 cursor-pointer">
-                <div class="flex flex-col">
+            <button wire:click.prevent="openFolder('unpaid', 'Factures impayées')"
+               class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-red-50 dark:bg-red-900">
+                <div class="flex flex-col text-left">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-red-100 dark:bg-red-900">
-                        <x-svg.clock class="w-6 h-6 text-red-500 dark:text-red-400"/>
+                    <x-svg.clock class="w-6 h-6 text-red-500 dark:text-red-400"/>
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Impayés</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['unpaid']['count'] }} Fichiers • {{ $folderStats['unpaid']['amount'] }}€
-                </span>
+                        {{ $folderStats['unpaid']['count'] }} Fichiers • {{ $folderStats['unpaid']['amount'] }}€
+                    </span>
                 </div>
-            </a>
+            </button>
 
             {{-- Retard de paiement --}}
-            <a wire:click.prevent="openFolder('late', 'Retards de paiement')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-yellow-50 dark:bg-yellow-900 cursor-pointer">
-                <div class="flex flex-col">
+            <button wire:click.prevent="openFolder('late', 'Retards de paiement')"
+               class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-yellow-50 dark:bg-yellow-900">
+                <div class="flex flex-col text-left">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-yellow-100 dark:bg-yellow-900">
-                        <x-heroicon-o-document class="w-6 h-6 text-yellow-500 dark:text-yellow-400"/>
+                    <x-heroicon-o-document class="w-6 h-6 text-yellow-500 dark:text-yellow-400"/>
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Retard de paiement</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['late']['count'] }} Fichiers • {{ $folderStats['late']['amount'] }}€
-                </span>
+                        {{ $folderStats['late']['count'] }} Fichiers • {{ $folderStats['late']['amount'] }}€
+                    </span>
                 </div>
-            </a>
-
-            {{-- Semaine dernière --}}
-            <a wire:click.prevent="openFolder('last_week', 'Semaine dernière')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-purple-50 dark:bg-purple-900 cursor-pointer">
-                <div class="flex flex-col">
-                    <div class="mb-3.5 p-3 rounded-lg w-fit bg-purple-100 dark:bg-purple-900">
-                        <x-svg.calendar class="w-6 h-6 text-purple-500 dark:text-purple-400"/>
-                    </div>
-                    <span class="text-md-medium text-gray-900 dark:text-white">Semaine dernière</span>
-                    <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['last_week']['count'] }} Fichiers • {{ $folderStats['last_week']['amount'] }}€
-                </span>
-                </div>
-            </a>
-
-            {{-- Montant élevé --}}
-            <a wire:click.prevent="openFolder('high_amount', 'Montants élevés')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-indigo-50 dark:bg-indigo-900 cursor-pointer">
-                <div class="flex flex-col">
-                    <div class="mb-3.5 p-3 rounded-lg w-fit bg-indigo-100 dark:bg-indigo-900">
-                        <x-svg.dollar class="w-6 h-6 text-indigo-500 dark:text-indigo-400"/>
-                    </div>
-                    <span class="text-md-medium text-gray-900 dark:text-white">Montant élevé</span>
-                    <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['high_amount']['count'] }} Fichiers • {{ $folderStats['high_amount']['amount'] }}€
-                </span>
-                </div>
-            </a>
+            </button>
 
             {{-- Priorité élevée --}}
-            <a wire:click.prevent="openFolder('high_priority', 'Priorités élevées')" href="#"
-               class="inline-block p-5 min-w-48 rounded-xl bg-orange-50 dark:bg-orange-900 cursor-pointer">
-                <div class="flex flex-col">
+            <button wire:click.prevent="openFolder('high_priority', 'Priorités élevées')"
+               class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-orange-50 dark:bg-orange-900">
+                <div class="flex flex-col text-left">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-orange-100 dark:bg-orange-900">
                         <x-svg.download class="w-6 h-6 text-orange-500 dark:text-orange-400"/>
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Priorité élevée</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                    {{ $folderStats['high_priority']['count'] }} Fichiers • {{ $folderStats['high_priority']['amount'] }}€
-                </span>
+                        {{ $folderStats['high_priority']['count'] }} Fichiers • {{ $folderStats['high_priority']['amount'] }}€
+                    </span>
                 </div>
-            </a>
+            </button>
         </div>
     </section>
 
@@ -129,7 +99,7 @@
                                     {{ Str::limit($invoice->name, 16) }}
                                 </h3>
                                 <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
-                                    {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->format('j M Y') : 'Date inconnue' }}
+                                    {{ $invoice->created_at ? \Carbon\Carbon::parse($invoice->issued_date)->format('j M Y') : 'Date inconnue' }}
                                     • {{ $invoice->amount ?? 'Montant vide' }} {{ $invoice->currency ?? '€' }}
                                 </p>
                             </div>
@@ -138,29 +108,27 @@
                                 <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
                                     <x-svg.dots class="w-5 h-5 text-gray-500 rotate-90"/>
                                 </x-menu.button>
-                                <x-menu.items
-                                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
+                                <x-menu.items class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
                                     <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
-                                        <x-svg.show class="w-4 h-4"/>
+                                        <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Voir l’aperçu') }}
                                     </x-menu.item>
                                     <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
-                                        <x-svg.help class="w-4 h-4"/>
+                                        <x-svg.help class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Voir en détail') }}
                                     </x-menu.item>
                                     <x-divider />
                                     <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
-                                        <x-svg.download class="w-4 h-4"/>
+                                        <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Télécharger') }}
                                     </x-menu.item>
                                     <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
-                                        <x-svg.edit class="w-4 h-4"/>
+                                        <x-svg.edit class="w-4 h-4" class="group-hover:text-gray-900"/>
                                         {{ __('Modifier') }}
                                     </x-menu.item>
-                                    <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})"
-                                                 class="hover:text-red-600">
-                                        <x-svg.trash class="w-4 h-4 text-red-500"/>
-                                        {{ __('Supprimer') }}
+                                    <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:text-red-500">
+                                        <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
+                                        {{ __('Archiver') }}
                                     </x-menu.item>
                                 </x-menu.items>
                             </x-menu>
@@ -171,10 +139,11 @@
         </div>
     </section>
 
-    {{-- En-tête du tableau --}}
+    {{-- Tableau regroupant toutes les factures --}}
     <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
-        <div
-            class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
+
+        {{-- En-tête --}}
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
             <h2 class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h2>
             <div class="flex flex-wrap gap-2">
                 {{-- Filtres --}}
@@ -184,89 +153,78 @@
                         {{ $activeFilter ? $availableFilters[$activeFilter] : 'Filtres' }}
                     </x-menu.button>
 
-                    <x-menu.items class="origin-top-left mt-2 py-3 px-4 max-w-[20rem] w-auto">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="text-sm font-medium text-gray-700 dark:text-gray-400">Filtres</p>
-                            @if($activeFilter)
-                                <button wire:click="resetSort"
-                                        class="text-blue-600 text-sm hover:text-blue-800 flex items-center">
-                                    <x-svg.reset class="mr-1.5 text-blue-600 text-sm hover:text-blue-800"/>
+                    <x-menu.items class="mt-2 w-64">
+                        <p class="px-4 py-3 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
+
+                        <x-divider/>
+
+                        @php
+                            $activeState = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white';
+                            $inactiveState = 'bg-white hover:bg-gray-100 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
+                            $iconActiveClass = 'text-gray-900 dark:text-white';
+                            $iconInactiveClass = 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200';
+                        @endphp
+
+                        <!-- Filtres de date -->
+                        <x-menu.item wire:click="applyFilter('issued_date_asc')" class="{{ $activeFilter === 'issued_date_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Date (ancien → récent)
+                        </x-menu.item>
+
+                        <x-menu.item wire:click="applyFilter('issued_date_desc')" class="{{ $activeFilter === 'issued_date_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Date (récent → ancien)
+                        </x-menu.item>
+
+                        <x-divider/>
+
+                        <!-- Filtres d'échéance -->
+                        <x-menu.item wire:click="applyFilter('payment_due_date_asc')" class="{{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Échéance (proche → loin)
+                        </x-menu.item>
+
+                        <x-menu.item wire:click="applyFilter('payment_due_date_desc')" class="{{ $activeFilter === 'payment_due_date_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Échéance (loin → proche)
+                        </x-menu.item>
+
+                        <x-divider/>
+
+                        <!-- Filtres de montant -->
+                        <x-menu.item wire:click="applyFilter('amount_asc')" class="{{ $activeFilter === 'amount_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.dollar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'amount_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Prix (- → +)
+                        </x-menu.item>
+
+                        <x-menu.item wire:click="applyFilter('amount_desc')" class="{{ $activeFilter === 'amount_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.dollar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'amount_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Prix (+ → -)
+                        </x-menu.item>
+
+                        <x-divider/>
+
+                        <!-- Filtres alphabétiques -->
+                        <x-menu.item wire:click="applyFilter('name_asc')" class="{{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.atoz class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'name_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            A → Z
+                        </x-menu.item>
+
+                        <x-menu.item wire:click="applyFilter('name_desc')" class="{{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.atoz class="w-4 h-4 rotate-180 transition-colors duration-200 {{ $activeFilter === 'name_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Z → A
+                        </x-menu.item>
+
+                        @if($activeFilter)
+                            <x-divider/>
+
+                            <div class="p-1.5">
+                                <x-menu.item wire:click="resetSort" class="p-2 flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                                    <x-svg.reset/>
                                     Réinitialiser
-                                </button>
-                            @endif
-                        </div>
-
-                        <div class="flex flex-wrap gap-3 mb-3">
-                            @php
-                                $activeState = 'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-200';
-                                $inactiveState = 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700';
-                            @endphp
-
-                            {{-- Statut --}}
-                            <button wire:click="applyFilter('payment_status_paid')"
-                                    class="button-rounded {{ $activeFilter === 'payment_status_paid' ? $activeState : $inactiveState }}">
-                                <x-svg.validate class="w-3.5 h-3.5"/>
-                                Payé
-                            </button>
-
-                            <button wire:click="applyFilter('payment_status_unpaid')"
-                                    class="button-rounded {{ $activeFilter === 'payment_status_unpaid' ? $activeState : $inactiveState }}">
-                                <x-svg.validate class="w-3.5 h-3.5"/>
-                                Impayé
-                            </button>
-
-                            {{-- Filtres de date d'ajout --}}
-                            <button wire:click="applyFilter('issued_date_asc')"
-                                    class="button-rounded {{ $activeFilter === 'issued_date_asc' ? $activeState : $inactiveState }}">
-                                <x-svg.calendar class="w-3.5 h-3.5"/>
-                                Date (ancien → récent)
-                            </button>
-
-                            <button wire:click="applyFilter('issued_date_desc')"
-                                    class="button-rounded {{ $activeFilter === 'issued_date_desc' ? $activeState : $inactiveState }}">
-                                <x-svg.calendar class="w-3.5 h-3.5"/>
-                                Date (récent → ancien)
-                            </button>
-
-                            {{-- Filtres d'échéance --}}
-                            <button wire:click="applyFilter('payment_due_date_asc')"
-                                    class="button-rounded {{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }}">
-                                <x-svg.clock class="w-3.5 h-3.5"/>
-                                Échéance (proche → loin)
-                            </button>
-
-                            <button wire:click="applyFilter('payment_due_date_desc')"
-                                    class="button-rounded {{ $activeFilter === 'payment_due_date_desc' ? $activeState : $inactiveState }}">
-                                <x-svg.clock class="w-3.5 h-3.5"/>
-                                Échéance (loin → proche)
-                            </button>
-
-                            {{-- Filtres de montant --}}
-                            <button wire:click="applyFilter('amount_asc')"
-                                    class="button-rounded {{ $activeFilter === 'amount_asc' ? $activeState : $inactiveState }}">
-                                <x-svg.dollar class="w-3.5 h-3.5"/>
-                                Prix (- → +)
-                            </button>
-
-                            <button wire:click="applyFilter('amount_desc')"
-                                    class="button-rounded {{ $activeFilter === 'amount_desc' ? $activeState : $inactiveState }}">
-                                <x-svg.dollar class="w-3.5 h-3.5"/>
-                                Prix (+ → -)
-                            </button>
-
-                            {{-- Filtres alphabétiques --}}
-                            <button wire:click="applyFilter('name_asc')"
-                                    class="button-rounded {{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }}">
-                                <x-svg.atoz class="w-3.5 h-3.5"/>
-                                A → Z
-                            </button>
-
-                            <button wire:click="applyFilter('name_desc')"
-                                    class="button-rounded {{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }}">
-                                <x-svg.atoz class="w-3.5 h-3.5 rotate-180"/>
-                                Z → A
-                            </button>
-                        </div>
+                                </x-menu.item>
+                            </div>
+                        @endif
                     </x-menu.items>
                 </x-menu>
 
@@ -298,7 +256,7 @@
                             <x-form.checkbox-input
                                 name="column_issued_date"
                                 model="visibleColumns.issued_date"
-                                label="Date d'ajout"
+                                label="Date d'émission"
                                 :checked="isset($visibleColumns['issued_date']) && $visibleColumns['issued_date']"
                                 wire:click="toggleColumn('issued_date')"
                             />
@@ -377,8 +335,7 @@
                         <x-divider/>
 
                         <div class="p-1.5">
-                            <x-menu.item wire:click="resetColumns"
-                                         class="p-2 flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                            <x-menu.item wire:click="resetColumns" class="p-2 flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
                                 <x-svg.reset/>
                                 Réinitialiser
                             </x-menu.item>
@@ -424,7 +381,6 @@
                             </th>
                         @endif
 
-                        {{-- Colonnes supplémentaires --}}
                         {{-- Type --}}
                         @if($visibleColumns['type'])
                             <th scope="col" class="min-w-[150px]">
@@ -530,11 +486,11 @@
                             </th>
                         @endif
 
-                        {{-- Date d'ajout --}}
+                        {{-- Date d'émission --}}
                         @if($visibleColumns['issued_date'])
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('issued_date')" class="flex items-center">
-                                    <span>Date d'ajout</span>
+                                    <span>Date d'émission</span>
                                     @if ($sortField === 'issued_date')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                              xmlns="http://www.w3.org/2000/svg">
@@ -593,22 +549,19 @@
                                 <td>
                                     <div class="flex items-center">
                                         @php
-                                            $extension = pathinfo($invoice->file_path, PATHINFO_EXTENSION);
-                                            $badgeClass = match(strtolower($extension)) {
-                                                'pdf' => 'bg-red-100 text-red-600',
-                                                'docx', 'doc' => 'bg-blue-100 text-blue-600',
-                                                'xlsx', 'xls' => 'bg-green-100 text-green-600',
-                                                'jpg', 'jpeg', 'png' => 'bg-yellow-100 text-yellow-600',
-                                                default => 'bg-gray-100 text-gray-600'
-                                            };
+                                            $extension = $invoice->file->file_extension ?? null;
                                         @endphp
 
-                                        <div class="{{ $badgeClass }} mr-3 p-2 rounded">
-                                            <span class="text-xs-medium">{{ strtoupper($extension) }}</span>
+                                        <div class="mr-3 p-2 rounded">
+                                            @if(View::exists('components.svg.file.' . $extension))
+                                                <x-dynamic-component :component="'svg.file.' . $extension" class="w-6 h-6" />
+                                            @else
+                                                <x-svg.file.default class="w-6 h-6" />
+                                            @endif
                                         </div>
+
                                         <div class="flex flex-col">
-                                            <span
-                                                class="text-sm-medium text-gray-900 dark:text-gray-400">{{ ucfirst($invoice->name) }}</span>
+                                            <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ ucfirst($invoice->name) }}</span>
                                         </div>
                                     </div>
                                 </td>
@@ -667,7 +620,7 @@
                                 </td>
                             @endif
 
-                            {{-- Date d'ajout --}}
+                            {{-- Date d'émission --}}
                             @if($visibleColumns['issued_date'])
                                 <td>
                                     @if($invoice->issued_date)
@@ -732,26 +685,25 @@
                                         <x-menu.items
                                             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
                                             <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
-                                                <x-svg.show class="w-4 h-4"/>
+                                                <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Voir l’aperçu') }}
                                             </x-menu.item>
                                             <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
-                                                <x-svg.help class="w-4 h-4"/>
+                                                <x-svg.help class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Voir en détail') }}
                                             </x-menu.item>
                                             <x-divider />
                                             <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
-                                                <x-svg.download class="w-4 h-4"/>
+                                                <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Télécharger') }}
                                             </x-menu.item>
                                             <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
-                                                <x-svg.edit class="w-4 h-4"/>
+                                                <x-svg.edit class="w-4 h-4" class="group-hover:text-gray-900"/>
                                                 {{ __('Modifier') }}
                                             </x-menu.item>
-                                            <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})"
-                                                         class="hover:text-red-600">
-                                                <x-svg.trash class="w-4 h-4 text-red-500"/>
-                                                {{ __('Supprimer') }}
+                                            <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:text-red-500">
+                                                <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
+                                                {{ __('Archiver') }}
                                             </x-menu.item>
                                         </x-menu.items>
                                     </x-menu>
@@ -775,66 +727,63 @@
     <!-- Modal pour afficher les factures d'un dossier spécifique avec design de cartes -->
     @if($showFolderModal)
         <x-modal wire:model="showFolderModal">
-            <x-modal.panel class="max-w-5xl">
-                <div
-                    class="sticky top-0 p-5 px-8 flex items-center justify-between max-w-full border-b border-[#dde2e9] bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
-                    <div class="flex items-center">
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-white">{{ $folderTitle }}</h2>
-                        <span
-                            class="ml-3 px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-300 text-sm rounded-full">
-                        {{ count($folderInvoices) }} factures
-                    </span>
+            <x-modal.panel class="max-w-5xl bg-white dark:bg-gray-900">
+                <!-- En-tête avec titre et compteur -->
+                <div class="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
+                    <div class="flex items-center gap-3">
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $folderTitle }}</h2>
+                        <span class="inline-flex px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full">
+                            {{ count($folderInvoices) }} factures
+                        </span>
                     </div>
                 </div>
 
-                <div class="p-6 bg-gray-50 dark:bg-gray-900 max- overflow-y-auto">
-                    @if(empty($folderInvoices))
-                        <div class="flex flex-col items-center justify-center py-16">
-                            <x-heroicon-o-document-text class="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4"/>
-                            <p class="text-lg font-medium text-gray-500 dark:text-gray-400">{{ __('Aucune facture dans cette catégorie') }}</p>
-                            <p class="text-sm text-gray-400 dark:text-gray-500 mt-2">{{ __('Les factures que vous ajouterez apparaîtront ici') }}</p>
+                <!-- Contenu principal -->
+                <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto max-h-[70vh]">
+                    @if($folderInvoices->isEmpty())
+                        <!-- État vide -->
+                        <div class="flex flex-col items-center justify-center py-16 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                            <x-heroicon-o-document-text class="w-14 h-14 text-gray-300 dark:text-gray-700 mb-3"/>
+                            <p class="text-base font-medium text-gray-700 dark:text-gray-300">{{ __('Aucune facture dans cette catégorie') }}</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">{{ __('Les factures que vous ajouterez apparaîtront ici !') }}</p>
                         </div>
                     @else
-                        <div class="flex flex-wrap gap-4">
+                        <!-- Liste des factures -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             @foreach($folderInvoices as $invoice)
-                                <div
-                                    class="w-full bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden relative">
+                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 hover:shadow-sm transition-shadow duration-200 overflow-hidden">
                                     <!-- En-tête de la carte -->
-                                    <div
-                                        class="p-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-850 flex justify-between items-center">
+                                    <div class="px-4 py-3 border-b border-gray-50 dark:border-gray-800 flex justify-between items-center">
                                         @php
-                                            $extension = pathinfo($invoice->file_path, PATHINFO_EXTENSION);
-                                            $badgeClass = match(strtolower($extension)) {
-                                                'pdf' => 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400',
-                                                'docx', 'doc' => 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400',
-                                                'xlsx', 'xls' => 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400',
-                                                'jpg', 'jpeg', 'png' => 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400',
-                                                default => 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                                            };
+                                            $extension = $invoice->file->file_extension ?? null;
                                         @endphp
-                                        <div class="flex items-center">
-                                            <div class="{{ $badgeClass }} p-2 rounded mr-3">
-                                                <span class="text-xs-medium">{{ strtoupper($extension) }}</span>
+
+                                        <div class="flex items-center gap-2.5 overflow-hidden">
+                                            <div class="flex-shrink-0  p-1.5 rounded">
+                                                @if(View::exists('components.svg.file.' . $extension))
+                                                    <x-dynamic-component :component="'svg.file.' . $extension" class="w-5 h-5" />
+                                                @else
+                                                    <x-svg.file.default class="w-5 h-5" />
+                                                @endif
                                             </div>
-                                            <h3 class="font-medium text-gray-900 dark:text-white truncate max-w-[180px]"
+                                            <h3 class="font-medium text-gray-900 dark:text-white truncate"
                                                 title="{{ $invoice->name }}">
                                                 {{ $invoice->name }}
                                             </h3>
                                         </div>
+
                                         <x-menu>
-                                            <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
+                                            <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 py-0.5 px-1">
                                                 <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                             </x-menu.button>
-                                            <x-menu.items
-                                                class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 z-20">
-                                                <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
-                                                    <x-svg.edit class="w-4 h-4"/>
-                                                    {{ __('Modifier') }}
+                                            <x-menu.items class="origin-top-right absolute right-0 mt-1 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 z-30">
+                                                <x-menu.item wire:click="showEditPage({{ $invoice->id }})" class="group hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                    <x-svg.edit class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"/>
+                                                    <span class="text-sm">{{ __('Modifier') }}</span>
                                                 </x-menu.item>
-                                                <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})"
-                                                             class="hover:text-red-600">
-                                                    <x-svg.trash class="w-4 h-4 text-red-500"/>
-                                                    {{ __('Supprimer') }}
+                                                <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:bg-red-50 dark:hover:bg-red-900/20">
+                                                    <x-svg.trash class="w-4 h-4 text-gray-400 group-hover:text-red-500"/>
+                                                    <span class="text-sm group-hover:text-red-600 dark:group-hover:text-red-400">{{ __('Archiver') }}</span>
                                                 </x-menu.item>
                                             </x-menu.items>
                                         </x-menu>
@@ -842,28 +791,28 @@
 
                                     <!-- Corps de la carte -->
                                     <div class="p-4">
-                                        <div class="grid grid-cols-2 gap-3 text-sm">
-                                            <div>
-                                                <p class="text-gray-500 dark:text-gray-400 text-xs mb-1">{{ __('Date d\'ajout') }}</p>
-                                                <p class="text-gray-900 dark:text-white">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="space-y-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d\'émission') }}</p>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
                                                     {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->format('j F Y') : 'Non spécifiée' }}
                                                 </p>
                                             </div>
-                                            <div>
-                                                <p class="text-gray-500 dark:text-gray-400 text-xs mb-1">{{ __('Échéance') }}</p>
-                                                <p class="text-gray-900 dark:text-white">
+                                            <div class="space-y-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Échéance') }}</p>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
                                                     {{ $invoice->payment_due_date ? \Carbon\Carbon::parse($invoice->payment_due_date)->format('j F Y') : 'Non spécifiée' }}
                                                 </p>
                                             </div>
-                                            <div>
-                                                <p class="text-gray-500 dark:text-gray-400 text-xs mb-1">{{ __('Émetteur') }}</p>
-                                                <p class="text-gray-900 dark:text-white">
+                                            <div class="space-y-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Émetteur') }}</p>
+                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate" title="{{ $invoice->issuer_name ?? 'Non spécifié' }}">
                                                     {{ $invoice->issuer_name ?? 'Non spécifié' }}
                                                 </p>
                                             </div>
-                                            <div>
-                                                <p class="text-gray-500 dark:text-gray-400 text-xs mb-1">{{ __('Montant') }}</p>
-                                                <p class="font-medium text-gray-900 dark:text-white">
+                                            <div class="space-y-1">
+                                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Montant') }}</p>
+                                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                                     {{ number_format($invoice->amount, 2, ',', ' ') }} €
                                                 </p>
                                             </div>
@@ -871,14 +820,13 @@
                                     </div>
 
                                     <!-- Pied de la carte -->
-                                    <div
-                                        class="border-t border-gray-100 dark:border-gray-700 p-3 flex justify-between items-center">
+                                    <div class="border-t border-gray-50 dark:border-gray-800 px-4 py-3 flex justify-between items-center">
                                         @php
                                             $statusClass = match($invoice->payment_status) {
-                                                'paid' => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-                                                'partially_paid' => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-                                                'late' => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-                                                default => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
+                                                'paid' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-100 dark:border-green-800',
+                                                'partially_paid' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-100 dark:border-amber-800',
+                                                'late' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-100 dark:border-red-800',
+                                                default => 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-700',
                                             };
 
                                             $statusText = match($invoice->payment_status) {
@@ -889,17 +837,19 @@
                                                 default => 'Non spécifié',
                                             };
                                         @endphp
-                                        <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
-                                    {{ $statusText }}
-                                </span>
+                                        <span class="px-2.5 py-1 {{ $statusClass }} rounded-full text-xs font-medium border">
+                                {{ $statusText }}
+                            </span>
 
-                                        <div class="flex gap-2">
-                                            <button wire:click="showFile({{ $invoice->id }})"
-                                                    class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                        <div class="flex gap-1">
+                                            <button wire:click="showInvoiceModal({{ $invoice->id }})"
+                                                    class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                    title="Voir">
                                                 <x-svg.show class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                             </button>
                                             <button wire:click="downloadInvoice({{ $invoice->id }})"
-                                                    class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                    title="Télécharger">
                                                 <x-svg.download class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                             </button>
                                         </div>
@@ -910,13 +860,14 @@
                     @endif
                 </div>
 
-                <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <!-- Pied de modal -->
+                <x-modal.footer class="bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 px-6 py-4">
                     <div class="flex items-center justify-between w-full">
                         <div class="text-sm text-gray-500 dark:text-gray-400">
                             {{ count($folderInvoices) }} {{ __('factures trouvées') }}
                         </div>
                         <x-modal.close>
-                            <button type="button" class="button-secondary">
+                            <button type="button" class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
                                 {{ __('Fermer') }}
                             </button>
                         </x-modal.close>
@@ -930,64 +881,40 @@
         <x-modal wire:model="showInvoicePreviewModal">
             <x-modal.panel class="max-w-4xl">
                 <p class="sticky top-0 p-5 px-8 max-w-full text-xl font-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
-                    {{ __('Aperçu du fichier') }}
+                    {{ __('Aperçu de la facture') }}
                 </p>
 
                 <div class="p-1 border-b border-gray-200 bg-gray-50 dark:bg-gray-900 relative overflow-auto">
-                    @php
-                        $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
-                        $isImage = in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
-                        $isPdf = strtolower($extension) === 'pdf';
-                        $isDocument = in_array(strtolower($extension), ['doc', 'docx', 'txt', 'rtf', 'xls', 'xlsx']);
-                    @endphp
 
                     <!-- Loader -->
                     <div wire:loading class="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-800/80 z-10">
                         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
                     </div>
 
-                    @if($isPdf)
-                        <div class="flex flex-col items-center justify-center p-8">
-                            <x-svg.file-size class="w-16 h-16 text-gray-400 mb-4"/>
-                            <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Le PDF ne peut pas
-                                être affiché</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Votre navigateur ne prend pas
-                                en charge la visualisation de PDF intégrés.</p>
-                            <a href="{{ $fileUrl }}" download class="button-primary">
-                                <x-svg.download class="mr-2"/>
-                                Télécharger le fichier
-                            </a>
+                    @php
+                        $isImage = $filePath && preg_match('/\.(jpg|jpeg|png|gif)$/i', $filePath);
+                        $isPdf = $filePath && preg_match('/\.pdf$/i', $filePath);
+                    @endphp
+
+                    @if($isImage)
+                        <div class="flex-center p-1">
+                            <img src="{{ $filePath }}" alt="Aperçu de la facture" class="min-h-120 rounded-xl flex-center">
                         </div>
-                    @elseif($isImage)
-                        <div class="flex-center">
-                            <img src="{{ $fileUrl }}" alt="Aperçu de l'image" class="rounded-2xl">
+                    @elseif($isPdf)
+                        <div class="flex-center p-1">
+                            <embed src="{{ $filePath }}" type="application/pdf" width="100%" height="100%" class="min-h-120 rounded-xl" />
                         </div>
-                    @elseif($isDocument)
-                        <iframe src="https://docs.google.com/viewer?url={{ urlencode($fileUrl) }}&embedded=true">
-                            <div class="flex-center flec-col p-8">
-                                <x-svg.file-size class="w-16 h-16 text-gray-400 mb-4"/>
-                                <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Ce document ne peut pas être affiché
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                                    Ce type de fichier ne peut pas être prévisualisé.</p>
-                                <a href="{{ $fileUrl }}" download class="button-primary">
-                                    <x-svg.download class="mr-2"/>
-                                    Télécharger le fichier
-                                </a>
-                            </div>
-                        </iframe>
                     @else
-                        <div class="flex flex-col items-center justify-center p-8 ">
+                        <div class="flex-center flex-col p-8">
                             <x-svg.file-size class="w-24 h-24 text-gray-400 mb-6"/>
                             <p class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
                                 Prévisualisation non disponible
                             </p>
                             <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md mb-8">
-                                Le type de fichier "{{ strtoupper($extension) }}" ne peut pas être prévisualisé
+                                Le type de fichier "{{ strtoupper($fileExtension) }}" ne peut pas être prévisualisé
                                 directement. Veuillez télécharger le fichier pour le consulter.
                             </p>
-                            <a href="{{ $fileUrl }}" download class="button-primary">
+                            <a href="{{ $filePath }}" download class="button-primary">
                                 <x-svg.download class="mr-2"/>
                                 Télécharger le fichier
                             </a>
@@ -999,7 +926,7 @@
                     <div class="flex justify-between w-full">
                         <p class="text-sm text-gray-500 dark:text-gray-400">
                             <span class="font-medium">Type:</span>
-                            {{ strtoupper($extension) }}
+                            {{ strtoupper($fileExtension) }}
                         </p>
                         <x-modal.close>
                             <button type="button" class="button-secondary">
@@ -1012,11 +939,11 @@
         </x-modal>
     @endif
 
-    <!-- Modale de suppression d'une facture -->
-    @if($showDeleteFormModal)
-        <x-modal wire:model="showDeleteFormModal">
+    <!-- Modale pour archiver d'une facture -->
+    @if($showArchiveFormModal)
+        <x-modal wire:model="showArchiveFormModal">
             <x-modal.panel>
-                <form wire:submit.prevent="deleteInvoice">
+                <form wire:submit.prevent="archiveInvoice">
                     @csrf
 
                     <div x-data="{ confirmation: '' }">
@@ -1052,7 +979,7 @@
 
                             <x-modal.close>
                                 <button type="submit" class="button-danger" :disabled="confirmation !== 'CONFIRMER'">
-                                    {{ __('Supprimer') }}
+                                    {{ __('Archiver') }}
                                 </button>
                             </x-modal.close>
                         </x-modal.footer>
@@ -1062,27 +989,11 @@
         </x-modal>
     @endif
 
-    @if($addedWithSuccess)
+    @if($archivedWithSuccess)
         <x-flash-message
-            icon="add"
-            title="Facture ajoutée avec succès !"
-            method="$set('addedWithSuccess', false)"
-        />
-    @endif
-
-    @if($editWithSuccess)
-        <x-flash-message
-            icon="edit"
-            title="Facture modifiée avec succès !"
-            method="$set('editWithSuccess', false)"
-        />
-    @endif
-
-    @if($deleteWithSuccess)
-        <x-flash-message
-            icon="delete"
-            title="Facture supprimée avec succès !"
-            method="$set('deleteWithSuccess', false)"
+            icon="archive"
+            title="Facture archivée !"
+            method="$set('archivedWithSuccess', false)"
         />
     @endif
 
