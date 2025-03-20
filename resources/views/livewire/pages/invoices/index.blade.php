@@ -108,7 +108,7 @@
                                 <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
                                     <x-svg.dots class="w-5 h-5 text-gray-500 rotate-90"/>
                                 </x-menu.button>
-                                <x-menu.items class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
+                                <x-menu.items>
                                     <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                         <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Voir l’aperçu') }}
@@ -117,7 +117,13 @@
                                         <x-svg.help class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Voir en détail') }}
                                     </x-menu.item>
-                                    <x-divider />
+                                    <x-menu.divider />
+                                    @if(!$invoice->is_favorite)
+                                        <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
+                                            <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                                            {{ __('Mettre en favori') }}
+                                        </x-menu.item>
+                                    @endif
                                     <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                         <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
                                         {{ __('Télécharger') }}
@@ -154,9 +160,9 @@
                     </x-menu.button>
 
                     <x-menu.items class="mt-2 w-64">
-                        <p class="px-4 py-3 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
+                        <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
                         @php
                             $activeState = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-white';
@@ -176,7 +182,7 @@
                             Date (récent → ancien)
                         </x-menu.item>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
                         <!-- Filtres d'échéance -->
                         <x-menu.item wire:click="applyFilter('payment_due_date_asc')" class="{{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }} group">
@@ -189,7 +195,7 @@
                             Échéance (loin → proche)
                         </x-menu.item>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
                         <!-- Filtres de montant -->
                         <x-menu.item wire:click="applyFilter('amount_asc')" class="{{ $activeFilter === 'amount_asc' ? $activeState : $inactiveState }} group">
@@ -202,7 +208,7 @@
                             Prix (+ → -)
                         </x-menu.item>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
                         <!-- Filtres alphabétiques -->
                         <x-menu.item wire:click="applyFilter('name_asc')" class="{{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }} group">
@@ -216,10 +222,10 @@
                         </x-menu.item>
 
                         @if($activeFilter)
-                            <x-divider/>
+                            <x-menu.divider />
 
-                            <div class="p-1.5">
-                                <x-menu.item wire:click="resetSort" class="p-2 flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                            <div>
+                                <x-menu.item wire:click="resetSort" class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
                                     <x-svg.reset/>
                                     Réinitialiser
                                 </x-menu.item>
@@ -236,11 +242,11 @@
                     </x-menu.button>
 
                     <x-menu.items class="mt-2 w-56">
-                        <p class="px-4 py-3 text-sm-medium text-gray-700 dark:text-gray-400">
+                        <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">
                             Colonnes à afficher
                         </p>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
                         <x-menu.item wire:click="toggleColumn('name')">
                             <x-form.checkbox-input
@@ -332,10 +338,10 @@
                             />
                         </x-menu.item>
 
-                        <x-divider/>
+                        <x-menu.divider />
 
-                        <div class="p-1.5">
-                            <x-menu.item wire:click="resetColumns" class="p-2 flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                        <div>
+                            <x-menu.item wire:click="resetColumns" class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
                                 <x-svg.reset/>
                                 Réinitialiser
                             </x-menu.item>
@@ -682,8 +688,7 @@
                                         <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 p-1">
                                             <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                         </x-menu.button>
-                                        <x-menu.items
-                                            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-sm bg-white z-20">
+                                        <x-menu.items>
                                             <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
                                                 <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Voir l’aperçu') }}
@@ -692,7 +697,13 @@
                                                 <x-svg.help class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Voir en détail') }}
                                             </x-menu.item>
-                                            <x-divider />
+                                            <x-menu.divider />
+                                            @if(!$invoice->is_favorite)
+                                                <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
+                                                    <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                                                    {{ __('Mettre en favori') }}
+                                                </x-menu.item>
+                                            @endif
                                             <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
                                                 <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Télécharger') }}
@@ -776,14 +787,20 @@
                                             <x-menu.button class="rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 py-0.5 px-1">
                                                 <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                             </x-menu.button>
-                                            <x-menu.items class="origin-top-right absolute right-0 mt-1 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 z-30">
-                                                <x-menu.item wire:click="showEditPage({{ $invoice->id }})" class="group hover:bg-gray-50 dark:hover:bg-gray-700">
-                                                    <x-svg.edit class="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300"/>
-                                                    <span class="text-sm">{{ __('Modifier') }}</span>
+                                            <x-menu.items>
+                                                @if($invoice->is_favorite)
+                                                    <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
+                                                        <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                                                        {{ __('Retirer des favoris') }}
+                                                    </x-menu.item>
+                                                @endif
+                                                <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
+                                                    <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
+                                                    {{ __('Modifier') }}
                                                 </x-menu.item>
-                                                <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:bg-red-50 dark:hover:bg-red-900/20">
-                                                    <x-svg.trash class="w-4 h-4 text-gray-400 group-hover:text-red-500"/>
-                                                    <span class="text-sm group-hover:text-red-600 dark:group-hover:text-red-400">{{ __('Archiver') }}</span>
+                                                <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:text-red-600">
+                                                    <x-svg.trash class="w-4 h-4 group-hover:text-red-600"/>
+                                                    {{ __('Archiver') }}
                                                 </x-menu.item>
                                             </x-menu.items>
                                         </x-menu>

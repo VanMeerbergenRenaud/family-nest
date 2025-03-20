@@ -216,7 +216,7 @@ class Index extends Component
     public function toggleFavorite($invoiceId)
     {
         $this->invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
+        $this->invoice->update(['is_favorite' => ! $this->invoice->is_favorite]);
     }
 
     // Implémentations des fonctionnalités manquantes
