@@ -1,6 +1,6 @@
 <x-guest-layout>
     <!-- Hero Section avec éléments flottants -->
-    <div class="relative min-h-screen w-full overflow-hidden bg-gray-50"
+    <div class="relative min-h-screen w-full overflow-hidden bg-white"
          x-data="{
          showOnboarding: false,
          showMembers: false,
@@ -142,10 +142,10 @@
             </a>
 
             <div class="max-w-3xl text-center">
-                <h1 class="mb-8 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                <h1 class="mb-8 text-4xl font-medium text-gray-900 sm:text-5xl md:text-6xl">
                     Centralisez et organisez vos factures familiales
                 </h1>
-                <p class="mb-10 mx-auto max-w-2xl text-xl text-gray-500">
+                <p class="mb-10 mx-auto max-w-2xl text-[1.125rem] text-gray-500">
                     Dans un monde digital, gérez toutes vos factures efficacement au même endroit.
                     Visualisez vos dépenses, évitez les imprévus et collaborez avec votre famille pour une meilleure maîtrise financière.
                 </p>
@@ -170,7 +170,9 @@
         <div class="absolute bottom-1/4 right-1/3 -z-10 h-96 w-96 rounded-full bg-[#3b4d89]/5"></div>
         <div class="absolute bottom-1/3 left-1/2 -z-10 h-48 w-48 rounded-full bg-[#88c0d5]/5"></div>
     </div>
-        <p>
-            © {{ date('Y') }} FamilyNest - <a href="https://renaud-vmb.com">Renaud Vmb</a>. Tous droits réservés.
-        </p>
+
+    <p class="py-4 text-center text-sm text-gray-500">
+        © {{ date('Y') }} FamilyNest - Développé par <a href="https://renaud-vmb.com" class="text-sm  text-[#3b4d89] hover:text-[#9370db] transition duration-200" target="_blank" rel="noopener noreferrer"
+            > Renaud Vmb </a>. Tous droits réservés.
+    </p>
 </x-guest-layout>
