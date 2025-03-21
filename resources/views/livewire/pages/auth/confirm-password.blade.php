@@ -55,7 +55,7 @@ $confirmPassword = function () {
                 />
             </div>
 
-            <button type="submit" class="mt-4 px-4 py-2.5 rounded-md text-sm-medium bg-[#364153] text-gray-100">
+            <button type="submit" class="mt-4 button-secondary">
                 {{ __('Confirmer') }}
             </button>
         </form>

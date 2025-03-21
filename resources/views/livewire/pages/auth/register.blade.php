@@ -73,7 +73,7 @@ $register = function () {
             <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
             @if (Route::has('password.request'))
                 <a href="{{ route('password.request') }}" class="ml-3 min-w-fit text-sm-medium underline" title="Vers la page de réinitialisation de l'adresse mail" wire:navigate>
-                    {{ __('Adresse mail oubliée ?') }}
+                    {{ __("Mot de passe oublié ?") }}
                 </a>
             @endif
         </div>
@@ -90,7 +90,9 @@ $register = function () {
                 {{ __('Déjà un compte ?') }}
                 <a href="{{ route('login') }}"
                    class="text-sm-medium text-black custom-underline-link"
-                   title="Vers la page de connexion" wire:navigate>
+                   title="Vers la page de connexion"
+                   wire:navigate
+                >
                     {{ __('Se connecter') }}
                 </a>
             </div>

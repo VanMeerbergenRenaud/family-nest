@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "../../public/fonts/clash-grotesk/clash-grotesk.css";
+@import "../../public/fonts/instrument-sans/instrument-sans.css";
 
 @source "../views";
 
@@ -6,7 +8,8 @@
 
 @theme {
     --font-opensans: "Open Sans", sans-serif;
-    --font-satoshi: "Satoshi", "sans-serif";
+    --font-clashgrotesk: "Clash Grotesk", sans-serif;
+    --font-instrumentsans: "Instrument Sans", sans-serif;
 
     --color-light-white: #fafafa;
     --color-blue-dark: #364153;
@@ -31,11 +34,11 @@
         @apply m-0 p-0 bg-gray-50 dark:bg-bg-dark;
     }
 
-    h1, h2, h3, h4, h5, h6 {
-
+    h1, h2, h3, h4, h5, h6 {/*font-clashgrotesk*/
+        @apply font-medium;
     }
 
-    p, span {
+    p, span {/*font-instrumentsans*/
         @apply text-base font-normal;
     }
 

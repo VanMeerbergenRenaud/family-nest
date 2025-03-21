@@ -56,7 +56,7 @@ $directLogin = function () {
         @endif
 
         <!-- Liens de vérification ou de déconnexion -->
-        <div class="mt-5 flex flex flex-wrap gap-2">
+        <div class="mt-5 flex flex-wrap gap-2">
             <button type="button" wire:click="sendVerification" class="button-primary">
                 {{ __('Renvoyer un nouveau.') }}
             </button>

@@ -1,0 +1,234 @@
+/**
+* @license
+*
+* Font Family: Instrument Sans
+* Designed by: Luca Fontanella
+* URL: https://www.fontshare.com/fonts/instrument-sans
+* © 2025 Luca Fontanella
+
+* Instrument Sans Extralight
+* Instrument Sans Light
+* Instrument Sans Regular
+* Instrument Sans Medium
+* Instrument Sans Semibold
+* Instrument Sans Bold
+* Instrument Sans Variable (Variable font)
+*
+*/
+
+/* Polices standard */
+@font-face {
+  font-family: 'InstrumentSans-Regular';
+  src: url('InstrumentSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-Medium';
+  src: url('InstrumentSans-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiBold';
+  src: url('InstrumentSans-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-Bold';
+  src: url('InstrumentSans-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Polices italiques */
+@font-face {
+  font-family: 'InstrumentSans-Italic';
+  src: url('InstrumentSans-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-MediumItalic';
+  src: url('InstrumentSans-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiBoldItalic';
+  src: url('InstrumentSans-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-BoldItalic';
+  src: url('InstrumentSans-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+
+/* Polices condensées */
+@font-face {
+  font-family: 'InstrumentSans-Condensed';
+  src: url('InstrumentSans_Condensed-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedMedium';
+  src: url('InstrumentSans_Condensed-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedSemiBold';
+  src: url('InstrumentSans_Condensed-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedBold';
+  src: url('InstrumentSans_Condensed-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Polices condensées italiques */
+@font-face {
+  font-family: 'InstrumentSans-CondensedItalic';
+  src: url('InstrumentSans_Condensed-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedMediumItalic';
+  src: url('InstrumentSans_Condensed-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedSemiBoldItalic';
+  src: url('InstrumentSans_Condensed-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-CondensedBoldItalic';
+  src: url('InstrumentSans_Condensed-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+
+/* Polices semi-condensées */
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensed';
+  src: url('InstrumentSans_SemiCondensed-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedMedium';
+  src: url('InstrumentSans_SemiCondensed-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedSemiBold';
+  src: url('InstrumentSans_SemiCondensed-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedBold';
+  src: url('InstrumentSans_SemiCondensed-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* Polices semi-condensées italiques */
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedItalic';
+  src: url('InstrumentSans_SemiCondensed-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedMediumItalic';
+  src: url('InstrumentSans_SemiCondensed-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedSemiBoldItalic';
+  src: url('InstrumentSans_SemiCondensed-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-SemiCondensedBoldItalic';
+  src: url('InstrumentSans_SemiCondensed-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+  font-style: italic;
+}
+
+/* Polices variables */
+@font-face {
+  font-family: 'InstrumentSans-Variable';
+  src: url('InstrumentSans-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: normal;
+  font-stretch: 75% 100%;
+}
+
+@font-face {
+  font-family: 'InstrumentSans-VariableItalic';
+  src: url('InstrumentSans-Italic-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: 200 700;
+  font-display: swap;
+  font-style: italic;
+  font-stretch: 75% 100%;
+}

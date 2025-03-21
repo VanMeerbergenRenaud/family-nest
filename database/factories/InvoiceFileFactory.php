@@ -18,8 +18,8 @@ class InvoiceFileFactory extends Factory
 
         // Générer l'image
         $extension = $this->faker->randomElement(['jpg', 'jpeg', 'png', 'pdf', 'docx']);
-        $filename = $this->faker->unique()->word() . '.' . $extension;
-        $filePath = 'invoices/' . $filename;
+        $filename = $this->faker->unique()->word().'.'.$extension;
+        $filePath = 'invoices/'.$filename;
 
         $fileSize = $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024);
 
