@@ -6,14 +6,14 @@
 
 <div class="relative min-h-screen flex-center bg-gray-100">
     {{-- Arrow go back --}}
-    <div class="absolute top-4 left-4">
+    <div class="absolute top-4 left-4 max-sm:hidden">
         <a href="{{ route('welcome') }}"
            title="Retour à l'accueil"
            wire:navigate
-           class="flex-center p-2 pr-3 rounded-lg bg-gray-800 text-white text-sm-medium"
+           class="button-classic"
         >
-            <x-svg.arrows.left class="w-4 h-4"/>
-            <span class="ml-0.5 text-sm-medium">Retour</span>
+            <x-svg.arrows.left class="w-4 h-4 text-gray-700" />
+            Retour
         </a>
     </div>
 

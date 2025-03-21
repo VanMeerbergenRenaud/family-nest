@@ -80,7 +80,9 @@ $login = function () {
                 {{ __("Pas encore membre ?") }}
                 <a href="{{ route('register') }}"
                    class="text-sm-medium text-black custom-underline-link"
-                   title="Vers la page de connexion" wire:navigate>
+                   title="Vers la page de connexion"
+                   wire:navigate
+                >
                     {{ __("Créer un compte") }}
                 </a>
             </div>
