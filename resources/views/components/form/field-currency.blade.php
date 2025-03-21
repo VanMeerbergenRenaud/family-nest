@@ -102,6 +102,7 @@
                 @blur="updateLivewire()"
                 class="rounded-0 p-2.5 border-0 flex-grow w-[calc(100%-1.5rem)] text-sm-regular focus:outline-0 text-gray-700 dark:bg-gray-700 dark:text-white"
                 placeholder="{{ $placeholder }}"
+                {{ $attributes }}
             />
 
             <x-menu>

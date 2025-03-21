@@ -133,10 +133,6 @@ class Index extends Component
                 'count' => $invoice->where('payment_status', 'late')->count(),
                 'amount' => $invoice->where('payment_status', 'late')->sum('amount'),
             ],
-            'last_week' => [
-                'count' => $invoice->where('issued_date', '>=', now()->subWeek())->count(),
-                'amount' => $invoice->where('issued_date', '>=', now()->subWeek())->sum('amount'),
-            ],
             'high_priority' => [
                 'count' => $invoice->where('priority', 'high')->count(),
                 'amount' => $invoice->where('priority', 'high')->sum('amount'),
@@ -253,10 +249,22 @@ class Index extends Component
 
     public function showInvoiceModal($id)
     {
-        $invoice = auth()->user()->invoices()->with('file')->findOrFail($id);
+        $invoice = auth()->user()->invoices()
+            ->with('file')
+            ->findOrFail($id);
+
         $this->invoice = $invoice;
-        $this->filePath = $invoice->file->file_path;
-        $this->fileExtension = $invoice->file->file_extension;
+
+        // Vérifier si le fichier existe avant d'accéder à ses propriétés
+        if ($invoice->file) {
+            $this->filePath = $invoice->file->file_path;
+            $this->fileExtension = $invoice->file->file_extension;
+        } else {
+            // Définir des valeurs par défaut si aucun fichier n'est trouvé
+            $this->filePath = null;
+            $this->fileExtension = null;
+        }
+
         $this->showFolderModal = false;
         $this->showInvoicePreviewModal = true;
     }
@@ -299,7 +307,7 @@ class Index extends Component
                 fn ($query) => $query->orderBy($this->sortField, $this->sortDirection)
             )
             ->where('is_archived', false)
-            ->paginate(10);
+            ->paginate(8);
 
         $this->recentInvoices = auth()->user()->invoices()
             ->with('file')

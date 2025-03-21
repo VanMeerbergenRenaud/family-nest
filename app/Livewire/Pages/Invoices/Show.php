@@ -21,6 +21,6 @@ class Show extends Component
     public function render()
     {
         return view('livewire.pages.invoices.show')
-            ->layout('layouts.app');
+            ->layout('layouts.app-sidebar');
     }
 }

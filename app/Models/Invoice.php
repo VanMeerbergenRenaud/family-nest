@@ -30,6 +30,8 @@ class Invoice extends Model
         'is_favorite' => 'boolean',
     ];
 
+    protected $with = ['file'];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

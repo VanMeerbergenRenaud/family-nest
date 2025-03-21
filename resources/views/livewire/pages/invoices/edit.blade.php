@@ -65,7 +65,7 @@
                                 @if ($isImage)
                                     <img src="{{ $storagePath }}"
                                          alt="Aperçu de la facture"
-                                         class="bg-gray-100 rounded-xl max-h-[50vh]"
+                                         class="bg-gray-100 rounded-xl max-h-[50vh] text-center"
                                     />
                                 @elseif ($isPdf)
                                     <div class="w-full h-[40vh] overflow-hidden rounded-xl">
@@ -233,7 +233,8 @@
                             label="Montant total à payer"
                             name="form.amount"
                             model="form.amount"
-                            defaultCurrency="EUR"
+                            :initialValue="$form->amount"
+                            defaultCurrency="{{ $form->currency }}"
                             placeholder="0,00"
                             asterix="true"
                         />

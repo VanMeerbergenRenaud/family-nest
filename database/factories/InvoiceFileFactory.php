@@ -13,17 +13,20 @@ class InvoiceFileFactory extends Factory
      */
     public function definition(): array
     {
-        // Liste des extensions possibles
-        $extension = $this->faker->randomElement(['pdf', 'docx', 'jpg', 'jpeg', 'png']);
+        // Assurez-vous que le répertoire existe
+        $directory = storage_path('app/public/invoices');
 
-        // Nom du fichier fictif
-        $filename = 'invoice_'.$this->faker->unique()->numberBetween(1000, 9999).'.'.$extension;
+        // Générer l'image
+        $extension = $this->faker->randomElement(['jpg', 'jpeg', 'png', 'pdf', 'docx']);
+        $filename = $this->faker->unique()->word() . '.' . $extension;
+        $filePath = 'invoices/' . $filename;
 
-        // Chemin du fichier dans le stockage
-        $filePath = 'invoices/'.$filename;
-
-        // Taille aléatoire du fichier en octets (entre 100Ko et 5Mo)
         $fileSize = $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024);
+
+        // Compression du fichier pdf
+        $compressionStatus = $this->faker->randomElement(['null', 'pending', 'completed', 'failed']);
+        $originalSize = $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024);
+        $compressionRate = $this->faker->randomFloat(2, 0, 100);
 
         return [
             'file_name' => $filename,
@@ -31,9 +34,9 @@ class InvoiceFileFactory extends Factory
             'file_extension' => $extension,
             'file_size' => $fileSize,
             'is_primary' => $this->faker->boolean(),
-            'compression_status' => $this->faker->randomElement(['null', 'pending', 'completed', 'failed']),
-            'original_size' => $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024),
-            'compression_rate' => $this->faker->randomFloat(2, 0, 100),
+            'compression_status' => $compressionStatus,
+            'original_size' => $originalSize,
+            'compression_rate' => $compressionRate,
         ];
     }
 }

@@ -466,15 +466,19 @@ class InvoiceForm extends Form
         $this->issuer_website = $invoice->issuer_website;
 
         // Détails financiers
-        $this->amount = is_numeric($invoice->amount) ? (float) $invoice->amount : null;
+        // Nb: pour le montant, on le stocke simplement comme un nombre,
+        $this->amount = is_numeric($invoice->amount)
+            ? (float) $invoice->amount
+            : null;
+
         $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
-        $this->associated_members = $invoice->associated_members;
+        $this->associated_members = is_array($invoice->associated_members) ? $invoice->associated_members : [];
 
-        // Dates
-        $this->issued_date = $invoice->issued_date;
-        $this->payment_due_date = $invoice->payment_due_date;
-        $this->payment_reminder = $invoice->payment_reminder;
+        // Dates - Les formater au format Y-m-d pour les champs input
+        $this->issued_date = $invoice->issued_date ? date('Y-m-d', strtotime($invoice->issued_date)) : null;
+        $this->payment_due_date = $invoice->payment_due_date ? date('Y-m-d', strtotime($invoice->payment_due_date)) : null;
+        $this->payment_reminder = $invoice->payment_reminder ? date('Y-m-d', strtotime($invoice->payment_reminder)) : null;
         $this->payment_frequency = $invoice->payment_frequency;
 
         // Statut de paiement
@@ -484,7 +488,7 @@ class InvoiceForm extends Form
 
         // Notes et tags
         $this->notes = $invoice->notes;
-        $this->tags = $invoice->tags;
+        $this->tags = is_array($invoice->tags) ? $invoice->tags : [];
 
         // États
         $this->is_archived = $invoice->is_archived;

@@ -42,35 +42,4 @@ class InvoiceFile extends Model
             get: fn ($value) => asset('storage/'.$value),
         );
     }
-
-    // Obtenir la taille formatée du fichier
-    public function getFormattedFileSizeAttribute(): string
-    {
-        if (! $this->file_size) {
-            return '0 B';
-        }
-
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $power = $this->file_size > 0 ? floor(log($this->file_size, 1024)) : 0;
-
-        return number_format($this->file_size / pow(1024, $power), 2).' '.$units[$power];
-    }
-
-    // Déterminer si le fichier est une image
-    public function getIsImageAttribute(): bool
-    {
-        return in_array(strtolower($this->file_extension), ['jpg', 'jpeg', 'png', 'gif']);
-    }
-
-    // Déterminer si le fichier est un PDF
-    public function getIsPdfAttribute(): bool
-    {
-        return strtolower($this->file_extension) === 'pdf';
-    }
-
-    // Déterminer si le fichier est un document Word
-    public function getIsDocxAttribute(): bool
-    {
-        return strtolower($this->file_extension) === 'docx';
-    }
 }
