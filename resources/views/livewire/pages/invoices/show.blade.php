@@ -2,7 +2,7 @@
     <div class="relative flex-center overflow-hidden border border-slate-200 bg-gray-100 rounded-xl">
 
         @php
-            $uploadedFile = $invoice->file->file_path;
+            $uploadedFile = $invoice->file->file_path ?? null;
 
             $isImage = $uploadedFile && preg_match('/\.(jpg|jpeg|png|gif)$/i', $uploadedFile);
             $isPdf = $uploadedFile && preg_match('/\.pdf$/i', $uploadedFile);

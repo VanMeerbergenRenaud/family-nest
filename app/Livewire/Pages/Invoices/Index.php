@@ -21,9 +21,7 @@ class Index extends Component
 
     public bool $showInvoicePreviewModal = false;
 
-    public bool $showArchiveFormModal = false;
-
-    public bool $archivedWithSuccess = false;
+    public bool $archivedWithSuccess;
 
     public bool $downloadNotWorking = false;
 
@@ -70,7 +68,7 @@ class Index extends Component
     ];
 
     // Méthodes pour le dossier
-    public function openFolder($folder, $title)
+    public function openFolder($folder, $title): void
     {
         $this->currentFolder = $folder;
         $this->folderTitle = $title;
@@ -269,29 +267,16 @@ class Index extends Component
         $this->showInvoicePreviewModal = true;
     }
 
-    public function showInvoicePage($id)
-    {
-        $this->redirectRoute('invoices.show', $id);
-    }
-
-    public function showEditPage($id)
-    {
-        $this->redirectRoute('invoices.edit', $id);
-    }
-
-    public function showArchiveForm($id)
-    {
-        $this->invoice = auth()->user()->invoices()->findOrFail($id);
-        $this->showFolderModal = false;
-        $this->showArchiveFormModal = true;
-    }
-
-    public function archiveInvoice()
+    public function archiveInvoice($invoiceId): void
     {
         try {
+            $this->invoice = Invoice::where('id', $invoiceId)
+                ->where('is_archived', false)
+                ->firstOrFail();
+
             $this->invoice->update(['is_archived' => true]);
 
-            $this->showArchiveFormModal = false;
+            $this->showFolderModal = false;
             $this->archivedWithSuccess = true;
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
@@ -312,8 +297,8 @@ class Index extends Component
         $this->recentInvoices = auth()->user()->invoices()
             ->with('file')
             ->where('is_archived', false)
-            ->orderBy('created_at', 'desc')
-            ->limit(5)
+            ->orderBy('updated_at', 'desc')
+            ->limit(8)
             ->get();
 
         $folderStats = $this->getFolderStats();

@@ -408,6 +408,7 @@ class InvoiceForm extends Form
             $this->invoice->update([
                 'is_archived' => false,
             ]);
+
             $this->is_archived = false;
 
             return true;
@@ -418,7 +419,7 @@ class InvoiceForm extends Form
         }
     }
 
-    public function forceDelete(): bool
+    public function delete(): bool
     {
         if (! $this->invoice) {
             return false;
@@ -427,19 +428,11 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            // Récupérer tous les fichiers liés
-            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
-
-            // Supprimer chaque fichier physique du stockage
-            foreach ($files as $file) {
-                if (Storage::disk('public')->exists($file->getRawOriginal('file_path'))) {
-                    Storage::disk('public')->delete($file->getRawOriginal('file_path'));
-                }
-                $file->delete();
-            }
+            // Supprimer les fichiers de la base de données
+            $this->invoice->files()->delete();
 
             // Supprimer la facture
-            $this->invoice->forceDelete();
+            $this->invoice->delete();
 
             DB::commit();
 

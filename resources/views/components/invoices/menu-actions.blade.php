@@ -16,7 +16,7 @@
             {{ __('Voir l‘aperçu') }}
         </x-menu.item>
 
-        <x-menu.item wire:click="showInvoicePage({{ $invoice->id }})">
+        <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}">
             <x-svg.binocular class="w-4 h-4 group-hover:text-gray-900"/>
             {{ __('Voir en détail') }}
         </x-menu.item>
@@ -37,12 +37,12 @@
             {{ __('Télécharger') }}
         </x-menu.item>
 
-        <x-menu.item wire:click="showEditPage({{ $invoice->id }})">
+        <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
             <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
             {{ __('Modifier') }}
         </x-menu.item>
 
-        <x-menu.item wire:click="showArchiveForm({{ $invoice->id }})" class="group hover:text-red-500">
+        <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
             <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
             {{ __('Archiver') }}
         </x-menu.item>
