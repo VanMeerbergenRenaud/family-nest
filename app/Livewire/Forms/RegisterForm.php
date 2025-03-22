@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Forms;
 
+use App\Mail\WelcomeMessage;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Validate;
@@ -40,6 +42,12 @@ class RegisterForm extends Form
         event(new Registered(($user = User::create($validated))));
 
         Auth::login($user);
+
+        try {
+            Mail::to($user->email)->send(new WelcomeMessage($user));
+        } catch (\Exception $e) {
+            \Log::error('Erreur avec Mailgun (inscription) : ' . $e->getMessage());
+        }
 
         Session::regenerate();
     }
