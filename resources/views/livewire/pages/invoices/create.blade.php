@@ -167,8 +167,8 @@
                             @endforeach
                         </x-form.select>
 
-                        <x-form.select name="form.associated_members" model="form.associated_members" label="Associé à un membre de la famille">
-                            <option value="" disabled>Sélectionner un membre</option>
+                        <x-form.select name="form.associated_members" model="form.associated_members" label="Associé à un membre de la famille" multiple>
+                            <option value="[]" selected>Sélectionner un membre</option>
                             @foreach($family_members as $member)
                                 <option value="{{ $member->name }}">{{ $member->name }}</option>
                             @endforeach

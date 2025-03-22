@@ -264,7 +264,7 @@ class InvoiceForm extends Form
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
-                'associated_members' => $this->associated_members ?? null,
+                'associated_members' => $this->associated_members ?? [],
                 // Dates
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
@@ -276,7 +276,7 @@ class InvoiceForm extends Form
                 'priority' => $this->priority,
                 // Notes et tags
                 'notes' => $this->notes,
-                'tags' => $this->tags ?? null,
+                'tags' => $this->tags ?? [],
                 // Archives et favoris
                 'is_archived' => $this->is_archived,
                 'is_favorite' => $this->is_favorite,

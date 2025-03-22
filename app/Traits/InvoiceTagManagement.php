@@ -82,7 +82,7 @@ trait InvoiceTagManagement
         $invoices = DB::table('invoices')
             ->where('user_id', auth()->id())
             ->whereNotNull('tags')
-            ->where('tags', '<>', '[]')
+            ->whereRaw("tags != '[]'")
             ->select('tags')
             ->get();
 
