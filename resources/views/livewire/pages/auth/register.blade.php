@@ -4,10 +4,13 @@ use App\Livewire\Forms\RegisterForm;
 
 use function Livewire\Volt\form;
 use function Livewire\Volt\layout;
+use function Livewire\Volt\state;
 
 layout('layouts.guest');
 
 form(RegisterForm::class);
+
+state(['showGeneralCondition' => false]);
 
 $register = function () {
     $this->validate();
@@ -15,6 +18,10 @@ $register = function () {
     $this->form->register();
 
     $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+};
+
+$showConditions = function () {
+    $this->showGeneralCondition = true;
 };
 
 ?>
@@ -56,26 +63,13 @@ $register = function () {
                 autocomplete="new-password"
                 required
             />
-
-            <!-- Confirm Password -->
-            {{--<div>
-                <x-form.field-password
-                    label="Confirmer le mot de passe"
-                    name="password_confirmation"
-                    model="form.password_confirmation"
-                    autocomplete="new-password"
-                    required
-                />
-            </div>--}}
         </div>
 
         <div class="mt-6 md:px-2 flex items-center justify-between">
-            <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="ml-3 min-w-fit text-sm-medium underline" title="Vers la page de réinitialisation de l'adresse mail" wire:navigate>
-                    {{ __("Mot de passe oublié ?") }}
-                </a>
-            @endif
+            <x-form.checkbox-input checked name="general_conditions" model="form.general_conditions" label="Accepter les conditions générales" />
+            <button type="button" wire:click="showConditions" class="ml-3 min-w-fit text-sm-medium text-indigo-600 underline">
+                {{ __("Voir les conditions") }}
+            </button>
         </div>
 
         <div class="mt-8 mb-5">
@@ -98,4 +92,85 @@ $register = function () {
             </div>
         @endif
     </form>
+
+    @if($showGeneralCondition)
+        <x-modal wire:model="showGeneralCondition">
+            <x-modal.panel>
+                <div class="flex gap-x-6 p-6">
+                    <div class="-mr-1 -mt-1 p-3 w-fit h-fit rounded-full bg-gray-100">
+                        <x-svg.conditions />
+                    </div>
+
+                    <div>
+                        <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                            {{ __('Conditions générales d\'utilisation') }}
+                        </h3>
+                        <div class="mt-6 text-md-regular text-gray-500">
+                            <div class="overflow-y-auto max-h-96 pr-2">
+                                <h4 class="font-semibold mb-2">1. Introduction</h4>
+                                <p class="mb-3">
+                                    Bienvenue sur notre plateforme. Les présentes conditions générales d'utilisation régissent votre utilisation de notre service et constituent un accord légal entre vous et notre entreprise.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">2. Acceptation des conditions</h4>
+                                <p class="mb-3">
+                                    En vous inscrivant et en utilisant notre service, vous acceptez d'être lié par ces conditions. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">3. Description du service</h4>
+                                <p class="mb-3">
+                                    Notre service offre une solution de gestion de facturation en ligne permettant aux utilisateurs de créer, gérer et suivre leurs factures et clients.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">4. Inscription et compte</h4>
+                                <p class="mb-3">
+                                    Pour utiliser notre service, vous devez créer un compte en fournissant des informations exactes et complètes. Vous êtes responsable de maintenir la confidentialité de votre mot de passe et de toutes les activités qui se produisent sous votre compte.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">5. Protection des données personnelles</h4>
+                                <p class="mb-3">
+                                    Nous traitons vos données personnelles conformément à notre politique de confidentialité. En utilisant notre service, vous consentez à ce traitement de vos données personnelles.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">6. Limites de responsabilité</h4>
+                                <p class="mb-3">
+                                    Notre service est fourni "tel quel" sans garantie d'aucune sorte. Nous ne serons pas responsables des dommages directs, indirects, accessoires ou consécutifs résultant de votre utilisation du service.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">7. Droits de propriété intellectuelle</h4>
+                                <p class="mb-3">
+                                    Tous les droits de propriété intellectuelle sur le service et son contenu restent notre propriété ou celle de nos concédants de licence. Vous ne pouvez pas utiliser notre contenu sans notre autorisation écrite.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">8. Résiliation</h4>
+                                <p class="mb-3">
+                                    Nous nous réservons le droit de résilier ou de suspendre votre compte et l'accès au service, à notre seule discrétion, sans préavis, pour toute violation des présentes conditions.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">9. Modifications des conditions</h4>
+                                <p class="mb-3">
+                                    Nous pouvons modifier ces conditions à tout moment. Les modifications prennent effet dès leur publication. Votre utilisation continue du service après de telles modifications constitue votre acceptation des conditions modifiées.
+                                </p>
+
+                                <h4 class="font-semibold mb-2">10. Loi applicable et juridiction</h4>
+                                <p class="mb-3">
+                                    Ces conditions sont régies par la loi applicable dans votre pays. Tout litige relatif à ces conditions sera soumis à la juridiction exclusive des tribunaux compétents de votre pays.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">
+                    <div class="flex justify-end w-full gap-3">
+                        <x-modal.close>
+                            <button type="button" class="button-secondary">
+                                {{ __('Fermer') }}
+                            </button>
+                        </x-modal.close>
+                    </div>
+                </x-modal.footer>
+            </x-modal.panel>
+        </x-modal>
+    @endif
 </x-auth-template>

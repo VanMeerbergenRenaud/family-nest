@@ -805,11 +805,12 @@
                                                     title="Voir">
                                                 <x-svg.show class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                             </button>
-                                            <button wire:click="showEditPage({{ $invoice->id }})"
+                                            <a href="{{ route('invoices.edit', $invoice->id) }}"
+                                                    wire:navigate
                                                     class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                                    title="Modifier">
+                                                    title="Aller vers la page d'édition">
                                                 <x-svg.edit class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </div>

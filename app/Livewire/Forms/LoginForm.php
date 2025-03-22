@@ -26,7 +26,7 @@ class LoginForm extends Form
     {
         return [
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
-            'password' => ['required', 'string', 'min:8', Rules\Password::defaults()],
+            'password' => ['required', 'string', Rules\Password::defaults()],
         ];
     }
 
