@@ -75,9 +75,9 @@ trait InvoiceTagManagement
     private function searchTagsWithDatabase($query): array
     {
         $tag = DB::table('invoices')
-                ->where('user_id', auth()->id())
-                ->whereNotNull('tags')
-                ->count() === 0;
+            ->where('user_id', auth()->id())
+            ->whereNotNull('tags')
+            ->count() === 0;
 
         // Vérifier si l'utilisateur possède des tags dans sa db
         if ($tag) {

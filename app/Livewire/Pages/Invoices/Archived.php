@@ -16,11 +16,6 @@ class Archived extends Component
 
     public bool $deletedWithSuccess = false;
 
-    public function mount(): void
-    {
-
-    }
-
     public function restoreInvoice($invoiceId): void
     {
         $invoice = auth()->user()->invoices()

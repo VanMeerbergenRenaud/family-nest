@@ -6,37 +6,43 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rules;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class RegisterForm extends Form
 {
-    #[Validate('required|string|max:255')]
+    #[Validate]
     public string $name = '';
 
-    #[Validate('required|string|lowercase|email|max:255|unique:users,email')]
+    #[Validate]
     public string $email = '';
 
-    #[Validate('required|string|min:8|max:255')]
+    #[Validate]
     public string $password = '';
 
-    /*#[Validate('required|string|min:8|max:255|same:password')]
-    public string $password_confirmation = '';*/
+    #[Validate('boolean')]
+    public bool $remember = false;
 
-    /**
-     * Register a new user.
-     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'lowercase', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', Rules\Password::defaults()],
+        ];
+    }
+
     public function register(): void
     {
-        $validated = $this->validate();
+        $user = User::create([
+            'name' => $this->name,
+            'email' => $this->email,
+            'password' => Hash::make($this->password),
+        ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        event(new Registered($user));
 
-        event(new Registered($user = User::create($validated)));
-
-        Auth::login($user);
-
-        Session::regenerate();
+        Auth::login($user, $this->remember);
     }
 }

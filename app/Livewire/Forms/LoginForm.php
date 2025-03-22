@@ -6,20 +6,29 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class LoginForm extends Form
 {
-    #[Validate('required|string|lowercase|email|max:255')]
+    #[Validate]
     public string $email = '';
 
-    #[Validate('required|string|min:8|max:255')]
+    #[Validate]
     public string $password = '';
 
     #[Validate('boolean')]
     public bool $remember = false;
+
+    public function rules(): array
+    {
+        return [
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'password' => ['required', 'string', 'min:8', Rules\Password::defaults()],
+        ];
+    }
 
     /**
      * Authenticate the user with the application.
