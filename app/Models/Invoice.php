@@ -69,4 +69,17 @@ class Invoice extends Model
     {
         return ! $this->is_archived;
     }
+
+    // Rechercher des factures par nom, référence, type, catégorie, montant, émetteur ou tags
+    public function scopeSearch($query, $searchTerm)
+    {
+        return $query->where(function ($query) use ($searchTerm) {
+            $query->where('name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('reference', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('type', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('category', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('issuer_name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('tags', 'LIKE', "%{$searchTerm}%");
+        });
+    }
 }

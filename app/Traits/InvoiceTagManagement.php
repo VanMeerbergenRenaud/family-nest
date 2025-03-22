@@ -20,7 +20,7 @@ trait InvoiceTagManagement
     {
         // Initialiser le tableau des tags s'il est null
         if (! is_array($this->form->tags)) {
-            $this->form->tags = [];
+            $this->form->tags = [] ?? null;
         }
     }
 
@@ -83,7 +83,6 @@ trait InvoiceTagManagement
             ->where('user_id', auth()->id())
             ->whereNotNull('tags')
             ->where('tags', '<>', '[]')
-            ->where('tags', '<>', '""[]""')
             ->select('tags')
             ->get();
 

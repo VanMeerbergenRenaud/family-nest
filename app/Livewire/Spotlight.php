@@ -32,8 +32,8 @@ class Spotlight extends Component
         $this->results = collect();
 
         // Search for users and invoices
-        $userResults = User::search($value)->take(3)->get();
-        $invoiceResults = Invoice::search($value)->take(3)->get();
+        $userResults = auth()->user()->search($value)->take(3)->get();
+        $invoiceResults = auth()->user()->invoices()->search($value)->take(3)->get();
 
         // Concat results into a single collection
         $this->results = $this->results->concat($userResults)->concat($invoiceResults);
