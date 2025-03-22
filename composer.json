@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
+        "mailersend/laravel-driver": "^2.8",
         "meilisearch/meilisearch-php": "^1.13",
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/google": "^4.1",

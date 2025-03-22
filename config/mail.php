@@ -42,6 +42,10 @@ return [
             'transport' => 'mailgun',
         ],
 
+        'mailersend' => [
+            'transport' => 'mailersend',
+        ],
+
         // mailpit
         'mailpit' => [
             'transport' => 'smtp',

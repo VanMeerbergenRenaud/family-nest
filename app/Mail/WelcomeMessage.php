@@ -2,24 +2,30 @@
 
 namespace App\Mail;
 
-use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Arr;
+use Log;
+use MailerSend\Exceptions\MailerSendAssertException;
+use MailerSend\Helpers\Builder\Personalization;
+use MailerSend\LaravelDriver\MailerSendTrait;
 
 class WelcomeMessage extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, MailerSendTrait;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(
-        protected User $user,
-    ) {}
+    public function __construct()
+    {
+        //
+    }
 
     /**
      * Get the message envelope.
@@ -27,7 +33,7 @@ class WelcomeMessage extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome to Our Platform',
+            subject: 'Test Email',
         );
     }
 
@@ -36,21 +42,52 @@ class WelcomeMessage extends Mailable
      */
     public function content(): Content
     {
+        $to = Arr::get($this->to, '0.address');
+
+        // Additional options for MailerSend API features
+        try {
+            $this->mailersend(
+                template_id: null,
+                tags: ['tag'],
+                personalization: [
+                    new Personalization($to, [
+                        'var' => 'variable',
+                        'number' => 123,
+                        'object' => [
+                            'key' => 'object-value'
+                        ],
+                        'objectCollection' => [
+                            [
+                                'name' => 'John'
+                            ],
+                            [
+                                'name' => 'Patrick'
+                            ]
+                        ],
+                    ])
+                ],
+                precedenceBulkHeader: true,
+                sendAt: new Carbon('2022-01-28 11:53:20'),
+            );
+        } catch (MailerSendAssertException $e) {
+            Log::error('MailerSendAssertException: ' . $e->getMessage());
+        }
+
         return new Content(
             view: 'emails.welcome',
-            with: [
-                'name' => $this->user->name,
-            ],
+            text: 'emails.welcome'
         );
     }
 
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {
-        return [];
+        return [
+            Attachment::fromStorageDisk('public', 'img/img_placeholder.jpg')
+        ];
     }
 }
