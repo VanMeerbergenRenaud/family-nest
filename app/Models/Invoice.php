@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
@@ -15,7 +16,7 @@ class Invoice extends Model
 
     protected $fillable = [
         'name', 'type', 'category', 'issuer_name', 'issuer_website',
-        'amount', 'currency', 'paid_by', 'associated_members', 'issued_date', 'payment_due_date',
+        'amount', 'currency', 'paid_by', 'paid_by_id', 'issued_date', 'payment_due_date',
         'payment_reminder', 'payment_frequency', 'payment_status', 'payment_method', 'priority',
         'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
     ];
@@ -24,7 +25,6 @@ class Invoice extends Model
         'amount' => 'decimal:2',
         'issued_date' => 'date',
         'payment_due_date' => 'date',
-        'associated_members' => 'array',
         'tags' => 'array',
         'is_archived' => 'boolean',
         'is_favorite' => 'boolean',
@@ -81,5 +81,63 @@ class Invoice extends Model
                 ->orWhere('issuer_name', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('tags', 'LIKE', "%{$searchTerm}%");
         });
+    }
+
+    /**
+     * Get the primary file for the invoice.
+     */
+    public function primaryFile()
+    {
+        return $this->hasOne(InvoiceFile::class)->where('is_primary', true);
+    }
+
+    /**
+     * Get the family member who paid the invoice.
+     */
+    public function payer(): BelongsTo
+    {
+        return $this->belongsTo(Family::class, 'paid_by_id');
+    }
+
+    /**
+     * Get the family members who share this invoice.
+     */
+    public function familyShares(): BelongsToMany
+    {
+        return $this->belongsToMany(Family::class, 'invoice_family')
+            ->withPivot('share_amount', 'share_percentage')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the total amount of shares allocated.
+     */
+    public function getTotalSharedAmount()
+    {
+        return $this->familyShares()->sum('share_amount');
+    }
+
+    /**
+     * Get the total percentage of shares allocated.
+     */
+    public function getTotalSharedPercentage()
+    {
+        return $this->familyShares()->sum('share_percentage');
+    }
+
+    /**
+     * Check if the invoice has been fully allocated by percentage.
+     */
+    public function isFullyAllocatedByPercentage(): bool
+    {
+        return $this->getTotalSharedPercentage() >= 100;
+    }
+
+    /**
+     * Check if the invoice has been fully allocated by amount.
+     */
+    public function isFullyAllocatedByAmount(): bool
+    {
+        return $this->getTotalSharedAmount() >= $this->amount;
     }
 }

@@ -60,9 +60,12 @@ class InvoiceForm extends Form
 
     public $currency = 'EUR';
 
-    public $paid_by;
+    // Nouveaux champs pour la gestion des paiements par membre de famille
+    public $paid_by_id;  // ID du membre qui paie la facture
 
-    public $associated_members = [];
+    public $paid_by;     // Pour compatibilité avec l'ancien système
+
+    public $family_shares = [];      // Nouvelle version - array de [id => family_id, amount => montant, percentage => pourcentage]
 
     // Dates
     #[Validate]
@@ -123,8 +126,12 @@ class InvoiceForm extends Form
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
+            'paid_by_id' => 'nullable|exists:families,id',
             'paid_by' => 'nullable|string|max:255',
-            'associated_members' => 'nullable|array',
+            'family_shares' => 'nullable|array',
+            'family_shares.*.id' => 'required|exists:families,id',
+            'family_shares.*.amount' => 'nullable|numeric|min:0',
+            'family_shares.*.percentage' => 'nullable|numeric|min:0|max:100',
 
             // Étape 3 - Dates
             'issued_date' => 'nullable|date',
@@ -171,6 +178,9 @@ class InvoiceForm extends Form
             'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
             'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
             'tags.array' => 'Les tags doivent être un tableau.',
+            'family_shares.*.amount' => 'Le montant de la part doit être un nombre valide.',
+            'family_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
+            'paid_by_id.exists' => 'Le membre de famille sélectionné n\'existe pas.',
         ];
     }
 
@@ -264,7 +274,7 @@ class InvoiceForm extends Form
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
-                'associated_members' => $this->associated_members ?? [],
+                'paid_by_id' => $this->paid_by_id,
                 // Dates
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
@@ -292,6 +302,9 @@ class InvoiceForm extends Form
                 $invoiceData['user_id'] = auth()->user()->id;
                 $invoice = auth()->user()->invoices()->create($invoiceData);
             }
+
+            // Traitement des parts de famille
+            $this->processInvoiceShares($invoice);
 
             // Traitement du fichier si présent
             if ($this->uploadedFile) {
@@ -361,6 +374,25 @@ class InvoiceForm extends Form
             Log::error('Erreur lors du traitement de la facture: '.$e->getMessage());
 
             return false;
+        }
+    }
+
+    // Traite les parts de famille pour la facture
+    private function processInvoiceShares(Invoice $invoice): void
+    {
+        // Supprimer d'abord toutes les anciennes parts
+        $invoice->familyShares()->detach();
+
+        // Si nous avons des parts à ajouter
+        if (! empty($this->family_shares)) {
+            foreach ($this->family_shares as $share) {
+                if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
+                    $invoice->familyShares()->attach($share['id'], [
+                        'share_amount' => $share['amount'] ?? null,
+                        'share_percentage' => $share['percentage'] ?? null,
+                    ]);
+                }
+            }
         }
     }
 
@@ -459,14 +491,23 @@ class InvoiceForm extends Form
         $this->issuer_website = $invoice->issuer_website;
 
         // Détails financiers
-        // Nb: pour le montant, on le stocke simplement comme un nombre,
         $this->amount = is_numeric($invoice->amount)
             ? (float) $invoice->amount
             : null;
 
         $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
-        $this->associated_members = is_array($invoice->associated_members) ? $invoice->associated_members : [];
+        $this->paid_by_id = $invoice->paid_by_id;
+
+        // Charger les parts de famille
+        $this->family_shares = [];
+        foreach ($invoice->familyShares as $share) {
+            $this->family_shares[] = [
+                'id' => $share->id,
+                'amount' => $share->pivot->share_amount,
+                'percentage' => $share->pivot->share_percentage,
+            ];
+        }
 
         // Dates - Les formater au format Y-m-d pour les champs input
         $this->issued_date = $invoice->issued_date ? date('Y-m-d', strtotime($invoice->issued_date)) : null;

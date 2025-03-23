@@ -46,26 +46,141 @@
             @endif
         </x-invoices.create.summary-item>
 
-        <x-invoices.create.summary-item label="Répartition du montant" :alternateBackground="true">
+        <x-invoices.create.summary-item label="Montant et répartition" :alternateBackground="true">
             @if(!empty($form->amount))
-                @if($form->paid_by)
-                    <span class="block">
-                        <span class="text-sm-regular">Payée par :</span>
-                        <span class="text-sm-medium">{{ $form->paid_by }}</span>
-                    </span>
-                @endif
-                @if($form->associated_members)
-                    <span class="block">
-                        <span class="text-sm-regular">Associée à :</span>
-                        @foreach($form->associated_members as $member)
-                            <span class="text-sm-medium">
-                                {{ $member }}@if(!$loop->last), @endif
-                            </span>
-                        @endforeach
-                    </span>
-                @endif
+                @php
+                    $family_members = $form->family_members ?? collect();
+
+                    // Récupérer les informations du payeur
+                    $payerName = "Non spécifié";
+                    $payerId = null;
+                    if ($form->paid_by_id) {
+                        $payer = $family_members->firstWhere('id', $form->paid_by_id);
+                        if ($payer) {
+                            $payerName = $payer->name;
+                            $payerId = $payer->id;
+                        }
+                    } elseif ($form->paid_by) {
+                        $payerName = $form->paid_by;
+                    }
+
+                    // Calculer les totaux
+                    $totalShared = 0;
+                    $totalPercentage = 0;
+                    if (!empty($form->family_shares)) {
+                        foreach ($form->family_shares as $share) {
+                            $totalShared += $share['amount'] ?? 0;
+                            $totalPercentage += $share['percentage'] ?? 0;
+                        }
+                    }
+
+                    // Déterminer le statut de la répartition
+                    $isFullyShared = abs($totalPercentage - 100) < 0.1 || abs($totalShared - $form->amount) < 0.01;
+                    $isOverShared = $totalPercentage > 100.1 || $totalShared > ($form->amount + 0.01);
+
+                    // Calculer le montant restant
+                    $remainingAmount = $form->amount - $totalShared;
+                    $remainingPercentage = 100 - $totalPercentage;
+
+                    // Formater pour l'affichage
+                    $formattedTotal = number_format($form->amount, 2, ',', ' ');
+                    $formattedShared = number_format($totalShared, 2, ',', ' ');
+                    $formattedRemaining = number_format(abs($remainingAmount), 2, ',', ' ');
+
+                    // Premier caractère du nom pour l'avatar
+                    $firstChar = substr($payerName, 0, 1);
+                @endphp
+
+                <div class="space-y-2">
+                    <!-- Nom du payeur -->
+                    <div class="flex justify-between items-center">
+                        <p class="text-sm-regular">
+                            Payeur :
+                            @if($payerName)
+                                <span class="text-sm-medium">
+                                    <img src="{{ $payerName ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
+                                    {{ $payerName }}
+                                </span>
+                            @else
+                                <span class="text-sm-medium">Non spécifié</span>
+                            @endif
+                        </p>
+                    </div>
+
+                    <!-- Détail des parts -->
+                    @if(!empty($form->family_shares))
+                        <!-- Détail des parts avec toggle -->
+                        <div class="mt-2 pr-4" x-data="{ showRepartition: false }">
+
+                            <!-- En-tête avec bouton toggle -->
+                            <button @click="showRepartition = !showRepartition"
+                                    type="button"
+                                    class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm font-medium rounded-lg text-gray-700 transition-colors">
+
+                                <div class="flex items-center gap-2">
+                                    <div class="text-sm-regular">Répartition&nbsp;:</div>
+                                    <div class="text-sm-medium w-max">{{ $formattedShared }}&nbsp;€</div>
+                                    <div class="relative top-0.5 h-1 min-w-20 bg-gray-200 rounded-full">
+                                        <div class="h-1 rounded-full bg-amber-500" style="width: {{ min($totalPercentage, 100) }}%"></div>
+                                    </div>
+                                    <div class="text-sm-medium">({{ number_format($totalPercentage, 0) }}%)</div>
+                                </div>
+
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     class="h-4 w-4 transition-transform"
+                                     :class="showRepartition ? 'transform rotate-180' : ''"
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <!-- Détail des répartitions - collapsible -->
+                            <div x-show="showRepartition"
+                                 x-transition
+                                 x-collapse
+                                 class="mt-1 pt-3 space-y-2 border-t border-slate-200">
+
+                                @foreach($form->family_shares as $share)
+                                    @php
+                                        $memberName = "Membre inconnu";
+                                        $member = $family_members->firstWhere('id', $share['id']);
+                                        if ($member) {
+                                            $memberName = $member->name;
+                                        }
+                                        $sharePercentage = $share['percentage'] ?? 0;
+                                        $shareAmount = $share['amount'] ?? 0;
+                                        $firstMemberChar = substr($memberName, 0, 1);
+                                        $isPayer = $share['id'] == $payerId;
+                                    @endphp
+                                    <div class="flex justify-between items-center py-1">
+                                        <div class="flex items-center gap-2">
+                                            <img src="{{ $memberName ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
+                                            <span class="text-sm {{ $isPayer ? 'text-indigo-600' : 'text-gray-700' }}">{{ $memberName }}</span>
+                                        </div>
+                                        <p class="text-sm-medium text-gray-800">{{ number_format($shareAmount, 2, ',', ' ') }} €</p>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-1 bg-gray-100 rounded-full">
+                                                <div class="h-1 rounded-full {{ $isPayer ? 'bg-indigo-400' : 'bg-gray-400' }}"
+                                                     style="width: {{ min($sharePercentage, 100) }}%"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-500 ml-1">{{ number_format($sharePercentage, 1) }}%</span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
+                        <!-- Aucune répartition -->
+                        <p class="text-sm-regular">
+                            Répartition : <span class="text-sm-medium">Non définie</span>
+                        </p>
+                    @endif
+                </div>
             @else
-                Non spécifié
+                <!-- Montant non défini -->
+                <p class="text-sm-medium">
+                    Non spécifié - Non définie
+                </p>
             @endif
         </x-invoices.create.summary-item>
 
@@ -153,24 +268,6 @@
                     @endforeach
                 @endif
             </div>
-        </x-invoices.create.summary-item>
-
-        <x-invoices.create.summary-item label="Pièce jointe" :alternateBackground="true">
-            @if($form->uploadedFile)
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                    </svg>
-                    Facture importée
-                </div>
-            @else
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                    </svg>
-                    Aucune facture importée
-                </div>
-            @endif
         </x-invoices.create.summary-item>
     </dl>
 </div>
