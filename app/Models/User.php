@@ -52,4 +52,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Invoice::class);
     }
+
+    /**
+     * Get all family members that belong to the user.
+     */
+    public function familyMembers(): HasMany
+    {
+        return $this->hasMany(Family::class);
+    }
 }

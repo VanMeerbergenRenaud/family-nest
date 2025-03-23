@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Family;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Models\User;
@@ -14,7 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        // Création de l'utilisateur principal
+        $mainUser = User::factory()->create([
             'name' => 'Renaud Vmb',
             'email' => 'renaud.vmb@gmail.com',
             'password' => bcrypt('password'),
@@ -61,7 +63,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Cédric Muller',
             'email' => 'cedric.test@gmail.com',
             'password' => bcrypt('password_1'),
-            'avatar' => asset('img/avatar_placeholder.png'),
         ]);
 
         /* Invoices pour l'utilisateur 1 avec leurs fichiers associés */
@@ -75,5 +76,11 @@ class DatabaseSeeder extends Seeder
                 'invoice_id' => $invoice->id,
             ]);
         }
+
+        // Membres de la famille
+        Family::factory(12)->create([
+            'user_id' => $mainUser->id,
+            'is_primary' => false,
+        ]);
     }
 }
