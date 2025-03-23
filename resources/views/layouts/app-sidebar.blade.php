@@ -11,7 +11,7 @@
 
         <livewire:breadcrumb /> {{-- Breadcrumb --}}
 
-        <x-divider class="mb-4 border-b border-b-gray-200" />
+        <x-divider class="max-lg:mb-4 border-b border-b-gray-200" />
 
         <main class="flex-1 p-4 lg:px-6"
               :class="{'lg:ml-64': expanded, 'lg:ml-20': !expanded}"

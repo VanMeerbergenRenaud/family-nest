@@ -43,12 +43,6 @@ class RegisterForm extends Form
 
         Auth::login($user);
 
-        try {
-            Mail::to($user->email)->send(new WelcomeMessage($user));
-        } catch (\Exception $e) {
-            \Log::error('Erreur avec Mailgun (inscription) : ' . $e->getMessage());
-        }
-
         Session::regenerate();
     }
 }
