@@ -5,15 +5,16 @@
     </head>
     <body>
         <header>
-            <div class="flex items-center justify-between px-4">
-                <a href="{{ route('dashboard') }}" class="button-classic w-fit text-sm-semibold">
+            {{-- Slot pour bannière mode édition --}}
+            {{ $banner ?? null }}
+
+            <div class="relative flex-center px-4">
+                <a href="{{ route('dashboard') }}" class="absolute top-auto left-4 button-classic w-fit text-sm-semibold">
                     <x-svg.arrows.left class="text-gray-900" />
                     Retour
                 </a>
 
                 <livewire:breadcrumb /> {{-- Breadcrumb --}}
-
-                <x-theme-switcher /> {{-- Theme switcher --}}
             </div>
 
             <x-divider class="mb-4 lg:block sm:hidden" />
@@ -21,7 +22,6 @@
 
         {{-- MAIN --}}
         <main class="p-4">
-
             <livewire:spotlight /> {{-- Spotlight search --}}
 
             {{ $slot }}

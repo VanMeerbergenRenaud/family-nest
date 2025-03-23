@@ -17,7 +17,7 @@ use MailerSend\LaravelDriver\MailerSendTrait;
 
 class WelcomeMessage extends Mailable
 {
-    use Queueable, SerializesModels, MailerSendTrait;
+    use MailerSendTrait, Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
@@ -54,23 +54,23 @@ class WelcomeMessage extends Mailable
                         'var' => 'variable',
                         'number' => 123,
                         'object' => [
-                            'key' => 'object-value'
+                            'key' => 'object-value',
                         ],
                         'objectCollection' => [
                             [
-                                'name' => 'John'
+                                'name' => 'John',
                             ],
                             [
-                                'name' => 'Patrick'
-                            ]
+                                'name' => 'Patrick',
+                            ],
                         ],
-                    ])
+                    ]),
                 ],
                 precedenceBulkHeader: true,
                 sendAt: new Carbon('2022-01-28 11:53:20'),
             );
         } catch (MailerSendAssertException $e) {
-            Log::error('MailerSendAssertException: ' . $e->getMessage());
+            Log::error('MailerSendAssertException: '.$e->getMessage());
         }
 
         return new Content(
@@ -87,7 +87,7 @@ class WelcomeMessage extends Mailable
     public function attachments(): array
     {
         return [
-            Attachment::fromStorageDisk('public', 'img/img_placeholder.jpg')
+            Attachment::fromStorageDisk('public', 'img/img_placeholder.jpg'),
         ];
     }
 }

@@ -19,7 +19,7 @@ trait InvoiceTagManagement
     public function initializeTagManagement(): void
     {
         // Initialiser le tableau des tags s'il est null
-        if (!is_array($this->form->tags)) {
+        if (! is_array($this->form->tags)) {
             $this->form->tags = [] ?? null;
         }
     }
@@ -29,9 +29,9 @@ trait InvoiceTagManagement
      */
     public function addTag(): void
     {
-        if (!empty($this->form->tagInput)) {
+        if (! empty($this->form->tagInput)) {
             // Vérifier si le tag n'existe pas déjà
-            if (!in_array($this->form->tagInput, $this->form->tags)) {
+            if (! in_array($this->form->tagInput, $this->form->tags)) {
                 $this->form->tags[] = $this->form->tagInput;
             }
             $this->form->tagInput = '';
@@ -75,9 +75,9 @@ trait InvoiceTagManagement
     private function searchTagsWithDatabase($query): array
     {
         $tag = DB::table('invoices')
-                ->where('user_id', auth()->id())
-                ->whereNotNull('tags')
-                ->count() === 0;
+            ->where('user_id', auth()->id())
+            ->whereNotNull('tags')
+            ->count() === 0;
 
         // Vérifier si l'utilisateur possède des tags dans sa db
         if ($tag) {
@@ -115,7 +115,7 @@ trait InvoiceTagManagement
                 // Maintenant décoder le JSON
                 $tagsArray = json_decode($tagsJson, true);
 
-                if (!is_array($tagsArray)) {
+                if (! is_array($tagsArray)) {
                     // Si ce n'est toujours pas un tableau, essayer une autre approche
                     $tagsArray = json_decode($invoice->tags, true);
                 }
@@ -130,7 +130,7 @@ trait InvoiceTagManagement
                 }
             } catch (\Exception $e) {
                 // Si le JSON est invalide, enregistrer l'erreur et continuer
-                Log::warning('Erreur de décodage JSON pour les tags: ' . $e->getMessage() . ' - Tags: ' . $invoice->tags);
+                Log::warning('Erreur de décodage JSON pour les tags: '.$e->getMessage().' - Tags: '.$invoice->tags);
 
                 continue;
             }
@@ -150,7 +150,7 @@ trait InvoiceTagManagement
      */
     public function selectTag($tag): void
     {
-        if (!in_array($tag, $this->form->tags)) {
+        if (! in_array($tag, $this->form->tags)) {
             $this->form->tags[] = $tag;
         }
         $this->form->tagInput = '';

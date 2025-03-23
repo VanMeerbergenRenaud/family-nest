@@ -7,6 +7,8 @@
         x-data="{ expanded: localStorage.getItem('sidebarExpanded') !== 'false' }"
         @sidebar-toggled.window="expanded = $event.detail.expanded"
     >
+        {{ $banner ?? null }}
+
         <livewire:sidebar />
 
         <livewire:breadcrumb /> {{-- Breadcrumb --}}

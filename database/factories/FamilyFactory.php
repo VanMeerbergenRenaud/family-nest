@@ -28,7 +28,7 @@ class FamilyFactory extends Factory
             'user_id' => User::factory(),
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
-            'avatar' => 'https://i.pravatar.cc/150?u=' . $this->faker->uuid,
+            'avatar' => 'https://i.pravatar.cc/150?u='.$this->faker->uuid,
             'relation_type' => $this->faker->randomElement($relationTypes),
             'is_active' => true,
             'is_primary' => false,

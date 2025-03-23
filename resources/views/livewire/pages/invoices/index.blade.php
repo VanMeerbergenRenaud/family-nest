@@ -708,7 +708,7 @@
                 </div>
 
                 <!-- Contenu principal -->
-                <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto max-h-[70vh]">
+                <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto max-h-[60vh]">
                     @if($folderInvoices->isEmpty())
                         <!-- État vide -->
                         <div

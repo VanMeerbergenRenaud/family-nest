@@ -208,7 +208,6 @@ return [
         'amount' => 'montant',
         'currency' => 'monnaie',
         'paid_by' => 'payé par qui',
-        'associated_members' => 'membres associés',
         'issued_date' => 'date d\'émission',
         'payment_due_date' => 'date d\'échéance',
         'payment_reminder' => 'rappel de paiement',

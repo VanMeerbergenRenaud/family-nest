@@ -39,7 +39,6 @@ it('permet de créer une facture complète avec succès', function () {
         ->set('form.amount', 49.99)
         ->set('form.currency', 'EUR')
         ->set('form.paid_by', $user->name)
-        ->set('form.associated_members', $user->name)
 
         // Étape 4: Dates importantes
         ->set('form.issued_date', '2024-03-01')

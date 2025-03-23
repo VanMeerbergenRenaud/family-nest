@@ -53,7 +53,6 @@ class InvoiceFactory extends Factory
             'amount' => $this->faker->randomFloat(2, 10, 1000),
             'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
             'paid_by' => $this->faker->name(),
-            'associated_members' => $this->faker->randomElements(['John Doe', 'Jane Smith', 'Alice Johnson', 'Bob Brown'], $this->faker->numberBetween(1, 4)),
 
             /* Étape 3 */
             'issued_date' => Carbon::instance($issuedDate)->format('Y-m-d'),
