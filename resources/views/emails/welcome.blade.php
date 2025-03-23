@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="email-container">
-    <h1>Hello, {{ $name }}!</h1>
+    <h1>Hello !</h1>
     <p>
         Thank you for signing up on our platform. We're excited to have
         you on board.
