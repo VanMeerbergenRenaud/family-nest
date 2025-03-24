@@ -23,12 +23,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('family_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('role')->default('member'); // admin, editor, viewer, member
-            $table->string('relation')->nullable(); // self, spouse, child, parent, other
+            $table->string('permission')->default('viewer'); // admin, editor, viewer
+            $table->string('relation')->default('member'); // spouse, father, mother, brother, sister, son, daughter, colleague, colocataire, friend, other
             $table->boolean('is_admin')->default(false);
             $table->timestamps();
 
-            // Un utilisateur ne peut apparaître qu'une seule fois dans une famille
+            // Un utilisateur ne peut apparaître qu'une seule fois dans une famille.
             $table->unique(['family_id', 'user_id']);
         });
 

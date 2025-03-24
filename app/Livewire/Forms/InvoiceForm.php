@@ -62,6 +62,7 @@ class InvoiceForm extends Form
 
     // Nouveaux champs pour la gestion des paiements par membre de famille
     public $family_id;  // ID de la famille
+
     public $paid_by_user_id;  // ID de l'utilisateur qui paie la facture
 
     public $paid_by;     // Pour compatibilité avec l'ancien système

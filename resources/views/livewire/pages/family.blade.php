@@ -1,19 +1,10 @@
 <div>
     <div>
         <h2 class="text-xl-semibold">Membres de la famille</h2>
-        <p class="text-sm-regular text-gray-500">Gérez les membres de votre famille et leurs autorisations de compte
-            ici.</p>
+        <p class="text-sm-regular text-gray-500">Gérez les membres de votre famille et leurs autorisations de compte ici.</p>
     </div>
 
-    @if(!$family)
-        <div class="mt-6 p-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm text-center">
-            <p class="text-gray-500">{{ __('Vous n\'appartenez à aucune famille pour le moment.') }}</p>
-            <button wire:click="createFamily" class="mt-4 button-tertiary">
-                <x-svg.add2 class="text-white"/>
-                Créer une famille
-            </button>
-        </div>
-    @else
+    @if($family)
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
             {{-- En-tête --}}
             <div
@@ -46,10 +37,12 @@
                         </x-menu.items>
                     </x-menu>
 
-                    <button wire:click="addAMember" class="button-tertiary">
-                        <x-svg.add2 class="text-white"/>
-                        Ajouter un membre
-                    </button>
+                    @if($isAdmin)
+                        <button type="button" wire:click="addMember" class="button-tertiary">
+                            <x-svg.add2 class="text-white"/>
+                            {{ __("Ajouter un membre") }}
+                        </button>
+                    @endif
                 </div>
             </div>
 
@@ -80,9 +73,9 @@
                                 </button>
                             </th>
                             <th scope="col">
-                                <button wire:click="sortBy('role')" class="flex items-center">
+                                <button wire:click="sortBy('permission')" class="flex items-center">
                                     <span>Rôle</span>
-                                    @if ($sortField === 'role')
+                                    @if ($sortField === 'permission')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                              xmlns="http://www.w3.org/2000/svg">
                                             @if ($sortDirection === 'desc')
@@ -120,7 +113,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {{-- Afficher tous les membres de la famille, y compris l'utilisateur --}}
                         @foreach($members as $member)
                             <tr class="{{ $member->id === $currentUser ? 'bg-gray-50' : '' }}">
                                 <td>
@@ -148,24 +140,24 @@
                                 <td>
                                     @php
                                         $isCurrentUser = $member->id === $currentUser;
-                                        $roleClass = match($member->pivot->role) {
+                                        $permissionClass = match($member->pivot->permission) {
                                             'admin' => 'bg-indigo-50 text-indigo-700 border-indigo-100',
                                             'editor' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
                                             'viewer' => 'bg-rose-50 text-rose-700 border-rose-100',
                                             default => 'bg-slate-50 text-slate-700 border-slate-100'
                                         };
 
-                                        $roleLabel = $isCurrentUser
+                                        $permissionLabel = $isCurrentUser
                                             ? 'Responsable'
-                                            : match($member->pivot->role) {
+                                            : match($member->pivot->permission) {
                                                 'admin' => 'Administrateur',
                                                 'editor' => 'Éditeur',
                                                 'viewer' => 'Lecteur',
                                                 default => 'Membre'
                                             };
                                     @endphp
-                                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $roleClass }}">
-                                       {{ $roleLabel }}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $permissionClass }}">
+                                       {{ $permissionLabel }}
                                    </span>
                                 </td>
                                 <td>
@@ -174,14 +166,11 @@
 
                                         // match relation
                                         $relation = match($relation) {
-                                            'father' => 'Père',
-                                            'mother' => 'Mère',
-                                            'brother' => 'Frère',
-                                            'sister' => 'Soeur',
-                                            'son' => 'Fils',
-                                            'daughter' => 'Fille',
-                                            'colleague' => 'Collègue',
-                                            'colocataire' => 'Colocataire',
+                                            'parent' => 'Parent',
+                                            'spouse' => 'Conjoint(e)',
+                                            'child' => 'Enfant',
+                                            'sibling' => 'Frère/Sœur',
+                                            'friend' => 'Ami(e)',
                                             'self' => 'Moi-même',
                                             default => ucfirst($relation)
                                         };
@@ -226,26 +215,25 @@
                                             <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                         </x-menu.button>
                                         <x-menu.items>
+                                            @if(!$isAdmin)
+                                                <x-menu.item type="link" href="#">
+                                                    <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
+                                                    {{ __('Voir le profil') }}
+                                                </x-menu.item>
+                                            @endif
                                             @if($member->id === $currentUser)
-                                                @if($members->count() > 1)
-                                                    <x-menu.item type="link" href="#">
-                                                        <x-svg.switch class="w-4 h-4 group-hover:text-gray-900"/>
-                                                        {{ __('Changer de rôle') }}
-                                                    </x-menu.item>
-                                                @endif
                                                 <x-menu.item type="link" href="{{ route('settings.profile') }}">
                                                     <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
                                                     {{ __('Modifier mon profil') }}
                                                 </x-menu.item>
-                                            @else
-                                                <x-menu.item type="link" href="#">
-                                                    <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
-                                                    {{ __('Modifier le profil') }}
-                                                </x-menu.item>
+                                            @endif
+                                            @if($members->count() > 1 && $isAdmin)
                                                 <x-menu.item type="link" href="#">
                                                     <x-svg.switch class="w-4 h-4 group-hover:text-gray-900"/>
                                                     {{ __('Changer de rôle') }}
                                                 </x-menu.item>
+                                            @endif
+                                            @if($isAdmin)
                                                 <x-menu.item class="group hover:text-red-500">
                                                     <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
                                                     {{ __('Supprimer de la famille') }}
@@ -267,5 +255,149 @@
                 </div>
             @endif
         </section>
+    @else
+        <div class="mt-6 p-6 w-full flex-center overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm text-center">
+            <p class="text-gray-500">{{ __('Vous n\'appartenez à aucune famille pour le moment.') }}</p>
+            <button wire:click="createFamily" class="button-tertiary">
+                <x-svg.add2 class="text-white"/>
+                Créer une famille
+            </button>
+        </div>
+    @endif
+
+    {{-- Modal pour ajouter 1 ou plusieurs membre à la famille --}}
+    @if($showAddMemberModal)
+        <x-modal wire:model="showAddMemberModal">
+            <x-modal.panel>
+
+                <form wire:submit.prevent="sendInvitations">
+                    @csrf
+
+                    <div class="flex gap-x-6 p-6" wire:loading.class="opacity-50">
+                        <div class="w-full space-y-6">
+                            <!-- Titre et Description -->
+                            <div class="text-center space-y-3">
+                                <!-- Avatar Images -->
+                                <div class="flex justify-center -space-x-4 mb-2">
+                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                </div>
+                                <h2 class="text-2xl font-semibold">Invitez de nouveaux membres</h2>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    Vous avez une grande famille ? Invitez d'autres membres pour encore mieux gérer vos dépenses.
+                                </p>
+                            </div>
+
+                            <!-- Liste des membres déjà ajoutés -->
+                            @if(count($newMembers) > 0)
+                                <div class="space-y-2 mb-4">
+                                    <h3 class="pl-3 text-md-medium">Membres à inviter</h3>
+                                    <div class="space-y-2">
+                                        @foreach($newMembers as $index => $member)
+                                            <div class="flex items-center justify-between py-2.5 pl-3 pr-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="flex-shrink-0">
+                                                        <div class="button-primary py-3">
+                                                            <x-svg.user />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $member['email'] }}</p>
+                                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                                            {{ $availablePermissions[$member['permission']] }} •
+                                                            {{ $availableRelations[$member['relation']] }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <button wire:click="removeMemberFromList({{ $index }})" type="button" class="text-red-500 hover:text-red-700">
+                                                    <x-svg.trash class="w-4.5 h-4.5 text-red-500 hover:text-red-700" />
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <x-divider />
+                            @endif
+
+                            <!-- Formulaire d'ajout de membre -->
+                            <div class="grid grid-cols-1 gap-4">
+                                @error('general')
+                                <ul class="my-2 flex-center p-2 bg-red-50 border border-red-200 rounded-lg gap-2 font-medium text-red-500 dark:text-red-400">
+                                    <div>
+                                        <x-svg.error class="w-5 h-5 text-red-500 dark:text-red-400" />
+                                    </div>
+                                    @foreach ($errors->get('general') as $error)
+                                        <li class="pr-1 text-sm-medium text-red-500 dark:text-red-400">
+                                            {{ $error }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                                @enderror
+
+                                <x-form.field
+                                    label="Adresse email"
+                                    name="memberEmail"
+                                    model="memberEmail"
+                                    placeholder="email@exemple.com"
+                                    type="email"
+                                    :asterix="true"
+                                />
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <x-form.select
+                                        label="Rôle dans la famille"
+                                        name="memberPermission"
+                                        model="memberPermission"
+                                        :asterix="true"
+                                    >
+                                        @foreach($availablePermissions as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </x-form.select>
+
+                                    <x-form.select
+                                        label="Relation avec vous"
+                                        name="memberRelation"
+                                        model="memberRelation"
+                                        :asterix="true"
+                                    >
+                                        @foreach($availableRelations as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </x-form.select>
+                                </div>
+
+                                <div class="pt-2">
+                                    <button
+                                        wire:click="addMemberToList"
+                                        type="button"
+                                        class="button-tertiary"
+                                    >
+                                        <x-svg.add2 class="text-white" />
+                                        Ajouter à la liste
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">
+                        <div class="flex justify-end w-full gap-3">
+                            <x-modal.close>
+                                <button wire:loading.attr="disabled" type="button" class="button-secondary">
+                                    {{ __('Annuler') }}
+                                </button>
+                            </x-modal.close>
+                            <button wire:loading.attr="disabled" type="submit" class="button-primary gap-2">
+                                <x-svg.send />
+                                {{ __('Inviter') }}
+                            </button>
+                        </div>
+                    </x-modal.footer>
+                </form>
+            </x-modal.panel>
+        </x-modal>
     @endif
 </div>

@@ -21,7 +21,7 @@ class Family extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)
-            ->withPivot('role', 'relation', 'is_admin')
+            ->withPivot('permission', 'relation', 'is_admin')
             ->withTimestamps();
     }
 

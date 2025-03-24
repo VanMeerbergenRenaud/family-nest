@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
 
         // Ajouter l'utilisateur principal à sa famille en tant qu'administrateur
         $mainFamily->users()->attach($mainUser->id, [
-            'role' => 'admin',
+            'permission' => 'admin',
             'relation' => 'self',
             'is_admin' => true,
         ]);
@@ -84,17 +84,17 @@ class DatabaseSeeder extends Seeder
 
         // Ajouter les enseignants à leur famille
         $teachersFamily->users()->attach($dominique->id, [
-            'role' => 'admin',
+            'permission' => 'admin',
             'relation' => 'self',
             'is_admin' => true,
         ]);
 
         $teachersFamily->users()->attach([
-            $toon->id => ['role' => 'editor', 'relation' => 'colleague'],
-            $myriam->id => ['role' => 'editor', 'relation' => 'colleague'],
-            $daniel->id => ['role' => 'editor', 'relation' => 'colleague'],
-            $francois->id => ['role' => 'viewer', 'relation' => 'colleague'],
-            $cedric->id => ['role' => 'viewer', 'relation' => 'colleague'],
+            $toon->id => ['permission' => 'editor', 'relation' => 'colleague'],
+            $myriam->id => ['permission' => 'editor', 'relation' => 'colleague'],
+            $daniel->id => ['permission' => 'editor', 'relation' => 'colleague'],
+            $francois->id => ['permission' => 'viewer', 'relation' => 'colleague'],
+            $cedric->id => ['permission' => 'viewer', 'relation' => 'colleague'],
         ]);
 
         /* Invoices pour la famille principale avec leurs fichiers associés */

@@ -179,7 +179,7 @@ class Create extends Component
         $totalAmount = 0;
         $totalPercentage = 0;
 
-        if (!empty($this->form->user_shares)) {
+        if (! empty($this->form->user_shares)) {
             foreach ($this->form->user_shares as $share) {
                 $totalAmount += $share['amount'] ?? 0;
                 $totalPercentage += $share['percentage'] ?? 0;
@@ -195,7 +195,7 @@ class Create extends Component
      */
     private function calculateAmountFromPercentage($percentage)
     {
-        if (!is_numeric($this->form->amount) || !is_numeric($percentage)) {
+        if (! is_numeric($this->form->amount) || ! is_numeric($percentage)) {
             return 0;
         }
 
@@ -208,7 +208,7 @@ class Create extends Component
      */
     private function calculatePercentageFromAmount($amount)
     {
-        if (!is_numeric($this->form->amount) || $this->form->amount == 0 || !is_numeric($amount)) {
+        if (! is_numeric($this->form->amount) || $this->form->amount == 0 || ! is_numeric($amount)) {
             return 0;
         }
 
