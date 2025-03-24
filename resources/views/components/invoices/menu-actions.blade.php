@@ -4,9 +4,7 @@
 ])
 
 <x-menu>
-    <x-menu.button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                   x-bind:class="{ 'bg-gray-100 dark:bg-gray-700': menuOpen }"
-    >
+    <x-menu.button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
         <x-svg.dots class="w-5 h-5 text-gray-500 {{ $dotsRotation ? 'rotate-90' : '' }}" />
     </x-menu.button>
 
