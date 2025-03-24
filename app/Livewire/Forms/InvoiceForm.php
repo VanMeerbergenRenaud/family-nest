@@ -61,11 +61,12 @@ class InvoiceForm extends Form
     public $currency = 'EUR';
 
     // Nouveaux champs pour la gestion des paiements par membre de famille
-    public $paid_by_id;  // ID du membre qui paie la facture
+    public $family_id;  // ID de la famille
+    public $paid_by_user_id;  // ID de l'utilisateur qui paie la facture
 
     public $paid_by;     // Pour compatibilité avec l'ancien système
 
-    public $family_shares = [];      // Nouvelle version - array de [id => family_id, amount => montant, percentage => pourcentage]
+    public $user_shares = [];      // Nouvelle version - array de [id => user_id, amount => montant, percentage => pourcentage]
 
     // Dates
     #[Validate]
@@ -126,12 +127,13 @@ class InvoiceForm extends Form
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|size:3', // 3 pour le code ISO
-            'paid_by_id' => 'nullable|exists:families,id',
+            'family_id' => 'nullable|exists:families,id',
+            'paid_by_user_id' => 'nullable|exists:users,id',
             'paid_by' => 'nullable|string|max:255',
-            'family_shares' => 'nullable|array',
-            'family_shares.*.id' => 'required|exists:families,id',
-            'family_shares.*.amount' => 'nullable|numeric|min:0',
-            'family_shares.*.percentage' => 'nullable|numeric|min:0|max:100',
+            'user_shares' => 'nullable|array',
+            'user_shares.*.id' => 'required|exists:users,id',
+            'user_shares.*.amount' => 'nullable|numeric|min:0',
+            'user_shares.*.percentage' => 'nullable|numeric|min:0|max:100',
 
             // Étape 3 - Dates
             'issued_date' => 'nullable|date',
@@ -178,9 +180,10 @@ class InvoiceForm extends Form
             'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
             'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
             'tags.array' => 'Les tags doivent être un tableau.',
-            'family_shares.*.amount' => 'Le montant de la part doit être un nombre valide.',
-            'family_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
-            'paid_by_id.exists' => 'Le membre de famille sélectionné n\'existe pas.',
+            'user_shares.*.amount' => 'Le montant de la part doit être un nombre valide.',
+            'user_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
+            'paid_by_user_id.exists' => 'L\'utilisateur sélectionné n\'existe pas.',
+            'family_id.exists' => 'La famille sélectionnée n\'existe pas.',
         ];
     }
 
@@ -274,7 +277,8 @@ class InvoiceForm extends Form
                 'amount' => $amount,
                 'currency' => $this->currency,
                 'paid_by' => $this->paid_by,
-                'paid_by_id' => $this->paid_by_id,
+                'paid_by_user_id' => $this->paid_by_user_id,
+                'family_id' => $this->family_id,
                 // Dates
                 'issued_date' => $this->issued_date,
                 'payment_due_date' => $this->payment_due_date,
@@ -303,7 +307,7 @@ class InvoiceForm extends Form
                 $invoice = auth()->user()->invoices()->create($invoiceData);
             }
 
-            // Traitement des parts de famille
+            // Traitement des parts d'utilisateurs
             $this->processInvoiceShares($invoice);
 
             // Traitement du fichier si présent
@@ -377,17 +381,17 @@ class InvoiceForm extends Form
         }
     }
 
-    // Traite les parts de famille pour la facture
+    // Traite les parts d'utilisateurs pour la facture
     private function processInvoiceShares(Invoice $invoice): void
     {
         // Supprimer d'abord toutes les anciennes parts
-        $invoice->familyShares()->detach();
+        $invoice->sharedUsers()->detach();
 
         // Si nous avons des parts à ajouter
-        if (! empty($this->family_shares)) {
-            foreach ($this->family_shares as $share) {
+        if (! empty($this->user_shares)) {
+            foreach ($this->user_shares as $share) {
                 if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
-                    $invoice->familyShares()->attach($share['id'], [
+                    $invoice->sharedUsers()->attach($share['id'], [
                         'share_amount' => $share['amount'] ?? null,
                         'share_percentage' => $share['percentage'] ?? null,
                     ]);
@@ -497,15 +501,16 @@ class InvoiceForm extends Form
 
         $this->currency = $invoice->currency ?? 'EUR';
         $this->paid_by = $invoice->paid_by;
-        $this->paid_by_id = $invoice->paid_by_id;
+        $this->paid_by_user_id = $invoice->paid_by_user_id;
+        $this->family_id = $invoice->family_id;
 
-        // Charger les parts de famille
-        $this->family_shares = [];
-        foreach ($invoice->familyShares as $share) {
-            $this->family_shares[] = [
-                'id' => $share->id,
-                'amount' => $share->pivot->share_amount,
-                'percentage' => $share->pivot->share_percentage,
+        // Charger les parts d'utilisateurs
+        $this->user_shares = [];
+        foreach ($invoice->sharedUsers as $user) {
+            $this->user_shares[] = [
+                'id' => $user->id,
+                'amount' => $user->pivot->share_amount,
+                'percentage' => $user->pivot->share_percentage,
             ];
         }
 
@@ -564,9 +569,9 @@ class InvoiceForm extends Form
             return null;
         }
 
-        // Si le montant est déjà un nombre, le retourner directement
+        // Si le montant est déjà un nombre, le formater avec exactement 2 décimales
         if (is_numeric($amount)) {
-            return (float) $amount;
+            return (float) number_format((float) $amount, 2, '.', '');
         }
 
         // Convertir en chaîne si ce n'est pas déjà le cas
@@ -578,7 +583,7 @@ class InvoiceForm extends Form
         // Convertir la virgule en point (format standard pour PHP)
         $amount = str_replace(',', '.', $amount);
 
-        // Conversion en float et arrondi
-        return round((float) $amount, 2);
+        // Conversion en float et formatage avec exactement 2 décimales
+        return (float) number_format((float) $amount, 2, '.', '');
     }
 }

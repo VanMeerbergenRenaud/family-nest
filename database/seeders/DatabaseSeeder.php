@@ -24,50 +24,84 @@ class DatabaseSeeder extends Seeder
         ]);
 
         /* Teachers users */
-        User::factory()->create([
+        $dominique = User::factory()->create([
+            'name' => 'Dominique Vilain',
+            'email' => 'teachers.test@gmail.com',
+            'password' => bcrypt('password'),
+            'avatar' => asset('img/users/teachers/dominique_vilain.jpeg'),
+        ]);
+
+        $toon = User::factory()->create([
             'name' => 'Toon Van Den Bos',
             'email' => 'toon.test@gmail.com',
             'password' => bcrypt('password_1'),
             'avatar' => asset('img/users/teachers/toon_van_den_bos.jpeg'),
         ]);
 
-        User::factory()->create([
-            'name' => 'Dominique Vilain',
-            'email' => 'dominique.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/teachers/dominique_vilain.jpeg'),
-        ]);
-
-        User::factory()->create([
+        $myriam = User::factory()->create([
             'name' => 'Myriam Dupont',
             'email' => 'myriam.test@gmail.com',
             'password' => bcrypt('password_1'),
             'avatar' => asset('img/users/teachers/myriam_dupont.jpeg'),
         ]);
 
-        User::factory()->create([
+        $daniel = User::factory()->create([
             'name' => 'Daniel Schreurs',
             'email' => 'daniel.test@gmail.com',
             'password' => bcrypt('password_1'),
             'avatar' => asset('img/users/teachers/daniel_schreurs.jpeg'),
         ]);
 
-        User::factory()->create([
+        $francois = User::factory()->create([
             'name' => 'François Parmentier',
             'email' => 'francois.test@gmail.com',
             'password' => bcrypt('password_1'),
             'avatar' => asset('img/users/teachers/francois_parmentier.jpeg'),
         ]);
 
-        User::factory()->create([
+        $cedric = User::factory()->create([
             'name' => 'Cédric Muller',
             'email' => 'cedric.test@gmail.com',
             'password' => bcrypt('password_1'),
         ]);
 
-        /* Invoices pour l'utilisateur 1 avec leurs fichiers associés */
+        // Création de la famille principale
+        $mainFamily = Family::factory()->create([
+            'name' => 'Famille Vmb',
+        ]);
+
+        // Ajouter l'utilisateur principal à sa famille en tant qu'administrateur
+        $mainFamily->users()->attach($mainUser->id, [
+            'role' => 'admin',
+            'relation' => 'self',
+            'is_admin' => true,
+        ]);
+
+        // Création d'une seconde famille (professeurs)
+        $teachersFamily = Family::factory()->create([
+            'name' => 'Professeurs HEPL',
+        ]);
+
+        // Ajouter les enseignants à leur famille
+        $teachersFamily->users()->attach($dominique->id, [
+            'role' => 'admin',
+            'relation' => 'self',
+            'is_admin' => true,
+        ]);
+
+        $teachersFamily->users()->attach([
+            $toon->id => ['role' => 'editor', 'relation' => 'colleague'],
+            $myriam->id => ['role' => 'editor', 'relation' => 'colleague'],
+            $daniel->id => ['role' => 'editor', 'relation' => 'colleague'],
+            $francois->id => ['role' => 'viewer', 'relation' => 'colleague'],
+            $cedric->id => ['role' => 'viewer', 'relation' => 'colleague'],
+        ]);
+
+        /* Invoices pour la famille principale avec leurs fichiers associés */
         $invoices = Invoice::factory(20)->create([
-            'user_id' => 1,
+            'user_id' => $mainUser->id,
+            'family_id' => $mainFamily->id,
+            'paid_by_user_id' => $mainUser->id,
         ]);
 
         // Créer un fichier pour chaque facture
@@ -76,11 +110,5 @@ class DatabaseSeeder extends Seeder
                 'invoice_id' => $invoice->id,
             ]);
         }
-
-        // Membres de la famille
-        Family::factory(12)->create([
-            'user_id' => $mainUser->id,
-            'is_primary' => false,
-        ]);
     }
 }

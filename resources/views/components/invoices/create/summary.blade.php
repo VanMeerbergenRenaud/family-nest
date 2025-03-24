@@ -1,5 +1,6 @@
 @props([
     'form' => $form,
+    'family_members' => collect(),
 ])
 
 <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
@@ -49,16 +50,23 @@
         <x-invoices.create.summary-item label="Montant et répartition" :alternateBackground="true">
             @if(!empty($form->amount))
                 @php
-                    $family_members = $form->family_members ?? collect();
+                    // S'assurer que $family_members existe
+                    $family_members = $family_members ?? collect();
 
                     // Récupérer les informations du payeur
                     $payerName = "Non spécifié";
                     $payerId = null;
-                    if ($form->paid_by_id) {
-                        $payer = $family_members->firstWhere('id', $form->paid_by_id);
-                        if ($payer) {
-                            $payerName = $payer->name;
-                            $payerId = $payer->id;
+                    $payerAvatar = null;
+
+                    if ($form->paid_by_user_id) {
+                        // Chercher l'utilisateur dans la liste des membres de famille
+                        foreach ($family_members as $member) {
+                            if ($member->id == $form->paid_by_user_id) {
+                                $payerName = $member->name;
+                                $payerId = $member->id;
+                                $payerAvatar = $member->avatar;
+                                break;
+                            }
                         }
                     } elseif ($form->paid_by) {
                         $payerName = $form->paid_by;
@@ -67,8 +75,8 @@
                     // Calculer les totaux
                     $totalShared = 0;
                     $totalPercentage = 0;
-                    if (!empty($form->family_shares)) {
-                        foreach ($form->family_shares as $share) {
+                    if (!empty($form->user_shares)) {
+                        foreach ($form->user_shares as $share) {
                             $totalShared += $share['amount'] ?? 0;
                             $totalPercentage += $share['percentage'] ?? 0;
                         }
@@ -86,21 +94,18 @@
                     $formattedTotal = number_format($form->amount, 2, ',', ' ');
                     $formattedShared = number_format($totalShared, 2, ',', ' ');
                     $formattedRemaining = number_format(abs($remainingAmount), 2, ',', ' ');
-
-                    // Premier caractère du nom pour l'avatar
-                    $firstChar = substr($payerName, 0, 1);
                 @endphp
 
                 <div class="space-y-2">
                     <!-- Nom du payeur -->
                     <div class="flex justify-between items-center">
-                        <p class="text-sm-regular">
+                        <p class="max-sm:mt-1.5 text-sm-regular">
                             Payeur :
                             @if($payerName)
                                 <span class="text-sm-medium">
-                                    <img src="{{ $payerName ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
-                                    {{ $payerName }}
-                                </span>
+                            <img src="{{ $payerAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
+                            {{ $payerName }}
+                        </span>
                             @else
                                 <span class="text-sm-medium">Non spécifié</span>
                             @endif
@@ -108,9 +113,9 @@
                     </div>
 
                     <!-- Détail des parts -->
-                    @if(!empty($form->family_shares))
+                    @if(!empty($form->user_shares))
                         <!-- Détail des parts avec toggle -->
-                        <div class="mt-2 pr-4" x-data="{ showRepartition: false }">
+                        <div class="mt-2 pr-4 max-sm:max-w-[70vw] overflow-x-scroll" x-data="{ showRepartition: false }">
 
                             <!-- En-tête avec bouton toggle -->
                             <button @click="showRepartition = !showRepartition"
@@ -140,22 +145,30 @@
                                  x-collapse
                                  class="mt-1 pt-3 space-y-2 border-t border-slate-200">
 
-                                @foreach($form->family_shares as $share)
+                                @foreach($form->user_shares as $share)
                                     @php
                                         $memberName = "Membre inconnu";
-                                        $member = $family_members->firstWhere('id', $share['id']);
-                                        if ($member) {
-                                            $memberName = $member->name;
+                                        $memberAvatar = null;
+                                        $memberObj = null;
+
+                                        // Rechercher dans la liste des membres
+                                        foreach ($family_members as $familyMember) {
+                                            if ($familyMember->id == $share['id']) {
+                                                $memberName = $familyMember->name;
+                                                $memberAvatar = $familyMember->avatar;
+                                                $memberObj = $familyMember;
+                                                break;
+                                            }
                                         }
+
                                         $sharePercentage = $share['percentage'] ?? 0;
                                         $shareAmount = $share['amount'] ?? 0;
-                                        $firstMemberChar = substr($memberName, 0, 1);
                                         $isPayer = $share['id'] == $payerId;
                                     @endphp
                                     <div class="flex justify-between items-center py-1">
-                                        <div class="flex items-center gap-2">
-                                            <img src="{{ $memberName ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
-                                            <span class="text-sm {{ $isPayer ? 'text-indigo-600' : 'text-gray-700' }}">{{ $memberName }}</span>
+                                        <div class="flex items-center gap-2 sm:w-44">
+                                            <img src="{{ $memberAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
+                                            <span class="text-sm text-gray-700">{{ $memberName }}</span>
                                         </div>
                                         <p class="text-sm-medium text-gray-800">{{ number_format($shareAmount, 2, ',', ' ') }} €</p>
                                         <div class="flex items-center gap-3">
@@ -163,7 +176,7 @@
                                                 <div class="h-1 rounded-full {{ $isPayer ? 'bg-indigo-400' : 'bg-gray-400' }}"
                                                      style="width: {{ min($sharePercentage, 100) }}%"></div>
                                             </div>
-                                            <span class="text-xs text-gray-500 ml-1">{{ number_format($sharePercentage, 1) }}%</span>
+                                            <span class="text-xs text-gray-500 ml-1">{{ number_format($sharePercentage, 2) }}%</span>
                                         </div>
                                     </div>
                                 @endforeach

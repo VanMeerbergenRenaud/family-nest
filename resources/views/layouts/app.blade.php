@@ -8,8 +8,8 @@
             {{-- Slot pour bannière mode édition --}}
             {{ $banner ?? null }}
 
-            <div class="relative flex-center px-4">
-                <a href="{{ route('dashboard') }}" class="absolute top-auto left-4 button-classic w-fit text-sm-semibold">
+            <div class="relative flex-center max-sm:justify-start max-sm:py-2 px-4">
+                <a href="{{ route('dashboard') }}" class="lg:absolute top-auto left-4 button-classic w-fit text-sm-semibold">
                     <x-svg.arrows.left class="text-gray-900" />
                     Retour
                 </a>

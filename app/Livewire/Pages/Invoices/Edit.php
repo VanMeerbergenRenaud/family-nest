@@ -4,8 +4,8 @@ namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
 use App\Livewire\Forms\InvoiceForm;
-use App\Models\Family;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Traits\InvoiceTagManagement;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -38,20 +38,28 @@ class Edit extends Component
 
         $this->form->setFromInvoice($this->invoice);
 
-        $this->family_members = Family::where('user_id', auth()->id())
-            ->where('is_active', true)
-            ->orderBy('is_primary', 'desc')
-            ->orderBy('name')
-            ->get();
+        // Récupérer la famille de l'utilisateur
+        $family = auth()->user()->family();
+
+        if ($family) {
+            $this->form->family_id = $family->id;
+
+            // Récupérer tous les membres de la famille
+            $this->family_members = $family->users()
+                ->where('users.id', '!=', auth()->id())
+                ->get();
+        } else {
+            $this->family_members = collect();
+        }
+
+        // Ajouter l'utilisateur actuel à la liste
+        $currentUser = User::find(auth()->id());
+        if ($currentUser) {
+            $this->family_members->prepend($currentUser);
+        }
 
         // Initialiser le tableau des tags
         $this->initializeTagManagement();
-
-        // Initialiser le payeur principal (membre principal de la famille)
-        $primaryMember = $this->family_members->firstWhere('is_primary', true);
-        if ($primaryMember) {
-            $this->form->paid_by_id = $primaryMember->id;
-        }
 
         // Initialiser les parts de partage
         $this->calculateRemainingShares();
@@ -91,39 +99,39 @@ class Edit extends Component
     /**
      * Ajouter ou mettre à jour une part pour un membre
      */
-    public function updateShare($memberId, $value, $type = 'percentage')
+    public function updateShare($userId, $value, $type = 'percentage')
     {
         // Initialiser la structure si elle n'existe pas déjà
-        if (empty($this->form->family_shares)) {
-            $this->form->family_shares = [];
+        if (empty($this->form->user_shares)) {
+            $this->form->user_shares = [];
         }
 
         // Chercher si ce membre a déjà une part
-        $memberIndex = null;
-        foreach ($this->form->family_shares as $index => $share) {
-            if ($share['id'] == $memberId) {
-                $memberIndex = $index;
+        $userIndex = null;
+        foreach ($this->form->user_shares as $index => $share) {
+            if ($share['id'] == $userId) {
+                $userIndex = $index;
                 break;
             }
         }
 
         // Mettre à jour ou ajouter la part
-        if ($memberIndex !== null) {
+        if ($userIndex !== null) {
             if ($type === 'percentage') {
-                $this->form->family_shares[$memberIndex]['percentage'] = $value;
-                $this->form->family_shares[$memberIndex]['amount'] = $this->calculateAmountFromPercentage($value);
+                $this->form->user_shares[$userIndex]['percentage'] = $value;
+                $this->form->user_shares[$userIndex]['amount'] = $this->calculateAmountFromPercentage($value);
             } else {
-                $this->form->family_shares[$memberIndex]['amount'] = $value;
-                $this->form->family_shares[$memberIndex]['percentage'] = $this->calculatePercentageFromAmount($value);
+                $this->form->user_shares[$userIndex]['amount'] = $value;
+                $this->form->user_shares[$userIndex]['percentage'] = $this->calculatePercentageFromAmount($value);
             }
         } else {
             // Nouveau membre
             $newShare = [
-                'id' => $memberId,
+                'id' => $userId,
                 'amount' => $type === 'percentage' ? $this->calculateAmountFromPercentage($value) : $value,
                 'percentage' => $type === 'percentage' ? $value : $this->calculatePercentageFromAmount($value),
             ];
-            $this->form->family_shares[] = $newShare;
+            $this->form->user_shares[] = $newShare;
         }
 
         $this->calculateRemainingShares();
@@ -132,49 +140,49 @@ class Edit extends Component
     /**
      * Supprimer la part d'un membre
      */
-    public function removeShare($memberId)
+    public function removeShare($userId)
     {
-        foreach ($this->form->family_shares as $index => $share) {
-            if ($share['id'] == $memberId) {
-                unset($this->form->family_shares[$index]);
+        foreach ($this->form->user_shares as $index => $share) {
+            if ($share['id'] == $userId) {
+                unset($this->form->user_shares[$index]);
                 break;
             }
         }
 
         // Réindexer le tableau
-        $this->form->family_shares = array_values($this->form->family_shares);
+        $this->form->user_shares = array_values($this->form->user_shares);
         $this->calculateRemainingShares();
     }
 
     /**
      * Distribuer également les parts entre tous les membres sélectionnés
      */
-    public function distributeEvenly($memberIds = [])
+    public function distributeEvenly($userIds = [])
     {
-        if (empty($memberIds)) {
+        if (empty($userIds)) {
             // Si aucun membre n'est spécifié, utiliser tous les membres
-            $memberIds = $this->family_members->pluck('id')->toArray();
+            $userIds = $this->family_members->pluck('id')->toArray();
         }
 
-        $count = count($memberIds);
+        $count = count($userIds);
         if ($count === 0) {
             return;
         }
 
         // Réinitialiser les parts existantes
-        $this->form->family_shares = [];
+        $this->form->user_shares = [];
 
         // Calculer la part équitable
         if ($this->shareMode === 'percentage') {
             $share = 100 / $count;
-            foreach ($memberIds as $memberId) {
-                $this->updateShare($memberId, $share, 'percentage');
+            foreach ($userIds as $userId) {
+                $this->updateShare($userId, $share, 'percentage');
             }
         } else {
             $amount = $this->form->amount;
             $share = $amount / $count;
-            foreach ($memberIds as $memberId) {
-                $this->updateShare($memberId, $share, 'amount');
+            foreach ($userIds as $userId) {
+                $this->updateShare($userId, $share, 'amount');
             }
         }
     }
@@ -187,8 +195,8 @@ class Edit extends Component
         $totalAmount = 0;
         $totalPercentage = 0;
 
-        if (! empty($this->form->family_shares)) {
-            foreach ($this->form->family_shares as $share) {
+        if (! empty($this->form->user_shares)) {
+            foreach ($this->form->user_shares as $share) {
                 $totalAmount += $share['amount'] ?? 0;
                 $totalPercentage += $share['percentage'] ?? 0;
             }
@@ -207,7 +215,8 @@ class Edit extends Component
             return 0;
         }
 
-        return round(($percentage / 100) * $this->form->amount, 2);
+        // Limiter à exactement 2 décimales pour éviter les problèmes de précision
+        return number_format(($percentage / 100) * $this->form->amount, 2, '.', '');
     }
 
     /**
@@ -219,7 +228,8 @@ class Edit extends Component
             return 0;
         }
 
-        return round(($amount / $this->form->amount) * 100, 2);
+        // Limiter à exactement 2 décimales pour le pourcentage
+        return number_format(($amount / $this->form->amount) * 100, 2, '.', '');
     }
 
     /**
@@ -243,6 +253,9 @@ class Edit extends Component
     {
         return view('livewire.pages.invoices.edit', [
             'invoiceTypes' => InvoiceTypeEnum::getTypesOptions(),
+            'remainingAmount' => $this->remainingAmount,
+            'remainingPercentage' => $this->remainingPercentage,
+            'shareMode' => $this->shareMode,
         ])->layout('layouts.app');
     }
 }
