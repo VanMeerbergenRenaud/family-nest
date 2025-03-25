@@ -199,6 +199,12 @@ class InvoiceForm extends Form
         $this->fileExtension = strtolower($this->uploadedFile->getClientOriginalExtension());
         $this->fileSize = $this->uploadedFile->getSize();
 
+        \Log::info('Fichier en mode upload', [
+            'file_name' => $this->fileName,
+            'file_extension' => $this->fileExtension,
+            'file_size' => $this->fileSize,
+        ]);
+
         // Par défaut, définir comme fichier principal
         if (! isset($this->is_primary)) {
             $this->is_primary = true;
@@ -319,6 +325,12 @@ class InvoiceForm extends Form
                 // Stocker le fichier
                 $userPath = 'invoices/user_'.auth()->user()->id;
                 $this->filePath = $this->uploadedFile->store($userPath, 's3');
+
+                Log::info('File uploaded successfully', [
+                    'file_path' => $this->filePath,
+                    'file_name' => $this->fileName,
+                    'file_size' => $this->fileSize,
+                ]);
 
                 // Récupérer l'ancien fichier si édition
                 $oldFile = null;

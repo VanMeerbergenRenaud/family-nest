@@ -101,7 +101,7 @@ $resetPassword = function () {
             />
         </div>
 
-        <button type="submit" class="button-secondary">
+        <button type="submit" class="mt-6 button-secondary">
             {{ __('Réinitialiser le mot de passe') }}
         </button>
     </form>
