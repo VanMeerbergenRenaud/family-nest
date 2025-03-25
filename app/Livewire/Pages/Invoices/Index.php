@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Invoices;
 
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -230,19 +231,76 @@ class Index extends Component
 
         if (! $invoiceFile) {
             session()->flash('error', 'Fichier de facture non trouvé.');
-
             return;
         }
 
-        $filePath = storage_path('app/public/'.$invoiceFile->getRawOriginal('file_path'));
+        try {
+            // Récupérer le chemin brut du fichier dans S3
+            $s3FilePath = $invoiceFile->getRawOriginal('file_path');
 
-        if (! file_exists($filePath)) {
-            session()->flash('error', 'Le fichier n\'existe pas sur le serveur.');
+            if (! Storage::disk('s3')->exists($s3FilePath)) {
+                session()->flash('error', 'Le fichier n\'existe pas sur S3.');
+                return;
+            }
 
+            // Pour les gros fichiers, utilisez une redirection avec entêtes modifiés
+            // Générer une URL présignée avec paramètres spécifiques
+            $client = Storage::disk('s3')->getClient();
+            $bucket = config('filesystems.disks.s3.bucket');
+
+            // Créer une commande avec des paramètres spécifiques pour le téléchargement
+            $command = $client->getCommand('GetObject', [
+                'Bucket' => $bucket,
+                'Key' => $s3FilePath,
+                'ResponseContentType' => $this->getContentType($invoiceFile->file_extension),
+                'ResponseContentDisposition' => 'attachment; filename="' . $invoiceFile->file_name . '"',
+            ]);
+
+            // Générer l'URL signée avec ces paramètres
+            $request = $client->createPresignedRequest($command, '+5 minutes');
+            $presignedUrl = (string) $request->getUri();
+
+            // Rediriger vers l'URL présignée qui forcera le téléchargement
+            return redirect()->away($presignedUrl);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Erreur lors du téléchargement: ' . $e->getMessage());
+            \Log::error('Erreur téléchargement S3: ' . $e->getMessage() . ' | ' . $e->getTraceAsString());
             return;
         }
+    }
 
-        return response()->download($filePath, $invoiceFile->file_name);
+// Méthode auxiliaire pour déterminer le type de contenu
+    private function getContentType($extension)
+    {
+        $contentTypes = [
+            'pdf' => 'application/pdf',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'csv' => 'text/csv',
+        ];
+
+        return $contentTypes[strtolower($extension)] ?? 'application/octet-stream';
+    }
+
+    public function getS3FileUrl($invoiceId)
+    {
+        $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
+
+        if (!$invoiceFile) {
+            return null;
+        }
+
+        $s3FilePath = $invoiceFile->getRawOriginal('file_path');
+
+        if (Storage::disk('s3')->exists($s3FilePath)) {
+            return Storage::disk('s3')->url($s3FilePath);
+        }
+
+        return null;
     }
 
     public function showInvoiceModal($id)
@@ -253,12 +311,38 @@ class Index extends Component
 
         $this->invoice = $invoice;
 
-        // Vérifier si le fichier existe avant d'accéder à ses propriétés
         if ($invoice->file) {
-            $this->filePath = $invoice->file->file_path;
-            $this->fileExtension = $invoice->file->file_extension;
+            // Générer une URL temporaire signée pour tous les types de fichiers
+            try {
+                $s3FilePath = $invoice->file->getRawOriginal('file_path');
+
+                // Vérifier que le fichier existe dans S3
+                if (Storage::disk('s3')->exists($s3FilePath)) {
+                    // Déterminer le type de contenu en fonction de l'extension
+                    $contentType = $this->getContentType($invoice->file->file_extension);
+
+                    // Créer une URL signée temporaire avec les bons en-têtes pour l'affichage
+                    $this->filePath = Storage::disk('s3')->temporaryUrl(
+                        $s3FilePath,
+                        now()->addMinutes(10),
+                        [
+                            'ResponseContentType' => $contentType,
+                            'ResponseContentDisposition' => 'inline; filename="' . $invoice->file->file_name . '"'
+                        ]
+                    );
+                    $this->fileExtension = $invoice->file->file_extension;
+                } else {
+                    // Fichier introuvable sur S3
+                    $this->filePath = null;
+                    $this->fileExtension = $invoice->file->file_extension;
+                    \Log::error('Fichier non trouvé sur S3: ' . $s3FilePath);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Erreur URL temporaire S3: ' . $e->getMessage());
+                $this->filePath = null;
+                $this->fileExtension = $invoice->file->file_extension;
+            }
         } else {
-            // Définir des valeurs par défaut si aucun fichier n'est trouvé
             $this->filePath = null;
             $this->fileExtension = null;
         }

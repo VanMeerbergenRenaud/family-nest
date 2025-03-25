@@ -50,6 +50,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/archived', Archived::class)->name('archived');
     });
 
+    // Route pour télécharger une facture
+    Route::get('/invoice/download/{id}', function ($id) {
+        return app(IndexInvoice::class)->downloadInvoice($id);
+    })->name('invoice.download');
+
     // Routes des thèmes
     Route::get('/themes', Themes::class)->name('themes');
 
