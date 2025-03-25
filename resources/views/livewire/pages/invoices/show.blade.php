@@ -23,5 +23,5 @@
         @endif
     </div>
 
-    <x-invoices.create.summary :form="$invoice" :family_members="$family_members"/>
+    <x-invoices.create.summary :form="$invoice" />
 </div>

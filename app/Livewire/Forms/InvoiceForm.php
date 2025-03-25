@@ -317,7 +317,8 @@ class InvoiceForm extends Form
                 $this->processUploadedFile();
 
                 // Stocker le fichier
-                $this->filePath = $this->uploadedFile->store('invoices', 'public');
+                $userPath = 'invoices/user_' . auth()->user()->id;
+                $this->filePath = $this->uploadedFile->store($userPath, 's3');
 
                 // Récupérer l'ancien fichier si édition
                 $oldFile = null;
@@ -327,8 +328,8 @@ class InvoiceForm extends Form
                         ->first();
 
                     // Supprimer l'ancien fichier du stockage si il existe
-                    if ($oldFile && Storage::disk('public')->exists($oldFile->getRawOriginal('file_path'))) {
-                        Storage::disk('public')->delete($oldFile->getRawOriginal('file_path'));
+                    if ($oldFile && Storage::disk('s3')->exists($oldFile->getRawOriginal('file_path'))) {
+                        Storage::disk('s3')->delete($oldFile->getRawOriginal('file_path'));
                     }
                 }
 
