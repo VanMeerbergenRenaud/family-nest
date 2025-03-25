@@ -64,11 +64,6 @@ $directLogin = function () {
             <button type="button" wire:click="logout" class="button-secondary">
                 {{ __('Se déconnecter') }}
             </button>
-
-            {{-- TODO : SUPRESS PROD : Connexion sans vérification --}}
-            <button class="button-tertiary" wire:click="directLogin">
-                {{ __('Se connecter sans vérification') }}
-            </button>
         </div>
     </div>
 </x-auth-template>

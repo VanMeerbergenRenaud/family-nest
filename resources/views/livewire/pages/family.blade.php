@@ -265,76 +265,33 @@
         </div>
     @endif
 
-    {{-- Modal pour ajouter 1 ou plusieurs membre à la famille --}}
+    {{-- Modal pour ajouter un membre à la famille --}}
     @if($showAddMemberModal)
         <x-modal wire:model="showAddMemberModal">
             <x-modal.panel>
-
-                <form wire:submit.prevent="sendInvitations">
+                <form wire:submit.prevent="sendInvitation">
                     @csrf
 
-                    <div class="flex gap-x-6 p-6" wire:loading.class="opacity-50">
+                    <div class="flex gap-x-6 p-6">
                         <div class="w-full space-y-6">
                             <!-- Titre et Description -->
                             <div class="text-center space-y-3">
-                                <!-- Avatar Images -->
-                                <div class="flex justify-center -space-x-4 mb-2">
-                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
-                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
-                                    <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                <!-- Avatar Image -->
+                                <div class="flex justify-center mb-2">
+                                    <div class="flex justify-center -space-x-4 mb-2">
+                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
+                                    </div>
                                 </div>
-                                <h2 class="text-2xl font-semibold">Invitez de nouveaux membres</h2>
-                                <p class="text-gray-600 dark:text-gray-400">
-                                    Vous avez une grande famille ? Invitez d'autres membres pour encore mieux gérer vos dépenses.
+                                <h2 class="text-2xl font-semibold">Inviter un membre</h2>
+                                <p class="text-gray-600 dark:text-gray-400 px-4 lg:px-12">
+                                    Invitez un membre de votre famille ou un proche pour mieux gérer vos dépenses ensemble.
                                 </p>
                             </div>
 
-                            <!-- Liste des membres déjà ajoutés -->
-                            @if(count($newMembers) > 0)
-                                <div class="space-y-2 mb-4">
-                                    <h3 class="pl-3 text-md-medium">Membres à inviter</h3>
-                                    <div class="space-y-2">
-                                        @foreach($newMembers as $index => $member)
-                                            <div class="flex items-center justify-between py-2.5 pl-3 pr-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                                <div class="flex items-center space-x-3">
-                                                    <div class="flex-shrink-0">
-                                                        <div class="button-primary py-3">
-                                                            <x-svg.user />
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $member['email'] }}</p>
-                                                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                            {{ $availablePermissions[$member['permission']] }} •
-                                                            {{ $availableRelations[$member['relation']] }}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <button wire:click="removeMemberFromList({{ $index }})" type="button" class="text-red-500 hover:text-red-700">
-                                                    <x-svg.trash class="w-4.5 h-4.5 text-red-500 hover:text-red-700" />
-                                                </button>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <x-divider />
-                            @endif
-
                             <!-- Formulaire d'ajout de membre -->
-                            <div class="grid grid-cols-1 gap-4">
-                                @error('general')
-                                <ul class="my-2 flex-center p-2 bg-red-50 border border-red-200 rounded-lg gap-2 font-medium text-red-500 dark:text-red-400">
-                                    <div>
-                                        <x-svg.error class="w-5 h-5 text-red-500 dark:text-red-400" />
-                                    </div>
-                                    @foreach ($errors->get('general') as $error)
-                                        <li class="pr-1 text-sm-medium text-red-500 dark:text-red-400">
-                                            {{ $error }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                                @enderror
+                            <div class="grid grid-cols-1 gap-4 my-4">
 
                                 <x-form.field
                                     label="Adresse email"
@@ -368,17 +325,6 @@
                                         @endforeach
                                     </x-form.select>
                                 </div>
-
-                                <div class="pt-2">
-                                    <button
-                                        wire:click="addMemberToList"
-                                        type="button"
-                                        class="button-tertiary"
-                                    >
-                                        <x-svg.add2 class="text-white" />
-                                        Ajouter à la liste
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -386,11 +332,11 @@
                     <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">
                         <div class="flex justify-end w-full gap-3">
                             <x-modal.close>
-                                <button wire:loading.attr="disabled" type="button" class="button-secondary">
+                                <button type="button" class="button-secondary">
                                     {{ __('Annuler') }}
                                 </button>
                             </x-modal.close>
-                            <button wire:loading.attr="disabled" type="submit" class="button-primary gap-2">
+                            <button type="submit" class="button-primary gap-2">
                                 <x-svg.send />
                                 {{ __('Inviter') }}
                             </button>
@@ -400,4 +346,15 @@
             </x-modal.panel>
         </x-modal>
     @endif
+
+    {{-- Modal pour montrer l'envoi de mail en cours avec wire:target --}}
+    <div wire:loading wire:target="sendInvitation" class="fixed left-0 right-0 mx-auto bottom-8 w-fit flex-center z-60">
+        <div class="bg-white dark:bg-gray-800 rounded-full shadow-lg py-2 px-4 flex items-center space-x-3 border border-gray-100 dark:border-gray-700">
+            <svg class="animate-spin h-5 w-5 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="pr-1 text-sm font-medium text-gray-700 dark:text-gray-300">Envoi de l'invitation en cours...</span>
+        </div>
+    </div>
 </div>
