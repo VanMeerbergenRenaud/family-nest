@@ -58,30 +58,28 @@
                                          alt="Aperçu de la facture"
                                          class="bg-gray-100 rounded-xl max-h-[50vh]"
                                     />
-                                    <!-- Preview pour les fichiers PDF -->
+                                <!-- Preview pour les fichiers PDF -->
                                 @elseif ($isPdf)
-                                    <div class="w-full h-[40vh] overflow-hidden rounded-xl">
-                                        <embed src="{{ $form->uploadedFile->temporaryUrl() }}"
-                                               type="application/pdf"
-                                               width="100%"
-                                               height="100%"
-                                               class="rounded-xl"
-                                        />
+                                    <div class="px-4 mb-4 text-center">
+                                        <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
+                                            <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers PDF</p>
+                                            <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture.</p>
+                                        </div>
                                     </div>
-                                    <!-- Button pour les fichiers Word -->
+                                <!-- Button pour les fichiers Word -->
                                 @elseif ($isDocx)
                                     <div class="px-4 mb-4 text-center">
                                         <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
                                             <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
-                                            <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture</p>
+                                            <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture.</p>
                                         </div>
                                     </div>
-                                        <!-- Icône pour les CSV -->
+                                    <!-- Icône pour les CSV -->
                                     @elseif($isCsv)
                                         <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
                                             <x-svg.csv class="w-12 h-12 text-gray-600" />
                                         </div>
-                                        <!-- Icône générique pour les autres types de fichiers -->
+                                    <!-- Icône générique pour les autres types de fichiers -->
                                     @else
                                         <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
                                             <x-svg.img class="w-12 h-12 text-gray-600" />

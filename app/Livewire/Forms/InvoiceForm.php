@@ -188,31 +188,6 @@ class InvoiceForm extends Form
         ];
     }
 
-    // Traiter le fichier uploadé et récupérer ses informations
-    public function processUploadedFile(): bool
-    {
-        if (! $this->uploadedFile) {
-            return false;
-        }
-
-        $this->fileName = $this->uploadedFile->getClientOriginalName();
-        $this->fileExtension = strtolower($this->uploadedFile->getClientOriginalExtension());
-        $this->fileSize = $this->uploadedFile->getSize();
-
-        \Log::info('Fichier en mode upload', [
-            'file_name' => $this->fileName,
-            'file_extension' => $this->fileExtension,
-            'file_size' => $this->fileSize,
-        ]);
-
-        // Par défaut, définir comme fichier principal
-        if (! isset($this->is_primary)) {
-            $this->is_primary = true;
-        }
-
-        return true;
-    }
-
     // Obtenir les informations sur le fichier uploadé
     public function getFileInfo(): ?array
     {
@@ -230,6 +205,25 @@ class InvoiceForm extends Form
             'isDocx' => ($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension())) === 'docx',
             'isCsv' => ($this->fileExtension ?? strtolower($this->uploadedFile->getClientOriginalExtension())) === 'csv',
         ];
+    }
+
+    // Traiter le fichier uploadé et récupérer ses informations
+    public function processUploadedFile(): bool
+    {
+        if (! $this->uploadedFile) {
+            return false;
+        }
+
+        $this->fileName = $this->uploadedFile->getClientOriginalName();
+        $this->fileExtension = strtolower($this->uploadedFile->getClientOriginalExtension());
+        $this->fileSize = $this->uploadedFile->getSize();
+
+        // Par défaut, définir comme fichier principal
+        if (! isset($this->is_primary)) {
+            $this->is_primary = true;
+        }
+
+        return true;
     }
 
     // Supprimer le fichier
@@ -326,11 +320,6 @@ class InvoiceForm extends Form
                 $userPath = 'invoices/user_'.auth()->user()->id;
                 $this->filePath = $this->uploadedFile->store($userPath, 's3');
 
-                Log::info('File uploaded successfully', [
-                    'file_path' => $this->filePath,
-                    'file_name' => $this->fileName,
-                    'file_size' => $this->fileSize,
-                ]);
 
                 // Récupérer l'ancien fichier si édition
                 $oldFile = null;
@@ -368,7 +357,7 @@ class InvoiceForm extends Form
                 }
 
                 // Si c'est un PDF, marquer pour compression
-                if ($this->fileExtension === 'pdf') {
+                /*if ($this->fileExtension === 'pdf') {
                     $this->invoiceFile->update([
                         'compression_status' => 'pending',
                         'original_size' => $this->fileSize,
@@ -380,7 +369,7 @@ class InvoiceForm extends Form
                         $this->filePath,
                         $this->fileSize
                     );
-                }
+                }*/
             }
 
             DB::commit();
