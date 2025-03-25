@@ -1,8 +1,10 @@
-<x-guest-layout>
-    <div class="max-w-md mx-auto mt-10 bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
-        <div class="p-6">
+<div>
+    <div class="max-w-md mx-auto flex-center h-screen">
+        <div class="p-6 h-fit bg-white dark:bg-gray-800 rounded-2xl overflow-hidden">
             <h2 class="text-xl-semibold text-gray-900 dark:text-gray-100 mb-1">{{ __('Compte incorrect') }}</h2>
             <p class="text-sm-regular text-gray-500 dark:text-gray-400 mb-6">{{ __('Vous n\'utilisez pas le bon compte') }}</p>
+
+            <x-flash-messages />
 
             <div class="flex items-center p-4 mb-6 rounded-xl bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800">
                 <x-svg.warning class="w-5 h-5 text-amber-500 dark:text-amber-400 mr-3 flex-shrink-0" />
@@ -12,10 +14,10 @@
                 </div>
             </div>
 
-           <a href="{{ route('logout') }}" class="button-tertiary w-full inline-flex items-center justify-center">
+            <button wire:click="logout" class="button-tertiary w-full flex-center">
                 <x-svg.logout class="text-white" />
                 {{ __('Se déconnecter') }}
-            </a>
+            </button>
 
             <div class="mt-4 flex justify-center">
                 <a href="{{ route('welcome') }}" class="text-sm text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
@@ -24,4 +26,4 @@
             </div>
         </div>
     </div>
-</x-guest-layout>
+</div>
