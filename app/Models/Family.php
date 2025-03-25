@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Family extends Model
@@ -12,33 +12,32 @@ class Family extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'name',
-        'email',
-        'avatar',
-        'is_active',
-        'is_primary',
-        'relation_type',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
-        'is_primary' => 'boolean',
     ];
 
     /**
-     * Get the user that owns the family member.
+     * Les utilisateurs qui appartiennent à cette famille.
      */
-    public function user(): BelongsTo
+    public function users(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot('permission', 'relation', 'is_admin')
+            ->withTimestamps();
     }
 
     /**
-     * Get the invoices associated with this family member.
+     * Les administrateurs de la famille.
+     */
+    public function admins()
+    {
+        return $this->users()->wherePivot('is_admin', true);
+    }
+
+    /**
+     * Les factures associées à cette famille.
      */
     public function invoices(): HasMany
     {
-        return $this->hasMany(Invoice::class, 'paid_by_id');
+        return $this->hasMany(Invoice::class);
     }
 }

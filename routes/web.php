@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\FamilyInvitationHandler;
 use App\Livewire\Pages\Calendar;
 use App\Livewire\Pages\Dashboard;
 use App\Livewire\Pages\Family;
@@ -73,6 +74,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Centre d'aide
     Route::get('/help-center', HelpCenter::class)->name('help-center');
 });
+
+// Route d'invitation utilisant le composant Livewire
+Route::get('/invitation/{token}', FamilyInvitationHandler::class)
+    ->name('family.invitation');
 
 // Inclusion des routes d'authentification
 require __DIR__.'/auth.php';

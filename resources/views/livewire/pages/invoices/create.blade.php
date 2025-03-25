@@ -161,16 +161,13 @@
                                 asterix="true"
                             />
 
-                            <x-form.select name="form.paid_by_id" model="form.paid_by_id" label="Qui paie cette facture" asterix="true">
+                            <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
-                                <option value="{{ auth()->user()->id }}">
-                                    {{ auth()->user()->name }} (Moi)
-                                </option>
                                 @foreach($family_members as $member)
-                                    <option value="{{ $member->id }}" {{ $member->is_primary ? 'selected' : '' }}>
+                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }}>
                                         {{ $member->name }}
-                                        @if($member->is_primary)
-                                            (Membre principal)
+                                        @if($member->id === auth()->id())
+                                            (Moi)
                                         @endif
                                     </option>
                                 @endforeach
@@ -194,9 +191,9 @@
 
                                     <div class="flex items-center">
                                         @php
-                                            $totalShares = count($form->family_shares);
+                                            $totalShares = count($form->user_shares);
                                             $totalPercent = 0;
-                                            foreach($form->family_shares as $share) {
+                                            foreach($form->user_shares as $share) {
                                                 $totalPercent += $share['percentage'] ?? 0;
                                             }
                                         @endphp
@@ -249,7 +246,8 @@
                                         @foreach($family_members as $member)
                                             @php
                                                 $memberShare = null;
-                                                foreach($form->family_shares as $index => $share) {
+                                                $memberShareIndex = null;
+                                                foreach($form->user_shares as $index => $share) {
                                                     if ($share['id'] == $member->id) {
                                                         $memberShare = $share;
                                                         $memberShareIndex = $index;
@@ -272,7 +270,7 @@
                                                             step="0.01"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
-                                                            wire:model="form.family_shares.{{ $memberShareIndex }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
+                                                            wire:model="form.user_shares.{{ $memberShareIndex }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
                                                             wire:change="updateShare({{ $member->id }}, $event.target.value, '{{ $shareMode }}')"
                                                             class="min-w-16 p-1 text-xs border border-gray-300 rounded-l-md text-right"
                                                         />
@@ -421,7 +419,7 @@
                     >
 
                         <!-- Résumé du formulaire -->
-                        <x-invoices.create.summary :form="$form" />
+                        <x-invoices.create.summary :form="$form" :family_members="$family_members" />
 
                     </x-invoices.create.form-step>
 

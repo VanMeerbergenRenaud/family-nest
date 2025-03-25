@@ -32,3 +32,9 @@ Route::middleware('auth')->group(function () {
     Volt::route('confirm-password', 'pages.auth.confirm-password')
         ->name('password.confirm');
 });
+
+Route::get('/logout', function () {
+    (new App\Livewire\Actions\Logout)();
+
+    return redirect()->route('welcome');
+})->name('logout');

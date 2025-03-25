@@ -16,8 +16,9 @@ class Invoice extends Model
 
     protected $fillable = [
         'name', 'type', 'category', 'issuer_name', 'issuer_website',
-        'amount', 'currency', 'paid_by', 'paid_by_id', 'issued_date', 'payment_due_date',
-        'payment_reminder', 'payment_frequency', 'payment_status', 'payment_method', 'priority',
+        'amount', 'currency', 'paid_by', 'paid_by_user_id', 'family_id',
+        'issued_date', 'payment_due_date', 'payment_reminder', 'payment_frequency',
+        'payment_status', 'payment_method', 'priority',
         'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
     ];
 
@@ -35,6 +36,14 @@ class Invoice extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the family this invoice belongs to.
+     */
+    public function family(): BelongsTo
+    {
+        return $this->belongsTo(Family::class);
     }
 
     // Obtenir le fichier principal associé à la facture
@@ -92,19 +101,19 @@ class Invoice extends Model
     }
 
     /**
-     * Get the family member who paid the invoice.
+     * Get the user who paid the invoice.
      */
-    public function payer(): BelongsTo
+    public function paidByUser(): BelongsTo
     {
-        return $this->belongsTo(Family::class, 'paid_by_id');
+        return $this->belongsTo(User::class, 'paid_by_user_id');
     }
 
     /**
-     * Get the family members who share this invoice.
+     * Get the users who share this invoice.
      */
-    public function familyShares(): BelongsToMany
+    public function sharedUsers(): BelongsToMany
     {
-        return $this->belongsToMany(Family::class, 'invoice_family')
+        return $this->belongsToMany(User::class, 'invoice_user')
             ->withPivot('share_amount', 'share_percentage')
             ->withTimestamps();
     }
@@ -114,7 +123,7 @@ class Invoice extends Model
      */
     public function getTotalSharedAmount()
     {
-        return $this->familyShares()->sum('share_amount');
+        return $this->sharedUsers()->sum('share_amount');
     }
 
     /**
@@ -122,7 +131,7 @@ class Invoice extends Model
      */
     public function getTotalSharedPercentage()
     {
-        return $this->familyShares()->sum('share_percentage');
+        return $this->sharedUsers()->sum('share_percentage');
     }
 
     /**

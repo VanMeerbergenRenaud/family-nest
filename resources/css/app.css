@@ -47,7 +47,7 @@
     }
 
     img, video {
-        @apply w-full max-w-full h-auto object-cover bg-gray-300;
+        @apply flex-center w-full max-w-full h-auto object-cover bg-gray-300 overflow-hidden;
     }
 
     svg {
