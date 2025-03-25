@@ -21,7 +21,12 @@ class Family extends Component
 
     public bool $showAddMemberModal = false;
 
+    public bool $showCreateFamilyModal = false;
+
     public bool $isAdmin = false;
+
+    // Propriété pour le nom de la famille
+    public string $familyName = '';
 
     // Propriétés pour l'invitation
     public string $memberEmail = '';
@@ -67,6 +72,12 @@ class Family extends Component
     {
         $this->reset(['memberEmail', 'memberPermission', 'memberRelation']);
         $this->showAddMemberModal = true;
+    }
+
+    public function openCreateFamilyModal(): void
+    {
+        $this->reset(['familyName']);
+        $this->showCreateFamilyModal = true;
     }
 
     public function sendInvitation(): void
@@ -149,20 +160,30 @@ class Family extends Component
         ]);
 
         try {
+            // Créer la famille
             $family = FamilyModel::create([
                 'name' => $this->familyName,
             ]);
 
+            // Attacher l'utilisateur actuel comme admin
             $family->users()->attach(auth()->id(), [
                 'permission' => 'admin',
                 'relation' => 'self',
                 'is_admin' => true,
             ]);
 
+            // Réinitialiser et fermer le modal
+            $this->reset(['familyName']);
+            $this->showCreateFamilyModal = false;
+
             session()->flash('message', 'Famille créée avec succès');
+
+            // Recharger la page pour afficher la nouvelle famille
+            $this->redirectRoute('family');
+
         } catch (\Exception $e) {
-            Log::error("Erreur de création de famille: " . $e->getMessage());
-            session()->flash('error', "Erreur lors de la création de la famille. Veuillez réessayer.");
+            Log::error('Erreur de création de famille: '.$e->getMessage());
+            session()->flash('error', 'Erreur lors de la création de la famille. Veuillez réessayer.');
         }
     }
 

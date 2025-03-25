@@ -255,15 +255,75 @@
                 </div>
             @endif
         </section>
-    @else
-        <div class="mt-6 p-6 w-full flex-center overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm text-center">
-            <p class="text-gray-500">{{ __('Vous n\'appartenez à aucune famille pour le moment.') }}</p>
-            <button wire:click="createFamily" class="button-tertiary">
+    @endif
+
+    {{-- Ajout de la propriété pour le modal de création de famille --}}
+    @if(!$family)
+        <div class="mt-6 p-3 w-full flex justify-between items-center flex-wrap gap-4 overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-xl">
+            <p class="pl-3 text-gray-500">{{ __('Vous n\'appartenez à aucune famille pour le moment.') }}</p>
+            <button wire:click="openCreateFamilyModal" class="button-tertiary">
                 <x-svg.add2 class="text-white"/>
                 Créer une famille
             </button>
         </div>
     @endif
+
+    {{-- Modal pour créer une famille --}}
+    @if($showCreateFamilyModal)
+        <x-modal wire:model="showCreateFamilyModal">
+            <x-modal.panel>
+                <form wire:submit.prevent="createFamily">
+                    @csrf
+
+                    <div class="p-6">
+                        <!-- Titre et Description -->
+                        <h2 class="text-xl font-semibold">Créer une famille</h2>
+                        <p class="text-gray-500 text-sm mt-1 mb-2">
+                            Pour commencer à gérer vos dépenses ensemble
+                        </p>
+
+                        <x-divider />
+
+                        <!-- Formulaire simple pour le nom de la famille -->
+                        <div class="grid grid-cols-1 gap-4 mt-6 mb-4">
+                            <x-form.field
+                                label="Nom de la famille"
+                                name="familyName"
+                                model="familyName"
+                                placeholder="Ex: Famille Dupont"
+                                :asterix="true"
+                            />
+                        </div>
+                    </div>
+
+                    <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">
+                        <div class="flex justify-end w-full gap-3">
+                            <x-modal.close>
+                                <button type="button" class="button-secondary">
+                                    {{ __('Annuler') }}
+                                </button>
+                            </x-modal.close>
+                            <button type="submit" class="button-primary">
+                                {{ __('Valider le nom') }}
+                                <x-svg.validate />
+                            </button>
+                        </div>
+                    </x-modal.footer>
+                </form>
+            </x-modal.panel>
+        </x-modal>
+    @endif
+
+    {{-- Indicateur de chargement pour la création de famille --}}
+    <div wire:loading wire:target="createFamily" class="fixed left-0 right-0 mx-auto bottom-8 w-fit flex-center z-60">
+        <div class="bg-white dark:bg-gray-800 rounded-full shadow-lg py-2 px-4 flex items-center space-x-3 border border-gray-100 dark:border-gray-700">
+            <svg class="animate-spin h-5 w-5 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span class="pr-1 text-sm font-medium text-gray-700 dark:text-gray-300">Création de la famille en cours...</span>
+        </div>
+    </div>
 
     {{-- Modal pour ajouter un membre à la famille --}}
     @if($showAddMemberModal)

@@ -231,6 +231,7 @@ class Index extends Component
 
         if (! $invoiceFile) {
             session()->flash('error', 'Fichier de facture non trouvé.');
+
             return;
         }
 
@@ -240,6 +241,7 @@ class Index extends Component
 
             if (! Storage::disk('s3')->exists($s3FilePath)) {
                 session()->flash('error', 'Le fichier n\'existe pas sur S3.');
+
                 return;
             }
 
@@ -253,7 +255,7 @@ class Index extends Component
                 'Bucket' => $bucket,
                 'Key' => $s3FilePath,
                 'ResponseContentType' => $this->getContentType($invoiceFile->file_extension),
-                'ResponseContentDisposition' => 'attachment; filename="' . $invoiceFile->file_name . '"',
+                'ResponseContentDisposition' => 'attachment; filename="'.$invoiceFile->file_name.'"',
             ]);
 
             // Générer l'URL signée avec ces paramètres
@@ -263,13 +265,14 @@ class Index extends Component
             // Rediriger vers l'URL présignée qui forcera le téléchargement
             return redirect()->away($presignedUrl);
         } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors du téléchargement: ' . $e->getMessage());
-            \Log::error('Erreur téléchargement S3: ' . $e->getMessage() . ' | ' . $e->getTraceAsString());
+            session()->flash('error', 'Erreur lors du téléchargement: '.$e->getMessage());
+            \Log::error('Erreur téléchargement S3: '.$e->getMessage().' | '.$e->getTraceAsString());
+
             return;
         }
     }
 
-// Méthode auxiliaire pour déterminer le type de contenu
+    // Méthode auxiliaire pour déterminer le type de contenu
     private function getContentType($extension)
     {
         $contentTypes = [
@@ -290,7 +293,7 @@ class Index extends Component
     {
         $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
 
-        if (!$invoiceFile) {
+        if (! $invoiceFile) {
             return null;
         }
 
@@ -327,7 +330,7 @@ class Index extends Component
                         now()->addMinutes(10),
                         [
                             'ResponseContentType' => $contentType,
-                            'ResponseContentDisposition' => 'inline; filename="' . $invoice->file->file_name . '"'
+                            'ResponseContentDisposition' => 'inline; filename="'.$invoice->file->file_name.'"',
                         ]
                     );
                     $this->fileExtension = $invoice->file->file_extension;
@@ -335,10 +338,10 @@ class Index extends Component
                     // Fichier introuvable sur S3
                     $this->filePath = null;
                     $this->fileExtension = $invoice->file->file_extension;
-                    \Log::error('Fichier non trouvé sur S3: ' . $s3FilePath);
+                    \Log::error('Fichier non trouvé sur S3: '.$s3FilePath);
                 }
             } catch (\Exception $e) {
-                \Log::error('Erreur URL temporaire S3: ' . $e->getMessage());
+                \Log::error('Erreur URL temporaire S3: '.$e->getMessage());
                 $this->filePath = null;
                 $this->fileExtension = $invoice->file->file_extension;
             }

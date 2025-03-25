@@ -317,7 +317,7 @@ class InvoiceForm extends Form
                 $this->processUploadedFile();
 
                 // Stocker le fichier
-                $userPath = 'invoices/user_' . auth()->user()->id;
+                $userPath = 'invoices/user_'.auth()->user()->id;
                 $this->filePath = $this->uploadedFile->store($userPath, 's3');
 
                 // Récupérer l'ancien fichier si édition

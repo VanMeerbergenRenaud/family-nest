@@ -5,7 +5,6 @@ namespace App\Livewire;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Forms\RegisterForm;
 use App\Models\FamilyInvitation;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -13,7 +12,9 @@ use Livewire\Component;
 class FamilyInvitationHandler extends Component
 {
     public ?FamilyInvitation $invitation = null;
+
     public RegisterForm $form;
+
     public string $token = '';
 
     public function mount($token)
@@ -22,7 +23,7 @@ class FamilyInvitationHandler extends Component
         $this->invitation = FamilyInvitation::where('token', $token)->first();
 
         // Vérifier si l'invitation existe
-        if (!$this->invitation || $this->invitation->isExpired()) {
+        if (! $this->invitation || $this->invitation->isExpired()) {
             $this->redirectRoute('welcome');
         }
 
@@ -38,7 +39,7 @@ class FamilyInvitationHandler extends Component
     public function acceptInvitation(): void
     {
         // Vérifier si l'invitation est valide
-        if (!$this->validateInvitation()) {
+        if (! $this->validateInvitation()) {
             $this->redirectRoute('welcome', ['error' => 'Cette invitation n\'est plus valide.']);
         }
 
@@ -53,7 +54,9 @@ class FamilyInvitationHandler extends Component
 
     public function register(): void
     {
-        if (!$this->validateInvitation()) return;
+        if (! $this->validateInvitation()) {
+            return;
+        }
 
         try {
             // Méthode RegisterForm pour créer le compte
@@ -78,14 +81,16 @@ class FamilyInvitationHandler extends Component
     private function validateInvitation(): bool
     {
         // Vérification de l'invitation
-        if (!$this->invitation || $this->invitation->isExpired()) {
+        if (! $this->invitation || $this->invitation->isExpired()) {
             session()->flash('error', 'Cette invitation n\'est plus valide.');
+
             return false;
         }
 
         // Vérification de l'email
         if (Auth::check() && Auth::user()->email !== $this->invitation->email) {
             session()->flash('error', 'Vous devez vous connecter avec le compte associé à cette invitation.');
+
             return false;
         }
 
@@ -120,7 +125,7 @@ class FamilyInvitationHandler extends Component
     public function render()
     {
         // Invitation expirée
-        if (!$this->invitation || $this->invitation->isExpired()) {
+        if (! $this->invitation || $this->invitation->isExpired()) {
             return view('livewire.family-invitation.expired')->layout('layouts.guest');
         }
 
