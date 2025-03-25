@@ -14,7 +14,7 @@
         type="{{ $type }}"
         wire:model.blur="{{ $model }}"
         placeholder="{{ $placeholder }}"
-        class="w-full pl-3 pr-2 py-2 placeholder:text-[0.9375rem] text-[0.9375rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 disabled:bg-gray-200 dark:disabled:bg-slate-700 disabled:cursor-not-allowed @error($name) input-invalid @enderror"
+        class="w-full pl-3 pr-2 py-2 placeholder:text-[0.9375rem] text-[0.9375rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 @error($name) input-invalid @enderror"
         {{ $attributes }}
     >
 </x-form.field-base>

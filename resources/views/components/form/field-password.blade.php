@@ -13,7 +13,7 @@
             type="password"
             wire:model.blur="{{ $model }}"
             placeholder="••••••••"
-            class="m-0 px-3 py-2 block w-full placeholder:text-[0.9375rem] text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200"
+            class="m-0 px-3 py-2 block w-full placeholder:text-[0.9375rem] text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error($name) input-invalid @enderror"
             x-bind:type="show ? 'text' : 'password'"
             {{ $attributes }}
         >
