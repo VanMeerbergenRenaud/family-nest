@@ -114,8 +114,8 @@ class InvoiceForm extends Form
         return [
             // Fichier
             'uploadedFile' => $this->existingFilePath
-                ? 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:102400'
-                : 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:102400',
+                ? 'nullable|file|mimes:jpg,jpeg,png,pdf,docx|max:10240'
+                : 'required|file|mimes:jpg,jpeg,png,pdf,docx|max:10240',
 
             // Étape 1 - Informations générales
             'name' => 'required|string|max:255',
