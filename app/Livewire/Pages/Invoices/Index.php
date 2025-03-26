@@ -365,6 +365,8 @@ class Index extends Component
 
             $this->showFolderModal = false;
             $this->archivedWithSuccess = true;
+
+            $this->js('window.location.reload()');
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
         }

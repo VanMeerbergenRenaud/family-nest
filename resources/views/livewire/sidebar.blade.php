@@ -67,11 +67,11 @@
     {{-- Desktop sidebar menu --}}
     <aside
         class="hidden lg:flex lg:flex-col lg:fixed h-full rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800 transition-all duration-300 z-50"
-        :class="{ 'lg:w-64': @js($expanded), 'lg:w-20': !@js($expanded) }"
+        style="width: {{ session('sidebar_expanded', true) ? '16rem' : '5rem' }};"
     >
         <div class="h-full px-4.5 pt-6 pb-4 flex flex-col justify-between gap-4 overflow-y-visible rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800">
 
-            <!-- Navigation header -->
+        <!-- Navigation header -->
             <div class="flex items-center justify-between pl-2">
                 <a href="{{ route('dashboard') }}"
                    class="flex items-center"
