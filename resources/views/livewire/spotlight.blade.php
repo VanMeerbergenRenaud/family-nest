@@ -51,14 +51,11 @@
                                         Suggestions
                                     </h3>
                                     <ul role="list" class="flex flex-col gap-1">
-                                        <x-spotlight.result href="#" text="Voir mes factures">
-                                            <x-svg.changelog class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
+                                        <x-spotlight.result href="{{ route('invoices.create') }}" text="Ajouter une nouvelle facture" shortcut="⌘ X">
+                                            <x-svg.add2 class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
                                         </x-spotlight.result>
-                                        <x-spotlight.result href="#" text="Ajouter une nouvelle facture" shortcut="⌘ N">
-                                            <x-svg.help class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
-                                        </x-spotlight.result>
-                                        <x-spotlight.result href="#" text="Inviter un membre à la famille">
-                                            <x-svg.user-plus class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
+                                        <x-spotlight.result href="{{ route('invoices.archived') }}" text="Voir mes factures archivées">
+                                            <x-svg.archive class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
                                         </x-spotlight.result>
                                     </ul>
                                 </div>
@@ -86,7 +83,7 @@
                                                 @endif
                                                 @if ($result instanceof \App\Models\Invoice)
                                                     <x-spotlight.result href="{{ route('invoices.show', $result) }}" text="{{ $result->name }}" description="({{ $result->amount }}€)">
-                                                        <x-svg.invoice class="h-5 w-5 text-gray-600 dark:text-gray-500"/>
+                                                        <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800"/>
                                                     </x-spotlight.result>
                                                 @endif
                                             @endforeach
@@ -108,7 +105,7 @@
 
                                 {{-- Arrows up/down --}}
                                 <div class="flex-center space-x-2">
-                                    <button type="button" class="py-2 px-1.5 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">
+                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
                                         <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12" viewBox="0 0 12 12" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -116,8 +113,8 @@
                                                 stroke="currentColor" stroke-width="1.67" stroke-linecap="round"
                                                 stroke-linejoin="round"/>
                                         </svg>
-                                    </button>
-                                    <button type="button" class="py-2 px-1.5 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">
+                                    </div>
+                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
                                         <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12" viewBox="0 0 12 12" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -125,13 +122,13 @@
                                                 stroke="currentColor" stroke-width="1.67" stroke-linecap="round"
                                                 stroke-linejoin="round"/>
                                         </svg>
-                                    </button>
+                                    </div>
                                     <span class="text-sm-medium text-gray-500 dark:text-gray-400">naviguer</span>
                                 </div>
 
                                 {{-- Arrow enter --}}
                                 <div class="flex-center space-x-2">
-                                    <button type="button" class="py-2 px-1.5 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600">
+                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
                                         <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="14" height="14" viewBox="0 0 14 14" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
@@ -139,22 +136,21 @@
                                                 stroke="currentColor" stroke-width="1.67" stroke-linecap="round"
                                                 stroke-linejoin="round"/>
                                         </svg>
-                                    </button>
+                                    </div>
                                     <span class="text-sm-medium text-gray-500 dark:text-gray-400">sélectionné</span>
                                 </div>
 
                                 {{-- Key escape --}}
                                 <div class="flex-center space-x-2">
-                                    <button type="button"
-                                            class="pt-1 pb-1 px-1.5 rounded-lg border border-gray-300 hover:bg-gray-100 dark:border-gray-700 text-sm-medium text-gray-500 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600">
+                                    <div class="pt-1 pb-1 px-1.5 rounded-lg border border-gray-300 dark:border-gray-700 text-sm-medium text-gray-500 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600">
                                         esc
-                                    </button>
+                                    </div>
                                     <span class="text-sm-medium text-gray-500 dark:text-gray-400">fermer</span>
                                 </div>
 
                                 {{-- Settings --}}
                                 <div class="ml-auto flex">
-                                    <a href="#" class="inline-block py-2.5 px-2">
+                                    <a href="{{ route('settings.index') }}" class="inline-block py-2.5 px-2" title="Vers les paramètres" wire:navigate>
                                         <x-svg.settings class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
                                     </a>
                                 </div>
@@ -173,17 +169,26 @@
 </div>
 
 <script>
-    // Spotlight keyboard ⌘+k shortcut
+    // Keyboard shortcuts handler
     document.addEventListener('keydown', function (event) {
-        if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
-            event.preventDefault();
-            @this.set('spotlightOpen', !@this.spotlightOpen);
+        // Si touche ⌘ ou CTRL est pressée
+        if (event.metaKey || event.ctrlKey) {
+            // Raccourci ⌘+K ou CTRL+K pour le spotlight
+            if (event.key === 'k') {
+                event.preventDefault();
+                @this.set('spotlightOpen', !@this.spotlightOpen);
 
-            // Focus on the search input
-            if (@this.spotlightOpen) {
-                setTimeout(() => {
-                    document.querySelector('[x-ref="searchInput"]').focus();
-                }, 100);
+                // Focus sur le champ de recherche si le spotlight est ouvert
+                if (@this.spotlightOpen) {
+                    setTimeout(() => {
+                        document.getElementById('search').focus();
+                    }, 100);
+                }
+            }
+            // Raccourci ⌘+X ou CTRL+X pour ajouter une facture
+            else if (event.key === 'x') {
+                event.preventDefault();
+                document.getElementById('add-invoice-link')?.click();
             }
         }
     });

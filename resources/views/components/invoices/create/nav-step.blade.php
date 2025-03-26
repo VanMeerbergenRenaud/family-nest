@@ -1,6 +1,6 @@
 <div class="mb-2 lg:mb-6">
     <!-- Navigation mobile -->
-    <div class="lg:hidden flex items-center justify-between px-4 py-3 bg-gray-50 dark:bg-gray-800 md:max-w-[60vw] mx-auto">
+    <div class="lg:hidden flex items-center justify-between px-4 pb-3 bg-gray-50 dark:bg-gray-800 md:max-w-[60vw] mx-auto">
 
         <button
             @click="currentStep > 1 ? prevStep() : null"

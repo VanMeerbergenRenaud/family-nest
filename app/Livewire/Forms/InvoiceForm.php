@@ -320,7 +320,6 @@ class InvoiceForm extends Form
                 $userPath = 'invoices/user_'.auth()->user()->id;
                 $this->filePath = $this->uploadedFile->store($userPath, 's3');
 
-
                 // Récupérer l'ancien fichier si édition
                 $oldFile = null;
                 if ($this->invoice) {

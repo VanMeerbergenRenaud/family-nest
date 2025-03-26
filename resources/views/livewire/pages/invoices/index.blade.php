@@ -53,7 +53,7 @@
                     class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-yellow-50 dark:bg-yellow-900">
                 <div class="flex flex-col text-left">
                     <div class="mb-3.5 p-3 rounded-lg w-fit bg-yellow-100 dark:bg-yellow-900">
-                        <x-heroicon-o-document class="w-6 h-6 text-yellow-500 dark:text-yellow-400"/>
+                        <x-svg.document class="w-6 h-6 text-yellow-500 dark:text-yellow-400"/>
                     </div>
                     <span class="text-md-medium text-gray-900 dark:text-white">Retard de paiement</span>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
@@ -84,13 +84,12 @@
 
         <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
             @if($recentInvoices->isEmpty())
-                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full">
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full border border-slate-200">
                     <p class="text-gray-500 dark:text-gray-400">{{ __('Aucune facture récente.') }}</p>
                 </div>
             @else
                 @foreach($recentInvoices as $invoice)
-                    <div
-                        class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
                         <div class="flex items-center justify-between gap-4">
                             <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                 <x-svg.file-size class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
@@ -114,7 +113,7 @@
     </section>
 
     {{-- Tableau regroupant toutes les factures --}}
-    <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+    <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
 
         {{-- En-tête --}}
         <div
@@ -713,7 +712,7 @@
                         <!-- État vide -->
                         <div
                             class="flex flex-col items-center justify-center py-16 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
-                            <x-heroicon-o-document-text class="w-14 h-14 text-gray-300 dark:text-gray-700 mb-3"/>
+                            <x-svg.document class="w-14 h-14 text-gray-300 dark:text-gray-700 mb-3"/>
                             <p class="text-base font-medium text-gray-700 dark:text-gray-300">{{ __('Aucune facture dans cette catégorie') }}</p>
                             <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">{{ __('Les factures que vous ajouterez apparaîtront ici !') }}</p>
                         </div>

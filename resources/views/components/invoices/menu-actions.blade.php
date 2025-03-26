@@ -22,10 +22,11 @@
         <x-menu.divider/>
 
         <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
-            <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
             @if($invoice->is_favorite)
+                <x-svg.star class="w-4 h-4 group-hover:text-gray-900 fill-current"/>
                 {{ __('Retirer des favoris') }}
             @else
+                <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
                 {{ __('Ajouter aux favoris') }}
             @endif
         </x-menu.item>

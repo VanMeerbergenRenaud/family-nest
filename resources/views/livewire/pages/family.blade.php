@@ -5,7 +5,7 @@
     </div>
 
     @if($family)
-        <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl shadow-sm">
+        <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
             <div
                 class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
@@ -47,7 +47,7 @@
             </div>
 
             @if($members->isEmpty())
-                <div class="p-6 text-center">
+                <div class="p-6 text-center border border-slate-200">
                     <p class="text-gray-500">{{ __('Aucun membre dans la famille pour le moment.') }}</p>
                 </div>
             @else
