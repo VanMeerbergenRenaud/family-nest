@@ -237,7 +237,7 @@ class Index extends Component
             $s3FilePath = $invoiceFile->getRawOriginal('file_path');
 
             if (! Storage::disk('s3')->exists($s3FilePath)) {
-                Toaster::error('Fichier introuvable::Fichier mal enregistré, veuillez modifier votre facture');
+                Toaster::error('Fichier introuvable ou mal enregistré::Veuillez modifier votre facture et importer à nouveau le fichier.');
 
                 return;
             }
@@ -262,8 +262,8 @@ class Index extends Component
             // Rediriger vers l'URL présignée qui forcera le téléchargement
             return redirect()->away($presignedUrl);
         } catch (\Exception $e) {
-            session()->flash('error', 'Erreur lors du téléchargement: '.$e->getMessage());
-            \Log::error('Erreur téléchargement S3: '.$e->getMessage().' | '.$e->getTraceAsString());
+            Toaster::error('Erreur lors du téléchargement::Le fichier n‘a pas pu être téléchargé.');
+            \Log::error('Erreur téléchargement S3: '.$e->getMessage());
 
             return;
         }
@@ -335,12 +335,14 @@ class Index extends Component
                     // Fichier introuvable sur S3
                     $this->filePath = null;
                     $this->fileExtension = $invoice->file->file_extension;
+                    Toaster::error('Fichier introuvable::Le fichier n‘existe pas...');
                     \Log::error('Fichier non trouvé sur S3: '.$s3FilePath);
                 }
             } catch (\Exception $e) {
-                \Log::error('Erreur URL temporaire S3: '.$e->getMessage());
                 $this->filePath = null;
                 $this->fileExtension = $invoice->file->file_extension;
+                Toaster::error('Erreur lors de l‘affichage::La facture n‘a pas pu être affichée.');
+                \Log::error('Erreur URL temporaire S3: '.$e->getMessage());
             }
         } else {
             $this->filePath = null;
@@ -365,6 +367,7 @@ class Index extends Component
             Toaster::success('Facture archivée avec succès !');
 
         } catch (\Exception $e) {
+            Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
             \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
         }
     }

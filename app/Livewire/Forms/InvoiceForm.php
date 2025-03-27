@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use Masmerise\Toaster\Toaster;
 
 class InvoiceForm extends Form
 {
@@ -377,6 +378,7 @@ class InvoiceForm extends Form
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Toaster::error("Une erreur est survenue lors du traitement de la facture");
             Log::error('Erreur lors du traitement de la facture: '.$e->getMessage());
 
             return false;

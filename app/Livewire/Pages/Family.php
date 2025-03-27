@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Masmerise\Toaster\Toaster;
 
 class Family extends Component
 {
@@ -145,11 +146,11 @@ class Family extends Component
             $this->reset(['memberEmail', 'memberPermission', 'memberRelation']);
             $this->showAddMemberModal = false;
 
-            session()->flash('message', 'Invitation envoyée avec succès');
+            Toaster::success('Invitation envoyée avec succès');
 
         } catch (\Exception $e) {
             Log::error("Erreur d'envoi d'invitation: ".$e->getMessage());
-            session()->flash('error', "Erreur lors de l'envoi de l'invitation. Veuillez réessayer.");
+            Toaster::error("Erreur lors de l'envoi d'invitation::Vérifiez correctement cette adresse email et réessayez.");
         }
     }
 
@@ -176,14 +177,12 @@ class Family extends Component
             $this->reset(['familyName']);
             $this->showCreateFamilyModal = false;
 
-            session()->flash('message', 'Famille créée avec succès');
+            Toaster::success('Famille créée avec succès');
 
-            // Recharger la page pour afficher la nouvelle famille
             $this->redirectRoute('family');
-
         } catch (\Exception $e) {
             Log::error('Erreur de création de famille: '.$e->getMessage());
-            session()->flash('error', 'Erreur lors de la création de la famille. Veuillez réessayer.');
+            Toaster::error('Erreur lors de la création de la famille::Vérifiez que le nom de la famille et réessayez.');
         }
     }
 

@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Traits\InvoiceTagManagement;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Masmerise\Toaster\Toaster;
 
 class Edit extends Component
 {
@@ -242,7 +243,7 @@ class Edit extends Component
         if ($invoice) {
             $this->redirectRoute('invoices.index', $invoice);
         } else {
-            session()->flash('error', 'Une erreur est survenue lors de la mise à jour de la facture');
+            Toaster::error('Mise à jour de la facture::Une erreur s\'est produite lors de la mise à jour de la facture.');
         }
     }
 

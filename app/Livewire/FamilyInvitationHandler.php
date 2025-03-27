@@ -8,6 +8,7 @@ use App\Models\FamilyInvitation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Masmerise\Toaster\Toaster;
 
 class FamilyInvitationHandler extends Component
 {
@@ -32,7 +33,7 @@ class FamilyInvitationHandler extends Component
 
         // Vérifier si l'utilisateur connecté a un email différent de l'invitation
         if (Auth::check() && Auth::user()->email !== $this->invitation->email) {
-            session()->flash('error', 'Vous devez vous connecter avec le compte associé à cette invitation.');
+            Toaster::warning('Attention ! Vous êtes déjà connecté avec un compte::Veuillez vous déconnecter pour accepter cette invitation.');
         }
     }
 
@@ -48,7 +49,7 @@ class FamilyInvitationHandler extends Component
             $this->redirectRoute('family');
         } catch (\Exception $e) {
             Log::error('Erreur lors de l\'acceptation de l\'invitation', ['error' => $e->getMessage()]);
-            session()->flash('error', 'Une erreur est survenue. Veuillez réessayer.');
+            Toaster::error('Une erreur est survenue::L\'invitation n\'a pas pu être acceptée.');
         }
     }
 
@@ -74,7 +75,7 @@ class FamilyInvitationHandler extends Component
 
         } catch (\Exception $e) {
             Log::error('Erreur création compte', ['error' => $e->getMessage()]);
-            session()->flash('error', 'Une erreur est survenue. Veuillez réessayer.');
+            Toaster::error('Une erreur est survenue::Le compte n\'a pas pu être créé.');
         }
     }
 
@@ -82,14 +83,14 @@ class FamilyInvitationHandler extends Component
     {
         // Vérification de l'invitation
         if (! $this->invitation || $this->invitation->isExpired()) {
-            session()->flash('error', 'Cette invitation n\'est plus valide.');
+            Toaster::error('Cette invitation n\'est plus valide.');
 
             return false;
         }
 
         // Vérification de l'email
         if (Auth::check() && Auth::user()->email !== $this->invitation->email) {
-            session()->flash('error', 'Vous devez vous connecter avec le compte associé à cette invitation.');
+            Toaster::error('Vous êtes déjà connecté::Veuillez vous déconnecter pour accepter cette invitation.');
 
             return false;
         }

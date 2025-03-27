@@ -80,7 +80,7 @@ $sendVerification = function () {
                 </p>
 
                 @if (session('status') === 'verification-link-sent')
-                <p class="mt-2 text-sm text-green-600">
+                    <p class="mt-2 text-sm text-green-600">
                         {{ __('Un nouveau lien de vérification a été envoyé à l’adresse email que vous avez fournie lors de votre inscription.') }}
                     </p>
                 @endif

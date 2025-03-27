@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Traits\InvoiceTagManagement;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Masmerise\Toaster\Toaster;
 
 class Create extends Component
 {
@@ -233,10 +234,10 @@ class Create extends Component
         $invoice = $this->form->store();
 
         if ($invoice) {
-            session()->flash('success', 'La facture a été créée avec succès');
+            Toaster::success('Facture créée avec succès !');
             $this->redirectRoute('invoices.index', $invoice);
         } else {
-            session()->flash('error', 'Une erreur est survenue lors de la création de la facture');
+            Toaster::error('Création de la facture::Une erreur s\'est produite lors de la création de la facture.');
         }
     }
 
