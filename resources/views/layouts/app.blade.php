@@ -20,6 +20,8 @@
             <x-divider class="mb-4" />
         </header>
 
+        <x-toaster-hub />
+
         {{-- MAIN --}}
         <main class="p-4">
             <livewire:spotlight /> {{-- Spotlight search --}}

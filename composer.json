@@ -18,6 +18,7 @@
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
         "mailersend/laravel-driver": "^2.8",
+        "masmerise/livewire-toaster": "^2.7",
         "meilisearch/meilisearch-php": "^1.13",
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/google": "^4.1",

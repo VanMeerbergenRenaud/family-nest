@@ -10,6 +10,8 @@
 
         <livewire:sidebar />
 
+        <x-toaster-hub />
+
         <main class="flex-1 transition-all duration-300 max-lg:!ml-0"
               style="margin-left: {{ session('sidebar_expanded', true) ? '16rem' : '5rem' }};"
         >
