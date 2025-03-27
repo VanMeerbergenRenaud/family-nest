@@ -919,20 +919,4 @@
             </x-modal.panel>
         </x-modal>
     @endif
-
-    @if($archivedWithSuccess)
-        <x-flash-message
-            icon="archive"
-            title="Facture archivée !"
-            method="$set('archivedWithSuccess', false)"
-        />
-    @endif
-
-    @if($downloadNotWorking)
-        <x-flash-message
-            icon="import"
-            title="Le téléchargement n'a pas fonctionné !"
-            method="$set('downloadNotWorking', false)"
-        />
-    @endif
 </div>

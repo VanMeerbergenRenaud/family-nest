@@ -7,6 +7,7 @@ use App\Models\InvoiceFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Masmerise\Toaster\Toaster;
 
 class Index extends Component
 {
@@ -21,10 +22,6 @@ class Index extends Component
     public $fileExtension;
 
     public bool $showInvoicePreviewModal = false;
-
-    public bool $archivedWithSuccess;
-
-    public bool $downloadNotWorking = false;
 
     // Filtres et colonnes...
     public $sortField = 'name';
@@ -220,9 +217,9 @@ class Index extends Component
     }
 
     // Implémentations des fonctionnalités manquantes
-    public function downloadAllFiles()
+    public function downloadAllFiles(): void
     {
-        dd('Download all the files');
+        Toaster::error('Méthode de téléchargement de plusieurs fichiers non implémentée.');
     }
 
     public function downloadInvoice($invoiceId)
@@ -230,7 +227,7 @@ class Index extends Component
         $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
 
         if (! $invoiceFile) {
-            session()->flash('error', 'Fichier de facture non trouvé.');
+            Toaster::error('Aucun fichier trouvé pour cette facture.');
 
             return;
         }
@@ -240,7 +237,7 @@ class Index extends Component
             $s3FilePath = $invoiceFile->getRawOriginal('file_path');
 
             if (! Storage::disk('s3')->exists($s3FilePath)) {
-                session()->flash('error', 'Le fichier n\'existe pas sur S3.');
+                Toaster::error('Fichier introuvable::Fichier mal enregistré, veuillez modifier votre facture');
 
                 return;
             }
@@ -364,9 +361,9 @@ class Index extends Component
             $this->invoice->update(['is_archived' => true]);
 
             $this->showFolderModal = false;
-            $this->archivedWithSuccess = true;
 
-            $this->js('window.location.reload()');
+            Toaster::success('Facture archivée avec succès !');
+
         } catch (\Exception $e) {
             \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
         }

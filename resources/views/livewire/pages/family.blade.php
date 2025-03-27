@@ -114,7 +114,7 @@
                         </thead>
                         <tbody>
                         @foreach($members as $member)
-                            <tr class="{{ $member->id === $currentUser ? 'bg-gray-50' : '' }}">
+                            <tr>
                                 <td>
                                     <div class="flex items-center">
                                         <div class="mr-3 rounded">
@@ -127,8 +127,7 @@
                                                class="text-sm-medium text-gray-900 dark:text-gray-400">
                                                {{ ucfirst($member->name) }}
                                                @if($member->id === $currentUser)
-                                                   <span
-                                                       class="ml-2 text-xs-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full">Vous</span>
+                                                   <span class="ml-2 text-xs-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full">Vous</span>
                                                @endif
                                            </span>
                                             <span class="text-sm-regular text-gray-500 dark:text-gray-400">

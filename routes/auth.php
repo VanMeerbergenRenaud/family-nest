@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Livewire\FamilyInvitationHandler;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -33,8 +34,6 @@ Route::middleware('auth')->group(function () {
         ->name('password.confirm');
 });
 
-Route::get('/logout', function () {
-    (new App\Livewire\Actions\Logout)();
-
-    return redirect()->route('welcome');
-})->name('logout');
+// Route d'invitation utilisant le composant Livewire
+Route::get('/invitation/{token}', FamilyInvitationHandler::class)
+    ->name('family.invitation');

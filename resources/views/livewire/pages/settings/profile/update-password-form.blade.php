@@ -35,7 +35,7 @@ $updatePassword = function () {
 
     $this->reset('current_password', 'password', 'password_confirmation');
 
-    $this->dispatch('password-updated');
+    Toaster::success('Mot de passe mis à jour.');
 };
 
 ?>
@@ -92,13 +92,6 @@ $updatePassword = function () {
                     class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
                 {{ __('Sauvegarder') }}
             </button>
-
-            <x-action-message on="password-updated">
-                <p>{{ __('Mot de passe mis à jour.') }}</p>
-                <button type="button" @click="actionMessage = false" class="text-gray-600 hover:text-gray-800">
-                    <x-svg.cross/>
-                </button>
-            </x-action-message>
         </div>
     </form>
 </section>
