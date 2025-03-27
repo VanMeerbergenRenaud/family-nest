@@ -53,6 +53,13 @@ class Family extends Component
         'other' => 'Autre',
     ];
 
+    public bool $showFamilyExempleModal;
+
+    public function showFamilyExemple(): void
+    {
+        $this->showFamilyExempleModal = true;
+    }
+
     public function sortBy($field): void
     {
         if ($this->sortField === $field) {

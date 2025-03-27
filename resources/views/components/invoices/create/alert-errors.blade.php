@@ -72,15 +72,15 @@
             $alertTitle = 'Aucune information';
         } elseif ($progressPercentage < 33) {
             $alertType = 'warning';
-            $barColor = 'bg-red-400';
+            $barColor = 'bg-orange-400';
             $alertTitle = 'Début de saisie';
         } elseif ($progressPercentage < 70) {
             $alertType = $errors->any() ? 'warning' : 'inProgress';
-            $barColor = 'bg-orange-400';
+            $barColor = 'bg-orange-500';
             $alertTitle = 'En cours de complétion';
         } elseif ($progressPercentage < 100) {
             $alertType = $errors->any() ? 'warning' : 'inProgress';
-            $barColor = 'bg-blue-500';
+            $barColor = 'bg-orange-600';
             $alertTitle = 'Presque terminé';
         } else {
             $alertType = $errors->any() ? 'warning' : 'success';

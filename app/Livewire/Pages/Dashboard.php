@@ -8,24 +8,17 @@ class Dashboard extends Component
 {
     public $user;
 
+    public bool $showDashboardExempleModal;
+
     public function mount()
     {
         $this->user = auth()->user();
     }
 
-    /*public $showModal = false;
-
-    public $isSidebarOpen = false;
-
-    public function toggleSidebar()
+    public function showDashboardExemple(): void
     {
-        $this->isSidebarOpen = ! $this->isSidebarOpen;
+        $this->showDashboardExempleModal = true;
     }
-
-    public function openModal()
-    {
-        $this->showModal = true;
-    }*/
 
     public function render()
     {

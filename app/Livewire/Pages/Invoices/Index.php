@@ -107,7 +107,7 @@ class Index extends Component
     }
 
     // Méthode pour obtenir les statistiques des dossiers
-    public function getFolderStats()
+    public function getFolderStats(): array
     {
         $invoice = auth()->user()->invoices
             ->where('is_archived', false);
@@ -137,7 +137,7 @@ class Index extends Component
     }
 
     // Méthodes de filtrage
-    public function applyFilter($filter)
+    public function applyFilter($filter): void
     {
         if (empty($filter)) {
             $this->activeFilter = null;
@@ -158,7 +158,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function resetSort()
+    public function resetSort(): void
     {
         $this->sortField = 'name';
         $this->sortDirection = 'desc';
@@ -166,19 +166,19 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function toggleColumn($column)
+    public function toggleColumn($column): void
     {
         if (isset($this->visibleColumns[$column])) {
             $this->visibleColumns[$column] = ! $this->visibleColumns[$column];
         }
     }
 
-    public function isColumnVisible($column)
+    public function isColumnVisible($column): bool
     {
         return isset($this->visibleColumns[$column]) && $this->visibleColumns[$column];
     }
 
-    public function resetColumns()
+    public function resetColumns(): void
     {
         $this->visibleColumns = [
             'name' => true,
@@ -195,7 +195,7 @@ class Index extends Component
         $this->js('window.location.reload()');
     }
 
-    public function sortBy($field)
+    public function sortBy($field): void
     {
         $this->activeFilter = null;
 
@@ -209,7 +209,7 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function toggleFavorite($invoiceId)
+    public function toggleFavorite($invoiceId): void
     {
         $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
         $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
@@ -270,7 +270,7 @@ class Index extends Component
     }
 
     // Méthode auxiliaire pour déterminer le type de contenu
-    private function getContentType($extension)
+    private function getContentType($extension): string
     {
         $contentTypes = [
             'pdf' => 'application/pdf',
@@ -286,7 +286,7 @@ class Index extends Component
         return $contentTypes[strtolower($extension)] ?? 'application/octet-stream';
     }
 
-    public function getS3FileUrl($invoiceId)
+    public function getS3FileUrl($invoiceId): ?string
     {
         $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
 
@@ -365,6 +365,8 @@ class Index extends Component
             $this->showFolderModal = false;
 
             Toaster::success('Facture archivée avec succès !');
+
+            $this->redirectRoute('invoices.index');
 
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');

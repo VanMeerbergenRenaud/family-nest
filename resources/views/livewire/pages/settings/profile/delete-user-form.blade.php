@@ -39,8 +39,7 @@ $deleteUser = function (Logout $logout) {
 
     <x-modal wire:model="showModal">
         <x-modal.open>
-            <button type="submit"
-                    class="inline-flex items-center px-4 py-2 bg-red-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+            <button type="submit" class="button-danger">
                 {{ __('Supprimer le compte') }}
             </button>
         </x-modal.open>
@@ -71,12 +70,12 @@ $deleteUser = function (Logout $logout) {
 
                 <x-modal.footer>
                     <x-modal.close>
-                        <button type="button">
+                        <button type="button" class="button-secondary">
                             {{ __('Annuler') }}
                         </button>
                     </x-modal.close>
 
-                    <button type="submit">
+                    <button type="submit" class="button-danger">
                         {{ __('Supprimer le compte') }}
                     </button>
                 </x-modal.footer>

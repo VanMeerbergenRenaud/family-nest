@@ -54,7 +54,7 @@
                                 $isCsv = $fileExtension === 'csv';
                                 $fileSize = $form->fileSize;
                                 $sizeFormatted = $form->formatFileSize($fileSize);
-                                $storagePath = Storage::url($form->existingFilePath);
+                                $storagePath = $invoice->file->file_path;
                             @endphp
 
                             <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">

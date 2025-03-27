@@ -65,24 +65,12 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password_1'),
         ]);
 
-        // Création de la famille principale
-        $mainFamily = Family::factory()->create([
-            'name' => 'Famille Vmb',
-        ]);
-
-        // Ajouter l'utilisateur principal à sa famille en tant qu'administrateur
-        $mainFamily->users()->attach($mainUser->id, [
-            'permission' => 'admin',
-            'relation' => 'self',
-            'is_admin' => true,
-        ]);
-
-        // Création d'une seconde famille (professeurs)
+        // Création d'une famille pour les professeurs
         $teachersFamily = Family::factory()->create([
             'name' => 'Professeurs HEPL',
         ]);
 
-        // Ajouter les enseignants à leur famille
+        // Ajouter les enseignants avec comme professeur principal Dominique
         $teachersFamily->users()->attach($dominique->id, [
             'permission' => 'admin',
             'relation' => 'self',
@@ -97,11 +85,9 @@ class DatabaseSeeder extends Seeder
             $cedric->id => ['permission' => 'viewer', 'relation' => 'colleague'],
         ]);
 
-        /* Invoices pour la famille principale avec leurs fichiers associés */
+        /* Factures pour l'utilisateur principal */
         $invoices = Invoice::factory(20)->create([
             'user_id' => $mainUser->id,
-            'family_id' => $mainFamily->id,
-            'paid_by_user_id' => $mainUser->id,
         ]);
 
         // Créer un fichier pour chaque facture

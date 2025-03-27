@@ -1,14 +1,13 @@
 <div>
-    <div>
-        <h2 class="text-xl-semibold">Membres de la famille</h2>
-        <p class="text-sm-regular text-gray-500">Gérez les membres de votre famille et leurs autorisations de compte ici.</p>
-    </div>
-
     @if($family)
+        <div class="px-4">
+            <h2 class="text-xl-semibold">Membres de la famille</h2>
+            <p class="text-sm-regular text-gray-500">Gérez les membres de votre famille et leurs autorisations de compte ici.</p>
+        </div>
+
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
-            <div
-                class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
                     {{ $family->name }}
                     <span class="relative -top-0.5 ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
@@ -247,7 +246,7 @@
                     </table>
 
                     @if($members->hasPages())
-                        <div class="p-4">
+                        <div class="p-4 border-t border-slate-200">
                             {{ $members->links() }}
                         </div>
                     @endif
@@ -258,13 +257,30 @@
 
     {{-- Ajout de la propriété pour le modal de création de famille --}}
     @if(!$family)
-        <div class="mt-6 p-3 w-full flex justify-between items-center flex-wrap gap-4 overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-xl">
-            <p class="pl-3 text-gray-500">{{ __('Vous n\'appartenez à aucune famille pour le moment.') }}</p>
+        <x-empty-state
+            title="Aucune famille n'a été créée"
+            description="Vous n'avez pas encore de famille ? Créez-en une pour commencer à gérer vos dépenses ensemble."
+        >
             <button wire:click="openCreateFamilyModal" class="button-tertiary">
-                <x-svg.add2 class="text-white"/>
+                <x-svg.add2 class="text-white" />
                 Créer une famille
             </button>
-        </div>
+            <button wire:click="showFamilyExemple" class="button-primary">
+                <x-svg.help class="text-gray-900" />
+                Voir un exemple
+            </button>
+        </x-empty-state>
+
+        @if($showFamilyExempleModal)
+            <x-modal wire:model="showFamilyExempleModal">
+                <x-modal.panel>
+                    <video controls class="w-full h-full rounded-lg" autoplay muted>
+                        <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo prévue.
+                    </video>
+                </x-modal.panel>
+            </x-modal>
+        @endif
     @endif
 
     {{-- Modal pour créer une famille --}}
@@ -312,17 +328,6 @@
             </x-modal.panel>
         </x-modal>
     @endif
-
-    {{-- Indicateur de chargement pour la création de famille --}}
-    <div wire:loading wire:target="createFamily" class="fixed left-0 right-0 mx-auto bottom-8 w-fit flex-center z-60">
-        <div class="bg-white dark:bg-gray-800 rounded-full shadow-lg py-2 px-4 flex items-center space-x-3 border border-gray-100 dark:border-gray-700">
-            <svg class="animate-spin h-5 w-5 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span class="pr-1 text-sm font-medium text-gray-700 dark:text-gray-300">Création de la famille en cours...</span>
-        </div>
-    </div>
 
     {{-- Modal pour ajouter un membre à la famille --}}
     @if($showAddMemberModal)

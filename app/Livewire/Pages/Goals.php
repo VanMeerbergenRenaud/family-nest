@@ -6,6 +6,13 @@ use Livewire\Component;
 
 class Goals extends Component
 {
+    public bool $showGoalExempleModal;
+
+    public function showGoalExemple(): void
+    {
+        $this->showGoalExempleModal = true;
+    }
+
     public function render()
     {
         return view('livewire.pages.goals')

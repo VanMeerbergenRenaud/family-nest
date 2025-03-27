@@ -89,7 +89,7 @@
         @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors;
     }
 
-    tbody td {
+    tbody td, tbody td p {
         @apply text-sm font-normal text-gray-700 dark:text-gray-400;
     }
 
@@ -103,6 +103,10 @@
 
     td {
         @apply px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400;
+    }
+
+    tbody tr:last-of-type {
+        @apply border-b-0;
     }
 }
 

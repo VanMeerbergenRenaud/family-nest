@@ -1,47 +1,109 @@
 <div>
-    <h1 class="text-2xl font-bold mb-6 ml-4">Factures archivées</h1>
-
     @if($archivedInvoices->isEmpty())
-        <div class="bg-white p-6 rounded-lg">
-            <p class="text-gray-700">Aucune facture archivée pour l'instant.</p>
-        </div>
+        <x-empty-state
+            title="Aucune facture archivées pour le moment"
+            description="Les élément de la corbeille contiennent les factures que vous avez initialement choisies de supprimer. Si, par malheur, vous souhaitez récupérer une facture que vous avez supprimée par inadvertance, c'est possible ici. Vous pouvez également supprimer définitivement une facture si vous le souhaitez, mais elle sera alors irrécupérable."
+        >
+            <a href="{{ route('invoices.index') }}" class="button-danger" title="Vers la page des factures">
+                <x-svg.trash class="text-white" />
+                Supprimer une facture
+            </a>
+            <button wire:click="showArchiveExemple" class="button-primary">
+                <x-svg.help class="text-gray-900" />
+                Voir un exemple
+            </button>
+        </x-empty-state>
+
+        @if($showArchiveExempleModal)
+            <x-modal wire:model="showArchiveExempleModal">
+                <x-modal.panel>
+                    <video controls class="w-full h-full rounded-lg" autoplay muted>
+                        <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo prévue.
+                    </video>
+                </x-modal.panel>
+            </x-modal>
+        @endif
     @else
-        <div class="w-full overflow-x-auto rounded-lg border border-gray">
-            <table class="w-full">
+        <div class="flex justify-between items-center flex-wrap gap-4 mt-2 md:px-4 mb-6">
+            <div>
+                <h1 class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h1>
+                <p class="text-sm-regular text-gray-500">
+                    Les éléments affichés ci-dessous seront automatiquement supprimés après 30 jours.
+                </p>
+            </div>
+
+            @if(!$archivedInvoices->isEmpty())
+                <button wire:click="deleteAllInvoicesForm" class="button-danger">
+                    Vider la corbeille
+                </button>
+            @endif
+        </div>
+
+        <div class="w-full overflow-x-auto rounded-lg border border-gray" wire:loading.class="opacity-50">
+            <table>
                 <thead>
                 <tr>
                     <th>Nom</th>
-                    <th>Émetteur</th>
                     <th>Montant</th>
+                    <th>Émetteur</th>
                     <th>Date d'archivage</th>
-                    <th>Actions</th>
+                    <th class="text-right">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                     @foreach ($archivedInvoices as $invoice)
                         <tr>
                             <td>
-                                <p>{{ $invoice->name }}</p>
-                            </td>
-                            <td>
-                                <p>{{ $invoice->issuer_name }}</p>
+                                <div class="flex items-center">
+                                    @php
+                                        $extension = $invoice->file->file_extension ?? null;
+                                    @endphp
+
+                                    <div class="mr-3 p-2 rounded">
+                                        @if(View::exists('components.svg.file.' . $extension))
+                                            <x-dynamic-component :component="'svg.file.' . $extension" class="w-6 h-6"/>
+                                        @else
+                                            <x-svg.file.default class="w-6 h-6"/>
+                                        @endif
+                                    </div>
+
+                                    <div class="flex flex-col">
+                                        <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ ucfirst($invoice->name) }}</span>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <p>
-                                    {{ number_format($invoice->amount, 2, ',', ' ') }} {{ $invoice->currency }}
+                                    {{ number_format($invoice->amount, 2, ',', ' ') ?? '00.0' }} {{ $invoice->currency ?? '€' }}
                                 </p>
                             </td>
                             <td>
-                                <p>{{ $invoice->updated_at->format('d/m/Y H:i') }}</p>
+                                <p>{{ $invoice->issuer_name ?? 'Non défini' }}</p>
                             </td>
                             <td>
-                                <div class="flex space-x-4">
-                                    <button wire:click="restoreInvoice({{ $invoice->id }})" class="button-primary">
-                                        Restaurer
-                                    </button>
-                                    <button wire:click="showDeleteForm({{ $invoice->id }})" class="button-secondary">
-                                        Supprimer définitivement
-                                    </button>
+                                <p>{{ $invoice->payment_due_date ? $invoice->payment_due_date->locale('fr_FR')->isoFormat('D MMMM YYYY') : 'Non définie' }}</p>
+                            </td>
+                            {{-- Actions --}}
+                            <td class="text-right">
+                                <div class="flex justify-end">
+                                    <x-menu>
+                                        <x-menu.button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                            <x-svg.dots class="w-5 h-5 text-gray-500" />
+                                        </x-menu.button>
+
+                                        <x-menu.items>
+                                            <x-menu.item wire:click="restoreInvoice({{ $invoice->id }})">
+                                                <x-svg.restore class="w-4 h-4 group-hover:text-gray-900"/>
+                                                {{ __('Restaurer') }}
+                                            </x-menu.item>
+
+                                            <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500">
+                                                <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
+                                                {{ __('Supprimer définitivement') }}
+                                            </x-menu.item>
+                                        </x-menu.items>
+                                    </x-menu>
                                 </div>
                             </td>
                         </tr>
@@ -51,7 +113,7 @@
         </div>
 
         @if($archivedInvoices->hasPages())
-            <div class="mt-4">
+            <div class="p-4 border-t border-slate-200">
                 {{ $archivedInvoices->links() }}
             </div>
         @endif
@@ -77,10 +139,10 @@
                                         {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
                                     </p>
                                     <div class="mt-6 mb-2 flex flex-col gap-3">
-                                        <label for="confirmation" class="text-sm-medium text-gray-800">
+                                        <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
                                             {{ __('Veuillez tapper "CONFIRMER" pour confirmer la suppression.') }}
                                         </label>
-                                        <input x-model="confirmation" placeholder="CONFIRMER" type="text" id="confirmation"
+                                        <input x-model="confirmation" placeholder="CONFIRMER" type="text" id="delete-definitely-invoice"
                                                class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
                                                autofocus>
                                     </div>
@@ -106,12 +168,54 @@
             </x-modal>
         @endif
 
-        @if($deletedWithSuccess)
-            <x-flash-message
-                icon="delete"
-                title="Facture supprimée !"
-                method="$set('deletedWithSuccess', false)"
-            />
+        <!-- Modale pour vider la corbeille -->
+        @if($showDeleteAllInvoicesFormModal)
+            <x-modal wire:model="showDeleteAllInvoicesFormModal">
+                <x-modal.panel>
+                    <form wire:submit.prevent="deleteDefinitelyAllInvoice">
+                        @csrf
+
+                        <div x-data="{ confirmation: '' }">
+                            <div class="flex gap-x-6 p-8">
+                                <x-svg.advertising/>
+
+                                <div>
+                                    <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                        {{ __('Vider la corbeille') }}
+                                    </h3>
+                                    <p class="mt-2 text-md-regular text-gray-500">
+                                        {{ __('Êtes-vous sûr de vouloir supprimer définitivement toutes les factures archivées') }}
+                                        <strong class="font-semibold">&nbsp;?</strong>
+                                        {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
+                                    </p>
+                                    <div class="mt-6 mb-2 flex flex-col gap-3">
+                                        <label for="delete-definitely-all-invoices" class="text-sm-medium text-gray-800">
+                                            {{ __('Veuillez tapper "VIDER" pour confirmer la suppression.') }}
+                                        </label>
+                                        <input x-model="confirmation" placeholder="VIDER" type="text" id="delete-definitely-all-invoices"
+                                               class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
+                                               autofocus>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <x-modal.footer>
+                                <x-modal.close>
+                                    <button type="button" class="button-secondary">
+                                        {{ __('Annuler') }}
+                                    </button>
+                                </x-modal.close>
+
+                                <x-modal.close>
+                                    <button type="submit" class="button-danger" :disabled="confirmation !== 'VIDER'">
+                                        {{ __('Vider la corbeille') }}
+                                    </button>
+                                </x-modal.close>
+                            </x-modal.footer>
+                        </div>
+                    </form>
+                </x-modal.panel>
+            </x-modal>
         @endif
     @endif
 </div>
