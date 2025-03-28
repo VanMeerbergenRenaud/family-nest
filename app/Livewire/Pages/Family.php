@@ -8,6 +8,7 @@ use App\Models\FamilyInvitation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
@@ -26,17 +27,18 @@ class Family extends Component
 
     public bool $isAdmin = false;
 
-    // Propriété pour le nom de la famille
+    #[Validate('required|min:2|max:255')]
     public string $familyName = '';
 
-    // Propriétés pour l'invitation
+    #[Validate('required|email')]
     public string $memberEmail = '';
 
+    #[Validate('required|in:admin,editor,viewer')]
     public string $memberPermission = 'viewer';
 
+    #[Validate('required|in:member,spouse,parent,child,sibling,friend,other')]
     public string $memberRelation = 'member';
 
-    // Options pour les rôles et relations
     public array $availablePermissions = [
         'admin' => 'Administrateur',
         'editor' => 'Éditeur',
@@ -78,13 +80,11 @@ class Family extends Component
 
     public function addMember(): void
     {
-        $this->reset(['memberEmail', 'memberPermission', 'memberRelation']);
         $this->showAddMemberModal = true;
     }
 
     public function openCreateFamilyModal(): void
     {
-        $this->reset(['familyName']);
         $this->showCreateFamilyModal = true;
     }
 
@@ -92,8 +92,8 @@ class Family extends Component
     {
         $this->validate([
             'memberEmail' => 'required|email',
-            'memberPermission' => 'required|in:'.implode(',', array_keys($this->availablePermissions)),
-            'memberRelation' => 'required|in:'.implode(',', array_keys($this->availableRelations)),
+            'memberPermission' => 'required|in:admin,editor,viewer',
+            'memberRelation' => 'required|in:member,spouse,parent,child,sibling,friend,other',
         ]);
 
         $family = auth()->user()->family();
@@ -163,9 +163,7 @@ class Family extends Component
 
     public function createFamily(): void
     {
-        $this->validate([
-            'familyName' => 'required|string|max:255',
-        ]);
+        $this->validate('familyName');
 
         try {
             // Créer la famille

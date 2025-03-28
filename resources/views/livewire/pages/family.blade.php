@@ -341,12 +341,10 @@
                             <!-- Titre et Description -->
                             <div class="text-center space-y-3">
                                 <!-- Avatar Image -->
-                                <div class="flex justify-center mb-2">
-                                    <div class="flex justify-center -space-x-4 mb-2">
-                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
-                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
-                                        <div class="w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden"></div>
-                                    </div>
+                                <div class="flex-center mt-4 mb-6">
+                                    <img src="{{ asset('img/users/three.png') ?? null }}"
+                                         alt="Exemple de 3 avatars"
+                                         class="h-16 w-auto rounded-full object-cover bg-transparent">
                                 </div>
                                 <h2 class="text-2xl font-semibold">Inviter un membre</h2>
                                 <p class="text-gray-600 dark:text-gray-400 px-4 lg:px-12">
@@ -361,7 +359,7 @@
                                     label="Adresse email"
                                     name="memberEmail"
                                     model="memberEmail"
-                                    placeholder="email@exemple.com"
+                                    placeholder="exemple@gmail.com"
                                     type="email"
                                     :asterix="true"
                                 />

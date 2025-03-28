@@ -219,5 +219,10 @@ return [
         'tags' => 'tags',
         'is_favorite' => 'favori',
         'is_archived' => 'archivé',
+        // family
+        'familyName' => 'du nom de famille',
+        'memberEmail' => 'de l‘adresse mail du membre',
+        'memberPermission' =>  'des permissions du membre',
+        'memberRelation' => 'de la relation du membre',
     ],
 ];
