@@ -24,7 +24,6 @@ return new class extends Migration
             /* Step 2 */
             $table->decimal('amount', 10, 2); // Montant de la facture
             $table->string('currency', 3)->default('EUR'); // Devise de la facture
-            $table->string('paid_by')->nullable(); // Personne qui paie la facture
             /* Step 3 */
             $table->date('issued_date')->nullable(); // Date d'émission de la facture
             $table->date('payment_due_date')->nullable(); // Date d'échéance du paiement
@@ -37,12 +36,12 @@ return new class extends Migration
             /* Step 5 */
             $table->text('notes')->nullable(); // Notes supplémentaires
             $table->json('tags')->nullable(); // JSON format for tags
-            /* Archives */
+            /* States */
             $table->boolean('is_archived')->default(false); // Facture archivée
-            /* Favorites */
             $table->boolean('is_favorite')->default(false);
             // Foreign keys
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            // Time stamps
             $table->timestamps();
         });
     }

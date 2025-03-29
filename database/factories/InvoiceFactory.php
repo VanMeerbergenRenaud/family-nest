@@ -52,7 +52,7 @@ class InvoiceFactory extends Factory
             /* Étape 2 */
             'amount' => $this->faker->randomFloat(2, 10, 1000),
             'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
-            'paid_by' => $this->faker->name(),
+            'paid_by_user_id' => $this->faker->randomElement($users->pluck('id')->toArray()),
 
             /* Étape 3 */
             'issued_date' => Carbon::instance($issuedDate)->format('Y-m-d'),
@@ -69,14 +69,13 @@ class InvoiceFactory extends Factory
             'notes' => $this->faker->paragraph(),
             'tags' => $this->faker->words($this->faker->numberBetween(1, 5)),
 
-            /* Archives */
+            /* States */
             'is_archived' => $this->faker->boolean(20), // 20% chance d'être archivé
-
-            /* Favorites */
-            'is_favorite' => $this->faker->boolean(6), // 10% chance d'être favori
+            'is_favorite' => $this->faker->boolean(5), // 5% chance d'être favori
 
             /* Foreign keys */
             'user_id' => $userId,
+            'family_id' => $this->faker->randomElement($users->pluck('family_id')->toArray()),
         ];
     }
 

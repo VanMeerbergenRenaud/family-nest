@@ -34,16 +34,8 @@ return new class extends Migration
 
         // Modification de la table invoices pour référencer la famille plutôt que le membre
         Schema::table('invoices', function (Blueprint $table) {
-            // Supprimer la colonne paid_by_id si elle existe déjà
-            if (Schema::hasColumn('invoices', 'paid_by_id')) {
-                $table->dropForeign(['paid_by_id']);
-                $table->dropColumn('paid_by_id');
-            }
-
-            // Ajouter la colonne famille
-            $table->foreignId('family_id')->nullable()->constrained()->nullOnDelete();
-            // Ajouter la colonne pour qui a payé
             $table->foreignId('paid_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('family_id')->nullable()->constrained()->nullOnDelete();
         });
 
         // Table pivot pour gérer les répartitions de factures entre membres

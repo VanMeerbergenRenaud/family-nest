@@ -68,8 +68,6 @@
                                 break;
                             }
                         }
-                    } elseif ($form->paid_by) {
-                        $payerName = $form->paid_by;
                     }
 
                     // Calculer les totaux
@@ -101,7 +99,7 @@
                     <div class="flex justify-between items-center">
                         <p class="max-sm:mt-1.5 text-sm-regular">
                             Payeur :
-                            @if($payerName)
+                            @if($payerName !== "Non spécifié")
                                 <span class="text-sm-medium">
                             <img src="{{ $payerAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
                             {{ $payerName }}

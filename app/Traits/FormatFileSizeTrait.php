@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-trait FormatSizeTrait
+trait FormatFileSizeTrait
 {
     /**
      * Format a file size in bytes to a human-readable string

@@ -22,10 +22,10 @@ class CompressPdfJob implements ShouldQueue
 
     protected $originalSize;
 
-    // Nombre de tentatives avant d'abandonner
     public int $tries = 3;
 
-    // Create a new job instance.
+    public int $backoff = 30;
+
     public function __construct($invoiceFileId, $originalPath, $originalSize)
     {
         $this->invoiceFileId = $invoiceFileId;
@@ -33,115 +33,117 @@ class CompressPdfJob implements ShouldQueue
         $this->originalSize = $originalSize;
     }
 
-    // Execute the job.
     public function handle(): void
     {
+        $tempDir = null;
+        $tempFilePath = null;
+        $compressedPath = null;
+
         try {
-            // Récupérer le fichier de facture
+            // Get invoice file
             $invoiceFile = InvoiceFile::find($this->invoiceFileId);
-
-            if (! $invoiceFile) {
-                return;
-            }
-
-            // Chemin complet du fichier original
-            $originalFullPath = storage_path('app/public/'.$this->originalPath);
-
-            if (! file_exists($originalFullPath)) {
-                // Mettre à jour le statut en cas d'échec
-                $invoiceFile->update([
-                    'compression_status' => 'failed',
-                    'original_size' => $this->originalSize,
-                    'compression_rate' => 0,
-                ]);
+            if (! $invoiceFile || ! Storage::disk('s3')->exists($this->originalPath)) {
+                $this->markAsFailed($invoiceFile);
 
                 return;
             }
 
-            // Créer un dossier temporaire pour la sortie
-            $tempOutputDir = storage_path('app/public/temp/compressed');
+            // Create temp directories
+            $uniqueId = uniqid();
+            $tempDir = storage_path('app/temp/pdf_compression/'.$uniqueId);
+            $tempOutputDir = $tempDir.'/output';
+            mkdir($tempDir, 0755, true);
+            mkdir($tempOutputDir, 0755, true);
 
-            if (! is_dir($tempOutputDir)) {
-                mkdir($tempOutputDir, 0755, true);
-            }
+            // Download file from S3
+            $tempFilePath = $tempDir.'/'.basename($this->originalPath);
+            file_put_contents($tempFilePath, Storage::disk('s3')->get($this->originalPath));
 
-            // Compresser le PDF
-            Log::info('CompressPdfJob: Début de la compression', [
-                'service' => 'PdfCompressorService',
-            ]);
-
+            // Compress PDF
             $pdfCompressor = app(PdfCompressorService::class);
-
-            $compressedPath = $pdfCompressor->compressPdf(
-                $originalFullPath,
-                $tempOutputDir
-            );
+            $compressedPath = $pdfCompressor->compressPdf($tempFilePath, $tempOutputDir);
 
             if (! $compressedPath || ! file_exists($compressedPath)) {
-                // Mettre à jour le statut en cas d'échec
+                throw new \Exception('Compression failed');
+            }
+
+            // Check if compression is worth it
+            $compressedSize = filesize($compressedPath);
+            if ($compressedSize >= $this->originalSize) {
                 $invoiceFile->update([
-                    'compression_status' => 'failed',
-                    'original_size' => $this->originalSize,
+                    'compression_status' => 'skipped',
                     'compression_rate' => 0,
                 ]);
 
                 return;
             }
 
-            Log::info('CompressPdfJob: Compression réussie', [
-                'compressed_path' => $compressedPath,
-                'compressed_size' => filesize($compressedPath),
-            ]);
+            // Upload compressed file to S3
+            $newS3Path = dirname($this->originalPath).'/compressed_'.basename($this->originalPath);
+            Storage::disk('s3')->put($newS3Path, file_get_contents($compressedPath));
 
-            // Calculer le nouveau chemin de stockage permanent
-            $newFileName = 'compressed_'.basename($this->originalPath);
-            $newFilePath = 'invoices/'.$newFileName;
-
-            // Déplacer le fichier compressé vers le stockage permanent
-            Storage::disk('public')->put(
-                $newFilePath,
-                file_get_contents($compressedPath)
-            );
-
-            // Obtenir la nouvelle taille du fichier
-            $newSize = Storage::disk('public')->size($newFilePath);
-            $compressionRate = round(($this->originalSize - $newSize) / $this->originalSize * 100, 1);
-
-            // Mettre à jour le fichier de facture avec le nouveau fichier
+            // Update invoice file record
+            $compressionRate = round(($this->originalSize - $compressedSize) / $this->originalSize * 100, 1);
             $invoiceFile->update([
-                'file_path' => $newFilePath,
-                'file_size' => $newSize,
+                'file_path' => $newS3Path,
+                'file_size' => $compressedSize,
                 'compression_status' => 'completed',
-                'original_size' => $this->originalSize,
                 'compression_rate' => $compressionRate,
             ]);
 
-            // Nettoyer - supprimer le fichier original si différent du compressé
-            if ($this->originalPath !== $newFilePath) {
-                Storage::disk('public')->delete($this->originalPath);
+            // Delete original file
+            if ($this->originalPath !== $newS3Path) {
+                Storage::disk('s3')->delete($this->originalPath);
             }
 
-            // Nettoyer le fichier temporaire
-            if (file_exists($compressedPath)) {
-                unlink($compressedPath);
-            }
         } catch (\Exception $e) {
-            Log::error('CompressPdfJob: Erreur lors de la compression du PDF: '.$e->getMessage(), [
-                'invoice_file_id' => $this->invoiceFileId,
-                'exception_class' => get_class($e),
-                'stack_trace' => $e->getTraceAsString(),
-            ]);
-
-            // En cas d'exception, mettre également à jour le statut
-            try {
-                InvoiceFile::where('id', $this->invoiceFileId)->update([
-                    'compression_status' => 'failed',
-                    'original_size' => $this->originalSize,
-                    'compression_rate' => 0,
-                ]);
-            } catch (\Exception $updateEx) {
-                Log::error('CompressPdfJob: Impossible de mettre à jour le statut après erreur: '.$updateEx->getMessage());
-            }
+            Log::error('PDF compression error: '.$e->getMessage());
+            $this->markAsFailed(InvoiceFile::find($this->invoiceFileId));
+        } finally {
+            $this->cleanupTempFiles($tempFilePath, $compressedPath, $tempDir);
         }
+    }
+
+    private function markAsFailed(?InvoiceFile $invoiceFile): void
+    {
+        if ($invoiceFile) {
+            $invoiceFile->update([
+                'compression_status' => 'failed',
+                'compression_rate' => 0,
+            ]);
+        }
+    }
+
+    private function cleanupTempFiles(?string $tempFilePath, ?string $compressedPath, ?string $tempDir): void
+    {
+        // Delete temp file
+        if ($tempFilePath && file_exists($tempFilePath)) {
+            unlink($tempFilePath);
+        }
+
+        // Delete compressed file
+        if ($compressedPath && file_exists($compressedPath)) {
+            unlink($compressedPath);
+        }
+
+        // Recursively delete temp directory
+        if ($tempDir && is_dir($tempDir)) {
+            $this->deleteDirectory($tempDir);
+        }
+    }
+
+    private function deleteDirectory(string $dir): bool
+    {
+        if (! is_dir($dir)) {
+            return false;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = $dir.'/'.$file;
+            is_dir($path) ? $this->deleteDirectory($path) : unlink($path);
+        }
+
+        return rmdir($dir);
     }
 }

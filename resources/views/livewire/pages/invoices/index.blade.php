@@ -4,7 +4,7 @@
     @if($invoices->isEmpty())
         <div class="w-full mx-auto bg-white rounded-3xl border border-slate-200">
             <div class="relative px-8 pb-8 flex-center flex-col text-center overflow-hidden">
-                <div class="absolute -top-10 w-full h-100" style="background-image: url('{{ asset('img/empty-invoice.png') }}'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
+                <div class="absolute -top-10 w-full h-100 pointer-events-none" style="background-image: url('{{ asset('img/empty-invoice.png') }}'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
                 <!-- Textes -->
                 <h2 class="text-2xl font-semibold text-gray-900 mt-46 mb-4">
                     Aucune facture créée jusqu'à présent
@@ -860,55 +860,12 @@
 
                         <!-- Contenu réel qui s'affiche une fois chargé -->
                         <div wire:loading.remove>
-                            @if(!$filePath)
-                                <div class="flex-center flex-col p-8">
-                                    <x-svg.error class="w-20 h-20 text-gray-400 my-6"/>
-                                    <p class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        Aucun fichier enregistré !
-                                    </p>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md mb-8">
-                                        Cette facture n'a pas de fichier associé.
-                                    </p>
-                                </div>
-                            @else
-                                @php
-                                    $isImage = in_array(strtolower($fileExtension), ['jpg', 'jpeg', 'png', 'gif']);
-                                    $isPdf = strtolower($fileExtension) === 'pdf';
-                                @endphp
-
-                                @if($isImage)
-                                    <div class="flex-center p-1">
-                                        <img src="{{ $filePath }}" alt="Aperçu de la facture"
-                                             class="min-h-120 rounded-xl flex-center max-w-full object-contain"
-                                             onerror="this.onerror=null; this.src='{{ asset('img/image-error.png') }}'; this.classList.add('error-image');">
-                                    </div>
-                                @elseif($isPdf)
-                                    <div class="flex-center flex-col p-1 h-[600px]">
-                                        <iframe src="{{ $filePath }}" type="application/pdf" width="100%" height="100%"
-                                                class="min-h-120 rounded-xl">
-                                        </iframe>
-                                        <p class="text-center p-4">
-                                            Votre navigateur ne supporte pas l'affichage des PDF.
-                                            <a href="{{ $filePath }}" target="_blank" class="block mt-2 text-blue-500 underline">Voir le fichier dans une nouvelle fenêtre</a>
-                                        </p>
-                                    </div>
-                                @else
-                                    <div class="flex-center flex-col p-8">
-                                        <x-svg.file-size class="w-24 h-24 text-gray-400 mb-6"/>
-                                        <p class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            Prévisualisation non disponible
-                                        </p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md mb-8">
-                                            Le type de fichier "{{ strtoupper($fileExtension) }}" ne peut pas être prévisualisé
-                                            directement. Veuillez télécharger le fichier pour le consulter.
-                                        </p>
-                                        <a href="{{ route('invoice.download', ['id' => $invoice->id]) }}" class="button-primary">
-                                            <x-svg.download class="mr-2"/>
-                                            Télécharger le fichier
-                                        </a>
-                                    </div>
-                                @endif
-                            @endif
+                            <x-file-viewer
+                                :filePath="$filePath"
+                                :fileExtension="$fileExtension"
+                                :fileName="$fileName"
+                                class="min-h-[60vh]"
+                            />
                         </div>
                     </div>
 

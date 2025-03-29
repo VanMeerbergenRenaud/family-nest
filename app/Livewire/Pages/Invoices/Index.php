@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Invoices;
 
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Traits\InvoiceFileUrlTrait;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -11,6 +12,7 @@ use Masmerise\Toaster\Toaster;
 
 class Index extends Component
 {
+    use InvoiceFileUrlTrait;
     use WithPagination;
 
     public Invoice $invoice;
@@ -20,6 +22,10 @@ class Index extends Component
     public $filePath;
 
     public $fileExtension;
+
+    public $fileName;
+
+    public $fileExists = false;
 
     public bool $showInvoicePreviewModal = false;
 
@@ -224,7 +230,9 @@ class Index extends Component
 
     public function downloadInvoice($invoiceId)
     {
-        $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
+        $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)
+            ->where('is_primary', true)
+            ->first();
 
         if (! $invoiceFile) {
             Toaster::error('Aucun fichier trouvé pour cette facture.');
@@ -237,7 +245,7 @@ class Index extends Component
             $s3FilePath = $invoiceFile->getRawOriginal('file_path');
 
             if (! Storage::disk('s3')->exists($s3FilePath)) {
-                Toaster::error('Fichier introuvable ou mal enregistré::Veuillez modifier votre facture et importer à nouveau le fichier.');
+                Toaster::error('Fichier introuvable ou mal enregistré : Veuillez modifier votre facture et importer à nouveau le fichier.');
 
                 return;
             }
@@ -262,7 +270,7 @@ class Index extends Component
             // Rediriger vers l'URL présignée qui forcera le téléchargement
             return redirect()->away($presignedUrl);
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors du téléchargement::Le fichier n‘a pas pu être téléchargé.');
+            Toaster::error('Erreur lors du téléchargement : Le fichier n\'a pas pu être téléchargé.');
             \Log::error('Erreur téléchargement S3: '.$e->getMessage());
 
             return;
@@ -311,43 +319,13 @@ class Index extends Component
 
         $this->invoice = $invoice;
 
-        if ($invoice->file) {
-            // Générer une URL temporaire signée pour tous les types de fichiers
-            try {
-                $s3FilePath = $invoice->file->getRawOriginal('file_path');
+        // Générer l'URL du fichier
+        $fileInfo = $this->generateInvoiceFileUrl($invoice);
 
-                // Vérifier que le fichier existe dans S3
-                if (Storage::disk('s3')->exists($s3FilePath)) {
-                    // Déterminer le type de contenu en fonction de l'extension
-                    $contentType = $this->getContentType($invoice->file->file_extension);
-
-                    // Créer une URL signée temporaire avec les bons en-têtes pour l'affichage
-                    $this->filePath = Storage::disk('s3')->temporaryUrl(
-                        $s3FilePath,
-                        now()->addMinutes(10),
-                        [
-                            'ResponseContentType' => $contentType,
-                            'ResponseContentDisposition' => 'inline; filename="'.$invoice->file->file_name.'"',
-                        ]
-                    );
-                    $this->fileExtension = $invoice->file->file_extension;
-                } else {
-                    // Fichier introuvable sur S3
-                    $this->filePath = null;
-                    $this->fileExtension = $invoice->file->file_extension;
-                    Toaster::error('Fichier introuvable::Le fichier n‘existe pas...');
-                    \Log::error('Fichier non trouvé sur S3: '.$s3FilePath);
-                }
-            } catch (\Exception $e) {
-                $this->filePath = null;
-                $this->fileExtension = $invoice->file->file_extension;
-                Toaster::error('Erreur lors de l‘affichage::La facture n‘a pas pu être affichée.');
-                \Log::error('Erreur URL temporaire S3: '.$e->getMessage());
-            }
-        } else {
-            $this->filePath = null;
-            $this->fileExtension = null;
-        }
+        $this->filePath = $fileInfo['url'];
+        $this->fileExtension = $fileInfo['extension'];
+        $this->fileExists = $fileInfo['exists'];
+        $this->fileName = $invoice->file->file_name;
 
         $this->showFolderModal = false;
         $this->showInvoicePreviewModal = true;

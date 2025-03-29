@@ -15,8 +15,8 @@ class Invoice extends Model
     use HasFactory, Searchable;
 
     protected $fillable = [
-        'name', 'type', 'category', 'issuer_name', 'issuer_website',
-        'amount', 'currency', 'paid_by', 'paid_by_user_id', 'family_id',
+        'name', 'reference', 'type', 'category', 'issuer_name', 'issuer_website',
+        'amount', 'currency', 'paid_by_user_id', 'family_id',
         'issued_date', 'payment_due_date', 'payment_reminder', 'payment_frequency',
         'payment_status', 'payment_method', 'priority',
         'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
@@ -92,25 +92,7 @@ class Invoice extends Model
         });
     }
 
-    /**
-     * Get the primary file for the invoice.
-     */
-    public function primaryFile()
-    {
-        return $this->hasOne(InvoiceFile::class)->where('is_primary', true);
-    }
-
-    /**
-     * Get the user who paid the invoice.
-     */
-    public function paidByUser(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'paid_by_user_id');
-    }
-
-    /**
-     * Get the users who share this invoice.
-     */
+    // Get the users who share this invoice.
     public function sharedUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'invoice_user')
@@ -118,35 +100,8 @@ class Invoice extends Model
             ->withTimestamps();
     }
 
-    /**
-     * Get the total amount of shares allocated.
-     */
-    public function getTotalSharedAmount()
+    public function paidByUser(): BelongsTo
     {
-        return $this->sharedUsers()->sum('share_amount');
-    }
-
-    /**
-     * Get the total percentage of shares allocated.
-     */
-    public function getTotalSharedPercentage()
-    {
-        return $this->sharedUsers()->sum('share_percentage');
-    }
-
-    /**
-     * Check if the invoice has been fully allocated by percentage.
-     */
-    public function isFullyAllocatedByPercentage(): bool
-    {
-        return $this->getTotalSharedPercentage() >= 100;
-    }
-
-    /**
-     * Check if the invoice has been fully allocated by amount.
-     */
-    public function isFullyAllocatedByAmount(): bool
-    {
-        return $this->getTotalSharedAmount() >= $this->amount;
+        return $this->belongsTo(User::class, 'paid_by_user_id');
     }
 }

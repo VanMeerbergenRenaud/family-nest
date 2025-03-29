@@ -20,7 +20,7 @@ trait InvoiceTagManagement
     {
         // Initialiser le tableau des tags s'il est null
         if (! is_array($this->form->tags)) {
-            $this->form->tags = [] ?? null;
+            $this->form->tags = [];
         }
     }
 
@@ -57,51 +57,72 @@ trait InvoiceTagManagement
         $this->tagSuggestions = [];
 
         // Ne pas chercher si la saisie est trop courte
-        if (strlen($this->form->tagInput) < 2) {
+        if (strlen($this->form->tagInput) < 1) {
             $this->showTagSuggestions = false;
 
             return;
         }
 
-        // Utiliser directement la recherche en base de données qui est adaptée au format de stockage actuel
-        $this->tagSuggestions = $this->searchTagsWithDatabase($this->form->tagInput);
-
+        // Utiliser directement la recherche en base de données
+        $this->tagSuggestions = $this->searchTagsInDatabase($this->form->tagInput);
         $this->showTagSuggestions = count($this->tagSuggestions) > 0;
     }
 
     /**
      * Recherche les tags dans la base de données
+     *
+     * @param  string  $query  Texte à rechercher
+     * @return array Liste des tags correspondants
      */
-    private function searchTagsWithDatabase($query): array
+    private function searchTagsInDatabase(string $query): array
     {
-        $tag = DB::table('invoices')
-            ->where('user_id', auth()->id())
-            ->whereNotNull('tags')
-            ->count() === 0;
+        try {
+            // Vérifier si l'utilisateur a des factures avec des tags
+            $hasInvoicesWithTags = DB::table('invoices')
+                ->where('user_id', auth()->id())
+                ->whereNotNull('tags')
+                ->whereRaw("tags::text != '[]'")
+                ->exists();
 
-        // Vérifier si l'utilisateur possède des tags dans sa db
-        if ($tag) {
+            // Si aucune facture avec des tags, retourner un tableau vide
+            if (! $hasInvoicesWithTags || empty($query)) {
+                return [];
+            }
+
+            // Récupérer toutes les factures de l'utilisateur qui ont des tags
+            $invoices = DB::table('invoices')
+                ->where('user_id', auth()->id())
+                ->whereNotNull('tags')
+                ->whereRaw("tags::text != '[]'")
+                ->select('tags')
+                ->get();
+
+            // Extraire tous les tags uniques
+            $allTags = $this->extractTagsFromInvoices($invoices, $query);
+
+            // Exclure les tags déjà sélectionnés
+            return array_values(array_diff($allTags, $this->form->tags));
+        } catch (\Exception $e) {
+            Log::error('Erreur lors de la recherche de tags : '.$e->getMessage());
+
             return [];
         }
+    }
 
-        // Vérifier si la requête est vide
-        if (empty($query)) {
-            return [];
-        }
-
-        // Récupérer toutes les factures de l'utilisateur qui ont des tags
-        $invoices = DB::table('invoices')
-            ->where('user_id', auth()->id())
-            ->whereNotNull('tags')
-            ->whereRaw("tags::text != '[]'")
-            ->select('tags')
-            ->get();
-
-        // Extraire tous les tags
+    /**
+     * Extrait les tags des factures qui correspondent à la requête
+     *
+     * @param  \Illuminate\Support\Collection  $invoices  Collection de factures
+     * @param  string  $query  Texte à rechercher
+     * @return array Liste des tags uniques
+     */
+    private function extractTagsFromInvoices($invoices, string $query): array
+    {
         $allTags = [];
+
         foreach ($invoices as $invoice) {
             try {
-                // Gérer le double encodage JSON
+                // Gérer le double encodage JSON possible
                 $tagsJson = $invoice->tags;
 
                 // Si la chaîne commence et se termine par des guillemets, retirer ces guillemets
@@ -112,37 +133,31 @@ trait InvoiceTagManagement
                 // Remplacer les séquences d'échappement
                 $tagsJson = str_replace('\\', '', $tagsJson);
 
-                // Maintenant décoder le JSON
+                // Décoder le JSON
                 $tagsArray = json_decode($tagsJson, true);
 
+                // Si le décodage a échoué, essayer une autre approche
                 if (! is_array($tagsArray)) {
-                    // Si ce n'est toujours pas un tableau, essayer une autre approche
                     $tagsArray = json_decode($invoice->tags, true);
                 }
 
+                // Ajouter les tags qui contiennent la requête
                 if (is_array($tagsArray)) {
                     foreach ($tagsArray as $tag) {
-                        // Ne garder que les tags qui contiennent la requête
                         if (is_string($tag) && stripos($tag, $query) !== false) {
                             $allTags[] = $tag;
                         }
                     }
                 }
             } catch (\Exception $e) {
-                // Si le JSON est invalide, enregistrer l'erreur et continuer
-                Log::warning('Erreur de décodage JSON pour les tags: '.$e->getMessage().' - Tags: '.$invoice->tags);
+                Log::warning('Erreur de décodage JSON pour les tags: '.$e->getMessage());
 
                 continue;
             }
         }
 
-        // Filtrer pour avoir des tags uniques
-        $uniqueTags = array_unique($allTags);
-
-        // Exclure les tags déjà sélectionnés
-        $filteredTags = array_values(array_diff($uniqueTags, $this->form->tags));
-
-        return $filteredTags;
+        // Retourner les tags uniques
+        return array_unique($allTags);
     }
 
     /**

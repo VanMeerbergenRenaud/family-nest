@@ -1,5 +1,4 @@
 <div>
-
     @if($isEditMode)
         <x-slot name="banner">
             <x-banner message="Mode édition en cours de la facture" />
@@ -40,62 +39,23 @@
                             <!-- Button de suppression de l'image -->
                             <button type="button"
                                     wire:click="removeUploadedFile"
-                                    class="absolute top-2.5 right-2.5 z-2"
-                            >
+                                    class="absolute top-2.5 right-2.5 z-10">
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
 
-                            @php
-                                $fileName = $form->fileName;
-                                $fileExtension = $form->fileExtension;
-                                $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png']);
-                                $isPdf = $fileExtension === 'pdf';
-                                $isDocx = $fileExtension === 'docx';
-                                $isCsv = $fileExtension === 'csv';
-                                $fileSize = $form->fileSize;
-                                $sizeFormatted = $form->formatFileSize($fileSize);
-                                $storagePath = $invoice->file->file_path;
-                            @endphp
-
-                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
-                                <!-- Aperçu pour les images -->
-                                @if ($isImage)
-                                    <img src="{{ $storagePath }}"
-                                         alt="Aperçu de la facture"
-                                         class="bg-gray-100 rounded-xl max-h-[50vh] text-center"
-                                    />
-                                @elseif ($isPdf)
-                                    <div class="w-full h-[40vh] overflow-hidden rounded-xl">
-                                        <embed src="{{ $storagePath }}"
-                                               type="application/pdf"
-                                               width="100%"
-                                               height="100%"
-                                               class="rounded-xl"
-                                        />
-                                    </div>
-                                @elseif ($isDocx)
-                                    <div class="px-4 mb-4 text-center">
-                                        <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
-                                            <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
-                                            <p class="text-sm text-slate-500">Le fichier a été traité et sauvegardé</p>
-                                        </div>
-                                    </div>
-                                @elseif($isCsv)
-                                    <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
-                                        <x-svg.csv class="w-12 h-12 text-gray-600" />
-                                    </div>
-                                @else
-                                    <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
-                                        <x-svg.img class="w-12 h-12 text-gray-600" />
-                                    </div>
-                                @endif
+                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-auto">
+                                <x-file-viewer
+                                    :filePath="$filePath"
+                                    :fileExtension="$fileExtension"
+                                    :fileName="$fileName"
+                                    class="w-full h-[40vh] mb-4"
+                                />
 
                                 <!-- Informations sur le fichier -->
                                 <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $fileName }}</h2>
-                                    <p class="flex-center space-x-1.5 text-gray-600">
-                                        <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
-                                        <span class="text-sm-regular">{{ $sizeFormatted }}</span>
+                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $form->fileName }}</h2>
+                                    <p class="flex-center text-sm-regular text-gray-600">
+                                        {{ strtoupper($form->fileExtension) }}
                                     </p>
 
                                     <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
@@ -110,47 +70,34 @@
                             <!-- Button de suppression de l'image -->
                             <button type="button"
                                     wire:click="removeUploadedFile"
-                                    class="absolute top-2.5 right-2.5 z-2"
-                            >
+                                    class="absolute top-2.5 right-2.5 z-10">
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
 
                             @php
-                                $fileInfo = $form->getFileInfo();
-                                $fileName = $fileInfo['name'] ?? '';
-                                $fileExtension = $fileInfo['extension'] ?? '';
-                                $isImage = $fileInfo['isImage'] ?? false;
-                                $isPdf = $fileInfo['isPdf'] ?? false;
-                                $isDocx = $fileInfo['isDocx'] ?? false;
-                                $isCsv = $fileInfo['isCsv'] ?? false;
-                                $fileSize = $fileInfo['size'] ?? 0;
-                                $sizeFormatted = $fileInfo['sizeFormatted'] ?? '';
+                                $fileInfo = app(App\Services\FileStorageService::class)->getFileInfo($form->uploadedFile);
+                                $fileInfo['status'] = !$errors->has('form.uploadedFile') ? 'success' : 'error';
+                                $fileInfo['statusMessage'] = !$errors->has('form.uploadedFile') ? 'Nouveau fichier à importer' : 'Erreur lors de l\'import du fichier';
                             @endphp
 
-                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
+                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex-center flex-col p-2 overflow-y-auto">
                                 <!-- Aperçu pour les images -->
-                                @if ($isImage)
+                                @if ($fileInfo['isImage'] ?? false)
                                     <img src="{{ $form->uploadedFile->temporaryUrl() }}"
                                          alt="Aperçu de la facture"
-                                         class="bg-gray-100 rounded-xl max-h-[50vh]"
+                                         class="bg-gray-100 rounded-xl max-h-[40vh] mb-4"
                                     />
-                                @elseif ($isPdf)
-                                    <div class="w-full h-[40vh] overflow-hidden rounded-xl">
-                                        <embed src="{{ $form->uploadedFile->temporaryUrl() }}"
-                                               type="application/pdf"
-                                               width="100%"
-                                               height="100%"
-                                               class="rounded-xl"
-                                        />
+                                @elseif ($fileInfo['isPdf'] ?? false)
+                                    <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100 mb-4">
+                                        <p class="mb-2.5 text-center font-medium text-slate-700">Aperçu disponible après enregistrement</p>
+                                        <p class="text-sm text-center text-slate-500">Le fichier PDF sera affiché après enregistrement.</p>
                                     </div>
-                                @elseif ($isDocx)
-                                    <div class="px-4 mb-4 text-center">
-                                        <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
-                                            <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
-                                            <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture</p>
-                                        </div>
+                                @elseif ($fileInfo['isDocx'] ?? false)
+                                    <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100 mb-4">
+                                        <p class="mb-2.5 text-center font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
+                                        <p class="text-sm text-center text-slate-500">Le fichier sera disponible après enregistrement.</p>
                                     </div>
-                                @elseif($isCsv)
+                                @elseif($fileInfo['isCsv'] ?? false)
                                     <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
                                         <x-svg.csv class="w-12 h-12 text-gray-600" />
                                     </div>
@@ -162,21 +109,15 @@
 
                                 <!-- Informations sur le fichier -->
                                 <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $fileName }}</h2>
+                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] ?? '' }}</h2>
                                     <p class="flex-center space-x-1.5 text-gray-600">
-                                        <span class="text-sm-regular">{{ strtoupper($fileExtension) }}</span>
-                                        <span class="text-sm-regular">{{ $sizeFormatted }}</span>
+                                        <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
+                                        <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>
                                     </p>
 
-                                    @if(!$errors->has('form.uploadedFile'))
-                                        <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
-                                            Nouveau fichier à importer
-                                        </p>
-                                    @else
-                                        <p class="mt-2 px-3 py-1 text-xs rounded-full bg-red-100 text-red-800 w-fit">
-                                            Erreur lors de l'import du fichier
-                                        </p>
-                                    @endif
+                                    <p class="mt-2 px-3 py-1 text-xs rounded-full {{ ($fileInfo['status'] ?? '') === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} w-fit">
+                                        {{ $fileInfo['statusMessage'] ?? 'Nouveau fichier' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -217,7 +158,6 @@
                             <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name" model="form.issuer_name" placeholder="Nom du fournisseur"/>
                             <x-form.field label="Site internet du fournisseur" name="form.issuer_website" model="form.issuer_website" placeholder="https://monfournisseur.com"/>
                         </div>
-
                     </x-invoices.create.form-step>
 
                     {{-- Étape 2: Détails financiers --}}
@@ -240,7 +180,7 @@
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
                                 @foreach($family_members as $member)
-                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }}>
+                                    <option value="{{ $member->id }}">
                                         {{ $member->name }}
                                         @if($member->id === auth()->id())
                                             (Moi)
@@ -266,18 +206,21 @@
                                     </div>
 
                                     <div class="flex items-center">
-                                        @php
-                                            $totalShares = count($form->user_shares);
-                                            $totalPercent = 0;
-                                            foreach($form->user_shares as $share) {
-                                                $totalPercent += $share['percentage'] ?? 0;
-                                            }
-                                        @endphp
+                                        @if($form->user_shares)
+                                            @php
+                                                $totalShares = count($form->user_shares);
+                                                $totalPercent = 0;
+                                                foreach($form->user_shares as $share) {
+                                                    $totalPercent += $share['percentage'] ?? 0;
+                                                }
+                                                $isComplete = $totalPercent >= 99.9;
+                                            @endphp
 
-                                        @if($totalShares > 0)
-                                            <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $totalPercent >= 99.9 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                {{ $totalShares }} {{ $totalShares === 1 ? 'membre' : 'membres' }} • {{ number_format($totalPercent, 0) }}%
-                                            </span>
+                                            @if($totalShares > 0)
+                                                <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $isComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                    {{ $totalShares }} {{ $totalShares === 1 ? 'membre' : 'membres' }} • {{ number_format($totalPercent, 0) }}%
+                                                </span>
+                                            @endif
                                         @endif
 
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 transition-transform" :class="{'rotate-180': showShareInterface}" viewBox="0 0 20 20" fill="currentColor">
@@ -436,67 +379,20 @@
                             Montant de caractère maximum <span class="text-sm">{{ strlen($form->notes) }}</span>/500
                         </div>
 
-                        <div class="mt-2">
-                            <label for="tags" class="relative mb-1.5 pl-2 block text-sm font-medium text-gray-800 dark:text-gray-200">
-                                Tags personnalisés
-                            </label>
-
-                            <div class="flex mt-2 relative">
-                                <input type="text"
-                                       name="tags"
-                                       id="tags"
-                                       wire:model.live.debounce.300ms="form.tagInput"
-                                       placeholder="Ajouter un tag..."
-                                       class="flex-1 block w-full text-sm-regular rounded-l-md bg-white border border-slate-200 dark:border-gray-600 dark:text-white p-3 pl-4 focus:outline-0"
-                                >
-                                <button type="button" wire:click="addTag"
-                                        class="inline-flex items-center px-4 py-2 text-sm-medium bg-white border border-l-0 border-slate-200 rounded-r-md hover:bg-gray-50 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600">
-                                    Ajouter un tag
-                                </button>
-
-                                <!-- Menu déroulant pour les suggestions -->
-                                @if($showTagSuggestions && count($tagSuggestions) > 0)
-                                    <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto dark:bg-gray-800 dark:border-gray-700">
-                                        <ul class="p-1.5" x-data="{selectedIndex: -1}">
-                                            @foreach($tagSuggestions as $index => $tag)
-                                                <li wire:key="tag-suggestion-{{ $index }}"
-                                                    x-bind:class="{'bg-indigo-50 dark:bg-indigo-900': selectedIndex === {{ $index }}}"
-                                                    wire:click="selectTag('{{ $tag }}')"
-                                                    class="px-4 py-2 rounded-md text-sm-regular text-gray-700 dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-900 cursor-pointer flex items-center">
-                                                    <x-svg.tag class="mr-2 text-indigo-500"/>
-                                                    {{ $tag }}
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endif
-                            </div>
-
-                            {{-- Tags ajoutés --}}
-                            @if(count($form->tags) > 0)
-                                <ul class="flex flex-wrap gap-2.5 mt-1.5 ml-2">
-                                    @foreach($form->tags as $index => $tag)
-                                        <li class="mt-2 inline-flex items-center pl-3.5 pr-2.5 pt-1 pb-1.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                                            <span class="text-sm-regular">{{ $tag }}</span>
-                                            <button type="button" wire:click="removeTag({{ $index }})"
-                                                    class="relative top-0.25 ml-1.5 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">
-                                                <x-svg.cross class="h-4 w-4 text-indigo-700" />
-                                            </button>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </div>
+                        <x-invoices.tag-manager
+                            :tags="$form->tags"
+                            :tag-input="$form->tagInput"
+                            :show-suggestions="$showTagSuggestions"
+                            :suggestions="$tagSuggestions"
+                        />
                     </x-invoices.create.form-step>
 
                     <x-invoices.create.form-step
                         step="6" title="Étape 6 : Résumé"
                         description="Vérifiez les informations avant d'enregistrer la facture."
                     >
-
                         <!-- Résumé du formulaire -->
                         <x-invoices.create.summary :form="$form" :family_members="$family_members" />
-
                     </x-invoices.create.form-step>
 
                     {{-- Boutons de Navigation --}}

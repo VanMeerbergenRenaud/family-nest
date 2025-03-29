@@ -207,7 +207,7 @@ return [
         'issuer_website' => 'site du fournisseur',
         'amount' => 'montant',
         'currency' => 'monnaie',
-        'paid_by' => 'payé par qui',
+        'paid_by_user_id' => 'payé par qui',
         'issued_date' => 'date d\'émission',
         'payment_due_date' => 'date d\'échéance',
         'payment_reminder' => 'rappel de paiement',
@@ -222,7 +222,7 @@ return [
         // family
         'familyName' => 'du nom de famille',
         'memberEmail' => 'de l‘adresse mail du membre',
-        'memberPermission' =>  'des permissions du membre',
+        'memberPermission' => 'des permissions du membre',
         'memberRelation' => 'de la relation du membre',
     ],
 ];
