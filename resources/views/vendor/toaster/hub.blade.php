@@ -2,7 +2,7 @@
     'fixed z-70 p-4 w-fit flex flex-col pointer-events-none sm:p-6',
     'bottom-0 right-0' => $alignment->is('bottom'),
     'top-1/2 -translate-y-1/2' => $alignment->is('middle'),
-    'top-0 right-0' => $alignment->is('top'),
+    'top-0 right-0 lg:-top-3.5 lg:-right-3.5' => $alignment->is('top'),
     'items-start rtl:items-end' => $position->is('left'),
     'items-center' => $position->is('center'),
     'items-end rtl:items-start' => $position->is('right'),
@@ -84,13 +84,13 @@
                     </div>
 
                     <div class="flex-1 flex flex-col">
-                        <div class="flex justify-between items-center">
+                        <div class="relative flex justify-between items-start">
                             <!-- Title -->
                             <p class="text-sm-medium" :class="getTextColor()" x-text="title()"></p>
 
                             <!-- Close button -->
                             @if($closeable)
-                                <button type="button" class="ml-3">
+                                <button type="button" class="mt-0.5 ml-3">
                                     <svg class="h-4 w-4" :class="getTextColor()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
                                     </svg>

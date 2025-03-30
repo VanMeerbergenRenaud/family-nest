@@ -1,5 +1,5 @@
-<div class="relative p-4">
-    <nav class="lg:pl-5 flex items-center" aria-label="Fil d'Ariane">
+<div class="relative py-4 px-6">
+    <nav class="lg:pl-2 flex items-center" aria-label="Fil d'Ariane">
         <h1 class="sr-only" role="heading" aria-level="1">Menu de navigation avec fil d'Ariane</h1>
         <ol class="inline-flex items-center gap-2" role="list">
             @foreach($segments as $index => $segment)

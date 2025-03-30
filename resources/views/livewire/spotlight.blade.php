@@ -34,6 +34,7 @@
                                    aria-label="Search"
                                    placeholder="Rechercher..."
                                    wire:model.live.debounce.300ms="search"
+                                   x-init="$wire.spotlightOpen && setTimeout(() => $refs.searchInput.focus(), 200)"
                                    class="block w-full py-3 pl-13 pr-3 text-md-regular text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-600 dark:bg-gray-800 dark:border-gray-800"
                             />
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 max-sm:hidden">
@@ -177,13 +178,6 @@
             if (event.key === 'k') {
                 event.preventDefault();
                 @this.set('spotlightOpen', !@this.spotlightOpen);
-
-                // Focus sur le champ de recherche si le spotlight est ouvert
-                if (@this.spotlightOpen) {
-                    setTimeout(() => {
-                        document.getElementById('search').focus();
-                    }, 100);
-                }
             }
             // Raccourci ⌘+X ou CTRL+X pour ajouter une facture
             else if (event.key === 'x') {

@@ -26,7 +26,7 @@
         <section class="mb-8">
             <h2 class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Catégories</h2>
 
-            <div class="flex <!--overflow-x-scroll--> gap-4 scrollbar-hidden">
+            <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
                 {{-- Favoris --}}
                 <button wire:click.prevent="openFolder('favorites', 'Favoris')"
                         class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800">

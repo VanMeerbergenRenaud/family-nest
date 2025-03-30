@@ -37,6 +37,7 @@
                     position="right"
                     :active="$isActive"
                     show="true"
+                    colorStyle="gray"
                 />
             </div>
         @endif

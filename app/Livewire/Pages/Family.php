@@ -56,6 +56,7 @@ class Family extends Component
     ];
 
     public bool $showFamilyExempleModal;
+    public bool $showDeleteFamilyModal;
 
     public function showFamilyExemple(): void
     {
@@ -163,7 +164,9 @@ class Family extends Component
 
     public function createFamily(): void
     {
-        $this->validate('familyName');
+        $this->validate([
+            'familyName' => 'required|min:2|max:255',
+        ]);
 
         try {
             // Créer la famille
@@ -188,6 +191,25 @@ class Family extends Component
         } catch (\Exception $e) {
             Log::error('Erreur de création de famille: '.$e->getMessage());
             Toaster::error('Erreur lors de la création de la famille::Vérifiez que le nom de la famille et réessayez.');
+        }
+    }
+
+    public function showDeleteFamilyMFormModal(): void
+    {
+        $this->showDeleteFamilyModal = true;
+    }
+
+    // Delete family
+    public function deleteFamily()
+    {
+        $family = auth()->user()->family();
+
+        if ($family) {
+            $family->delete();
+            $this->showDeleteFamilyModal = false;
+            Toaster::success('Famille supprimée avec succès');
+        } else {
+            Toaster::error('Erreur lors de la suppression de la famille');
         }
     }
 

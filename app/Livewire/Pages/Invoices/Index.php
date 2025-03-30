@@ -325,7 +325,7 @@ class Index extends Component
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
-        $this->fileName = $invoice->file->file_name;
+        $this->fileName = $invoice->file->file_name ?? null;
 
         $this->showFolderModal = false;
         $this->showInvoicePreviewModal = true;

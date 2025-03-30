@@ -23,6 +23,7 @@
                 text="Ajouter une facture"
                 position="right"
                 show="true"
+                colorStyle="purple"
             />
         </div>
     @endif

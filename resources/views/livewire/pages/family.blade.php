@@ -232,9 +232,9 @@
                                                 </x-menu.item>
                                             @endif
                                             @if($isAdmin)
-                                                <x-menu.item class="group hover:text-red-500">
+                                                <x-menu.item wire:click="showDeleteFamilyMFormModal" class="group hover:text-red-500">
                                                     <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
-                                                    {{ __('Supprimer de la famille') }}
+                                                    {{ __('Supprimer la famille') }}
                                                 </x-menu.item>
                                             @endif
                                         </x-menu.items>
@@ -253,6 +253,55 @@
                 </div>
             @endif
         </section>
+    @endif
+
+    @if($showDeleteFamilyModal)
+        <x-modal wire:model="showDeleteFamilyModal">
+            <x-modal.panel>
+                <form wire:submit.prevent="deleteFamily">
+                    @csrf
+
+                    <div x-data="{ confirmation: '' }">
+                        <div class="flex gap-x-6 p-8">
+                            <x-svg.advertising/>
+
+                            <div>
+                                <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                    {{ __('Supprimer la famille') }}
+                                </h3>
+                                <p class="mt-2 text-md-regular text-gray-500">
+                                    {{ __('Êtes-vous sûre de vouloir supprimer toute la famille') }}
+                                    <strong class="font-semibold"> {{ ucfirst($family->name) }}&nbsp;?</strong>
+                                    {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
+                                </p>
+                                <div class="mt-6 mb-2 flex flex-col gap-3">
+                                    <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
+                                        {{ __('Veuillez tapper "CONFIRMER" pour confirmer la suppression.') }}
+                                    </label>
+                                    <input x-model="confirmation" placeholder="CONFIRMER" type="text"
+                                           class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
+                                           autofocus>
+                                </div>
+                            </div>
+                        </div>
+
+                        <x-modal.footer>
+                            <x-modal.close>
+                                <button type="button" class="button-secondary">
+                                    {{ __('Annuler') }}
+                                </button>
+                            </x-modal.close>
+
+                            <x-modal.close>
+                                <button type="submit" class="button-danger" :disabled="confirmation !== 'CONFIRMER'">
+                                    {{ __('Supprimer') }}
+                                </button>
+                            </x-modal.close>
+                        </x-modal.footer>
+                    </div>
+                </form>
+            </x-modal.panel>
+        </x-modal>
     @endif
 
     {{-- Ajout de la propriété pour le modal de création de famille --}}
@@ -307,6 +356,7 @@
                                 model="familyName"
                                 placeholder="Ex: Famille Dupont"
                                 :asterix="true"
+                                autofocus
                             />
                         </div>
                     </div>

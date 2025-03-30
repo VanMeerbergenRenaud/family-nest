@@ -35,6 +35,7 @@
                     text="Rechercher"
                     position="right"
                     show="true"
+                    colorStyle="gray"
                 />
             </div>
         @endif

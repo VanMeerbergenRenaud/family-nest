@@ -4,8 +4,8 @@
 
 @php
     $linkClass = 'flex items-center w-fit p-2 py-1.5 text-gray-700 rounded-lg dark:text-gray-400 group relative';
-    $activeClass = 'text-indigo-600 dark:text-indigo-500';
     $svgClass = 'w-5 h-5 text-gray-500 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-50';
+    $activeClass = 'text-indigo-600 dark:text-indigo-500 hover:text-indigo-600';
 @endphp
 
 <ul class="font-medium custom-mt-auto">
@@ -23,6 +23,7 @@
                         text="Rafraîchir"
                         position="right"
                         show="true"
+                        colorStyle="white"
                     />
                 </div>
             @endif
@@ -44,6 +45,7 @@
                         position="right"
                         :active="request()->routeIs('settings.index')"
                         show="true"
+                        colorStyle="white"
                     />
                 </div>
             @endif
@@ -65,6 +67,7 @@
                         position="right"
                         :active="request()->routeIs('help-center')"
                         show="true"
+                        colorStyle="white"
                     />
                 </div>
             @endif
