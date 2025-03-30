@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
@@ -38,28 +37,22 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the family this invoice belongs to.
-     */
-    public function family(): BelongsTo
-    {
-        return $this->belongsTo(Family::class);
-    }
-
-    // Obtenir le fichier principal associé à la facture
+    // File associated with the invoice
     public function file(): HasOne
     {
         return $this->hasOne(InvoiceFile::class)
             ->where('is_primary', true);
     }
 
-    // Obtenir tous les fichiers associés à la facture
-    public function files(): HasMany
+    // Users associated with the invoice
+    public function sharedUsers(): BelongsToMany
     {
-        return $this->hasMany(InvoiceFile::class);
+        return $this->belongsToMany(User::class, 'invoice_user')
+            ->withPivot('share_amount', 'share_percentage')
+            ->withTimestamps();
     }
 
-    // Configuration pour Algolia
+    // Configuration for Algolia
     public function toSearchableArray(): array
     {
         return [
@@ -73,13 +66,7 @@ class Invoice extends Model
         ];
     }
 
-    // NB: Seules les factures non archivées peuvent être indexées
-    public function shouldBeSearchable(): bool
-    {
-        return ! $this->is_archived;
-    }
-
-    // Rechercher des factures par nom, référence, type, catégorie, montant, émetteur ou tags
+    // Search invoices using specific terms
     public function scopeSearch($query, $searchTerm)
     {
         return $query->where(function ($query) use ($searchTerm) {
@@ -88,20 +75,14 @@ class Invoice extends Model
                 ->orWhere('type', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('category', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('issuer_name', 'LIKE', "%{$searchTerm}%")
+                ->orWhere('amount', 'LIKE', "%{$searchTerm}%")
                 ->orWhere('tags', 'LIKE', "%{$searchTerm}%");
         });
     }
 
-    // Get the users who share this invoice.
-    public function sharedUsers(): BelongsToMany
+    // Only non-archived invoices can be indexed
+    public function shouldBeSearchable(): bool
     {
-        return $this->belongsToMany(User::class, 'invoice_user')
-            ->withPivot('share_amount', 'share_percentage')
-            ->withTimestamps();
-    }
-
-    public function paidByUser(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'paid_by_user_id');
+        return ! $this->is_archived;
     }
 }

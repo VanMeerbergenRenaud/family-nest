@@ -1,4 +1,33 @@
 <div>
+    {{-- Empty state when no family is created --}}
+    @if(!$family)
+        <x-empty-state
+            title="Aucune famille n'a été créée"
+            description="Vous n'avez pas encore de famille ? Créez-en une pour commencer à gérer vos dépenses ensemble."
+        >
+            <button wire:click="openCreateFamilyModal" class="button-tertiary">
+                <x-svg.add2 class="text-white" />
+                Créer une famille
+            </button>
+            <button wire:click="showFamilyExemple" class="button-primary">
+                <x-svg.help class="text-gray-900" />
+                Voir un exemple
+            </button>
+        </x-empty-state>
+
+        @if($showFamilyExempleModal)
+            <x-modal wire:model="showFamilyExempleModal">
+                <x-modal.panel>
+                    <video controls class="w-full h-full rounded-lg" autoplay muted>
+                        <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
+                        Votre navigateur ne supporte pas la vidéo prévue.
+                    </video>
+                </x-modal.panel>
+            </x-modal>
+        @endif
+    @endif
+
+    {{-- Table of family members --}}
     @if($family)
         <div class="px-4">
             <h2 class="text-xl-semibold">Membres de la famille</h2>
@@ -15,6 +44,7 @@
                    </span>
                 </h2>
                 <div class="flex flex-wrap gap-2">
+                    {{-- Filter --}}
                     <x-menu>
                         <x-menu.button class="button-primary flex items-center">
                             <x-svg.filter/>
@@ -36,6 +66,7 @@
                         </x-menu.items>
                     </x-menu>
 
+                    {{-- Invite a member --}}
                     @if($isAdmin)
                         <button type="button" wire:click="addMember" class="button-tertiary">
                             <x-svg.add2 class="text-white"/>
@@ -231,7 +262,7 @@
                                                     {{ __('Changer de rôle') }}
                                                 </x-menu.item>
                                             @endif
-                                            @if($isAdmin)
+                                            @if($isAdmin && $member->id === $currentUser)
                                                 <x-menu.item wire:click="showDeleteFamilyMFormModal" class="group hover:text-red-500">
                                                     <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
                                                     {{ __('Supprimer la famille') }}
@@ -255,84 +286,7 @@
         </section>
     @endif
 
-    @if($showDeleteFamilyModal)
-        <x-modal wire:model="showDeleteFamilyModal">
-            <x-modal.panel>
-                <form wire:submit.prevent="deleteFamily">
-                    @csrf
-
-                    <div x-data="{ confirmation: '' }">
-                        <div class="flex gap-x-6 p-8">
-                            <x-svg.advertising/>
-
-                            <div>
-                                <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
-                                    {{ __('Supprimer la famille') }}
-                                </h3>
-                                <p class="mt-2 text-md-regular text-gray-500">
-                                    {{ __('Êtes-vous sûre de vouloir supprimer toute la famille') }}
-                                    <strong class="font-semibold"> {{ ucfirst($family->name) }}&nbsp;?</strong>
-                                    {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
-                                </p>
-                                <div class="mt-6 mb-2 flex flex-col gap-3">
-                                    <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
-                                        {{ __('Veuillez tapper "CONFIRMER" pour confirmer la suppression.') }}
-                                    </label>
-                                    <input x-model="confirmation" placeholder="CONFIRMER" type="text"
-                                           class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
-                                           autofocus>
-                                </div>
-                            </div>
-                        </div>
-
-                        <x-modal.footer>
-                            <x-modal.close>
-                                <button type="button" class="button-secondary">
-                                    {{ __('Annuler') }}
-                                </button>
-                            </x-modal.close>
-
-                            <x-modal.close>
-                                <button type="submit" class="button-danger" :disabled="confirmation !== 'CONFIRMER'">
-                                    {{ __('Supprimer') }}
-                                </button>
-                            </x-modal.close>
-                        </x-modal.footer>
-                    </div>
-                </form>
-            </x-modal.panel>
-        </x-modal>
-    @endif
-
-    {{-- Ajout de la propriété pour le modal de création de famille --}}
-    @if(!$family)
-        <x-empty-state
-            title="Aucune famille n'a été créée"
-            description="Vous n'avez pas encore de famille ? Créez-en une pour commencer à gérer vos dépenses ensemble."
-        >
-            <button wire:click="openCreateFamilyModal" class="button-tertiary">
-                <x-svg.add2 class="text-white" />
-                Créer une famille
-            </button>
-            <button wire:click="showFamilyExemple" class="button-primary">
-                <x-svg.help class="text-gray-900" />
-                Voir un exemple
-            </button>
-        </x-empty-state>
-
-        @if($showFamilyExempleModal)
-            <x-modal wire:model="showFamilyExempleModal">
-                <x-modal.panel>
-                    <video controls class="w-full h-full rounded-lg" autoplay muted>
-                        <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
-                        Votre navigateur ne supporte pas la vidéo prévue.
-                    </video>
-                </x-modal.panel>
-            </x-modal>
-        @endif
-    @endif
-
-    {{-- Modal pour créer une famille --}}
+    {{-- Modal to create a family --}}
     @if($showCreateFamilyModal)
         <x-modal wire:model="showCreateFamilyModal">
             <x-modal.panel>
@@ -379,7 +333,7 @@
         </x-modal>
     @endif
 
-    {{-- Modal pour ajouter un membre à la famille --}}
+    {{-- Modal to add a member to the family --}}
     @if($showAddMemberModal)
         <x-modal wire:model="showAddMemberModal">
             <x-modal.panel>
@@ -459,14 +413,53 @@
         </x-modal>
     @endif
 
-    {{-- Modal pour montrer l'envoi de mail en cours avec wire:target --}}
-    <div wire:loading wire:target="sendInvitation" class="fixed left-0 right-0 mx-auto bottom-8 w-fit flex-center z-60">
-        <div class="bg-white dark:bg-gray-800 rounded-full shadow-lg py-2 px-4 flex items-center space-x-3 border border-gray-100 dark:border-gray-700">
-            <svg class="animate-spin h-5 w-5 text-indigo-600 dark:text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <span class="pr-1 text-sm font-medium text-gray-700 dark:text-gray-300">Envoi de l'invitation en cours...</span>
-        </div>
-    </div>
+    {{-- Modal to delete a family --}}
+    @if($showDeleteFamilyModal)
+        <x-modal wire:model="showDeleteFamilyModal">
+            <x-modal.panel>
+                <form wire:submit.prevent="deleteFamily">
+                    @csrf
+
+                    <div x-data="{ confirmation: '' }">
+                        <div class="flex gap-x-6 p-8">
+                            <x-svg.advertising/>
+
+                            <div>
+                                <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                    {{ __('Supprimer la famille') }}
+                                </h3>
+                                <p class="mt-2 text-md-regular text-gray-500">
+                                    {{ __('Êtes-vous sûre de vouloir supprimer toute la famille') }}
+                                    <strong class="font-semibold"> {{ ucfirst($family->name) }}&nbsp;?</strong>
+                                    {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
+                                </p>
+                                <div class="mt-6 mb-2 flex flex-col gap-3">
+                                    <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
+                                        {{ __('Veuillez tapper "CONFIRMER" pour confirmer la suppression.') }}
+                                    </label>
+                                    <input x-model="confirmation" placeholder="CONFIRMER" type="text"
+                                           class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
+                                           autofocus>
+                                </div>
+                            </div>
+                        </div>
+
+                        <x-modal.footer>
+                            <x-modal.close>
+                                <button type="button" class="button-secondary">
+                                    {{ __('Annuler') }}
+                                </button>
+                            </x-modal.close>
+
+                            <x-modal.close>
+                                <button type="submit" class="button-danger" :disabled="confirmation !== 'CONFIRMER'">
+                                    {{ __('Supprimer') }}
+                                </button>
+                            </x-modal.close>
+                        </x-modal.footer>
+                    </div>
+                </form>
+            </x-modal.panel>
+        </x-modal>
+    @endif
 </div>

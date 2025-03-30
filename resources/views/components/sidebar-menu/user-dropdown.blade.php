@@ -15,7 +15,7 @@
             <span class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ ucfirst(auth()->user()->name) ?? 'Nom inconnu' }}</span>
             <span class="truncate text-xs text-gray-500 dark:text-gray-400">{{ mb_strtolower(auth()->user()->email) ?? 'Adresse mail inconnue' }}</span>
         </div>
-        {{-- Arrow --}} {{--TODO : Rotation of the arrow--}}
+        {{-- Arrow double --}}
         <x-svg.arrow-double />
     </x-menu.button>
 

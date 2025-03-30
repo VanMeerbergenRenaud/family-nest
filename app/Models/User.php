@@ -14,33 +14,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, Searchable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'avatar',
-    ];
+    protected $fillable = ['name', 'email', 'password', 'avatar'];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+    protected $hidden = ['password', 'remember_token'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -49,25 +26,17 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    /**
-     * Les factures créées par l'utilisateur.
-     */
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
-    /**
-     * Les factures payées par l'utilisateur.
-     */
     public function paidInvoices(): HasMany
     {
         return $this->hasMany(Invoice::class, 'paid_by_user_id');
     }
 
-    /**
-     * Les familles dont l'utilisateur est membre.
-     */
+    // Members of the family
     public function families(): BelongsToMany
     {
         return $this->belongsToMany(Family::class)
@@ -75,22 +44,17 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
-    /**
-     * La famille principale de l'utilisateur.
-     * Un utilisateur ne peut appartenir qu'à une seule famille,
-     * mais cette méthode aide à clarifier l'intention.
-     */
+    // Members of the family with admin permission
     public function family()
     {
         return $this->families()->first();
     }
 
-    /**
-     * Vérifie si l'utilisateur est administrateur de sa famille.
-     */
+    // Verify if the user is the admin of the family
     public function isAdminOfFamily(): bool
     {
         $family = $this->family();
+
         if (! $family) {
             return false;
         }

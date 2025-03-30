@@ -44,9 +44,63 @@
 
                         {{-- Scrollable div --}}
                         <div class="overflow-y-scroll max-h-[24.5rem]">
-                            {{-- Test empty search --}}
-                            @if(!empty($search))
-                                <x-divider class="sticky top-0 dark:bg-gray-700" />
+                            {{-- État initial : aucune recherche commencée --}}
+                            @if(empty($search))
+                                <div class="flex flex-col items-center justify-center h-48 bg-gray-100 border-t border-slate-200">
+                                    <x-svg.search-classic class="h-10 w-10 text-gray-500 dark:text-gray-600 mb-5"/>
+                                    <p class="text-sm-medium text-gray-500 dark:text-gray-400">
+                                        Aucune recherche commencée
+                                    </p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-500 mt-2">
+                                        Commencez à taper pour rechercher...
+                                    </p>
+                                </div>
+                            {{-- Recherche avec résultats --}}
+                            @elseif($results->isNotEmpty())
+                                @foreach($results as $section => $items)
+                                    <x-divider class="dark:bg-gray-700"/>
+
+                                    <div class="bg-white dark:bg-gray-800 py-3 px-2">
+                                        <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
+                                            {{ $section }}
+                                        </h3>
+                                        <ul role="list" class="flex flex-col gap-1">
+                                            @foreach ($items as $result)
+                                                @if ($result instanceof \App\Models\Invoice)
+                                                    <x-spotlight.result
+                                                        href="{{ route('invoices.show', $result) }}"
+                                                        text="{{ $result->name }}"
+                                                        description="({{ $result->amount }}{{ $result->currency }})"
+                                                    >
+                                                        <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800"/>
+                                                    </x-spotlight.result>
+                                                @endif
+
+                                                @if ($result instanceof \App\Models\User)
+                                                    <x-spotlight.result
+                                                        href="{{ route('settings.profile') }}"
+                                                        text="{{ $result->name }}"
+                                                        description="{{ $result->email }}"
+                                                    >
+                                                        <img class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"
+                                                             src="{{ $result->avatar ?? asset('img/avatar_placeholder.png') }}"
+                                                             alt="{{ $result->name }}"/>
+                                                    </x-spotlight.result>
+                                                @endif
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endforeach
+                            @elseif($results->isEmpty())
+                                {{-- Recherche sans résultats --}}
+                                <div class="flex items-center justify-start gap-3 py-3 px-4.5  border-slate-200">
+                                    <p class="text-sm-medium text-gray-500 dark:text-gray-400">
+                                        Aucun résultat pour "{{ $search }}"
+                                    </p>
+                                    <p class="text-xs text-gray-600 dark:text-gray-500">
+                                        Essayez d'autres mots-clés ou vérifiez l'orthographe.
+                                    </p>
+                                </div>
                                 <div class="bg-white dark:bg-gray-800 py-3 px-2">
                                     <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
                                         Suggestions
@@ -60,41 +114,6 @@
                                         </x-spotlight.result>
                                     </ul>
                                 </div>
-                            @else
-                                <p class="text-sm-medium text-gray-500 dark:text-gray-400 pl-3.5 py-3">
-                                    Aucun résultat pour l'instant
-                                </p>
-                            @endif
-
-                            {{-- Results --}}
-                            @if (!empty($results))
-                                @foreach($results as $section => $items)
-                                    <x-divider class="dark:bg-gray-700"/>
-
-                                    <div class="bg-white dark:bg-gray-800 py-3 px-2">
-                                        <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
-                                            {{ $section }}
-                                        </h3>
-                                        <ul role="list" class="flex flex-col gap-1">
-                                            @foreach ($items as $result)
-                                                @if ($result instanceof \App\Models\User)
-                                                    <x-spotlight.result href="#" text="{{ $result->name }}" description="({{ $result->email }})">
-                                                        <img src="{{ $result->avatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"/>
-                                                    </x-spotlight.result>
-                                                @endif
-                                                @if ($result instanceof \App\Models\Invoice)
-                                                    <x-spotlight.result href="{{ route('invoices.show', $result) }}" text="{{ $result->name }}" description="({{ $result->amount }}€)">
-                                                        <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800"/>
-                                                    </x-spotlight.result>
-                                                @endif
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-sm-medium text-gray-500 dark:text-gray-400 pl-3.5 py-3">
-                                    Aucun résultat pour "{{ $search }}"
-                                </p>
                             @endif
                         </div>
 
@@ -152,7 +171,7 @@
                                 {{-- Settings --}}
                                 <div class="ml-auto flex">
                                     <a href="{{ route('settings.index') }}" class="inline-block py-2.5 px-2" title="Vers les paramètres" wire:navigate>
-                                        <x-svg.settings class="h-4 w-4 text-gray-400 dark:text-gray-500"/>
+                                        <x-svg.settings class="text-gray-500 hover:text-gray-800"/>
                                     </a>
                                 </div>
                             </div>

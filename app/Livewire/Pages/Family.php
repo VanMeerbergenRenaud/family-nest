@@ -56,6 +56,7 @@ class Family extends Component
     ];
 
     public bool $showFamilyExempleModal;
+
     public bool $showDeleteFamilyModal;
 
     public function showFamilyExemple(): void
@@ -103,7 +104,7 @@ class Family extends Component
             return;
         }
 
-        // Vérifier si l'utilisateur est déjà membre de la famille
+        // Verify if the user is already a member of the family
         $memberExists = $family->users()
             ->where('email', $this->memberEmail)
             ->exists();
@@ -114,7 +115,7 @@ class Family extends Component
             return;
         }
 
-        // Vérifier si une invitation existe déjà pour cet email
+        // Verify if an invitation has already been sent to the email
         $invitationExists = FamilyInvitation::where('family_id', $family->id)
             ->where('email', $this->memberEmail)
             ->exists();
@@ -129,7 +130,7 @@ class Family extends Component
             $token = Str::uuid();
             $isAdmin = $this->memberPermission === 'admin';
 
-            // Créer l'invitation
+            // Create the invitation
             $invitation = FamilyInvitation::create([
                 'family_id' => $family->id,
                 'invited_by' => auth()->id(),
@@ -141,7 +142,7 @@ class Family extends Component
                 'expires_at' => now()->addDays(7),
             ]);
 
-            // Envoyer l'email d'invitation
+            // Send the invitation email
             Mail::to($this->memberEmail)->send(new FamilyInvitationMail(
                 $family,
                 auth()->user(),
@@ -150,7 +151,6 @@ class Family extends Component
                 $this->memberRelation
             ));
 
-            // Réinitialiser et fermer le modal
             $this->reset(['memberEmail', 'memberPermission', 'memberRelation']);
             $this->showAddMemberModal = false;
 
@@ -169,19 +169,17 @@ class Family extends Component
         ]);
 
         try {
-            // Créer la famille
             $family = FamilyModel::create([
                 'name' => $this->familyName,
             ]);
 
-            // Attacher l'utilisateur actuel comme admin
+            // Attach the current user to the family
             $family->users()->attach(auth()->id(), [
                 'permission' => 'admin',
                 'relation' => 'self',
                 'is_admin' => true,
             ]);
 
-            // Réinitialiser et fermer le modal
             $this->reset(['familyName']);
             $this->showCreateFamilyModal = false;
 
@@ -199,8 +197,7 @@ class Family extends Component
         $this->showDeleteFamilyModal = true;
     }
 
-    // Delete family
-    public function deleteFamily()
+    public function deleteFamily(): void
     {
         $family = auth()->user()->family();
 
@@ -221,12 +218,11 @@ class Family extends Component
             $members = collect();
             $this->isAdmin = false;
         } else {
-            // Récupération des membres de la famille
             $members = $family->users()
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate(6);
 
-            // Déterminer si l'utilisateur actuel est administrateur
+            // Verify if the user is the admin of the family
             $this->isAdmin = auth()->user()->isAdminOfFamily();
         }
 

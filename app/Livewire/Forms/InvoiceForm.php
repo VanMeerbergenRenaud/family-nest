@@ -373,7 +373,7 @@ class InvoiceForm extends Form
         }
     }
 
-    public function delete(FileStorageService $fileStorageService): bool
+    public function delete(): bool
     {
         if (! $this->invoice) {
             return false;
@@ -382,13 +382,8 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            // Supprimer les fichiers de S3 avant de supprimer les enregistrements
-            $invoiceFiles = $this->invoice->files;
-            foreach ($invoiceFiles as $file) {
-                $fileStorageService->deleteInvoiceFile($file);
-            }
+            // TODO: Supprimer les fichiers de S3 avant de supprimer les enregistrements
 
-            // Supprimer la facture définitivement
             $this->invoice->delete();
 
             DB::commit();
@@ -539,4 +534,3 @@ class InvoiceForm extends Form
         return (float) number_format((float) $amount, 2, '.', '');
     }
 }
-

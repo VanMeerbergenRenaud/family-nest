@@ -1,5 +1,5 @@
 <div>
-    <div>
+    @if(empty($allInvoicesOfFamily || $allInvoicesOfUser))
         <x-empty-state
             title="Salut {{ $user->name ?? 'inconnu' }} !"
             description="Votre tableau de bord est vide. Vous n'avez pas encore d'objectifs, de thèmes ou de factures. Veuillez commencer par ajouter une facture !"
@@ -24,5 +24,43 @@
                 </x-modal.panel>
             </x-modal>
         @endif
-    </div>
+    @elseif($allInvoicesOfFamily)
+        <div class="bg-white rounded-xl p-4 border border-slate-200">
+            <p class="text-lg-medium pl-2 mb-3">Factures de la famille : {{ $family->name ?? 'Non précisé' }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach(($allInvoicesOfFamily) as $invoice)
+                    <a href="{{ route('invoices.show', $invoice) }}" class="block bg-white hover:bg-gray-50 transition duration-150 rounded-lg p-4 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <x-svg.document class="w-5 h-5 text-gray-500" />
+                                <p class="text-sm text-gray-700">{{ $invoice->name ?? 'Non précisé' }}</p>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm font-semibold">{{ number_format($invoice->amount, 2, ',', ' ') }} €</span>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @elseif($allInvoicesOfUser)
+        <div class="bg-white rounded-xl p-4 border border-slate-200">
+            <p class="text-lg-medium pl-2 mb-3">Factures de : {{ auth()->user()->name }}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach(($allInvoicesOfUser) as $invoice)
+                    <a href="{{ route('invoices.show', $invoice) }}" class="block bg-white hover:bg-gray-50 transition duration-150 rounded-lg p-4 border border-slate-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <x-svg.document class="w-5 h-5 text-gray-500" />
+                                <p class="text-sm text-gray-700">{{ $invoice->name ?? 'Non précisé' }}</p>
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm font-semibold">{{ number_format($invoice->amount, 2, ',', ' ') }} €</span>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    @endif
 </div>
