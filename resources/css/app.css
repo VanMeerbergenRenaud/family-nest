@@ -132,7 +132,7 @@
     */
 
     .button-classic {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-200 transition-colors;
+        @apply flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium rounded-lg text-gray-700 border border-transparent hover:bg-zinc-200/50 hover:text-gray-800 transition-colors;
     }
 
     .button-primary {
@@ -140,7 +140,7 @@
     }
 
     .button-secondary {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-gray-200 bg-gray-800 hover:bg-gray-700 transition-colors;
+        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-gray-700 bg-gray-800 hover:bg-gray-700 transition-colors;
     }
 
     .button-tertiary {

@@ -9,8 +9,6 @@ Cette application permettrait aux familles de réunir leurs factures en un seul 
 Cela permettrait également de mieux gérer les imprévus financiers, qui sont loin d'être agréables.
 
 ## Temps passé sur le projet
-1. Design Figma :
-[![wakatime](https://wakatime.com/badge/user/1670a16f-54ce-43ec-b39d-ee5818d373cc/project/d15e921a-aa07-4fb2-9f63-cd6b424bd719.svg)](https://wakatime.com/badge/user/1670a16f-54ce-43ec-b39d-ee5818d373cc/project/d15e921a-aa07-4fb2-9f63-cd6b424bd719)
 
-2. Développement :
+Développement :
 [![wakatime](https://wakatime.com/badge/github/VanMeerbergenRenaud/family-nest.svg)](https://wakatime.com/badge/github/VanMeerbergenRenaud/family-nest)

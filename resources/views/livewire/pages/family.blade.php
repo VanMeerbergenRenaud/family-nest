@@ -29,10 +29,9 @@
 
     {{-- Table of family members --}}
     @if($family)
-        <div class="px-4">
-            <h2 class="text-xl-semibold">Membres de la famille</h2>
-            <p class="text-sm-regular text-gray-500">Gérez les membres de votre famille et leurs autorisations de compte ici.</p>
-        </div>
+        <x-header title="Membres de la famille"
+                  description="Gérez les membres de votre famille et leurs autorisations de compte ici."
+        />
 
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
@@ -210,7 +209,7 @@
                                     @php
                                         $invoiceCount = $member->paidInvoices()->count();
                                         $urgentCount = $member->paidInvoices()->where('payment_status', 'late')->count();
-                                        $upcomingCount = $member->paidInvoices()->where('payment_status', 'paid')->count();
+                                        $upcomingCount = $member->paidInvoices()->where('payment_status', 'unpaid')->count();
                                         $inProgressCount = $member->paidInvoices()->where('payment_status', 'pending')->count();
                                     @endphp
 
@@ -221,7 +220,7 @@
 
                                         @if($urgentCount > 0)
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-amber-100 text-amber-800">
-                                               {{ $urgentCount }} urgences
+                                               {{ $urgentCount }} urgent
                                            </span>
                                         @endif
 

@@ -1,5 +1,5 @@
 <div>
-    @if(empty($allInvoicesOfFamily || $allInvoicesOfUser))
+    @if($invoices->count() === 0)
         <x-empty-state
             title="Salut {{ $user->name ?? 'inconnu' }} !"
             description="Votre tableau de bord est vide. Vous n'avez pas encore d'objectifs, de thèmes ou de factures. Veuillez commencer par ajouter une facture !"

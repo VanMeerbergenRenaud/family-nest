@@ -11,6 +11,8 @@ class Dashboard extends Component
 
     public $family;
 
+    public $invoices;
+
     public $allInvoicesOfUser = [];
 
     public $allInvoicesOfFamily = [];
@@ -21,6 +23,11 @@ class Dashboard extends Component
     {
         $this->user = auth()->user();
         $this->family = $this->user->family();
+
+        $this->invoices = Invoice::where('user_id', $this->user->id)
+            ->where('is_archived', false)
+            ->orderBy('amount', 'desc')
+            ->get();
 
         // Get all the user's invoices
         $this->allInvoicesOfUser = auth()->user()->invoices()
