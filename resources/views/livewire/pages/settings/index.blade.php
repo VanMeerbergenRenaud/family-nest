@@ -215,7 +215,8 @@
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
                             class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-red-700 dark:group-hover:text-red-400">
-                            Zone de danger</h3>
+                            Zone de danger
+                        </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
                             Supprimer des données ou désactiver définitivement votre compte.
                         </p>

@@ -20,16 +20,20 @@ class Profile extends Component
     use WithFileUploads;
 
     public $name;
+
     public $email;
 
     #[Validate('nullable|image|max:1024|mimes:jpg,jpeg,png,gif')]
     public $avatar;
 
     public $avatarUrl;
+
     public $avatarError = false;
 
     public $current_password = '';
+
     public $password = '';
+
     public $password_confirmation = '';
 
     public function mount(): void
@@ -76,6 +80,7 @@ class Profile extends Component
         if ($this->avatarError) {
             $this->addError('avatar', "L'image contient des erreurs et ne peut pas être importée");
             $this->reset('avatar');
+
             return;
         }
 
@@ -89,7 +94,7 @@ class Profile extends Component
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($user->id)
+                Rule::unique(User::class)->ignore($user->id),
             ],
             'avatar' => ['nullable', 'image', 'max:1024', 'mimes:jpg,jpeg,png,gif'],
         ]);
@@ -117,10 +122,10 @@ class Profile extends Component
 
                 // Générer un nom de fichier unique
                 $directory = "avatars/{$user->id}";
-                $filename = $directory . '/' . Str::random(40) . '.' . $this->avatar->getClientOriginalExtension();
+                $filename = $directory.'/'.Str::random(40).'.'.$this->avatar->getClientOriginalExtension();
 
                 // S'assurer que le répertoire existe
-                if (!Storage::disk('s3')->exists($directory)) {
+                if (! Storage::disk('s3')->exists($directory)) {
                     Storage::disk('s3')->makeDirectory($directory);
                 }
 
@@ -130,7 +135,7 @@ class Profile extends Component
                 // Réinitialiser l'upload
                 $this->reset('avatar');
             } catch (\Exception $e) {
-                Toaster::error("Erreur lors du téléchargement de l'avatar: " . $e->getMessage());
+                Toaster::error("Erreur lors du téléchargement de l'avatar: ".$e->getMessage());
             }
         }
 
@@ -173,6 +178,7 @@ class Profile extends Component
 
         if ($user->hasVerifiedEmail()) {
             Toaster::info('Votre adresse e-mail est déjà vérifiée.');
+
             return;
         }
 

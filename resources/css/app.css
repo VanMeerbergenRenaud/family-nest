@@ -140,23 +140,23 @@
     }
 
     .button-secondary {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-gray-700 bg-gray-800 hover:bg-gray-700 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-white bg-gray-800 hover:bg-gray-700 transition-colors;
     }
 
     .button-tertiary {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors;
     }
 
     .button-danger {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-red-400 bg-red-500 hover:bg-red-600 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-red-400 bg-red-500 hover:bg-red-600 transition-colors;
     }
 
     .button-warning {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-yellow-400 bg-yellow-400 hover:bg-yellow-500 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-yellow-400 bg-yellow-400 hover:bg-yellow-500 transition-colors;
     }
 
     .button-success {
-        @apply flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white border border-green-400 bg-green-400 hover:bg-green-500 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-green-400 bg-green-400 hover:bg-green-500 transition-colors;
     }
 
     .button-rounded {
@@ -445,6 +445,20 @@
 @utility scrollbar-hidden {
     &::-webkit-scrollbar {
         display: none;
+    }
+}
+
+/* Loader animation */
+@utility animate-rotate {
+    animation: rotate 5s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg) scale(10);
+    }
+    100% {
+        transform: rotate(-360deg) scale(10);
     }
 }
 
