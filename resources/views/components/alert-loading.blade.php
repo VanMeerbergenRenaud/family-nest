@@ -43,7 +43,7 @@
             class="absolute top-0 right-0.5 p-3 z-10 cursor-pointer"
             aria-label="Fermer le dialogue de chargement"
         >
-            <x-svg.cross class="w-5 h-5"/>
+            <x-svg.cross class="w-4 h-4"/>
         </button>
     </div>
 </div>

@@ -83,7 +83,7 @@
                                                         description="{{ $result->email }}"
                                                     >
                                                         <img class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"
-                                                             src="{{ $result->avatar ?? asset('img/avatar_placeholder.png') }}"
+                                                             src="{{ $result->avatar_url ?? asset('img/avatar_placeholder.png') }}"
                                                              alt="{{ $result->name }}"/>
                                                     </x-spotlight.result>
                                                 @endif

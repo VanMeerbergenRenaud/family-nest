@@ -147,7 +147,7 @@
                                 <td>
                                     <div class="flex items-center">
                                         <div class="mr-3 rounded">
-                                            <img src="{{ $member->avatar ?? asset('img/img_placeholder.jpg') }}"
+                                            <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}"
                                                  alt="{{ $member->name }}"
                                                  class="h-10 min-w-8 w-10 rounded-full object-cover">
                                         </div>

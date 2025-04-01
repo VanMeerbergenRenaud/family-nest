@@ -115,27 +115,30 @@ class Profile extends Component
         // Rafraîchir l'URL de l'avatar
         $this->avatarUrl = $user->fresh()->avatar_url;
 
+        // Améliorez la gestion de l'upload d'avatar
         if ($this->avatar) {
             try {
                 // Supprimer l'ancien avatar si existe
                 $this->deleteOldAvatar($user);
 
                 // Générer un nom de fichier unique
-                $directory = "avatars/{$user->id}";
-                $filename = $directory.'/'.Str::random(40).'.'.$this->avatar->getClientOriginalExtension();
+                $directory = "avatars/user_{$user->id}/";
+                $filename = $directory . Str::random(40) . '.' . $this->avatar->getClientOriginalExtension();
 
-                // S'assurer que le répertoire existe
-                if (! Storage::disk('s3')->exists($directory)) {
-                    Storage::disk('s3')->makeDirectory($directory);
+                // S'assurer que le répertoire existe (en créant un fichier vide comme marqueur)
+                if (!Storage::disk('s3')->exists($directory . '/.init')) {
+                    Storage::disk('s3')->put($directory . '/.init', '');
                 }
 
-                // Stocker le fichier sur S3
+                // Mettre à jour l'avatar de l'utilisateur avec le chemin complet
                 $dataToUpdate['avatar'] = $this->avatar->storeAs('', $filename, 's3');
 
                 // Réinitialiser l'upload
                 $this->reset('avatar');
             } catch (\Exception $e) {
-                Toaster::error("Erreur lors du téléchargement de l'avatar: ".$e->getMessage());
+                logger('Erreur avatar: ' . $e->getMessage());
+                Toaster::error("Erreur lors du téléchargement de l'avatar: " . $e->getMessage());
+                return;
             }
         }
 

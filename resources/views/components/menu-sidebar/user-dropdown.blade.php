@@ -10,7 +10,7 @@
         <x-menu.button class="flex w-full items-center gap-3 overflow-hidden rounded-md px-1 cursor-pointer">
         <span class="relative flex shrink-0 overflow-hidden h-8 w-8 rounded-lg">
             <img class="object-cover w-full h-full"
-                 src="{{ $user->avatar ?? asset('img/avatar_placeholder.png') }}" alt="{{ $user->name }}">
+                 src="{{ $user->avatar_url ?? asset('img/avatar_placeholder.png') }}" alt="{{ $user->name }}">
         </span>
             <div class="grid flex-1 text-left text-sm leading-tight">
                 <span class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</span>
@@ -40,7 +40,7 @@
         <x-menu.button
             class="flex w-full items-center gap-3 overflow-hidden rounded-md px-1 cursor-pointer">
             <span class="relative flex shrink-0 overflow-hidden h-8 w-8 rounded-lg">
-                <img class="object-cover w-full h-full" src="{{ $user->avatar ?? asset('img/avatar_placeholder.png') }}" alt="{{ $user->name }}">
+                <img class="object-cover w-full h-full" src="{{ $user->avatar_url ?? asset('img/avatar_placeholder.png') }}" alt="{{ $user->name }}">
             </span>
             <div class="grid flex-1 text-left text-sm leading-tight">
                 <span class="truncate text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</span>
