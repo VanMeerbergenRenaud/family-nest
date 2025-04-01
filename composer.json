@@ -20,6 +20,7 @@
         "mailersend/laravel-driver": "^2.8",
         "masmerise/livewire-toaster": "^2.7",
         "meilisearch/meilisearch-php": "^1.13",
+        "opcodesio/log-viewer": "^3.15",
         "socialiteproviders/facebook": "^4.1",
         "socialiteproviders/google": "^4.1",
         "symfony/http-client": "^7.2",
