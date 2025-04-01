@@ -8,7 +8,7 @@
         <span class="relative flex shrink-0 overflow-hidden h-8 w-8 rounded-lg">
             <img class="object-cover w-full h-full"
                  alt="{{ auth()->user()->name ?? 'Nom inconnu' }}"
-                 src="{{ auth()->user()->avatar ?? asset('img/avatar_placeholder.png') }}">
+                 src="{{ auth()->user()->avatar_url ?? asset('img/avatar_placeholder.png') }}">
         </span>
         {{-- Name and email --}}
         <div class="grid flex-1 text-left text-sm leading-tight">
