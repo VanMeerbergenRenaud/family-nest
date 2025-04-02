@@ -4,7 +4,7 @@
     'showSocialLogin' => false
 ])
 
-<div class="relative min-h-screen flex-center bg-gray-100">
+<div class="relative min-h-screen flex-center bg-gray-100 lg:py-4">
     {{-- Arrow go back --}}
     <div class="absolute top-4 left-4 max-sm:hidden">
         <a href="{{ route('welcome') }}"

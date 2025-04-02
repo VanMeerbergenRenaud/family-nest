@@ -1,27 +1,3 @@
-<?php
-
-use App\Livewire\Forms\LoginForm;
-use Illuminate\Support\Facades\Session;
-
-use function Livewire\Volt\form;
-use function Livewire\Volt\layout;
-
-layout('layouts.guest');
-
-form(LoginForm::class);
-
-$login = function () {
-    $this->validate();
-
-    $this->form->authenticate();
-
-    Session::regenerate();
-
-    $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-};
-
-?>
-
 <x-auth-template title="Connexion" description="Entrez vos information pour vous connectez." showSocialLogin>
 
     <!-- Session Status -->
@@ -32,7 +8,6 @@ $login = function () {
         </p>
     @endif
 
-    <!-- Formulaire d'inscription -->
     <form wire:submit="login">
         @csrf
 
@@ -43,7 +18,7 @@ $login = function () {
                 name="email"
                 type="email"
                 model="form.email"
-                placeholder="john.doe@gmail.com"
+                placeholder="votre-email@gmail.com"
                 autocomplete="email"
                 autofocus
                 required
@@ -59,6 +34,7 @@ $login = function () {
             />
         </div>
 
+        {{-- Remember me --}}
         <div class="mt-6 md:px-2 flex items-center justify-between">
             <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
             @if (Route::has('password.request'))
@@ -74,7 +50,7 @@ $login = function () {
             </button>
         </div>
 
-        <!-- Lien inscription -->
+        <!-- Register link -->
         @if (Route::has('register'))
             <div class="text-sm-regular text-center text-dark-gray">
                 {{ __("Pas encore membre ?") }}

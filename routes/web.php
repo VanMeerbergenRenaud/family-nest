@@ -25,10 +25,12 @@ Route::view('/', 'welcome')
     ->middleware(['guest'])
     ->name('welcome');
 
-// Routes order => desktop sidebar
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::get('/dashboard', Dashboard::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-    Route::get('/dashboard', Dashboard::class)->name('dashboard');
+// Routes order => desktop sidebar
+Route::middleware(['auth'])->group(function () {
 
     Route::prefix('invoices')->name('invoices.')->group(function () {
         Route::get('/', IndexInvoice::class)->name('index');

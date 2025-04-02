@@ -87,7 +87,8 @@ class UserProfileForm extends Form
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Toaster::error("Erreur lors de la mise à jour du profil: " . $e->getMessage());
+            Toaster::error('Erreur lors de la mise à jour du profil');
+
             return false;
         }
     }
@@ -109,7 +110,8 @@ class UserProfileForm extends Form
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Toaster::error("Erreur lors de la suppression de l'avatar: " . $e->getMessage());
+            Toaster::error("Erreur lors de la suppression de l'avatar");
+
             return false;
         }
     }
@@ -146,6 +148,7 @@ class UserProfileForm extends Form
 
         if ($user->hasVerifiedEmail()) {
             Toaster::info('Votre adresse e-mail est déjà vérifiée.');
+
             return;
         }
 

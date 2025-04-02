@@ -1,34 +1,5 @@
-<?php
-
-use App\Livewire\Forms\RegisterForm;
-
-use function Livewire\Volt\form;
-use function Livewire\Volt\layout;
-use function Livewire\Volt\state;
-
-layout('layouts.guest');
-
-form(RegisterForm::class);
-
-state(['showGeneralCondition' => false]);
-
-$register = function () {
-    $this->validate();
-
-    $this->form->register();
-
-    $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-};
-
-$showConditions = function () {
-    $this->showGeneralCondition = true;
-};
-
-?>
-
 <x-auth-template title="Inscription" description="Entrez vos informations pour vous créer un compte." showSocialLogin>
 
-    <!-- Formulaire d'inscription -->
     <form wire:submit="register">
         @csrf
 
@@ -38,7 +9,7 @@ $showConditions = function () {
                 label="Nom"
                 name="name"
                 model="form.name"
-                placeholder="John Doe"
+                placeholder="Votre nom"
                 autocomplete="name"
                 autofocus
                 required
@@ -50,7 +21,7 @@ $showConditions = function () {
                 name="email"
                 type="email"
                 model="form.email"
-                placeholder="john.doe@gmail.com"
+                placeholder="votre-email@gmail.com"
                 autocomplete="email"
                 required
             />
@@ -65,10 +36,11 @@ $showConditions = function () {
             />
         </div>
 
-        <div class="mt-6 md:px-2 flex items-center justify-between">
-            <x-form.checkbox-input checked name="general_conditions" model="form.general_conditions" label="Accepter les conditions générales" />
-            <button type="button" wire:click="showConditions" class="ml-3 min-w-fit text-sm-medium text-indigo-600 underline">
-                {{ __("Voir les conditions") }}
+        {{-- General conditions --}}
+        <div class="mt-6 md:px-2 flex items-center justify-between gap-3">
+            <x-form.checkbox-input checked name="general_conditions" model="form.general_conditions" label="Accepter les conditions" />
+            <button type="button" wire:click="showConditions" class="min-w-fit text-sm-medium text-gray-700 underline" title="Voir les conditions d'utilisation">
+                {{ __("Conditions d'utilisation") }}
             </button>
         </div>
 
@@ -78,7 +50,7 @@ $showConditions = function () {
             </button>
         </div>
 
-        <!-- Lien connexion -->
+        <!-- Login link -->
         @if (Route::has('login'))
             <div class="text-sm-regular text-center text-dark-gray">
                 {{ __('Déjà un compte ?') }}
@@ -93,20 +65,25 @@ $showConditions = function () {
         @endif
     </form>
 
+    {{-- General conditions modal --}}
     @if($showGeneralCondition)
         <x-modal wire:model="showGeneralCondition">
             <x-modal.panel>
-                <div class="flex gap-x-6 p-6">
-                    <div class="-mr-1 -mt-1 p-3 w-fit h-fit rounded-full bg-gray-100">
-                        <x-svg.conditions />
-                    </div>
+                <div class="p-6">
+                    <!-- Structure avec grid -->
+                    <div class="grid grid-cols-[auto_1fr] gap-4">
+                        <!-- Première ligne: icône et titre -->
+                        <div class="p-3 w-fit h-fit rounded-full bg-gray-100">
+                            <x-svg.conditions />
+                        </div>
 
-                    <div>
-                        <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                        <h3 role="heading" aria-level="3" class="text-xl-semibold self-center">
                             {{ __('Conditions générales d\'utilisation') }}
                         </h3>
-                        <div class="mt-6 text-md-regular text-gray-500">
-                            <div class="overflow-y-auto max-h-96 pr-2">
+
+                        <!-- Deuxième ligne: contenu sur 2 colonnes -->
+                        <div class="col-span-2 mt-4 text-md-regular text-gray-500">
+                            <div class="px-2 overflow-y-auto max-h-96">
                                 <h4 class="font-semibold mb-2">1. Introduction</h4>
                                 <p class="mb-3">
                                     Bienvenue sur notre plateforme. Les présentes conditions générales d'utilisation régissent votre utilisation de notre service et constituent un accord légal entre vous et notre entreprise.
@@ -117,6 +94,7 @@ $showConditions = function () {
                                     En vous inscrivant et en utilisant notre service, vous acceptez d'être lié par ces conditions. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser notre service.
                                 </p>
 
+                                <!-- Reste du contenu identique -->
                                 <h4 class="font-semibold mb-2">3. Description du service</h4>
                                 <p class="mb-3">
                                     Notre service offre une solution de gestion de facturation en ligne permettant aux utilisateurs de créer, gérer et suivre leurs factures et clients.

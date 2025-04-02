@@ -44,12 +44,14 @@ class UserPasswordForm extends Form
             DB::commit();
 
             $this->reset(['current_password', 'password', 'password_confirmation']);
+
             Toaster::success('Mot de passe mis à jour.');
 
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            Toaster::error("Erreur lors de la mise à jour du mot de passe: " . $e->getMessage());
+            Toaster::error('Erreur lors de la mise à jour du mot de passe');
+
             return false;
         }
     }
