@@ -2,7 +2,9 @@
     'label',
     'name',
     'model',
-    'asterix' => false
+    'asterix' => false,
+    'title' => 'Traitement en cours',
+    'description' => null,
 ])
 
 <x-form.field-base :label="$label" :name="$name" :model="$model" :asterix="$asterix" class="w-full px-2">
@@ -12,7 +14,7 @@
          x-on:livewire-upload-cancel="uploading = false"
          x-on:livewire-upload-error="uploading = false"
          x-on:livewire-upload-progress="progress = $event.detail.progress"
-         class="@error($name) input-invalid @enderror border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-gray-700 hover:bg-slate-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+         class="@error($name) input-invalid @enderror relative border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-gray-700 hover:bg-slate-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
     >
         <div class="flex-center flex-col p-10 min-h-[25rem]">
             <x-svg.download class="w-5 h-5 mb-5"/>
@@ -47,19 +49,50 @@
             {{ $attributes }}
         >
 
-        <div class="fixed mx-auto top-0 left-0 right-0 w-fit p-4 z-50">
+        <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-80 rounded-xl overflow-hidden border border-transparent">
             <div wire:loading
                  wire:target="{{ $model }}"
-                 class="bg-white rounded-lg shadow-xl border border-blue-100 px-3 py-3.5 transform transition-all duration-300 ease-in-out flex flex-col gap-2"
+                 style="display: none;"
+                 class="w-full"
             >
-                <div class="mb-1 text-sm-medium text-gray-800">Importation en cours...</div>
-                <div x-show="uploading" class="w-full">
-                    <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div x-bind:style="'width: ' + progress + '%'"
-                             class="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out"
-                        ></div>
+                <div class="relative z-20 bg-white rounded-xl border border-slate-200 w-full h-full">
+                    <div class="flex items-center px-5 py-3 gap-5 w-full">
+
+                        {{-- Spinner --}}
+                        <div class="relative flex-shrink-0">
+                            <x-svg.spinner class="h-5 w-5 text-blue-500" />
+                        </div>
+
+                        {{-- Title and description --}}
+                        <div class="flex-grow"> {{-- Pas besoin de z-index ici car déjà dans le conteneur z-20 --}}
+                            <div class="font-medium text-gray-800">{{ $title }}</div>
+
+                            @if($description)
+                                <div class="text-sm text-gray-500 mt-1 leading-snug">
+                                    {{ $description }}
+                                </div>
+                            @endif
+                        </div>
                     </div>
-                    <div class="text-xs text-gray-500 mt-1 text-right" x-text="progress + '%'"></div>
+
+                    <div x-show="uploading" class="w-full px-4 mb-2">
+                        <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div x-bind:style="'width: ' + progress + '%'"
+                                 class="bg-blue-500 h-full rounded-full transition-all duration-300 ease-out"
+                            ></div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1 text-right" x-text="progress + '%'"></div>
+                    </div>
+
+                    {{-- Close button --}}
+                    <button
+                        type="button"
+                        @click="$wire.set('{{ $model }}', null)"
+                        class="absolute top-0 right-0.5 p-3 z-10 cursor-pointer"
+                        aria-label="Fermer le dialogue de chargement"
+                    >
+                        <x-svg.cross class="w-4 h-4"/>
+                    </button>
                 </div>
             </div>
         </div>

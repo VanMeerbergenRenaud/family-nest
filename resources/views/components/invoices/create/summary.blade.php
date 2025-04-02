@@ -201,17 +201,17 @@
             <div class="flex flex-col gap-1.5">
                 <p class="text-sm-regular">
                     Émission: <span class="text-sm-medium">
-                        {{ $form->issued_date ? \Carbon\Carbon::parse($form->issued_date)->format('d/m/Y') : 'Non spécifiée' }}
+                        {{ $form->simpleDateFormat($form->issued_date) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Paiement: <span class="text-sm-medium">
-                        {{ $form->payment_due_date ? \Carbon\Carbon::parse($form->payment_due_date)->format('d/m/Y') : 'Non spécifiée' }}
+                        {{ $form->simpleDateFormat($form->payment_due_date) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Rappel: <span class="text-sm-medium">
-                        {{ $form->payment_reminder ? \Carbon\Carbon::parse($form->payment_reminder)->format('d/m/Y') : 'Non spécifié' }}
+                        {{ $form->simpleDateFormat($form->payment_reminder) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">

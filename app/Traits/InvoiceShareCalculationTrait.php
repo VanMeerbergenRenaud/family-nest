@@ -2,13 +2,15 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Number;
+
 trait InvoiceShareCalculationTrait
 {
     public string $shareMode = 'amount';
 
-    public int $remainingAmount = 0;
+    public float $remainingAmount = 0;
 
-    public int $remainingPercentage = 100;
+    public float $remainingPercentage = 100;
 
     // Calculer le montant restant et le pourcentage restant
     public function calculateRemainingShares(): void
@@ -16,7 +18,7 @@ trait InvoiceShareCalculationTrait
         $totalAmount = 0;
         $totalPercentage = 0;
 
-        if (! empty($this->form->user_shares)) {
+        if (!empty($this->form->user_shares)) {
             foreach ($this->form->user_shares as $share) {
                 $totalAmount += $share['amount'] ?? 0;
                 $totalPercentage += $share['percentage'] ?? 0;
@@ -30,6 +32,9 @@ trait InvoiceShareCalculationTrait
     // Ajouter ou mettre à jour une part pour un membre
     public function updateShare($userId, $value, $type = 'percentage'): void
     {
+        // Formater la valeur pour garantir exactement 2 décimales
+        $value = number_format((float)$value, 2, '.', '');
+
         // Initialiser la structure si elle n'existe pas déjà
         if (empty($this->form->user_shares)) {
             $this->form->user_shares = [];
@@ -98,38 +103,68 @@ trait InvoiceShareCalculationTrait
 
         // Calculer la part équitable
         if ($this->shareMode === 'percentage') {
-            $share = 100 / $count;
-            foreach ($userIds as $userId) {
+            // Pour les pourcentages, distribuer 100% équitablement
+            $share = number_format(100 / $count, 2, '.', '');
+
+            // Ajuster pour éviter les erreurs d'arrondi
+            $totalAssigned = 0;
+            foreach ($userIds as $index => $userId) {
+                if ($index === count($userIds) - 1) {
+                    // Pour le dernier membre, attribuer ce qui reste pour atteindre 100%
+                    $share = number_format(100 - $totalAssigned, 2, '.', '');
+                }
                 $this->updateShare($userId, $share, 'percentage');
+                $totalAssigned += (float)$share;
             }
         } else {
+            // Pour les montants, distribuer le montant total équitablement
             $amount = $this->form->amount;
-            $share = $amount / $count;
-            foreach ($userIds as $userId) {
-                $this->updateShare($userId, $share, 'amount');
+            $shareAmount = number_format($amount / $count, 2, '.', '');
+
+            // Ajuster pour éviter les erreurs d'arrondi
+            $totalAssigned = 0;
+            foreach ($userIds as $index => $userId) {
+                if ($index === count($userIds) - 1) {
+                    // Pour le dernier membre, attribuer ce qui reste pour atteindre le montant total
+                    $shareAmount = number_format($amount - $totalAssigned, 2, '.', '');
+                }
+                $this->updateShare($userId, $shareAmount, 'amount');
+                $totalAssigned += (float)$shareAmount;
             }
         }
     }
 
     // Calculer le montant à partir d'un pourcentage
-    private function calculateAmountFromPercentage($percentage): int|string
+    private function calculateAmountFromPercentage($percentage): float
     {
-        if (! is_numeric($this->form->amount) || ! is_numeric($percentage)) {
+        if (!is_numeric($this->form->amount) || !is_numeric($percentage)) {
             return 0;
         }
 
-        // Limiter à exactement 2 décimales pour éviter les problèmes de précision
+        // Formater à exactement 2 décimales
         return number_format(($percentage / 100) * $this->form->amount, 2, '.', '');
     }
 
     // Calculer le pourcentage à partir d'un montant
-    private function calculatePercentageFromAmount($amount): int|string
+    private function calculatePercentageFromAmount($amount): float
     {
-        if (! is_numeric($this->form->amount) || $this->form->amount == 0 || ! is_numeric($amount)) {
+        if (!is_numeric($this->form->amount) || $this->form->amount == 0 || !is_numeric($amount)) {
             return 0;
         }
 
-        // Limiter à exactement 2 décimales pour le pourcentage
+        // Formater à exactement 2 décimales
         return number_format(($amount / $this->form->amount) * 100, 2, '.', '');
+    }
+
+    // Formater le montant pour l'affichage
+    public function formatMontant($value): string
+    {
+        return Number::format($value, 2, locale: 'fr_FR');
+    }
+
+    // Formater le pourcentage pour l'affichage
+    public function formatPourcentage($value): string
+    {
+        return Number::format($value, 2, locale: 'fr_FR') . '%';
     }
 }

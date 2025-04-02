@@ -375,7 +375,7 @@
                                         :asterix="true"
                                     >
                                         @foreach($availablePermissions as $value => $label)
-                                            <option value="{{ $value }}" wire:key="{{ $value }}">
+                                            <option value="{{ $value }}">
                                                 {{ $label }}
                                            </option>
                                         @endforeach
@@ -388,7 +388,7 @@
                                         :asterix="true"
                                     >
                                         @foreach($availableRelations as $value => $label)
-                                            <option value="{{ $value }}" wire:key="{{ $value }}">
+                                            <option value="{{ $value }}">
                                                 {{ $label }}
                                             </option>
                                         @endforeach

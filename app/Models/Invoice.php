@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HumanDateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Laravel\Scout\Searchable;
 
 class Invoice extends Model
 {
-    use HasFactory, Searchable;
+    use HasFactory, HumanDateTrait, Searchable;
 
     protected $fillable = [
         'name', 'reference', 'type', 'category', 'issuer_name', 'issuer_website',

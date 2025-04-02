@@ -21,7 +21,7 @@
     $symbols = json_encode(array_combine(array_keys($currencies), array_column($currencies, 'symbol')));
 @endphp
 
-<div class="m-0 p-0 max-w-[45rem]" wire:key="{{ $id }}">
+<div class="m-0 p-0 max-w-[45rem]">
     @if($label)
         <label for="{{ $id }}" class="relative mb-1.5 pl-2 block text-sm-medium text-gray-800 dark:text-gray-200">
             {{ ucfirst($label) }}@if($asterix)<span class="absolute -top-0.5 ml-0.5 text-rose-500">*</span>@endif

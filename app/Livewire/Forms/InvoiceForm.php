@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Services\FileStorageService;
 use App\Traits\FormatFileSizeTrait;
+use App\Traits\HumanDateTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Validate;
@@ -15,7 +16,7 @@ use Masmerise\Toaster\Toaster;
 
 class InvoiceForm extends Form
 {
-    use FormatFileSizeTrait;
+    use FormatFileSizeTrait, HumanDateTrait;
 
     public ?Invoice $invoice = null;
 
@@ -516,11 +517,6 @@ class InvoiceForm extends Form
             return null;
         }
 
-        // Si le montant est déjà un nombre, le formater avec exactement 2 décimales
-        if (is_numeric($amount)) {
-            return (float) number_format((float) $amount, 2, '.', '');
-        }
-
         // Convertir en chaîne si ce n'est pas déjà le cas
         $amount = (string) $amount;
 
@@ -530,7 +526,7 @@ class InvoiceForm extends Form
         // Convertir la virgule en point (format standard pour PHP)
         $amount = str_replace(',', '.', $amount);
 
-        // Conversion en float et formatage avec exactement 2 décimales
+        // Utiliser Number::format pour garantir la précision
         return (float) number_format((float) $amount, 2, '.', '');
     }
 }

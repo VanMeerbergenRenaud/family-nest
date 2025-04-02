@@ -123,7 +123,13 @@
                         </div>
                     @else
                         {{-- Champ d'upload vide --}}
-                        <x-form.field-upload label="Importer une nouvelle facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="false" />
+                        <x-form.field-upload
+                            label="Importer une facture"
+                            model="form.uploadedFile"
+                            name="form.uploadedFile"
+                            :asterix="true"
+                            title="Importation en cours..."
+                        />
                     @endif
                 </div>
 
@@ -144,7 +150,7 @@
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
-                                    <option value="{{ $typeValue }}" wire:key="{{ $typeValue }}">
+                                    <option value="{{ $typeValue }}">
                                         {{ $typeLabel }}
                                     </option>
                                 @endforeach
@@ -153,7 +159,7 @@
                             <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
                                 <option value="" selected>Sélectionner une catégorie</option>
                                 @foreach($form->availableCategories as $availableCategory)
-                                    <option value="{{ $availableCategory }}" wire:key="{{ $availableCategory }}">
+                                    <option value="{{ $availableCategory }}">
                                         {{ $availableCategory }}
                                     </option>
                                 @endforeach
@@ -184,7 +190,7 @@
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
                                 @foreach($family_members as $member)
-                                    <option value="{{ $member->id }}" wire:key="{{ $member->id }}">
+                                    <option value="{{ $member->id }}">
                                         {{ $member->name }}
                                         @if($member->id === auth()->id())
                                             (Moi)
@@ -280,9 +286,7 @@
                                                 $hasShare = $memberShare !== null;
                                             @endphp
 
-                                            <li wire:key="share-{{ $member->id }}"
-                                                class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md"
-                                            >
+                                            <li class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
 
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">

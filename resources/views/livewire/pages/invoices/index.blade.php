@@ -121,7 +121,7 @@
                                         {{ Str::limit($invoice->name, 16) }}
                                     </h3>
                                     <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
-                                        {{ $invoice->created_at ? \Carbon\Carbon::parse($invoice->issued_date)->locale('fr_FR')->isoFormat('D MMM YYYY') : 'Date inconnue' }}
+                                        {{ $invoice->dateForHumans($invoice->created_at) }}
                                         • {{ $invoice->amount ?? 'Montant vide' }} {{ $invoice->currency ?? '€' }}
                                     </p>
                                 </div>
@@ -632,7 +632,7 @@
                             @if($visibleColumns['issued_date'] ?? false)
                                 <td>
                                     @if($invoice->issued_date)
-                                        {{ \Carbon\Carbon::parse($invoice->issued_date)->locale('fr_FR')->isoFormat('D MMMM YYYY') }}
+                                        {{ $invoice->dateForHumans($invoice->issued_date) }}
                                     @else
                                         {{ __('Non spécifiée') }}
                                     @endif
@@ -643,7 +643,7 @@
                             @if($visibleColumns['payment_due_date'] ?? false)
                                 <td>
                                     @if($invoice->payment_due_date)
-                                        {{ \Carbon\Carbon::parse($invoice->payment_due_date)->locale('fr_FR')->isoFormat('D MMMM YYYY') }}
+                                        {{ $invoice->dateForHumans($invoice->payment_due_date) }}
                                     @else
                                         {{ __('Non spécifiée') }}
                                     @endif
@@ -761,7 +761,7 @@
                                                 <div class="space-y-1">
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d\'émission') }}</p>
                                                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $invoice->issued_date ? \Carbon\Carbon::parse($invoice->issued_date)->locale('fr_FR')->isoFormat('D MMM YYYY') : 'Non spécifiée' }}
+                                                        {{ $invoice->dateForHumans($invoice->issued_date) }}
                                                     </p>
                                                 </div>
                                                 <div class="space-y-1">
@@ -773,7 +773,7 @@
                                                 <div class="space-y-1">
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d‘échéance') }}</p>
                                                     <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                                        {{ $invoice->payment_due_date ? \Carbon\Carbon::parse($invoice->payment_due_date)->locale('fr_FR')->isoFormat('D MMM YYYY') : 'Non spécifiée' }}
+                                                        {{ $invoice->dateForHumans($invoice->payment_due_date) }}
                                                     </p>
                                                 </div>
                                                 <div class="space-y-1">

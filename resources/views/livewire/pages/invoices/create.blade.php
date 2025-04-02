@@ -28,7 +28,13 @@
                 {{-- Image : colonne 1 --}}
                 <div class="relative flex overflow-hidden max-h-[75vh] lg:max-w-[30vw]">
                     @if (!$form->uploadedFile)
-                        <x-form.field-upload label="Importer une facture" model="form.uploadedFile" name="form.uploadedFile" :asterix="true" />
+                        <x-form.field-upload
+                            label="Importer une facture"
+                            model="form.uploadedFile"
+                            name="form.uploadedFile"
+                            :asterix="true"
+                            title="Importation en cours..."
+                        />
                     @else
                         @php
                             $fileInfo = app(App\Services\FileStorageService::class)->getFileInfo($form->uploadedFile);
@@ -61,7 +67,7 @@
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
-                                    <option value="{{ $typeValue }}" wire:key="{{ $typeValue }}">
+                                    <option value="{{ $typeValue }}">
                                         {{ $typeValue }}
                                     </option>
                                 @endforeach
@@ -70,7 +76,7 @@
                             <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
                                 <option value="" selected>Sélectionner une catégorie</option>
                                 @foreach($form->availableCategories as $availableCategory)
-                                    <option value="{{ $availableCategory }}" wire:key="{{ $availableCategory }}">
+                                    <option value="{{ $availableCategory }}">
                                         {{ $availableCategory }}
                                     </option>
                                 @endforeach
@@ -100,7 +106,7 @@
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
                                 @foreach($family_members as $member)
-                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }} wire:key="{{ $member->id }}">
+                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }}>
                                         {{ $member->name }}
                                         @if($member->id === auth()->id())
                                             (Moi)
@@ -138,7 +144,8 @@
 
                                             @if($totalShares > 0)
                                                 <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $isComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                    {{ $totalShares }} {{ $totalShares === 1 ? 'membre' : 'membres' }} • {{ number_format($totalPercent, 0) }}%
+                                                    {{ $totalShares }} {{ $totalShares === 1 ? 'membre' : 'membres' }} •
+                                                    {{ \Illuminate\Support\Number::format($totalPercent, 0, locale: 'fr_FR') }}%
                                                 </span>
                                             @endif
                                         @endif
@@ -174,9 +181,9 @@
 
                                         <div class="ml-2 text-xs text-right px-2 py-1 rounded-md {{ $remainingPercentage <= 0.1 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             @if($shareMode === 'percentage')
-                                                {{ number_format($remainingPercentage, 1) }}% non attribués
+                                                {{ \Illuminate\Support\Number::format($remainingPercentage, 1, locale: 'fr_FR') }}% non attribués
                                             @else
-                                                {{ number_format($remainingAmount, 2) }}€ non attribués
+                                                {{ \Illuminate\Support\Number::currency($remainingAmount, 'EUR', locale: 'fr_FR') }} non attribués
                                             @endif
                                         </div>
                                     </div>
@@ -196,9 +203,7 @@
                                                 $hasShare = $memberShare !== null;
                                             @endphp
 
-                                            <li wire:key="share-{{ $member->id }}"
-                                                class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md"
-                                            >
+                                            <li class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
                                                 </div>
@@ -235,7 +240,7 @@
                                 </div>
                             </div>
                         @else
-                            <div class="py-2 px-3 bg-orange-50 border border-orange-200 rounded-md text-xs text-orange-600">
+                            <div class="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs text-yellow-600">
                                 Veuillez saisir un montant pour pouvoir le répartir entre les membres.
                             </div>
                         @endif
