@@ -2,6 +2,7 @@
     'href' => '#',
     'text' => 'Élément vide',
     'description' => null,
+    'state' => null,
     'shortcut' => null,
 ])
 
@@ -13,9 +14,16 @@
         </div>
 
         {{-- Text and description --}}
-        <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">
+        <span class="text-sm-medium text-gray-900 dark:text-white group-hover:text-gray-900 dark:group-hover:text-white">
             {{ $text }} <span class="text-sm-regular text-gray-400 dark:text-gray-400">{{ $description }}</span>
         </span>
+
+        {{-- State --}}
+        @if($state)
+            <div class="text-xs-medium ml-auto px-2 py-1 rounded-full bg-gray-700 text-white dark:bg-gray-700 dark:text-gray-200">
+                {{ $state }}
+            </div>
+        @endif
 
         {{-- Keyboard shortcut --}}
         @if($shortcut)

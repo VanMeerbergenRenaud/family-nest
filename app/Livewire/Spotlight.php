@@ -33,9 +33,10 @@ class Spotlight extends Component
         $limitResults = 8;
 
         if ($family) {
+            // Logique existante pour les utilisateurs avec famille
             $userResults = User::search($value)->get();
 
-            // Puis filtrer pour ne garder que ceux qui sont dans la même famille
+            // Filter users by family
             $userResults = $userResults->filter(function ($user) use ($family) {
                 return $user->families()
                     ->where('family_id', $family->id)
@@ -62,15 +63,28 @@ class Spotlight extends Component
                 };
             });
         } else {
-            // If user has no family -> search only invoices
+            // Cas où l'utilisateur n'a pas de famille
             $invoiceResults = $currentUser->invoices()
                 ->search($value)
                 ->take($limitResults)
                 ->get();
 
-            $this->results = collect([
-                'Factures' => $invoiceResults,
-            ]);
+            // Recherche l'utilisateur courant si son nom ou email correspond
+            $userResults = collect();
+            if (stripos($currentUser->name, $value) !== false || stripos($currentUser->email, $value) !== false) {
+                $userResults = collect([$currentUser]);
+            }
+
+            // Combine les résultats
+            $this->results = collect();
+
+            if ($userResults->isNotEmpty()) {
+                $this->results->put('Utilisateurs', $userResults);
+            }
+
+            if ($invoiceResults->isNotEmpty()) {
+                $this->results->put('Factures', $invoiceResults);
+            }
         }
     }
 

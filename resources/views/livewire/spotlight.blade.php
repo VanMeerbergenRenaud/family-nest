@@ -68,9 +68,10 @@
                                             @foreach ($items as $result)
                                                 @if ($result instanceof \App\Models\Invoice)
                                                     <x-spotlight.result
-                                                        href="{{ route('invoices.show', $result) }}"
+                                                        href="{{ $result->is_archived ? route('invoices.archived') : route('invoices.show', $result) }}"
                                                         text="{{ $result->name }}"
                                                         description="({{ $result->amount }}{{ $result->currency }})"
+                                                        state="{{ $result->is_archived ? '#archivée' : null }}"
                                                     >
                                                         <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800"/>
                                                     </x-spotlight.result>
@@ -81,6 +82,7 @@
                                                         href="{{ route('settings.profile') }}"
                                                         text="{{ $result->name }}"
                                                         description="{{ $result->email }}"
+                                                        state="{{ $result->getFamilyPermissionAttribute() ?? null }}"
                                                     >
                                                         <img class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"
                                                              src="{{ $result->avatar_url ?? asset('img/avatar_placeholder.png') }}"

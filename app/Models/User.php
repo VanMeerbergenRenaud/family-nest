@@ -89,4 +89,27 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('is_admin', true)
             ->exists();
     }
+
+    // Get the role of the user in the family
+    public function getFamilyPermissionAttribute(): string
+    {
+        $family = $this->family();
+
+        if (! $family) {
+            return 'Administrateur';
+        }
+
+        $permission = $this->families()->wherePivot('family_id', $family->id)
+            ->first()
+            ->pivot
+            ->permission;
+
+        // Translate the permission to French
+        return match ($permission) {
+            'admin' => 'Administrateur',
+            'editor' => 'Éditeur',
+            'viewer' => 'Spectateur',
+            default => ucfirst($permission),
+        };
+    }
 }
