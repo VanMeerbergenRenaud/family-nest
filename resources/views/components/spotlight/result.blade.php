@@ -4,9 +4,10 @@
     'description' => null,
     'state' => null,
     'shortcut' => null,
+    'wirekey' => null,
 ])
 
-<li>
+<li wire:key="{{ $wirekey }}">
     <a href="{{ $href }}" class="relative flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg p-2 group">
         {{-- Icon or img --}}
         <div class="flex-shrink-0">

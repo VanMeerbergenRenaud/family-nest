@@ -343,12 +343,8 @@ class Index extends Component
             $this->showFolderModal = false;
 
             Toaster::success('Facture archivée avec succès !');
-
-            $this->redirectRoute('invoices.index');
-
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
-            \Log::error('Erreur lors de l\'archivage de la facture : '.$e->getMessage());
         }
     }
 

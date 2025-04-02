@@ -22,7 +22,11 @@
 
         <x-menu.items class="w-full min-w-50 max-w-55 -mt-6.5 shadow-lg">
             @foreach ($items as $item)
-                <x-menu.item wire:click="{{ $item['action'] }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <x-menu.item
+                    wire:key="{{ $item['key'] }}"
+                    wire:click="{{ $item['action'] }}"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                >
                     <x-dynamic-component :component="$item['icon']"/>
                     {{ __($item['label']) }}
                 </x-menu.item>
@@ -52,8 +56,11 @@
 
         <x-menu.items class="w-full min-w-50 max-w-86 -mt-8 shadow-lg">
             @foreach ($items as $item)
-                <x-menu.item wire:click="{{ $item['action'] }}"
-                             class="block px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-200">
+                <x-menu.item
+                    wire:key="{{ $item['key'] }}"
+                    wire:click="{{ $item['action'] }}"
+                    class="block px-4 py-2 text-base text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+                >
                     <x-dynamic-component :component="$item['icon']"/>
                     {{ __($item['label']) }}
                 </x-menu.item>

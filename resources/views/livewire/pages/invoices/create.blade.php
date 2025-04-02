@@ -61,14 +61,18 @@
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
-                                    <option value="{{ $typeValue }}">{{ $typeLabel }}</option>
+                                    <option value="{{ $typeValue }}" wire:key="{{ $typeValue }}">
+                                        {{ $typeValue }}
+                                    </option>
                                 @endforeach
                             </x-form.select>
 
                             <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
                                 <option value="" selected>Sélectionner une catégorie</option>
                                 @foreach($form->availableCategories as $availableCategory)
-                                    <option value="{{ $availableCategory }}">{{ $availableCategory }}</option>
+                                    <option value="{{ $availableCategory }}" wire:key="{{ $availableCategory }}">
+                                        {{ $availableCategory }}
+                                    </option>
                                 @endforeach
                             </x-form.select>
 
@@ -96,7 +100,7 @@
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
                                 @foreach($family_members as $member)
-                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }}>
+                                    <option value="{{ $member->id }}" {{ $member->id === auth()->id() ? 'selected' : '' }} wire:key="{{ $member->id }}">
                                         {{ $member->name }}
                                         @if($member->id === auth()->id())
                                             (Moi)
@@ -177,7 +181,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
+                                    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
                                         @foreach($family_members as $member)
                                             @php
                                                 $memberShare = null;
@@ -192,7 +196,9 @@
                                                 $hasShare = $memberShare !== null;
                                             @endphp
 
-                                            <div class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
+                                            <li wire:key="share-{{ $member->id }}"
+                                                class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md"
+                                            >
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
                                                 </div>
@@ -223,9 +229,9 @@
                                                         <x-svg.add2 class="text-indigo-700 w-3.5 h-3.5" />
                                                     </button>
                                                 @endif
-                                            </div>
+                                            </li>
                                         @endforeach
-                                    </div>
+                                    </ul>
                                 </div>
                             </div>
                         @else

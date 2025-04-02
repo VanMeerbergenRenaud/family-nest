@@ -143,7 +143,7 @@
                         </thead>
                         <tbody>
                         @foreach($members as $member)
-                            <tr>
+                            <tr wire:key="member-{{ $member->id }}">
                                 <td>
                                     <div class="flex items-center">
                                         <div class="mr-3 rounded">
@@ -375,7 +375,9 @@
                                         :asterix="true"
                                     >
                                         @foreach($availablePermissions as $value => $label)
-                                            <option value="{{ $value }}">{{ $label }}</option>
+                                            <option value="{{ $value }}" wire:key="{{ $value }}">
+                                                {{ $label }}
+                                           </option>
                                         @endforeach
                                     </x-form.select>
 
@@ -386,7 +388,9 @@
                                         :asterix="true"
                                     >
                                         @foreach($availableRelations as $value => $label)
-                                            <option value="{{ $value }}">{{ $label }}</option>
+                                            <option value="{{ $value }}" wire:key="{{ $value }}">
+                                                {{ $label }}
+                                            </option>
                                         @endforeach
                                     </x-form.select>
                                 </div>

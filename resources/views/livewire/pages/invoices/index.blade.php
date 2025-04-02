@@ -101,16 +101,17 @@
 
         {{-- Section des fichiers récents --}}
         <section class="mb-10">
-            <h2 class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Factures récentes</h2>
+            <h2 role="heading" aria-level="2" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Factures récentes</h2>
 
-            <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
-                @if($recentInvoices->isEmpty())
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full border border-slate-200">
-                        <p class="text-gray-500 dark:text-gray-400">{{ __('Aucune facture récente.') }}</p>
-                    </div>
-                @else
+            @if($recentInvoices->isEmpty())
+                <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full border border-slate-200">
+                    <p class="text-gray-500 dark:text-gray-400">{{ __('Aucune facture récente.') }}</p>
+                </div>
+            @else
+                <ul class="flex overflow-x-scroll gap-4 scrollbar-hidden">
                     @foreach($recentInvoices as $invoice)
-                        <div class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                        <li wire:key="invoice-{{ $invoice->id }}"
+                            class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
                             <div class="flex items-center justify-between gap-4">
                                 <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
                                     <x-svg.file-size class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
@@ -127,10 +128,10 @@
                                 {{-- Menu d'action --}}
                                 <x-invoices.menu-actions :invoice="$invoice" :dotsRotation="true" />
                             </div>
-                        </div>
+                        </li>
                     @endforeach
-                @endif
-            </div>
+                </ul>
+            @endif
         </section>
 
         {{-- Tableau regroupant toutes les factures --}}
@@ -550,7 +551,7 @@
                     </thead>
                     <tbody>
                     @foreach ($invoices as $invoice)
-                        <tr>
+                        <tr wire:key="invoice-{{ $invoice->id }}">
                             {{-- Nom du fichier --}}
                             @if($visibleColumns['name'] ?? false)
                                 <td>

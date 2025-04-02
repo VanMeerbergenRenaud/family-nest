@@ -53,7 +53,7 @@
                 </thead>
                 <tbody>
                     @foreach ($archivedInvoices as $invoice)
-                        <tr>
+                        <tr wire:key="invoice-{{ $invoice->id }}">
                             <td>
                                 <div class="flex items-center">
                                     @php

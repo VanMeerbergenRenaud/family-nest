@@ -32,8 +32,6 @@ class Archived extends Component
         $this->form->restore();
 
         Toaster::success('Facture restaurée avec succès !');
-
-        $this->redirectRoute('invoices.archived');
     }
 
     // 2. Delete
@@ -53,8 +51,6 @@ class Archived extends Component
         $this->showDeleteFormModal = false;
 
         Toaster::success('Facture supprimée définitivement !');
-
-        $this->redirectRoute('invoices.archived');
     }
 
     // 3. Delete all
@@ -77,8 +73,6 @@ class Archived extends Component
         $this->showDeleteAllInvoicesFormModal = false;
 
         Toaster::success('Corbeille vidée avec succès !::Vous factures ont été supprimées définitivement.');
-
-        $this->redirectRoute('invoices.archived');
     }
 
     // 4. Archive exemple

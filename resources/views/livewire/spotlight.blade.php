@@ -18,7 +18,8 @@
 
                 {{-- Content --}}
                 <div class="absolute top-18 md:top-[20vh] max-sm:w-[calc(100vw-2rem)] transform transition-all ">
-                    <div class="bg-gray-100 dark:bg-gray-900 rounded-lg md:rounded-xl md:max-w-[40rem] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
+                    <div
+                        class="bg-gray-100 dark:bg-gray-900 rounded-lg md:rounded-xl md:max-w-[40rem] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
 
                         {{-- Search bar --}}
                         <div class="relative bg-white dark:bg-gray-800">
@@ -46,7 +47,8 @@
                         <div class="overflow-y-scroll max-h-[24.5rem]">
                             {{-- État initial : aucune recherche commencée --}}
                             @if(empty($search))
-                                <div class="flex flex-col items-center justify-center h-48 bg-gray-100 border-t border-slate-200">
+                                <div
+                                    class="flex flex-col items-center justify-center h-48 bg-gray-100 border-t border-slate-200">
                                     <x-svg.search-classic class="h-10 w-10 text-gray-500 dark:text-gray-600 mb-5"/>
                                     <p class="text-sm-medium text-gray-500 dark:text-gray-400">
                                         Aucune recherche commencée
@@ -55,44 +57,52 @@
                                         Commencez à taper pour rechercher...
                                     </p>
                                 </div>
-                            {{-- Recherche avec résultats --}}
+                                {{-- Recherche avec résultats --}}
                             @elseif($results->isNotEmpty())
-                                @foreach($results as $section => $items)
-                                    <x-divider class="dark:bg-gray-700"/>
+                                <ul>
+                                    @foreach($results as $section => $items)
+                                        <li wire:key="{{ $section }}">
+                                            <x-divider class="dark:bg-gray-700"/>
 
-                                    <div class="bg-white dark:bg-gray-800 py-3 px-2">
-                                        <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
-                                            {{ $section }}
-                                        </h3>
-                                        <ul role="list" class="flex flex-col gap-1">
-                                            @foreach ($items as $result)
-                                                @if ($result instanceof \App\Models\Invoice)
-                                                    <x-spotlight.result
-                                                        href="{{ $result->is_archived ? route('invoices.archived') : route('invoices.show', $result) }}"
-                                                        text="{{ $result->name }}"
-                                                        description="({{ $result->amount }}{{ $result->currency }})"
-                                                        state="{{ $result->is_archived ? '#archivée' : null }}"
-                                                    >
-                                                        <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800"/>
-                                                    </x-spotlight.result>
-                                                @endif
+                                            <div class="bg-white dark:bg-gray-800 py-3 px-2">
+                                                <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
+                                                    {{ $section }}
+                                                </h3>
+                                                <ul role="list" class="flex flex-col gap-1">
+                                                    @foreach ($items as $result)
+                                                        @if ($result instanceof \App\Models\Invoice)
+                                                            <x-spotlight.result
+                                                                wirekey="{{ $result->id }}"
+                                                                href="{{ $result->is_archived ? route('invoices.archived') : route('invoices.show', $result) }}"
+                                                                text="{{ $result->name }}"
+                                                                description="({{ $result->amount }}{{ $result->currency }})"
+                                                                state="{{ $result->is_archived ? '#archivée' : null }}"
+                                                            >
+                                                                <x-svg.invoice
+                                                                    class="h-5 w-5 group-hover:text-gray-800"/>
+                                                            </x-spotlight.result>
+                                                        @endif
 
-                                                @if ($result instanceof \App\Models\User)
-                                                    <x-spotlight.result
-                                                        href="{{ route('settings.profile') }}"
-                                                        text="{{ $result->name }}"
-                                                        description="{{ $result->email }}"
-                                                        state="{{ $result->getFamilyPermissionAttribute() ?? null }}"
-                                                    >
-                                                        <img class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"
-                                                             src="{{ $result->avatar_url ?? asset('img/avatar_placeholder.png') }}"
-                                                             alt="{{ $result->name }}"/>
-                                                    </x-spotlight.result>
-                                                @endif
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                @endforeach
+                                                        @if ($result instanceof \App\Models\User)
+                                                            <x-spotlight.result
+                                                                wirekey="{{ $result->id }}"
+                                                                href="{{ route('settings.profile') }}"
+                                                                text="{{ $result->name }}"
+                                                                description="{{ $result->email }}"
+                                                                state="{{ $result->getFamilyPermissionAttribute() ?? null }}"
+                                                            >
+                                                                <img
+                                                                    class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"
+                                                                    src="{{ $result->avatar_url ?? asset('img/avatar_placeholder.png') }}"
+                                                                    alt="{{ $result->name }}"/>
+                                                            </x-spotlight.result>
+                                                        @endif
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             @elseif($results->isEmpty())
                                 {{-- Recherche sans résultats --}}
                                 <div class="flex items-center justify-start gap-3 py-3 px-4.5  border-slate-200">
@@ -108,18 +118,22 @@
                                         Suggestions
                                     </h3>
                                     <ul role="list" class="flex flex-col gap-1">
-                                        <x-spotlight.result href="{{ route('invoices.create') }}" text="Ajouter une nouvelle facture" shortcut="⌘ X">
-                                            <x-svg.add2 class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
+                                        <x-spotlight.result href="{{ route('invoices.create') }}"
+                                                            text="Ajouter une nouvelle facture" shortcut="⌘ X">
+                                            <x-svg.add2
+                                                class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
                                         </x-spotlight.result>
-                                        <x-spotlight.result href="{{ route('invoices.archived') }}" text="Voir mes factures archivées">
-                                            <x-svg.archive class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
+                                        <x-spotlight.result href="{{ route('invoices.archived') }}"
+                                                            text="Voir mes factures archivées">
+                                            <x-svg.archive
+                                                class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
                                         </x-spotlight.result>
                                     </ul>
                                 </div>
                             @endif
                         </div>
 
-                        <x-divider />
+                        <x-divider/>
 
                         {{-- Bottom navigation --}}
                         <div class="bg-white dark:bg-gray-800 pl-4.5 pr-3 py-1.5 min-w-[40rem] max-sm:hidden">
@@ -127,8 +141,10 @@
 
                                 {{-- Arrows up/down --}}
                                 <div class="flex-center space-x-2">
-                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
-                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12" viewBox="0 0 12 12" fill="none"
+                                    <div
+                                        class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
+                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12"
+                                             viewBox="0 0 12 12" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 d="M6.00004 10.6667V1.33337M6.00004 1.33337L1.33337 6.00004M6.00004 1.33337L10.6667 6.00004"
@@ -136,8 +152,10 @@
                                                 stroke-linejoin="round"/>
                                         </svg>
                                     </div>
-                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
-                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12" viewBox="0 0 12 12" fill="none"
+                                    <div
+                                        class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
+                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="12" height="12"
+                                             viewBox="0 0 12 12" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 d="M6.00004 1.33337V10.6667M6.00004 10.6667L10.6667 6.00004M6.00004 10.6667L1.33337 6.00004"
@@ -150,8 +168,10 @@
 
                                 {{-- Arrow enter --}}
                                 <div class="flex-center space-x-2">
-                                    <div class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
-                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="14" height="14" viewBox="0 0 14 14" fill="none"
+                                    <div
+                                        class="py-2 px-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700">
+                                        <svg class="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" width="14" height="14"
+                                             viewBox="0 0 14 14" fill="none"
                                              xmlns="http://www.w3.org/2000/svg">
                                             <path
                                                 d="M12.3334 1.66663V2.59996C12.3334 4.84017 12.3334 5.96027 11.8974 6.81592C11.5139 7.56857 10.902 8.18049 10.1493 8.56398C9.29367 8.99996 8.17356 8.99996 5.93335 8.99996H1.66669M1.66669 8.99996L5.00002 5.66663M1.66669 8.99996L5.00002 12.3333"
@@ -172,7 +192,8 @@
 
                                 {{-- Settings --}}
                                 <div class="ml-auto flex">
-                                    <a href="{{ route('settings.index') }}" class="inline-block py-2.5 px-2" title="Vers les paramètres" wire:navigate>
+                                    <a href="{{ route('settings.index') }}" class="inline-block py-2.5 px-2"
+                                       title="Vers les paramètres" wire:navigate>
                                         <x-svg.settings class="text-gray-500 hover:text-gray-800"/>
                                     </a>
                                 </div>
@@ -198,7 +219,10 @@
             // Raccourci ⌘+K ou CTRL+K pour le spotlight
             if (event.key === 'k') {
                 event.preventDefault();
-                @this.set('spotlightOpen', !@this.spotlightOpen);
+                @this.
+                set('spotlightOpen', !@this.spotlightOpen
+            )
+                ;
             }
             // Raccourci ⌘+X ou CTRL+X pour ajouter une facture
             else if (event.key === 'x') {

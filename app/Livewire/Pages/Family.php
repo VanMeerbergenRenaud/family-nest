@@ -184,8 +184,6 @@ class Family extends Component
             $this->showCreateFamilyModal = false;
 
             Toaster::success('Famille créée avec succès');
-
-            $this->redirectRoute('family');
         } catch (\Exception $e) {
             Log::error('Erreur de création de famille: '.$e->getMessage());
             Toaster::error('Erreur lors de la création de la famille::Vérifiez que le nom de la famille et réessayez.');

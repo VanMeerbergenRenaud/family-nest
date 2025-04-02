@@ -45,7 +45,8 @@
     @if(count($tags) > 0)
         <ul class="flex flex-wrap gap-2.5 mt-1.5 ml-2">
             @foreach($tags as $index => $tag)
-                <li class="mt-2 inline-flex items-center pl-3.5 pr-2.5 pt-1 pb-1.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                <li wire:key="tag-{{ $index }}"
+                    class="mt-2 inline-flex items-center pl-3.5 pr-2.5 pt-1 pb-1.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                     <span class="text-sm-regular">{{ $tag }}</span>
                     <button type="button" wire:click="removeTag({{ $index }})"
                             class="relative top-0.25 ml-1.5 text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-200">

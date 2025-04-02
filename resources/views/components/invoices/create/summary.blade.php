@@ -64,10 +64,12 @@
                             if ($member->id == $form->paid_by_user_id) {
                                 $payerName = $member->name;
                                 $payerId = $member->id;
-                                $payerAvatar = $member->avatar;
+                                $payerAvatar = $member->avatar_url;
                                 break;
                             }
                         }
+                    } else {
+                        $payerName = $form->issuer_name;
                     }
 
                     // Calculer les totaux
@@ -138,7 +140,7 @@
                             </button>
 
                             <!-- Détail des répartitions - collapsible -->
-                            <div x-show="showRepartition"
+                            <ul x-show="showRepartition"
                                  x-transition
                                  x-collapse
                                  class="mt-1 pt-3 space-y-2 border-t border-slate-200">
@@ -153,7 +155,7 @@
                                         foreach ($family_members as $familyMember) {
                                             if ($familyMember->id == $share['id']) {
                                                 $memberName = $familyMember->name;
-                                                $memberAvatar = $familyMember->avatar;
+                                                $memberAvatar = $familyMember->avatar_url;
                                                 $memberObj = $familyMember;
                                                 break;
                                             }
@@ -163,7 +165,7 @@
                                         $shareAmount = $share['amount'] ?? 0;
                                         $isPayer = $share['id'] == $payerId;
                                     @endphp
-                                    <div class="flex justify-between items-center py-1">
+                                    <li class="flex justify-between items-center py-1" wire:key="share-{{ $share['id'] }}">
                                         <div class="flex items-center gap-2 sm:w-44">
                                             <img src="{{ $memberAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
                                             <span class="text-sm text-gray-700">{{ $memberName }}</span>
@@ -176,9 +178,9 @@
                                             </div>
                                             <span class="text-xs text-gray-500 ml-1">{{ number_format($sharePercentage, 2) }}%</span>
                                         </div>
-                                    </div>
+                                    </li>
                                 @endforeach
-                            </div>
+                            </ul>
                         </div>
                     @else
                         <!-- Aucune répartition -->
@@ -268,17 +270,19 @@
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Tags">
-            <div class="flex flex-wrap gap-2">
-                @if(empty($form->tags))
-                   <span class="text-sm-medium">Aucun</span>
-                @else
+            @if(empty($form->tags))
+               <span class="text-sm-medium">Aucun</span>
+            @else
+                <ul class="flex flex-wrap gap-2">
                     @foreach($form->tags as $tag)
-                        <span class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
-                            {{ $tag }}
-                        </span>
+                        <li wire:key="tag-{{ $tag }}">
+                            <span class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                                {{ $tag }}
+                            </span>
+                        </li>
                     @endforeach
-                @endif
-            </div>
+                </ul>
+            @endif
         </x-invoices.create.summary-item>
     </dl>
 </div>
