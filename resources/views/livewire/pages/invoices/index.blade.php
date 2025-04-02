@@ -373,18 +373,7 @@
                             <th scope="col">
                                 <button wire:click="sortBy('name')" class="flex items-center">
                                     <span>Nom du fichier</span>
-                                    @if ($sortField === 'name')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="name" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -394,18 +383,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('type')" class="flex items-center">
                                     <span>Type</span>
-                                    @if ($sortField === 'type')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="type" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -415,18 +393,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('category')" class="flex items-center">
                                     <span>Catégorie</span>
-                                    @if ($sortField === 'category')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="category" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -436,18 +403,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('issuer_name')" class="flex items-center">
                                     <span>Émetteur</span>
-                                    @if ($sortField === 'issuer_name')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="issuer_name" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -457,18 +413,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('amount')" class="flex items-center">
                                     <span>Montant</span>
-                                    @if ($sortField === 'amount')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="amount" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -478,18 +423,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('payment_status')" class="flex items-center">
                                     <span>Statut</span>
-                                    @if ($sortField === 'payment_status')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="payment_status" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -499,18 +433,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('issued_date')" class="flex items-center">
                                     <span>Date d'émission</span>
-                                    @if ($sortField === 'issued_date')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="issued_date" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -520,18 +443,7 @@
                             <th scope="col" class="min-w-[150px]">
                                 <button wire:click="sortBy('payment_due_date')" class="flex items-center">
                                     <span>Date d'échéance</span>
-                                    @if ($sortField === 'payment_due_date')
-                                        <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                             xmlns="http://www.w3.org/2000/svg">
-                                            @if ($sortDirection === 'asc')
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M5 15l7-7 7 7"></path>
-                                            @else
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M19 9l-7 7-7-7"></path>
-                                            @endif
-                                        </svg>
-                                    @endif
+                                    <x-invoices.index.sortable field="payment_due_date" :$sortField :$sortDirection />
                                 </button>
                             </th>
                         @endif
@@ -569,7 +481,7 @@
                                         </div>
 
                                         <div class="flex flex-col">
-                                            <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ ucfirst($invoice->name) }}</span>
+                                            <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ $invoice->name }}</span>
                                         </div>
                                     </div>
                                 </td>
@@ -578,21 +490,21 @@
                             {{-- Type --}}
                             @if($visibleColumns['type'] ?? false)
                                 <td>
-                                    {{ ucfirst($invoice->type) ?? 'Non spécifié' }}
+                                    {{ $invoice->type ?? 'Non spécifié' }}
                                 </td>
                             @endif
 
                             {{-- Catégorie --}}
                             @if($visibleColumns['category'] ?? false)
                                 <td>
-                                    {{ ucfirst($invoice->category) ?? 'Non spécifiée' }}
+                                    {{ $invoice->category ?? 'Non spécifiée' }}
                                 </td>
                             @endif
 
                             {{-- Émetteur --}}
                             @if($visibleColumns['issuer_name'] ?? false)
                                 <td>
-                                    {{ ucfirst($invoice->issuer_name) ?? 'Non spécifié' }}
+                                    {{ $invoice->issuer_name ?? 'Non spécifié' }}
                                 </td>
                             @endif
 
