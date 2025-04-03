@@ -42,7 +42,7 @@
         </x-menu.item>
 
         <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
-            <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
+            <x-svg.archive class="w-4 h-4 group-hover:text-red-500"/>
             {{ __('Archiver') }}
         </x-menu.item>
     </x-menu.items>

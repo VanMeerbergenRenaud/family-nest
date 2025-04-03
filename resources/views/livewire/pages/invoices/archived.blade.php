@@ -28,8 +28,8 @@
         <div class="flex justify-between items-center flex-wrap gap-4 mt-2 md:px-4 mb-6">
             <div>
                 <h1 class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h1>
-                <p class="text-sm-regular text-gray-500">
-                    Les éléments affichés ci-dessous seront automatiquement supprimés après 30 jours.
+                <p class="text-sm-regular text-gray-500 max-w-4xl">
+                    Les éléments affichés ci-dessous sont des factures que vous avez archivées. Vous pouvez les restaurer ou les supprimer définitivement. Lorsqu'une facture est archivée vous ne pouvez plus voir les informations associées à celle-ci.
                 </p>
             </div>
 

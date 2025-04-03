@@ -2,14 +2,14 @@
     'name',
     'model',
     'label',
-    'checked' => false
+    'checked' => false,
 ])
 
 <label for="{{ $name }}" class="relative w-full flex items-center cursor-pointer">
     <input id="{{ $name }}"
            model="{{ $model }}"
            type="checkbox"
-           class="h-4 w-4 cursor-pointer transition-all appearance-none rounded bg-white border border-slate-400 checked:bg-slate-800 checked:border-slate-800 dark:checked:bg-gray-300 dark:border-slate-400"
+           class="h-4 w-4 cursor-pointer transition-all pointer-events-none appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"
         {{ $checked ? 'checked' : '' }}
         {{ $attributes }}
     />

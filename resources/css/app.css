@@ -63,8 +63,8 @@
     }
 
     button:disabled,
-    input:read-only,
-    textarea:read-only {
+    input:disabled,
+    textarea:disabled {
         @apply opacity-50 cursor-not-allowed;
     }
 
@@ -86,7 +86,7 @@
     }
 
     tbody tr {
-        @apply bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors;
+        @apply bg-white dark:bg-gray-800 transition-colors;
     }
 
     tbody td, tbody td p {

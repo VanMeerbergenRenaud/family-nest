@@ -59,6 +59,10 @@ class Index extends Component
 
     public $folderInvoices = [];
 
+    public $selectedInvoiceIds = [];
+
+    public $invoiceIdsOnPage = [];
+
     // Filtres disponibles
     public $availableFilters = [
         'name_asc' => 'Par ordre alphabétique (A-Z)',
@@ -237,7 +241,7 @@ class Index extends Component
         if (! $invoiceFile) {
             Toaster::error('Aucun fichier trouvé pour cette facture.');
 
-            return;
+            return false;
         }
 
         try {
@@ -247,7 +251,7 @@ class Index extends Component
             if (! Storage::disk('s3')->exists($s3FilePath)) {
                 Toaster::error('Fichier introuvable ou mal enregistré : Veuillez modifier votre facture et importer à nouveau le fichier.');
 
-                return;
+                return false;
             }
 
             // Pour les gros fichiers, utilisez une redirection avec entêtes modifiés
@@ -273,7 +277,30 @@ class Index extends Component
             Toaster::error('Erreur lors du téléchargement : Le fichier n\'a pas pu être téléchargé.');
             \Log::error('Erreur téléchargement S3: '.$e->getMessage());
 
-            return;
+            return false;
+        }
+    }
+
+    public function downloadSelected(): void
+    {
+        try {
+            $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
+                ->where('is_archived', false)
+                ->get();
+
+            if ($invoices->isEmpty()) {
+                Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
+
+                return;
+            }
+
+            foreach ($invoices as $invoice) {
+                $this->downloadInvoice($invoice->id);
+            }
+
+            Toaster::info('Toutes les factures sélectionnées ont été téléchargées.');
+        } catch (\Exception) {
+            Toaster::error('Erreur lors du téléchargement::Vous n\'avez pas sélectionné de fichiers ou ils sont déjà archivés.');
         }
     }
 
@@ -348,6 +375,29 @@ class Index extends Component
         }
     }
 
+    public function archiveSelected(): void
+    {
+        try {
+            $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
+                ->where('is_archived', false)
+                ->get();
+
+            if ($invoices->isEmpty()) {
+                Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
+
+                return;
+            }
+
+            foreach ($invoices as $invoice) {
+                $this->archiveInvoice($invoice->id);
+            }
+
+            Toaster::info('Toutes les factures sélectionnées ont été archivées.');
+        } catch (\Exception) {
+            Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
+        }
+    }
+
     public function render()
     {
         // Récupération des factures avec filtres
@@ -367,6 +417,8 @@ class Index extends Component
             ->get();
 
         $folderStats = $this->getFolderStats();
+
+        $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
 
         return view('livewire.pages.invoices.index', compact('invoices', 'folderStats'))
             ->layout('layouts.app-sidebar');

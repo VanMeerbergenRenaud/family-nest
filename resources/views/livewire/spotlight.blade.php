@@ -211,6 +211,7 @@
     @endif
 </div>
 
+@script
 <script>
     // Keyboard shortcuts handler
     document.addEventListener('keydown', function (event) {
@@ -220,9 +221,7 @@
             if (event.key === 'k') {
                 event.preventDefault();
                 @this.
-                set('spotlightOpen', !@this.spotlightOpen
-            )
-                ;
+                set('spotlightOpen', !@this.spotlightOpen)
             }
             // Raccourci ⌘+X ou CTRL+X pour ajouter une facture
             else if (event.key === 'x') {
@@ -232,3 +231,4 @@
         }
     });
 </script>
+@endscript

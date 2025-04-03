@@ -364,10 +364,14 @@
                 </div>
             </div>
 
-            <div class="w-full overflow-x-auto">
+            <div class="w-full overflow-x-auto scrollbar-hidden">
                 <table class="w-full" aria-labelledby="tableTitle">
                     <thead>
                     <tr>
+                        {{-- Checkboxes... --}}
+                        <td class="whitespace-nowrap pr-0 pl-6 w-4">
+                            <x-invoices.index.check-all />
+                        </td>
                         {{-- Colonne "Nom du fichier" (toujours visible) --}}
                         @if($visibleColumns['name'] ?? false)
                             <th scope="col">
@@ -463,8 +467,16 @@
                     </thead>
                     <tbody>
                     @foreach ($invoices as $invoice)
-                        <tr wire:key="invoice-{{ $invoice->id }}">
+                        <tr wire:key="invoice-{{ $invoice->id }}" class="relative pl-8">
                             {{-- Nom du fichier --}}
+                            <td class="whitespace-nowrap pr-0 pl-6 w-4">
+                                <label class="relative flex items-center cursor-pointer w-fit">
+                                    <input wire:model="selectedInvoiceIds" value="{{ $invoice->id }}" type="checkbox" class="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded border border-slate-300 checked:bg-blue-700 checked:border-blue-700" />
+                                    <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                        <x-svg.check class="text-white h-3 w-3" />
+                                    </span>
+                                </label>
+                            </td>
                             @if($visibleColumns['name'] ?? false)
                                 <td>
                                     <div class="flex items-center">
@@ -472,7 +484,7 @@
                                             $extension = $invoice->file->file_extension ?? null;
                                         @endphp
 
-                                        <div class="mr-3 p-2 rounded">
+                                        <div class="mr-3 p-2 pl-0 rounded">
                                             @if(View::exists('components.svg.file.' . $extension))
                                                 <x-dynamic-component :component="'svg.file.' . $extension" class="w-6 h-6"/>
                                             @else
@@ -605,15 +617,50 @@
                     @endforeach
                     </tbody>
                 </table>
-
-                <!-- Pagination -->
-                @if($invoices->hasPages())
-                    <div class="p-4 border-t border-slate-200">
-                        {{ $invoices->links() }}
-                    </div>
-                @endif
             </div>
+            <!-- Pagination -->
+            @if($invoices->hasPages())
+                <div class="p-4 border-t border-slate-200">
+                    {{ $invoices->links() }}
+                </div>
+            @endif
         </section>
+
+        {{-- Bulk actions --}}
+        <div x-show="$wire.selectedInvoiceIds.length > 0" x-cloak class="h-20 lg:h-12">{{-- White space--}}</div>
+        <div x-transition x-show="$wire.selectedInvoiceIds.length > 0" x-cloak class="fixed bottom-4 left-4 right-4 lg:left-24 mx-auto max-w-md w-fit z-70 rounded-md lg:rounded-xl bg-white border border-gray-200">
+            <div class="flex flex-wrap items-center justify-between gap-y-4 pl-5 pr-3 py-2">
+                <!-- Selected count indicator -->
+                <div class="flex items-center gap-1">
+                    <span x-text="$wire.selectedInvoiceIds.length" class="text-gray-900 text-sm mr-0.5"></span>
+                    <span class="text-gray-500 text-sm">sur</span>
+                    <span class="text-gray-600 text-sm">
+                        {{ $invoices->total() }} {{ Str::plural('facture', $invoices->total()) }}
+                    </span>
+                </div>
+
+                <div class="max-sm:hidden h-5 w-px bg-gray-300 mx-3"></div>
+
+                <!-- Action buttons -->
+                <div class="ml-1 flex items-center gap-3">
+                    <!-- Archive button -->
+                    <form wire:submit="archiveSelected">
+                        <button type="submit" class="button-primary group hover:text-red-500">
+                            <x-svg.archive class="w-4 h-4 group-hover:text-red-500"/>
+                            Archiver
+                        </button>
+                    </form>
+
+                    <!-- Download button -->
+                    <form wire:submit="downloadSelected">
+                        <button type="submit" class="button-tertiary">
+                            <x-svg.download-down class="text-white" />
+                            Télécharger
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <!-- Modal pour afficher les factures d'un dossier spécifique avec design de cartes -->
         @if($showFolderModal)
@@ -728,9 +775,9 @@
                                                     <x-svg.show class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                                 </button>
                                                 <a href="{{ route('invoices.edit', $invoice->id) }}"
-                                                        wire:navigate
-                                                        class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                                        title="Aller vers la page d'édition">
+                                                   wire:navigate
+                                                   class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                   title="Aller vers la page d'édition">
                                                     <x-svg.edit class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                                 </a>
                                             </div>
