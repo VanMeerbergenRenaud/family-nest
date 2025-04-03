@@ -31,8 +31,17 @@ enum InvoiceCategoryEnum: string
     case RESTAURANTS = 'Restaurants';
     case SUPERMARCHE = 'Supermarché';
 
+    // Animaux
+    case ANIMAUX_NOURRITURE = 'Nourriture';
+    case ANIMAUX_VETERINAIRE = 'Vétérinaire';
+    case ANIMAUX_TOILETTAGE = 'Toilettage';
+    case ANIMAUX_ACCESSOIRES = 'Accessoires';
+    case ANIMAUX_PENSION = 'Pension';
+    case ANIMAUX_ASSURANCE = 'Assurance';
+    case ANIMAUX_DRESSAGE = 'Dressage';
+    case ANIMAUX_ACTIVITES = 'Activités';
+
     // Divers
-    case ANIMAUX = 'Animaux';
     case AUTRES = 'Autres';
     case CADEAUX = 'Cadeaux d\'Anniversaire';
 
@@ -118,9 +127,139 @@ enum InvoiceCategoryEnum: string
     case ASSURANCE_VIE = 'Assurance vie';
     case ASSURANCE_VOITURE = 'Assurance voiture/moto';
 
-    /**
-     * Récupérer le type associé à cette catégorie
-     */
+    public function emoji(): string
+    {
+        return match ($this) {
+            // Abonnements
+            self::ABO_ALIMENTAIRE => '🍱',
+            self::ABO_INTERNET_TELECOM => '📡',
+            self::ABO_JEUX_VIDEO => '🎮',
+            self::ABO_LOGICIELS_PRO => '💼',
+            self::ABO_MAGAZINES => '📰',
+            self::ABO_MOBILITE => '🛴',
+            self::ABO_SERVICES_LIGNE => '🌐',
+            self::ABO_SPORT => '🏋️',
+            self::ABO_STREAMING_MUSIQUE => '🎵',
+            self::ABO_STREAMING_VIDEO => '📺',
+            self::ABO_TELEVISION => '📡',
+            self::ABO_TRANSPORTS => '🚌',
+
+            // Achats de la maison
+            self::AMENAGEMENT => '🏗️',
+            self::DECORATION => '🎨',
+            self::GROS_ELECTROMENAGER => '🧊',
+            self::MEUBLES => '🪑',
+            self::PETIT_ELECTROMENAGER => '🔌',
+            self::SECURITE => '🔒',
+
+            // Alimentation et Courses
+            self::LIVRAISON_REPAS => '🛵',
+            self::RESTAURANTS => '🍽️',
+            self::SUPERMARCHE => '🛒',
+
+            // Animaux
+            self::ANIMAUX_NOURRITURE => '🥩',
+            self::ANIMAUX_VETERINAIRE => '🏥',
+            self::ANIMAUX_TOILETTAGE => '🧼',
+            self::ANIMAUX_ACCESSOIRES => '🧶',
+            self::ANIMAUX_PENSION => '🏠',
+            self::ANIMAUX_ASSURANCE => '📝',
+            self::ANIMAUX_DRESSAGE => '🦮',
+            self::ANIMAUX_ACTIVITES => '🐕',
+
+            // Divers
+            self::AUTRES => '📦',
+            self::CADEAUX => '🎁',
+
+            // Divertissements et Loisirs
+            self::INSTRUMENTS_MUSIQUE => '🎸',
+            self::LOISIRS_CULTURELS => '🎭',
+            self::LOISIRS_SPORTIFS => '⚽',
+
+            // Dons et Contributions
+            self::COTISATIONS_ASSO => '🤝',
+            self::DONS_CARITATIFS => '❤️',
+
+            // Éducation
+            self::ACTIVITES_PARASCOLAIRES => '🎯',
+            self::CANTINE => '🍲',
+            self::FOURNITURES_SCOLAIRES => '✏️',
+            self::FRAIS_SCOLARITE => '🏫',
+            self::LIVRES_SCOLAIRES => '📚',
+
+            // Enfants
+            self::ACHAT_VETEMENTS => '👕',
+            self::ARGENT_POCHE => '💸',
+            self::CRECHE => '👶',
+
+            // Finances
+            self::CREDIT_PERSONNEL => '💳',
+            self::FRAIS_BANCAIRES => '🏦',
+            self::FRAIS_NOTAIRE => '📝',
+            self::PRETS_PERSONNELS => '💰',
+            self::REVENU_RETRAITE => '👴',
+
+            // Impôts et Contributions Sociales
+            self::ALLOCATIONS_FAMILIALES => '👨‍👩‍👧‍👦',
+            self::COTISATIONS_SOCIALES => '📊',
+            self::IMPOTS_REVENU => '💸',
+
+            // Logement
+            self::CHARGES_LOCATIVES => '🏢',
+            self::CHAUFFAGE => '🔥',
+            self::CREDIT_IMMOBILIER => '🏠',
+            self::EAU => '💧',
+            self::ELECTRICITE => '⚡',
+            self::GAZ => '🔥',
+            self::HYPOTHEQUE => '📄',
+            self::LOYER => '🔑',
+            self::TAXE_FONCIERE => '📋',
+            self::TAXE_HABITATION => '🏘️',
+
+            // Santé et Bien-être
+            self::COMPLEMENTS_ALIMENTAIRES => '💊',
+            self::FRAIS_MEDICAUX => '🩺',
+            self::MEDICAMENTS => '💊',
+            self::SOINS_PARAMEDICAUX => '👨‍⚕️',
+            self::THERAPIE => '🧠',
+
+            // Services à domicile
+            self::JARDINAGE => '🌱',
+            self::NETTOYAGE => '🧹',
+            self::REPARATIONS => '🔧',
+
+            // Technologie
+            self::ACHAT_ELECTRONIQUE => '📱',
+            self::JEUX_VIDEOS => '🎮',
+            self::LOGICIELS => '💻',
+
+            // Transport
+            self::BILLETS_TRANSPORT => '🎫',
+            self::ENTRETIEN_AUTO => '🔧',
+            self::ESSENCE => '⛽',
+            self::LOCATION_VOITURE => '🚗',
+            self::REPARATION_AUTO => '🔨',
+            self::STATIONNEMENT => '🅿️',
+            self::TRANSPORT_SCOLAIRE => '🚌',
+
+            // Voyages
+            self::ACTIVITES_VACANCES => '🏄',
+            self::HOTEL => '🏨',
+
+            // Assurances
+            self::ASSURANCE_HABITATION => '🏠',
+            self::ASSURANCE_INCENDIE => '🔥',
+            self::ASSURANCE_SANTE => '🏥',
+            self::ASSURANCE_VIE => '📜',
+            self::ASSURANCE_VOITURE => '🚗',
+        };
+    }
+
+    public function labelWithEmoji(): string
+    {
+        return $this->emoji() . '&nbsp;&nbsp;' . $this->value;
+    }
+
     public function getType(): InvoiceTypeEnum
     {
         foreach (InvoiceTypeEnum::cases() as $type) {
@@ -129,7 +268,47 @@ enum InvoiceCategoryEnum: string
             }
         }
 
-        // Par défaut, retourner Divers
+        // Default
         return InvoiceTypeEnum::DIVERS;
+    }
+
+    public static function getCategoryOptions(): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->value;
+        }
+        return $options;
+    }
+
+    public static function getCategoryOptionsWithEmojis(): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->labelWithEmoji();
+        }
+        return $options;
+    }
+
+    public static function getCategoriesForType(InvoiceTypeEnum $type): array
+    {
+        $categories = [];
+        foreach (self::cases() as $case) {
+            if ($case->getType() === $type) {
+                $categories[$case->value] = $case->value;
+            }
+        }
+        return $categories;
+    }
+
+    public static function getCategoriesForTypeWithEmojis(InvoiceTypeEnum $type): array
+    {
+        $categories = [];
+        foreach (self::cases() as $case) {
+            if ($case->getType() === $type) {
+                $categories[$case->value] = $case->labelWithEmoji();
+            }
+        }
+        return $categories;
     }
 }

@@ -2,6 +2,10 @@
 
 namespace App\Livewire\Pages\Invoices;
 
+use App\Enums\PaymentFrequencyEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Traits\InvoiceFileUrlTrait;
 use Livewire\Component;
@@ -28,7 +32,6 @@ class Show extends Component
             $this->redirectRoute('invoices.archived');
         }
 
-        // Générer l'URL du fichier
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
 
         $this->filePath = $fileInfo['url'];
@@ -39,7 +42,11 @@ class Show extends Component
 
     public function render()
     {
-        return view('livewire.pages.invoices.show')
-            ->layout('layouts.app-sidebar');
+        return view('livewire.pages.invoices.show', [
+            'paymentStatusOptions' => PaymentStatusEnum::getStatusOptions(),
+            'paymentMethodOptions' => PaymentMethodEnum::getMethodOptions(),
+            'paymentFrequencyOptions' => PaymentFrequencyEnum::getFrequencyOptions(),
+            'priorityOptions' => PriorityEnum::getPriorityOptions(),
+        ])->layout('layouts.app-sidebar');
     }
 }

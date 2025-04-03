@@ -6,11 +6,11 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
         <x-invoices.create.summary-item label="Nom de la facture" :alternateBackground="true">
-            {{ ucfirst($form->name) ?: 'Non spécifié' }}
+            {{ ucfirst($form->name) ?? 'Non spécifié' }}
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Type et catégorie">
-            {{ ucfirst($form->type) ?: 'Non spécifié' }} - {{ ucfirst($form->category) ?: 'Non spécifié' }}
+            {{ $form->type ?? 'Non spécifié' }} - {{ $form->category ?? 'Non spécifié' }}
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Fournisseur" :alternateBackground="true">
@@ -141,9 +141,9 @@
 
                             <!-- Détail des répartitions - collapsible -->
                             <ul x-show="showRepartition"
-                                 x-transition
-                                 x-collapse
-                                 class="mt-1 pt-3 space-y-2 border-t border-slate-200">
+                                x-transition
+                                x-collapse
+                                class="mt-1 pt-3 space-y-2 border-t border-slate-200">
 
                                 @foreach($form->user_shares as $share)
                                     @php
@@ -216,46 +216,53 @@
                 </p>
                 <p class="text-sm-regular">
                     Fréquence: <span class="text-sm-medium">
-                        {{ $form->payment_frequency
-                            ? ($form->payment_frequency === 'monthly' ? 'Mensuel'
-                            : ($form->payment_frequency === 'quarterly' ? 'Trimestriel'
-                            : ($form->payment_frequency === 'annually' ? 'Annuel' : 'Ponctuel')))
-                            : 'Non spécifiée' }}
+                        @if($form->payment_frequency && $form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
+                            {{ $form->payment_frequency->label() }}
+                        @else
+                            Non spécifiée
+                        @endif
                     </span>
                 </p>
             </div>
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Statut de paiement">
-            <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                  {{ $form->payment_status === 'paid'
-                        ? 'bg-green-100 text-green-800'
-                        : ($form->payment_status === 'late' ? 'bg-red-100 text-red-800'
-                        : ($form->payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800')) }}"
-            >
-                {{ $form->payment_status === 'paid' ? 'Payée'
-                : ($form->payment_status === 'late' ? 'En retard'
-                : ($form->payment_status === 'partially_paid' ? 'Partiellement payée'
-                : 'Non payée')) }}
-            </span>
+            @if($form->payment_status && $form->payment_status instanceof \App\Enums\PaymentStatusEnum)
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                      {{ $form->payment_status === 'paid'
+                            ? 'bg-green-100 text-green-800'
+                            : ($form->payment_status === 'late' ? 'bg-red-100 text-red-800'
+                            : ($form->payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800')) }}"
+                >
+                    {{ $form->payment_status === 'paid' ? 'Payée'
+                    : ($form->payment_status === 'late' ? 'En retard'
+                    : ($form->payment_status === 'partially_paid' ? 'Partiellement payée'
+                    : 'Non payée')) }}
+                </span>
+            @else
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    Non spécifié
+                </span>
+            @endif
 
             <div class="mt-1 ml-1 flex flex-col gap-1.5">
                 <p class="text-sm-regular">
                     Méthode: <span class="text-sm-medium">
-                        {{ $form->payment_method
-                            ? ($form->payment_method === 'card' ? 'Carte bancaire'
-                            : ($form->payment_method === 'cash' ? 'Espèces' : 'Virement'))
-                            : 'Non spécifiée' }}
+                        @if($form->payment_method && $form->payment_method instanceof \App\Enums\PaymentMethodEnum)
+                            {{ $form->payment_method->label() }}
+                        @else
+                            Non spécifiée
+                        @endif
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Priorité: <span class="text-sm-medium">
-                        {{ $form->priority
-                            ? ($form->priority === 'high' ? 'Élevée'
-                            : ($form->priority === 'medium' ? 'Moyenne'
-                            : ($form->priority === 'low' ? 'Basse' : 'Aucune')))
-                            : 'Non spécifiée' }}
+                        @if($form->priority && $form->priority instanceof \App\Enums\PriorityEnum)
+                            {{ $form->priority->label() }}
+                        @else
+                            Non spécifiée
+                        @endif
                     </span>
                 </p>
             </div>
@@ -271,7 +278,7 @@
 
         <x-invoices.create.summary-item label="Tags">
             @if(empty($form->tags))
-               <span class="text-sm-medium">Aucun</span>
+                <span class="text-sm-medium">Aucun</span>
             @else
                 <ul class="flex flex-wrap gap-2">
                     @foreach($form->tags as $tag)

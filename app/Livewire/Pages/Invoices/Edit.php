@@ -3,6 +3,10 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Enums\InvoiceTypeEnum;
+use App\Enums\PaymentFrequencyEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Enums\PriorityEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Services\FileStorageService;
@@ -42,10 +46,8 @@ class Edit extends Component
             ->with('file')
             ->findOrFail($id);
 
-        // Initialiser le formulaire avec les données de la facture
         $this->form->setFromInvoice($this->invoice);
 
-        // Générer l'URL du fichier
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
 
         $this->filePath = $fileInfo['url'];
@@ -53,69 +55,49 @@ class Edit extends Component
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
 
-        // Récupérer les membres de la famille
         $this->prepareFamilyMembers();
 
-        // Initialiser le tableau des tags et le mode de partage
         $this->initializeTagManagement();
         $this->calculateRemainingShares();
     }
 
     private function prepareFamilyMembers(): void
     {
-        // Récupérer la famille de l'utilisateur
         $family = auth()->user()->family();
         $this->family_members = collect();
 
         if ($family) {
-            // Récupérer tous les membres de la famille sauf l'utilisateur courant
             $this->family_members = $family->users()
                 ->where('users.id', '!=', auth()->id())
                 ->get();
         }
 
-        // Ajouter l'utilisateur actuel au début de la liste
         $this->family_members->prepend(auth()->user());
     }
 
-    /**
-     * Réagir aux changements du type de facture
-     */
-    public function updatedFormType()
+    public function updatedFormType(): void
     {
         $this->form->updateAvailableCategories();
-        $this->form->category = null; // Réinitialiser la catégorie lorsque le type change
+        $this->form->category = null;
     }
 
-    /**
-     * Supprime le fichier uploadé
-     */
-    public function removeUploadedFile()
+    public function removeUploadedFile(): void
     {
         $this->form->removeFile();
         $this->form->resetErrorBag('uploadedFile');
     }
 
-    /**
-     * Réagir aux changements du champ montant
-     */
-    public function updatedFormAmount()
+    public function updatedFormAmount(): void
     {
         $this->calculateRemainingShares();
     }
 
-    /**
-     * Réagir aux changements du mode de partage
-     */
-    public function updatedShareMode()
+    public function updatedShareMode(): void
     {
         $this->calculateRemainingShares();
     }
 
-    /**
-     * Met à jour la facture existante
-     */
-    public function updateInvoice(FileStorageService $fileStorageService)
+    public function updateInvoice(FileStorageService $fileStorageService): void
     {
         $invoice = $this->form->update($fileStorageService);
 
@@ -127,13 +109,14 @@ class Edit extends Component
         }
     }
 
-    /**
-     * Rend la vue
-     */
     public function render()
     {
         return view('livewire.pages.invoices.edit', [
-            'invoiceTypes' => InvoiceTypeEnum::getTypesOptions(),
+            'invoiceTypes' => InvoiceTypeEnum::getTypesOptionsWithEmojis(),
+            'paymentStatuses' => PaymentStatusEnum::getStatusOptionsWithEmojis(),
+            'paymentMethods' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
+            'paymentFrequencies' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),
+            'priorities' => PriorityEnum::getPriorityOptionsWithEmojis(),
             'remainingAmount' => $this->remainingAmount,
             'remainingPercentage' => $this->remainingPercentage,
             'shareMode' => $this->shareMode,

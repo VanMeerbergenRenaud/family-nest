@@ -67,18 +67,14 @@
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
                                 <option value="" selected>Sélectionner un type</option>
                                 @foreach($invoiceTypes as $typeValue => $typeLabel)
-                                    <option value="{{ $typeValue }}">
-                                        {{ $typeValue }}
-                                    </option>
+                                    <option value="{{ $typeValue }}">{!! $typeLabel !!}</option>
                                 @endforeach
                             </x-form.select>
 
                             <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
                                 <option value="" selected>Sélectionner une catégorie</option>
-                                @foreach($form->availableCategories as $availableCategory)
-                                    <option value="{{ $availableCategory }}">
-                                        {{ $availableCategory }}
-                                    </option>
+                                @foreach($form->availableCategories as $categoryValue => $categoryLabel)
+                                    <option value="{{ $categoryValue }}">{!! $categoryLabel !!}</option>
                                 @endforeach
                             </x-form.select>
 
@@ -257,10 +253,9 @@
                             <x-form.field-date label="Rappel de paiement" name="form.payment_reminder" model="form.payment_reminder"/>
                             <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
                                 <option value="" selected>Sélectionner une fréquence</option>
-                                <option value="monthly">Mensuel</option>
-                                <option value="quarterly">Trimestriel</option>
-                                <option value="annually">Annuel</option>
-                                <option value="one_time">Ponctuel</option>
+                                @foreach($paymentFrequencies as $value => $label)
+                                    <option value="{{ $value }}">{!! $label !!}</option>
+                                @endforeach
                             </x-form.select>
                         </div>
                     </x-invoices.create.form-step>
@@ -273,25 +268,23 @@
                     >
                         <x-form.select name="form.payment_status" model="form.payment_status" label="Statut de la facture">
                             <option value="" selected>Sélectionner un statut</option>
-                            <option value="unpaid">Non payée</option>
-                            <option value="paid">Payée</option>
-                            <option value="late">En retard</option>
-                            <option value="partially_paid">Partiellement payée</option>
+                            @foreach($paymentStatuses as $value => $label)
+                                <option value="{{ $value }}">{!! $label !!}</option>
+                            @endforeach
                         </x-form.select>
-
 
                         <x-form.select name="form.payment_method" model="form.payment_method" label="Méthode de paiement utilisée">
                             <option value="" selected>Sélectionne un moyen de paiement</option>
-                            <option value="card">Carte bancaire</option>
-                            <option value="cash">Espèces</option>
-                            <option value="transfer">Virement</option>
+                            @foreach($paymentMethods as $value => $label)
+                                <option value="{{ $value }}">{!! $label !!}</option>
+                            @endforeach
                         </x-form.select>
 
                         <x-form.select name="form.priority" model="form.priority" label="Étiquette de priorité">
                             <option value="" selected>Sélectionner une priorité</option>
-                            <option value="low">Basse</option>
-                            <option value="medium">Moyenne</option>
-                            <option value="high">Élevée</option>
+                            @foreach($priorities as $value => $label)
+                                <option value="{{ $value }}">{!! $label !!}</option>
+                            @endforeach
                         </x-form.select>
                     </x-invoices.create.form-step>
 

@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Pages\Invoices;
 
+use App\Enums\PaymentStatusEnum;
+use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Traits\InvoiceFileUrlTrait;
@@ -91,19 +93,19 @@ class Index extends Component
                 $query->where('is_favorite', true);
                 break;
             case 'paid':
-                $query->where('payment_status', 'paid');
+                $query->where('payment_status', PaymentStatusEnum::Paid->value);
                 break;
             case 'unpaid':
-                $query->where('payment_status', 'unpaid');
+                $query->where('payment_status', PaymentStatusEnum::Unpaid->value);
                 break;
             case 'late':
-                $query->where('payment_status', 'late');
+                $query->where('payment_status', PaymentStatusEnum::Late->value);
                 break;
             case 'last_week':
                 $query->where('issued_date', '>=', now()->subWeek());
                 break;
             case 'high_priority':
-                $query->where('priority', 'high');
+                $query->where('priority', PriorityEnum::High->value);
                 break;
             default:
                 $this->folderInvoices = collect();
@@ -128,20 +130,20 @@ class Index extends Component
                 'amount' => $invoice->where('is_favorite', true)->sum('amount'),
             ],
             'paid' => [
-                'count' => $invoice->where('payment_status', 'paid')->count(),
-                'amount' => $invoice->where('payment_status', 'paid')->sum('amount'),
+                'count' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->count(),
+                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->sum('amount'),
             ],
             'unpaid' => [
-                'count' => $invoice->where('payment_status', 'unpaid')->count(),
-                'amount' => $invoice->where('payment_status', 'unpaid')->sum('amount'),
+                'count' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->count(),
+                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->sum('amount'),
             ],
             'late' => [
-                'count' => $invoice->where('payment_status', 'late')->count(),
-                'amount' => $invoice->where('payment_status', 'late')->sum('amount'),
+                'count' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->count(),
+                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->sum('amount'),
             ],
             'high_priority' => [
-                'count' => $invoice->where('priority', 'high')->count(),
-                'amount' => $invoice->where('priority', 'high')->sum('amount'),
+                'count' => $invoice->where('priority', PriorityEnum::High->value)->count(),
+                'amount' => $invoice->where('priority', PriorityEnum::High->value)->sum('amount'),
             ],
         ];
     }
@@ -420,7 +422,10 @@ class Index extends Component
 
         $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
 
-        return view('livewire.pages.invoices.index', compact('invoices', 'folderStats'))
-            ->layout('layouts.app-sidebar');
+        return view('livewire.pages.invoices.index', [
+            'invoices' => $invoices,
+            'folderStats' => $folderStats,
+            'paymentStatuses' => PaymentStatusEnum::getStatusOptions(),
+        ])->layout('layouts.app-sidebar');
     }
 }

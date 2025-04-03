@@ -13,17 +13,12 @@ class InvoiceFileFactory extends Factory
      */
     public function definition(): array
     {
-        // Assurez-vous que le répertoire existe
-        $directory = storage_path('app/public/invoices');
-
-        // Générer l'image
         $extension = $this->faker->randomElement(['jpg', 'jpeg', 'png', 'pdf', 'docx']);
         $filename = $this->faker->unique()->word().'.'.$extension;
         $filePath = 'invoices/'.$filename;
 
         $fileSize = $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024);
 
-        // Compression du fichier pdf
         $compressionStatus = $this->faker->randomElement(['null', 'pending', 'completed', 'failed']);
         $originalSize = $this->faker->numberBetween(100 * 1024, 5 * 1024 * 1024);
         $compressionRate = $this->faker->randomFloat(2, 0, 100);

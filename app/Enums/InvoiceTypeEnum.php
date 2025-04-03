@@ -7,6 +7,7 @@ enum InvoiceTypeEnum: string
     case ABONNEMENTS = 'Abonnements';
     case ACHATS_MAISON = 'Achats de la maison';
     case ALIMENTATION_COURSES = 'Alimentation et Courses';
+    case ANIMAUX = 'Animaux';
     case ASSURANCES = 'Assurances';
     case DIVERS = 'Divers';
     case DIVERTISSEMENTS_LOISIRS = 'Divertissements et Loisirs';
@@ -22,9 +23,35 @@ enum InvoiceTypeEnum: string
     case TRANSPORT = 'Transport';
     case VOYAGES = 'Voyages';
 
-    /**
-     * Obtenir toutes les catégories associées à ce type de facture
-     */
+    public function emoji(): string
+    {
+        return match ($this) {
+            self::ABONNEMENTS => '🔄',
+            self::ACHATS_MAISON => '🏠',
+            self::ALIMENTATION_COURSES => '🛒',
+            self::ANIMAUX => '🐾',
+            self::ASSURANCES => '🔐',
+            self::DIVERS => '📦',
+            self::DIVERTISSEMENTS_LOISIRS => '🎭',
+            self::DONS_CONTRIBUTIONS => '🤝',
+            self::EDUCATION => '🎓',
+            self::ENFANTS => '👶',
+            self::FINANCES => '💰',
+            self::IMPOTS_CONTRIBUTIONS => '📊',
+            self::LOGEMENT => '🏘️',
+            self::SANTE_BIEN_ETRE => '⚕️',
+            self::SERVICES_DOMICILE => '🧹',
+            self::TECHNOLOGIE => '💻',
+            self::TRANSPORT => '🚗',
+            self::VOYAGES => '✈️',
+        };
+    }
+
+    public function labelWithEmoji(): string
+    {
+        return $this->emoji() . '&nbsp;&nbsp;' . $this->value;
+    }
+
     public function categories(): array
     {
         return match ($this) {
@@ -55,6 +82,16 @@ enum InvoiceTypeEnum: string
                 'Restaurants',
                 'Supermarché',
             ],
+            self::ANIMAUX => [
+                'Nourriture',
+                'Vétérinaire',
+                'Toilettage',
+                'Accessoires',
+                'Pension',
+                'Assurance',
+                'Dressage',
+                'Activités',
+            ],
             self::ASSURANCES => [
                 'Assurance habitation',
                 'Assurance incendie',
@@ -63,7 +100,6 @@ enum InvoiceTypeEnum: string
                 'Assurance voiture/moto',
             ],
             self::DIVERS => [
-                'Animaux',
                 'Autres',
                 'Cadeaux d\'Anniversaire',
             ],
@@ -145,14 +181,21 @@ enum InvoiceTypeEnum: string
         };
     }
 
-    /**
-     * Obtenir un tableau associatif de tous les types avec leurs libellés
-     */
     public static function getTypesOptions(): array
     {
         $options = [];
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->value;
+        }
+
+        return $options;
+    }
+
+    public static function getTypesOptionsWithEmojis(): array
+    {
+        $options = [];
+        foreach (self::cases() as $case) {
+            $options[$case->value] = $case->labelWithEmoji();
         }
 
         return $options;

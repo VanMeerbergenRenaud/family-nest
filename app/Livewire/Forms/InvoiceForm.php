@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Enums\InvoiceCategoryEnum;
 use App\Enums\InvoiceTypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
@@ -22,7 +23,7 @@ class InvoiceForm extends Form
 
     public ?InvoiceFile $invoiceFile = null;
 
-    // Fichier uploadé
+    // Uploaded file
     #[Validate]
     public $uploadedFile;
 
@@ -103,12 +104,9 @@ class InvoiceForm extends Form
 
     public $user_id;
 
-    // Catégories disponibles
+    // Available categories
     public $availableCategories = [];
 
-    /**
-     * Définit les règles de validation
-     */
     public function rules()
     {
         return [
@@ -139,12 +137,12 @@ class InvoiceForm extends Form
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
             'payment_reminder' => 'nullable|string|max:255',
-            'payment_frequency' => 'nullable|string|max:255',
+            'payment_frequency' => 'nullable|string|in:daily,weekly,biweekly,monthly,bimonthly,quarterly,semiannually,annually,biennially,one_time',
 
             // Étape 4 - Statut de paiement
-            'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid',
-            'payment_method' => 'nullable|in:card,cash,transfer',
-            'priority' => 'nullable|in:high,medium,low,none',
+            'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid,pending,cancelled,refunded,disputed',
+            'payment_method' => 'nullable|in:card,cash,transfer,direct_debit,check,mobile_payment,cryptocurrency,gift_card',
+            'priority' => 'nullable|in:critical,high,medium,low,minimal,none',
 
             // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',
@@ -157,9 +155,6 @@ class InvoiceForm extends Form
         ];
     }
 
-    /**
-     * Définit les messages d'erreur personnalisés
-     */
     public function messages()
     {
         return [
@@ -189,9 +184,6 @@ class InvoiceForm extends Form
         ];
     }
 
-    /**
-     * Supprime le fichier
-     */
     public function removeFile(): void
     {
         $this->uploadedFile = null;
@@ -203,22 +195,39 @@ class InvoiceForm extends Form
         $this->is_primary = true;
     }
 
-    /**
-     * Mettre à jour la liste des catégories disponibles
-     */
     public function updateAvailableCategories(): void
     {
         if ($this->type) {
-            foreach (InvoiceTypeEnum::cases() as $case) {
-                if ($case->value === $this->type) {
-                    $this->availableCategories = $case->categories();
+            try {
+                $typeEnum = $this->type instanceof InvoiceTypeEnum
+                    ? $this->type
+                    : InvoiceTypeEnum::from($this->type);
 
-                    return;
+                $categoriesForType = $typeEnum->categories();
+
+                $this->availableCategories = [];
+
+                foreach ($categoriesForType as $category) {
+                    foreach (InvoiceCategoryEnum::cases() as $case) {
+                        if ($case->value === $category) {
+                            // Add the emoji to the label
+                            $this->availableCategories[$category] = $case->labelWithEmoji();
+                            break;
+                        }
+                    }
+
+                    // If no emoji found, fallback to the original category
+                    if (!isset($this->availableCategories[$category])) {
+                        $this->availableCategories[$category] = $category;
+                    }
                 }
+
+                return;
+            } catch (\ValueError) {
+                $this->availableCategories = [];
+                Toaster::error('Erreur lors de la récupération des catégories::Vérifiez le type de facture sélectionné.');
             }
         }
-
-        $this->availableCategories = [];
     }
 
     // Créer ou modifier une facture
@@ -231,6 +240,11 @@ class InvoiceForm extends Form
 
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
+
+            // Si le payeur n'est pas défini, le définir sur l'utilisateur connecté
+            if (! $this->paid_by_user_id) {
+                $this->paid_by_user_id = auth()->id();
+            }
 
             // Préparation des données communes
             $invoiceData = [
