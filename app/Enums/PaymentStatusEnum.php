@@ -8,7 +8,6 @@ enum PaymentStatusEnum: string
     case Paid = 'paid';
     case Late = 'late';
     case PartiallyPaid = 'partially_paid';
-    case Pending = 'pending';
     case Cancelled = 'cancelled';
     case Refunded = 'refunded';
     case Disputed = 'disputed';
@@ -20,7 +19,6 @@ enum PaymentStatusEnum: string
             static::Paid => 'Payée',
             static::Late => 'En retard',
             static::PartiallyPaid => 'Partiellement payée',
-            static::Pending => 'En attente',
             static::Cancelled => 'Annulée',
             static::Refunded => 'Remboursée',
             static::Disputed => 'Contestée',
@@ -34,7 +32,6 @@ enum PaymentStatusEnum: string
             static::Paid => '✅',
             static::Late => '⚠️',
             static::PartiallyPaid => '💰',
-            static::Pending => '⌛',
             static::Cancelled => '❌',
             static::Refunded => '↩️',
             static::Disputed => '⚖️',
@@ -53,7 +50,6 @@ enum PaymentStatusEnum: string
             static::Paid => 'green',
             static::Late => 'red',
             static::PartiallyPaid => 'yellow',
-            static::Pending => 'blue',
             static::Cancelled => 'slate',
             static::Refunded => 'purple',
             static::Disputed => 'orange',
@@ -67,7 +63,6 @@ enum PaymentStatusEnum: string
             static::Paid->value => static::Paid->label(),
             static::Late->value => static::Late->label(),
             static::PartiallyPaid->value => static::PartiallyPaid->label(),
-            static::Pending->value => static::Pending->label(),
             static::Cancelled->value => static::Cancelled->label(),
             static::Refunded->value => static::Refunded->label(),
             static::Disputed->value => static::Disputed->label(),
@@ -81,7 +76,6 @@ enum PaymentStatusEnum: string
             static::Paid->value => static::Paid->labelWithEmoji(),
             static::Late->value => static::Late->labelWithEmoji(),
             static::PartiallyPaid->value => static::PartiallyPaid->labelWithEmoji(),
-            static::Pending->value => static::Pending->labelWithEmoji(),
             static::Cancelled->value => static::Cancelled->labelWithEmoji(),
             static::Refunded->value => static::Refunded->labelWithEmoji(),
             static::Disputed->value => static::Disputed->labelWithEmoji(),

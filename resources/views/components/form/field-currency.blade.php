@@ -5,20 +5,24 @@
     'asterix' => false,
     'placeholder' => '0,00',
     'initialValue' => null,
-    'currencies' => [
-        'EUR' => ['symbol' => '€', 'name' => 'Euro'],
-        'USD' => ['symbol' => '$', 'name' => 'Dollar US'],
-        'GBP' => ['symbol' => '£', 'name' => 'Livre Sterling'],
-        'JPY' => ['symbol' => '¥', 'name' => 'Yen Japonais'],
-        'CHF' => ['symbol' => 'CHF', 'name' => 'Franc Suisse'],
-        'CAD' => ['symbol' => '$', 'name' => 'Dollar Canadien'],
-    ],
     'defaultCurrency' => 'EUR'
 ])
 
 @php
     $id = $name ?? uniqid('currency-field-');
-    $symbols = json_encode(array_combine(array_keys($currencies), array_column($currencies, 'symbol')));
+    $currencies = [];
+    $symbols = [];
+
+    foreach (App\Enums\InvoiceCurrencyEnum::cases() as $currency) {
+        $currencies[$currency->value] = [
+            'symbol' => $currency->symbol(),
+            'name' => $currency->name(),
+            'flag' => $currency->flag()
+        ];
+        $symbols[$currency->value] = $currency->symbol();
+    }
+
+    $symbolsJson = json_encode($symbols);
 @endphp
 
 <div class="m-0 p-0 max-w-[45rem]">
@@ -28,7 +32,7 @@
         </label>
     @endif
 
-    <div x-data="currencyField('{{ $id }}', {{ $symbols }}, '{{ $defaultCurrency }}', {{ is_numeric($initialValue) ? $initialValue : 'null' }}, '{{ $model }}')">
+    <div x-data="currencyField('{{ $id }}', {{ $symbolsJson }}, '{{ $defaultCurrency }}', {{ is_numeric($initialValue) ? $initialValue : 'null' }}, '{{ $model }}')">
         <div class="relative flex items-center justify-between rounded-md bg-white border border-slate-200 dark:border-gray-600 @error($name) input-invalid @enderror">
             <span class="pl-3 rounded-l-md text-gray-500 dark:text-gray-300" x-text="symbols[currency]"></span>
 
@@ -56,6 +60,7 @@
                     @foreach($currencies as $code => $currencyInfo)
                         <x-menu.item @click="setCurrency('{{ $code }}')">
                             <span class="relative w-full flex items-center gap-3">
+                                <span class="min-w-6 text-sm-regular">{{ $currencyInfo['flag'] }}</span>
                                 <span class="min-w-8 text-sm-medium text-gray-900 dark:text-white">{{ $code }}</span>
                                 <span class="min-w-10 text-center text-sm-medium text-gray-500 dark:text-gray-400">{{ $currencyInfo['symbol'] }}</span>
                                 <span class="pr-2 text-xs-regular text-gray-500 dark:text-gray-400">{{ $currencyInfo['name'] }}</span>

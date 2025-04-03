@@ -3,7 +3,12 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\InvoiceCategoryEnum;
+use App\Enums\InvoiceCurrencyEnum;
 use App\Enums\InvoiceTypeEnum;
+use App\Enums\PaymentFrequencyEnum;
+use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentStatusEnum;
+use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Services\FileStorageService;
@@ -78,7 +83,6 @@ class InvoiceForm extends Form
     #[Validate]
     public $payment_reminder;
 
-    #[Validate]
     public $payment_frequency;
 
     // 4. Paiement
@@ -125,7 +129,7 @@ class InvoiceForm extends Form
 
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
-            'currency' => 'nullable|string|size:3',
+            'currency' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, InvoiceCurrencyEnum::cases())),
             'paid_by_user_id' => 'exists:users,id',
             'family_id' => 'nullable|exists:families,id',
             'user_shares' => 'nullable|array',
@@ -136,13 +140,13 @@ class InvoiceForm extends Form
             // Étape 3 - Dates
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
-            'payment_reminder' => 'nullable|string|max:255',
-            'payment_frequency' => 'nullable|string|in:daily,weekly,biweekly,monthly,bimonthly,quarterly,semiannually,annually,biennially,one_time',
+            'payment_reminder' => 'nullable|date',
+            'payment_frequency' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, PaymentFrequencyEnum::cases())),
 
             // Étape 4 - Statut de paiement
-            'payment_status' => 'nullable|string|in:unpaid,paid,late,partially_paid,pending,cancelled,refunded,disputed',
-            'payment_method' => 'nullable|in:card,cash,transfer,direct_debit,check,mobile_payment,cryptocurrency,gift_card',
-            'priority' => 'nullable|in:critical,high,medium,low,minimal,none',
+            'payment_status' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, PaymentStatusEnum::cases())),
+            'payment_method' => 'nullable|in:' . implode(',', array_map(fn($case) => $case->value, PaymentMethodEnum::cases())),
+            'priority' => 'nullable|in:' . implode(',', array_map(fn($case) => $case->value, PriorityEnum::cases())),
 
             // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',

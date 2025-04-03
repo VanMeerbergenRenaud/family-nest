@@ -8,5 +8,5 @@
         />
     </div>
 
-    <x-invoices.create.summary :form="$invoice" />
+    <x-invoices.create.summary :form="$invoice" :family_members="$family_members" />
 </div>

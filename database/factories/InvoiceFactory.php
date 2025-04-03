@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\InvoiceCategoryEnum;
+use App\Enums\InvoiceCurrencyEnum;
 use App\Enums\InvoiceTypeEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
@@ -49,7 +50,7 @@ class InvoiceFactory extends Factory
 
             // Détails financiers
             'amount' => $this->faker->randomFloat(2, 10, 1000),
-            'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
+            'currency' => $this->faker->randomElement(InvoiceCurrencyEnum::cases())->value,
             'paid_by_user_id' => $this->faker->randomElement($users->pluck('id')->toArray()),
 
             // Dates

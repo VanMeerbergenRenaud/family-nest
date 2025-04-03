@@ -198,7 +198,7 @@
                         </div>
 
                         {{-- Section de répartition ultra-simplifiée --}}
-                        @if($form->amount > 0)
+                        @if($form->amount > 0 && $form->paid_by_user_id)
                             <div x-data="{ showShareInterface: false }">
                                 <button
                                     type="button"

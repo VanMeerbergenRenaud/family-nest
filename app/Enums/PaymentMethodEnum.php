@@ -9,7 +9,6 @@ enum PaymentMethodEnum: string
     case Transfer = 'transfer';
     case DirectDebit = 'direct_debit';
     case Check = 'check';
-    case Cryptocurrency = 'cryptocurrency';
     case GiftCard = 'gift_card';
 
     public function label(): string
@@ -20,7 +19,6 @@ enum PaymentMethodEnum: string
             static::Transfer => 'Virement',
             static::DirectDebit => 'Prélèvement automatique',
             static::Check => 'Chèque',
-            static::Cryptocurrency => 'Cryptomonnaie',
             static::GiftCard => 'Carte cadeau',
         };
     }
@@ -33,7 +31,6 @@ enum PaymentMethodEnum: string
             static::Transfer => '🏦',
             static::DirectDebit => '🔁',
             static::Check => '📝',
-            static::Cryptocurrency => '🪙',
             static::GiftCard => '🎁',
         };
     }
@@ -51,7 +48,6 @@ enum PaymentMethodEnum: string
             static::Transfer => 'purple',
             static::DirectDebit => 'indigo',
             static::Check => 'gray',
-            static::Cryptocurrency => 'yellow',
             static::GiftCard => 'pink',
         };
     }
@@ -64,7 +60,6 @@ enum PaymentMethodEnum: string
             static::Transfer->value => static::Transfer->label(),
             static::DirectDebit->value => static::DirectDebit->label(),
             static::Check->value => static::Check->label(),
-            static::Cryptocurrency->value => static::Cryptocurrency->label(),
             static::GiftCard->value => static::GiftCard->label(),
         ];
     }
@@ -77,7 +72,6 @@ enum PaymentMethodEnum: string
             static::Transfer->value => static::Transfer->labelWithEmoji(),
             static::DirectDebit->value => static::DirectDebit->labelWithEmoji(),
             static::Check->value => static::Check->labelWithEmoji(),
-            static::Cryptocurrency->value => static::Cryptocurrency->labelWithEmoji(),
             static::GiftCard->value => static::GiftCard->labelWithEmoji(),
         ];
     }

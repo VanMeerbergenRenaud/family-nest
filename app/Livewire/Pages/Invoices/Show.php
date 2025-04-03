@@ -24,9 +24,12 @@ class Show extends Component
 
     public $fileExists = false;
 
+    public $family_members = [];
+
     public function mount($id)
     {
         $this->invoice = auth()->user()->invoices()->findOrFail($id);
+        $this->prepareFamilyMembers();
 
         if ($this->invoice->is_archived) {
             $this->redirectRoute('invoices.archived');
@@ -38,6 +41,20 @@ class Show extends Component
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
+    }
+
+    private function prepareFamilyMembers(): void
+    {
+        $family = auth()->user()->family();
+        $this->family_members = collect();
+
+        if ($family) {
+            $this->family_members = $family->users()
+                ->where('users.id', '!=', auth()->id())
+                ->get();
+        }
+
+        $this->family_members->prepend(auth()->user());
     }
 
     public function render()
