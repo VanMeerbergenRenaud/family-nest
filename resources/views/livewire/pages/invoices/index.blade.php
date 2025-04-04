@@ -29,70 +29,84 @@
             <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
                 {{-- Favoris --}}
                 <button wire:click.prevent="openFolder('favorites', 'Favoris')"
-                        class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-gray-100 dark:bg-gray-800">
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-gray-100 dark:bg-gray-800">
                     <div class="flex flex-col text-left">
                         <div class="mb-3.5 p-3 rounded-lg w-fit bg-gray-200 dark:bg-green-800">
                             <x-svg.folder class="w-6 h-6 text-green-500 dark:text-green-400"/>
                         </div>
                         <span class="text-md-medium text-gray-900 dark:text-white">Favoris</span>
                         <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                            {{ $folderStats['favorites']['count'] }} Fichiers • {{ $folderStats['favorites']['amount'] }}€
+                            {{ $folderStats['favorites']['count'] }} Fichiers • {{ number_format($folderStats['favorites']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['favorites']['currency'] }}
                         </span>
                     </div>
                 </button>
 
                 {{-- Payés --}}
                 <button wire:click.prevent="openFolder('paid', 'Factures payées')"
-                        class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-green-100 dark:bg-green-900">
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-green-100 dark:bg-green-900">
                     <div class="flex flex-col text-left">
                         <div class="mb-3.5 p-3 rounded-lg w-fit bg-green-200 dark:bg-green-800">
                             <x-svg.validate class="w-6 h-6 text-green-500 dark:text-green-400"/>
                         </div>
                         <span class="text-md-medium text-gray-900 dark:text-white">Payés</span>
                         <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                            {{ $folderStats['paid']['count'] }} Fichiers • {{ $folderStats['paid']['amount'] }}€
+                            {{ $folderStats['paid']['count'] }} Fichiers • {{ number_format($folderStats['paid']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['paid']['currency'] }}
                         </span>
                     </div>
                 </button>
 
                 {{-- Impayés --}}
                 <button wire:click.prevent="openFolder('unpaid', 'Factures impayées')"
-                        class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-red-50 dark:bg-red-900">
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-red-50 dark:bg-red-900">
                     <div class="flex flex-col text-left">
                         <div class="mb-3.5 p-3 rounded-lg w-fit bg-red-100 dark:bg-red-900">
                             <x-svg.clock class="w-6 h-6 text-red-500 dark:text-red-400"/>
                         </div>
                         <span class="text-md-medium text-gray-900 dark:text-white">Impayés</span>
                         <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                            {{ $folderStats['unpaid']['count'] }} Fichiers • {{ $folderStats['unpaid']['amount'] }}€
+                            {{ $folderStats['unpaid']['count'] }} Fichiers • {{ number_format($folderStats['unpaid']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['unpaid']['currency'] }}
                         </span>
                     </div>
                 </button>
 
                 {{-- Retard de paiement --}}
                 <button wire:click.prevent="openFolder('late', 'Retards de paiement')"
-                        class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-yellow-50 dark:bg-yellow-900">
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-yellow-50 dark:bg-yellow-900">
                     <div class="flex flex-col text-left">
                         <div class="mb-3.5 p-3 rounded-lg w-fit bg-yellow-100 dark:bg-yellow-900">
                             <x-svg.document class="w-6 h-6 text-yellow-500 dark:text-yellow-400"/>
                         </div>
                         <span class="text-md-medium text-gray-900 dark:text-white">Retard de paiement</span>
                         <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                            {{ $folderStats['late']['count'] }} Fichiers • {{ $folderStats['late']['amount'] }}€
+                            {{ $folderStats['late']['count'] }} Fichiers • {{ number_format($folderStats['late']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['late']['currency'] }}
                         </span>
                     </div>
                 </button>
 
                 {{-- Priorité élevée --}}
                 <button wire:click.prevent="openFolder('high_priority', 'Priorités élevées')"
-                        class="inline-block p-5 pb-4 min-w-48 rounded-xl bg-orange-50 dark:bg-orange-900">
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-orange-50 dark:bg-orange-900">
                     <div class="flex flex-col text-left">
                         <div class="mb-3.5 p-3 rounded-lg w-fit bg-orange-100 dark:bg-orange-900">
                             <x-svg.download class="w-6 h-6 text-orange-500 dark:text-orange-400"/>
                         </div>
                         <span class="text-md-medium text-gray-900 dark:text-white">Priorité élevée</span>
                         <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                            {{ $folderStats['high_priority']['count'] }} Fichiers • {{ $folderStats['high_priority']['amount'] }}€
+                            {{ $folderStats['high_priority']['count'] }} Fichiers • {{ number_format($folderStats['high_priority']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['high_priority']['currency'] }}
+                        </span>
+                    </div>
+                </button>
+
+                {{-- Semaine dernière --}}
+                <button wire:click.prevent="openFolder('last_week', 'Semaine dernière')"
+                        class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-blue-50 dark:bg-blue-900">
+                    <div class="flex flex-col text-left">
+                        <div class="mb-3.5 p-3 rounded-lg w-fit bg-blue-100 dark:bg-blue-900">
+                            <x-svg.clock class="w-6 h-6 text-blue-500 dark:text-blue-400"/>
+                        </div>
+                        <span class="text-md-medium text-gray-900 dark:text-white">Semaine dernière</span>
+                        <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
+                            {{ $folderStats['last_week']['count'] }} Fichiers • {{ number_format($folderStats['last_week']['amount'], 2, ',', '.') }}&nbsp;{{ $folderStats['late']['currency'] }}
                         </span>
                     </div>
                 </button>
@@ -122,7 +136,7 @@
                                     </h3>
                                     <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
                                         {{ $invoice->dateForHumans($invoice->created_at) }}
-                                        • {{ $invoice->amount ?? 'Montant vide' }} {{ $invoice->currency ?? '€' }}
+                                        • {{ $invoice->amount ?? 'Montant vide' }} {{ $this->getInvoiceCurrencySymbol($invoice) }}
                                     </p>
                                 </div>
                                 {{-- Menu d'action --}}
@@ -523,7 +537,7 @@
                             {{-- Montant --}}
                             @if($visibleColumns['amount'] ?? false)
                                 <td>
-                                    {{ number_format($invoice->amount, 2, ',', ' ') }} €
+                                    {{ $this->formatAmount($invoice->amount, $invoice->currency) }}
                                 </td>
                             @endif
 
@@ -667,8 +681,8 @@
             <x-modal wire:model="showFolderModal">
                 <x-modal.panel class="max-w-5xl bg-white dark:bg-gray-900">
                     <!-- En-tête avec titre et compteur -->
-                    <div class="sticky top-0 px-6 py-4 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
-                        <div class="flex items-center gap-3">
+                    <div class="sticky top-0 px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
+                        <div class="flex flex-wrap items-center gap-3 pr-8">
                             <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $folderTitle }}</h2>
                             <span
                                 class="inline-flex px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full">
@@ -681,11 +695,10 @@
                     <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto max-h-[60vh]">
                         @if($folderInvoices->isEmpty())
                             <!-- État vide -->
-                            <div
-                                class="flex flex-col items-center justify-center py-16 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
+                            <div class="flex-center flex-col py-16 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
                                 <x-svg.document class="w-14 h-14 text-gray-300 dark:text-gray-700 mb-3"/>
-                                <p class="text-base font-medium text-gray-700 dark:text-gray-300">{{ __('Aucune facture dans cette catégorie') }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-500 mt-1">{{ __('Les factures que vous ajouterez apparaîtront ici !') }}</p>
+                                <p class="text-center px-4 text-md-medium text-gray-700 dark:text-gray-300">{{ __('Aucune facture dans cette catégorie') }}</p>
+                                <p class="text-center px-4 text-sm text-gray-500 dark:text-gray-500 mt-1">{{ __('Les factures que vous ajouterez apparaîtront ici !') }}</p>
                             </div>
                         @else
                             <!-- Liste des factures -->
@@ -726,7 +739,7 @@
                                                 <div class="space-y-1">
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Montant') }}</p>
                                                     <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                        {{ number_format($invoice->amount, 2, ',', ' ') }} €
+                                                        {{ $this->formatAmount($invoice->amount, $invoice->currency) }}
                                                     </p>
                                                 </div>
                                                 <div class="space-y-1">

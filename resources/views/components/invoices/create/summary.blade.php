@@ -27,84 +27,54 @@
 
         <x-invoices.create.summary-item label="Montant">
             @if($form->amount !== null && $form->amount !== '')
-                <span class="text-sm-medium">{{ number_format((float)$form->amount, 2, ',', ' ') }}</span>
-
                 @php
-                    $currencySymbols = [
-                        'EUR' => '€',
-                        'USD' => '$',
-                        'GBP' => '£',
-                        'JPY' => '¥',
-                        'CHF' => 'CHF',
-                        'CAD' => '$'
-                    ];
-                    $symbol = $currencySymbols[$form->currency] ?? $form->currency;
+                    try {
+                        $currencyEnum = \App\Enums\InvoiceCurrencyEnum::from($form->currency ?? 'EUR');
+                        $formattedAmount = \Illuminate\Support\Number::format((float)$form->amount, 2, locale: 'fr_FR');
+                        $symbol = $currencyEnum->symbol();
+                        $flag = $currencyEnum->flag();
+                        $currencyName = $currencyEnum->name();
+                    } catch (\ValueError $e) {
+                        $formattedAmount = \Illuminate\Support\Number::format((float)$form->amount, 2, locale: 'fr_FR');
+                        $symbol = $form->currency ?? '€';
+                        $flag = '';
+                        $currencyName = $form->currency ?? 'EUR';
+                    }
                 @endphp
 
-                <span class="ml-1 text-sm-medium">{{ $symbol }} ({{ $form->currency ?? 'EUR' }})</span>
+                <div class="flex items-center">
+                    <span class="text-sm-medium">{{ $formattedAmount }}</span>
+                    <span class="ml-1 text-sm-medium">{{ $symbol }}</span>
+                    <span class="ml-2 text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-teal-100 text-gray-800">
+                        {{ $flag }} {{ $currencyName }}
+                    </span>
+                </div>
             @else
-                Non spécifié
+                <span class="text-sm-medium">Non spécifié</span>
             @endif
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Montant et répartition" :alternateBackground="true">
-            @if(!empty($form->amount))
-                @php
-                    // S'assurer que $family_members existe
-                    $family_members = $family_members ?? collect();
-
-                    // Récupérer les informations du payeur
-                    $payerName = "Non spécifié";
-                    $payerId = null;
-                    $payerAvatar = null;
-
-                    if ($form->paid_by_user_id) {
-                        // Chercher l'utilisateur dans la liste des membres de famille
-                        foreach ($family_members as $member) {
-                            if ($member->id == $form->paid_by_user_id) {
-                                $payerName = $member->name;
-                                $payerId = $member->id;
-                                $payerAvatar = $member->avatar_url;
-                                break;
-                            }
-                        }
-                    } else {
-                        $payerName = $form->issuer_name;
-                    }
-
-                    // Calculer les totaux
-                    $totalShared = 0;
-                    $totalPercentage = 0;
-                    if (!empty($form->user_shares)) {
-                        foreach ($form->user_shares as $share) {
-                            $totalShared += $share['amount'] ?? 0;
-                            $totalPercentage += $share['percentage'] ?? 0;
-                        }
-                    }
-
-                    // Déterminer le statut de la répartition
-                    $isFullyShared = abs($totalPercentage - 100) < 0.1 || abs($totalShared - $form->amount) < 0.01;
-                    $isOverShared = $totalPercentage > 100.1 || $totalShared > ($form->amount + 0.01);
-
-                    // Calculer le montant restant
-                    $remainingAmount = $form->amount - $totalShared;
-                    $remainingPercentage = 100 - $totalPercentage;
-
-                    // Formater pour l'affichage
-                    $formattedTotal = number_format($form->amount, 2, ',', ' ');
-                    $formattedShared = number_format($totalShared, 2, ',', ' ');
-                    $formattedRemaining = number_format(abs($remainingAmount), 2, ',', ' ');
-                @endphp
-
+            @php
+                $shareSummary = $this->getShareDetailSummary($family_members);
+                $currencySymbol = '';
+                try {
+                    $currencyEnum = \App\Enums\InvoiceCurrencyEnum::from($form->currency ?? 'EUR');
+                    $currencySymbol = $currencyEnum->symbol();
+                } catch (\ValueError $e) {
+                    $currencySymbol = $form->currency ?? '€';
+                }
+            @endphp
+            @if($shareSummary['hasAmount'])
                 <div class="space-y-2">
                     <!-- Nom du payeur -->
                     <div class="flex justify-between items-center">
                         <p class="max-sm:mt-1.5 text-sm-regular">
                             Payeur :
-                            @if($payerName !== "Non spécifié")
+                            @if($shareSummary['payer']['name'] !== "Non spécifié")
                                 <span class="text-sm-medium">
-                            <img src="{{ $payerAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
-                            {{ $payerName }}
+                            <img src="{{ $shareSummary['payer']['avatar'] ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
+                            {{ $shareSummary['payer']['name'] }}
                         </span>
                             @else
                                 <span class="text-sm-medium">Non spécifié</span>
@@ -113,7 +83,7 @@
                     </div>
 
                     <!-- Détail des parts -->
-                    @if(!empty($form->user_shares))
+                    @if($shareSummary['hasDetails'])
                         <!-- Détail des parts avec toggle -->
                         <div class="mt-2 pr-4 max-sm:max-w-[70vw] overflow-x-scroll" x-data="{ showRepartition: false }">
 
@@ -121,14 +91,13 @@
                             <button @click="showRepartition = !showRepartition"
                                     type="button"
                                     class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm font-medium rounded-lg text-gray-700 transition-colors">
-
                                 <div class="flex items-center gap-2">
                                     <div class="text-sm-regular">Répartition&nbsp;:</div>
-                                    <div class="text-sm-medium w-max">{{ $formattedShared }}&nbsp;€</div>
+                                    <div class="text-sm-medium w-max">{{ $shareSummary['formattedShared'] }}&nbsp;{{ $currencySymbol }}</div>
                                     <div class="relative top-0.5 h-1 min-w-20 bg-gray-200 rounded-full">
-                                        <div class="h-1 rounded-full bg-amber-500" style="width: {{ min($totalPercentage, 100) }}%"></div>
+                                        <div class="h-1 rounded-full bg-amber-500" style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
                                     </div>
-                                    <div class="text-sm-medium">({{ number_format($totalPercentage, 0) }}%)</div>
+                                    <div class="text-sm-medium">({{ number_format($shareSummary['totalPercentage'], 0) }}%)</div>
                                 </div>
 
                                 <svg xmlns="http://www.w3.org/2000/svg"
@@ -144,39 +113,19 @@
                                 x-transition
                                 x-collapse
                                 class="mt-1 pt-3 space-y-2 border-t border-slate-200">
-
-                                @foreach($form->user_shares as $share)
-                                    @php
-                                        $memberName = "Membre inconnu";
-                                        $memberAvatar = null;
-                                        $memberObj = null;
-
-                                        // Rechercher dans la liste des membres
-                                        foreach ($family_members as $familyMember) {
-                                            if ($familyMember->id == $share['id']) {
-                                                $memberName = $familyMember->name;
-                                                $memberAvatar = $familyMember->avatar_url;
-                                                $memberObj = $familyMember;
-                                                break;
-                                            }
-                                        }
-
-                                        $sharePercentage = $share['percentage'] ?? 0;
-                                        $shareAmount = $share['amount'] ?? 0;
-                                        $isPayer = $share['id'] == $payerId;
-                                    @endphp
-                                    <li class="flex justify-between items-center py-1" wire:key="share-{{ $share['id'] }}">
-                                        <div class="flex items-center gap-2 sm:w-44">
-                                            <img src="{{ $memberAvatar ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
-                                            <span class="text-sm text-gray-700">{{ $memberName }}</span>
+                                @foreach($shareSummary['memberDetails'] as $member)
+                                    <li class="flex justify-between items-center gap-2 py-1" wire:key="share-{{ $member['id'] }}">
+                                        <div class="flex items-center gap-2 sm:w-44 mr-2">
+                                            <img src="{{ $member['avatar'] ?? asset('img/img_placeholder.jpg') }}" alt="" class="w-6 h-6 rounded-full inline-block">
+                                            <span class="text-sm text-gray-700">{{ $member['name'] }}</span>
                                         </div>
-                                        <p class="text-sm-medium text-gray-800">{{ number_format($shareAmount, 2, ',', ' ') }} €</p>
-                                        <div class="flex items-center gap-3">
+                                        <p class="text-sm-medium text-gray-800">{{ $member['formattedAmount'] }}&nbsp;{{ $currencySymbol }}</p>
+                                        <div class="flex items-center gap-2">
                                             <div class="w-10 h-1 bg-gray-100 rounded-full">
-                                                <div class="h-1 rounded-full {{ $isPayer ? 'bg-indigo-400' : 'bg-gray-400' }}"
-                                                     style="width: {{ min($sharePercentage, 100) }}%"></div>
+                                                <div class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}"
+                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
                                             </div>
-                                            <span class="text-xs text-gray-500 ml-1">{{ number_format($sharePercentage, 2) }}%</span>
+                                            <span class="text-xs text-gray-500 ml-1">{{ $member['formattedPercentage'] }}%</span>
                                         </div>
                                     </li>
                                 @endforeach

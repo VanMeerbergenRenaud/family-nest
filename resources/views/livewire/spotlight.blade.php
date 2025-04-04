@@ -73,9 +73,9 @@
                                                         @if ($result instanceof \App\Models\Invoice)
                                                             <x-spotlight.result
                                                                 wirekey="{{ $result->id }}"
-                                                                href="{{ $result->is_archived ? route('invoices.archived') : route('invoices.show', $result) }}"
+                                                                href="{{ route('invoices.show', $result) }}"
                                                                 text="{{ $result->name }}"
-                                                                description="({{ $result->amount }}{{ $result->currency }})"
+                                                                description="({{ $result->amount }} {{ $result->currency }})"
                                                                 state="{{ $result->is_archived ? '#archivée' : null }}"
                                                             >
                                                                 <x-svg.invoice

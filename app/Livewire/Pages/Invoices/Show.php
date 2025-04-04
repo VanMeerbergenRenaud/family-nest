@@ -8,11 +8,13 @@ use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Traits\InvoiceFileUrlTrait;
+use App\Traits\InvoiceShareCalculationTrait;
 use Livewire\Component;
 
 class Show extends Component
 {
     use InvoiceFileUrlTrait;
+    use InvoiceShareCalculationTrait;
 
     public Invoice $invoice;
 
@@ -26,23 +28,28 @@ class Show extends Component
 
     public $family_members = [];
 
+    // Objet nécessaire pour utiliser le trait InvoiceShareCalculationTrait
+    public $form;
+
     public function mount($id)
     {
-        $this->invoice = auth()->user()->invoices()->findOrFail($id);
-        $this->prepareFamilyMembers();
+        $this->invoice = auth()->user()->invoices()
+            ->with('sharedUsers') // Préchargement de la relation pour éviter les requêtes N+1
+            ->findOrFail($id);
 
-        if ($this->invoice->is_archived) {
-            $this->redirectRoute('invoices.archived');
-        }
+        $this->prepareFamilyMembers();
+        $this->prepareFormData();
 
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
-
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
     }
 
+    /**
+     * Récupère les membres de la famille
+     */
     private function prepareFamilyMembers(): void
     {
         $family = auth()->user()->family();
@@ -57,13 +64,38 @@ class Show extends Component
         $this->family_members->prepend(auth()->user());
     }
 
+    /**
+     * Prépare les données de formulaire pour utiliser le trait InvoiceShareCalculationTrait
+     */
+    private function prepareFormData(): void
+    {
+        $this->form = (object) [
+            'amount' => $this->invoice->amount,
+            'currency' => $this->invoice->currency,
+            'paid_by_user_id' => $this->invoice->paid_by_user_id,
+            'user_shares' => [],
+        ];
+
+        foreach ($this->invoice->sharedUsers as $user) {
+            $this->form->user_shares[] = [
+                'id' => $user->id,
+                'amount' => $user->pivot->share_amount ?? 0,
+                'percentage' => $user->pivot->share_percentage ?? 0,
+            ];
+        }
+
+        // Calculer les parts restantes
+        $this->calculateRemainingShares();
+    }
+
     public function render()
     {
         return view('livewire.pages.invoices.show', [
-            'paymentStatusOptions' => PaymentStatusEnum::getStatusOptions(),
-            'paymentMethodOptions' => PaymentMethodEnum::getMethodOptions(),
-            'paymentFrequencyOptions' => PaymentFrequencyEnum::getFrequencyOptions(),
-            'priorityOptions' => PriorityEnum::getPriorityOptions(),
+            'paymentStatusOptions' => PaymentStatusEnum::getStatusOptionsWithEmojis(),
+            'paymentMethodOptions' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
+            'paymentFrequencyOptions' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),
+            'priorityOptions' => PriorityEnum::getPriorityOptionsWithEmojis(),
+            'shareSummary' => $this->getShareDetailSummary($this->family_members),
         ])->layout('layouts.app-sidebar');
     }
 }

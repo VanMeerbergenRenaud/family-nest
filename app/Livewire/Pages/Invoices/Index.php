@@ -7,6 +7,7 @@ use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Traits\InvoiceFileUrlTrait;
+use App\Traits\InvoiceShareCalculationTrait;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -15,6 +16,7 @@ use Masmerise\Toaster\Toaster;
 class Index extends Component
 {
     use InvoiceFileUrlTrait;
+    use InvoiceShareCalculationTrait;
     use WithPagination;
 
     public Invoice $invoice;
@@ -101,11 +103,11 @@ class Index extends Component
             case 'late':
                 $query->where('payment_status', PaymentStatusEnum::Late->value);
                 break;
-            case 'last_week':
-                $query->where('issued_date', '>=', now()->subWeek());
-                break;
             case 'high_priority':
                 $query->where('priority', PriorityEnum::High->value);
+                break;
+            case 'last_week':
+                $query->where('issued_date', '>=', now()->subWeek());
                 break;
             default:
                 $this->folderInvoices = collect();
@@ -128,24 +130,81 @@ class Index extends Component
             'favorites' => [
                 'count' => $invoice->where('is_favorite', true)->count(),
                 'amount' => $invoice->where('is_favorite', true)->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('is_favorite', true)),
             ],
             'paid' => [
                 'count' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->count(),
                 'amount' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Paid->value)),
             ],
             'unpaid' => [
                 'count' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->count(),
                 'amount' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)),
             ],
             'late' => [
                 'count' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->count(),
                 'amount' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Late->value)),
             ],
             'high_priority' => [
                 'count' => $invoice->where('priority', PriorityEnum::High->value)->count(),
                 'amount' => $invoice->where('priority', PriorityEnum::High->value)->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('priority', PriorityEnum::High->value)),
+            ],
+            'last_week' => [
+                'count' => $invoice->where('issued_date', '>=', now()->subWeek())->count(),
+                'amount' => $invoice->where('issued_date', '>=', now()->subWeek())->sum('amount'),
+                'currency' => $this->getMostCommonCurrency($invoice->where('issued_date', '>=', now()->subWeek())),
             ],
         ];
+    }
+
+    /**
+     * Détermine le symbole de devise la plus utilisée dans le folder de factures
+     */
+    private function getMostCommonCurrency($invoices): string
+    {
+        $currencies = $invoices->pluck('currency')->groupBy(function ($currency) {
+            return $currency;
+        });
+
+        $mostCommonCurrency = $currencies->sortByDesc(function ($group) {
+            return $group->count();
+        })->keys()->first();
+
+        // get the symbol for the most common currency
+        $this->form = (object) [
+            'currency' => $mostCommonCurrency ?? 'EUR',
+        ];
+
+        return $this->getCurrencySymbol();
+    }
+
+    /**
+     * Récupère le symbole correct pour une facture donnée
+     */
+    public function getInvoiceCurrencySymbol($invoice): string
+    {
+        $this->form = (object) [
+            'currency' => $invoice->currency ?? 'EUR',
+        ];
+
+        return $this->getCurrencySymbol();
+    }
+
+    /**
+     * Formate un montant avec le symbole de la devise appropriée
+     */
+    public function formatAmount($amount, $currency = 'EUR'): string
+    {
+        $this->form = (object) [
+            'currency' => $currency,
+        ];
+
+        $symbol = $this->getCurrencySymbol();
+
+        return number_format($amount, 2, ',', ' ').' '.$symbol;
     }
 
     // Méthodes de filtrage

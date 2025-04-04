@@ -2,7 +2,7 @@
     @if($archivedInvoices->isEmpty())
         <x-empty-state
             title="Aucune facture archivées pour le moment"
-            description="Les élément de la corbeille contiennent les factures que vous avez initialement choisies de supprimer. Si, par malheur, vous souhaitez récupérer une facture que vous avez supprimée par inadvertance, c'est possible ici. Vous pouvez également supprimer définitivement une facture si vous le souhaitez, mais elle sera alors irrécupérable."
+            description="Les élément de la corbeille contiennent les factures que vous avez initialement choisies d'archiver. Si, par malheur, vous souhaitez récupérer une facture que vous avez supprimée par inadvertance, c'est possible ici. Vous pouvez également supprimer définitivement une facture si vous le souhaitez, mais elle sera alors irrécupérable."
         >
             <a href="{{ route('invoices.index') }}" class="button-danger" title="Vers la page des factures">
                 <x-svg.trash class="text-white" />
@@ -29,7 +29,7 @@
             <div>
                 <h1 class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h1>
                 <p class="text-sm-regular text-gray-500 max-w-4xl">
-                    Les éléments affichés ci-dessous sont des factures que vous avez archivées. Vous pouvez les restaurer ou les supprimer définitivement. Lorsqu'une facture est archivée vous ne pouvez plus voir les informations associées à celle-ci.
+                    Les éléments affichés ci-dessous sont des factures que vous avez archivées. Vous pouvez les restaurer ou les supprimer définitivement. Lorsqu'une facture est archivée elle n'apparaît plus dans la liste des factures de votre tableau de bord.
                 </p>
             </div>
 
@@ -93,6 +93,13 @@
                                         </x-menu.button>
 
                                         <x-menu.items>
+                                            <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}">
+                                                <x-svg.binocular class="w-4 h-4 group-hover:text-gray-900"/>
+                                                {{ __('Voir en détail') }}
+                                            </x-menu.item>
+
+                                            <x-menu.divider />
+
                                             <x-menu.item wire:click="restoreInvoice({{ $invoice->id }})">
                                                 <x-svg.restore class="w-4 h-4 group-hover:text-gray-900"/>
                                                 {{ __('Restaurer') }}

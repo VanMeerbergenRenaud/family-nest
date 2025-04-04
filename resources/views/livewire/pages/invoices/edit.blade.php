@@ -197,7 +197,7 @@
                             </x-form.select>
                         </div>
 
-                        {{-- Section de répartition ultra-simplifiée --}}
+                        {{-- Section de répartition avec devise dynamique --}}
                         @if($form->amount > 0 && $form->paid_by_user_id)
                             <div x-data="{ showShareInterface: false }">
                                 <button
@@ -213,21 +213,12 @@
                                     </div>
 
                                     <div class="flex items-center">
-                                        @if($form->user_shares)
-                                            @php
-                                                $totalShares = count($form->user_shares);
-                                                $totalPercent = 0;
-                                                foreach($form->user_shares as $share) {
-                                                    $totalPercent += $share['percentage'] ?? 0;
-                                                }
-                                                $isComplete = $totalPercent >= 99.9;
-                                            @endphp
-
-                                            @if($totalShares > 0)
-                                                <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $isComplete ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                    {{ $totalShares }} {{ $totalShares === 1 ? 'membre' : 'membres' }} • {{ number_format($totalPercent, 0) }}%
-                                                </span>
-                                            @endif
+                                        @php $shareSummary = $this->getShareSummary(); @endphp
+                                        @if($shareSummary['totalShares'] > 0)
+                                            <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                                {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
+                                                {{ $shareSummary['formattedTotalPercent'] }}%
+                                            </span>
                                         @endif
 
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 transition-transform" :class="{'rotate-180': showShareInterface}" viewBox="0 0 20 20" fill="currentColor">
@@ -254,56 +245,42 @@
                                                 <button type="button"
                                                         wire:click="$set('shareMode', 'amount')"
                                                         class="w-7 h-7 flex-center text-xs rounded-md {{ $shareMode === 'amount' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700' }}">
-                                                    €
+                                                    {{ $this->getCurrencySymbol() }}
                                                 </button>
                                             </div>
                                         </div>
 
                                         <div class="ml-2 text-xs text-right px-2 py-1 rounded-md {{ $remainingPercentage <= 0.1 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             @if($shareMode === 'percentage')
-                                                {{ number_format($remainingPercentage, 1) }}% non attribués
+                                                {{ \Illuminate\Support\Number::format($remainingPercentage, 1, locale: 'fr_FR') }}% non attribués
                                             @else
-                                                {{ number_format($remainingAmount, 2) }}€ non attribués
+                                                {{ \Illuminate\Support\Number::currency($remainingAmount, $form->currency ?? 'EUR', locale: 'fr_FR') }} non attribués
                                             @endif
                                         </div>
                                     </div>
 
                                     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
                                         @foreach($family_members as $member)
-                                            @php
-                                                $memberShare = null;
-                                                $memberShareIndex = null;
-                                                foreach($form->user_shares as $index => $share) {
-                                                    if ($share['id'] == $member->id) {
-                                                        $memberShare = $share;
-                                                        $memberShareIndex = $index;
-                                                        break;
-                                                    }
-                                                }
-                                                $hasShare = $memberShare !== null;
-                                            @endphp
-
-                                            <li class="flex items-center p-2 border {{ $hasShare ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
-
+                                            @php $memberShare = $this->getMemberShareInfo($member->id); @endphp
+                                            <li class="flex items-center p-2 border {{ $memberShare['hasShare'] ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
                                                 </div>
-
                                                 <span class="text-xs font-medium ml-2 mr-auto truncate max-w-[80px]">{{ $member->name }}</span>
 
-                                                @if($hasShare)
+                                                @if($memberShare['hasShare'])
                                                     <div class="flex items-center">
                                                         <input
                                                             type="number"
                                                             step="0.01"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
-                                                            wire:model="form.user_shares.{{ $memberShareIndex }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
+                                                            wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
                                                             wire:change="updateShare({{ $member->id }}, $event.target.value, '{{ $shareMode }}')"
                                                             class="min-w-16 p-1 text-xs border border-gray-300 rounded-l-md text-right"
                                                         />
                                                         <span class="bg-gray-100 p-1 text-xs border border-l-0 border-gray-300 rounded-r-md w-6 text-center">
-                                                            {{ $shareMode === 'percentage' ? '%' : '€' }}
+                                                            {{ $shareMode === 'percentage' ? '%' : $this->getCurrencySymbol() }}
                                                         </span>
                                                         <button type="button" wire:click="removeShare({{ $member->id }})" class="ml-1 text-red-500 hover:text-red-700 w-5 h-5 flex-center">
                                                             <x-svg.cross />
@@ -322,7 +299,7 @@
                                 </div>
                             </div>
                         @else
-                            <div class="py-2 px-3 bg-orange-50 border border-orange-200 rounded-md text-xs text-orange-600">
+                            <div class="py-2 px-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs text-yellow-600">
                                 Veuillez saisir un montant pour pouvoir le répartir entre les membres.
                             </div>
                         @endif

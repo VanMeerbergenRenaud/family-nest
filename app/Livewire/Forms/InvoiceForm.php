@@ -129,7 +129,7 @@ class InvoiceForm extends Form
 
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
-            'currency' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, InvoiceCurrencyEnum::cases())),
+            'currency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, InvoiceCurrencyEnum::cases())),
             'paid_by_user_id' => 'exists:users,id',
             'family_id' => 'nullable|exists:families,id',
             'user_shares' => 'nullable|array',
@@ -141,12 +141,12 @@ class InvoiceForm extends Form
             'issued_date' => 'nullable|date',
             'payment_due_date' => 'nullable|date',
             'payment_reminder' => 'nullable|date',
-            'payment_frequency' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, PaymentFrequencyEnum::cases())),
+            'payment_frequency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, PaymentFrequencyEnum::cases())),
 
             // Étape 4 - Statut de paiement
-            'payment_status' => 'nullable|string|in:' . implode(',', array_map(fn($case) => $case->value, PaymentStatusEnum::cases())),
-            'payment_method' => 'nullable|in:' . implode(',', array_map(fn($case) => $case->value, PaymentMethodEnum::cases())),
-            'priority' => 'nullable|in:' . implode(',', array_map(fn($case) => $case->value, PriorityEnum::cases())),
+            'payment_status' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, PaymentStatusEnum::cases())),
+            'payment_method' => 'nullable|in:'.implode(',', array_map(fn ($case) => $case->value, PaymentMethodEnum::cases())),
+            'priority' => 'nullable|in:'.implode(',', array_map(fn ($case) => $case->value, PriorityEnum::cases())),
 
             // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',
@@ -221,7 +221,7 @@ class InvoiceForm extends Form
                     }
 
                     // If no emoji found, fallback to the original category
-                    if (!isset($this->availableCategories[$category])) {
+                    if (! isset($this->availableCategories[$category])) {
                         $this->availableCategories[$category] = $category;
                     }
                 }
