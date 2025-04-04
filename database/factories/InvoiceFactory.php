@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Enums\InvoiceCategoryEnum;
-use App\Enums\InvoiceCurrencyEnum;
-use App\Enums\InvoiceTypeEnum;
+use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\User;
 use Carbon\Carbon;
@@ -36,21 +35,24 @@ class InvoiceFactory extends Factory
         $users = User::all();
         $userId = $users->count() > 0 ? $users->random()->id : 1;
 
+        $type = $this->faker->randomElement(TypeEnum::cases())->value;
+        $category = $this->faker->randomElement(TypeEnum::from($type)->categories());
+
         $issuedDate = $this->faker->dateTimeBetween('-2 year', 'now');
         $paymentDueDate = $this->faker->dateTimeBetween($issuedDate, '+2 month');
 
         return [
             // Informations générales
             'name' => $this->faker->words(3, true),
-            'reference' => $this->faker->bothify('INV-#####-???'),
-            'type' => $this->faker->randomElement(InvoiceTypeEnum::cases())->value,
-            'category' => $this->faker->randomElement(InvoiceCategoryEnum::cases())->value,
+            'reference' => $this->faker->bothify('INV-#####'),
+            'type' => $type,
+            'category' => $category,
             'issuer_name' => $this->faker->company(),
             'issuer_website' => $this->faker->url(),
 
             // Détails financiers
             'amount' => $this->faker->randomFloat(2, 10, 1000),
-            'currency' => $this->faker->randomElement(InvoiceCurrencyEnum::cases())->value,
+            'currency' => $this->faker->randomElement(CurrencyEnum::cases())->value,
             'paid_by_user_id' => $this->faker->randomElement($users->pluck('id')->toArray()),
 
             // Dates

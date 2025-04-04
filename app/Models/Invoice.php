@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Enums\InvoiceCategoryEnum;
-use App\Enums\InvoiceTypeEnum;
+use App\Enums\CategoryEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\TypeEnum;
 use App\Traits\HumanDateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,8 +29,8 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'type' => InvoiceTypeEnum::class,
-        'category' => InvoiceCategoryEnum::class,
+        'type' => TypeEnum::class,
+        'category' => CategoryEnum::class,
         'amount' => 'decimal:2',
         'issued_date' => 'date',
         'payment_due_date' => 'date',

@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InvoiceTypeEnum: string
+enum TypeEnum: string
 {
     case ABONNEMENTS = 'Abonnements';
     case ACHATS_MAISON = 'Achats de la maison';

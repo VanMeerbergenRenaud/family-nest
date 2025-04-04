@@ -2,13 +2,13 @@
 
 namespace App\Livewire\Forms;
 
-use App\Enums\InvoiceCategoryEnum;
-use App\Enums\InvoiceCurrencyEnum;
-use App\Enums\InvoiceTypeEnum;
+use App\Enums\CategoryEnum;
+use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Services\FileStorageService;
@@ -129,7 +129,7 @@ class InvoiceForm extends Form
 
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
-            'currency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, InvoiceCurrencyEnum::cases())),
+            'currency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, CurrencyEnum::cases())),
             'paid_by_user_id' => 'exists:users,id',
             'family_id' => 'nullable|exists:families,id',
             'user_shares' => 'nullable|array',
@@ -203,16 +203,16 @@ class InvoiceForm extends Form
     {
         if ($this->type) {
             try {
-                $typeEnum = $this->type instanceof InvoiceTypeEnum
+                $typeEnum = $this->type instanceof TypeEnum
                     ? $this->type
-                    : InvoiceTypeEnum::from($this->type);
+                    : TypeEnum::from($this->type);
 
                 $categoriesForType = $typeEnum->categories();
 
                 $this->availableCategories = [];
 
                 foreach ($categoriesForType as $category) {
-                    foreach (InvoiceCategoryEnum::cases() as $case) {
+                    foreach (CategoryEnum::cases() as $case) {
                         if ($case->value === $category) {
                             // Add the emoji to the label
                             $this->availableCategories[$category] = $case->labelWithEmoji();

@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use App\Enums\InvoiceCurrencyEnum;
+use App\Enums\CurrencyEnum;
 use Illuminate\Support\Number;
 use ValueError;
 
@@ -164,7 +164,7 @@ trait InvoiceShareCalculationTrait
     public function getCurrencySymbol(): string
     {
         try {
-            return InvoiceCurrencyEnum::from($this->form->currency ?? 'EUR')->symbol();
+            return CurrencyEnum::from($this->form->currency ?? 'EUR')->symbol();
         } catch (ValueError) {
             return $this->form->currency ?? '€';
         }

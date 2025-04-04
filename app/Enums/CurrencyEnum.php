@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Illuminate\Support\Number;
 
-enum InvoiceCurrencyEnum: string
+enum CurrencyEnum: string
 {
     case EUR = 'EUR';
     case USD = 'USD';

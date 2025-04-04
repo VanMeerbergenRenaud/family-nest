@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Pages\Invoices;
 
-use App\Enums\InvoiceTypeEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Services\FileStorageService;
@@ -112,7 +112,7 @@ class Edit extends Component
     public function render()
     {
         return view('livewire.pages.invoices.edit', [
-            'invoiceTypes' => InvoiceTypeEnum::getTypesOptionsWithEmojis(),
+            'invoiceTypes' => TypeEnum::getTypesOptionsWithEmojis(),
             'paymentStatuses' => PaymentStatusEnum::getStatusOptionsWithEmojis(),
             'paymentMethods' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
             'paymentFrequencies' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),

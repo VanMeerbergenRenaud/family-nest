@@ -2,11 +2,11 @@
 
 namespace App\Livewire\Pages\Invoices;
 
-use App\Enums\InvoiceTypeEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
+use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Services\FileStorageService;
 use App\Traits\InvoiceShareCalculationTrait;
@@ -88,7 +88,7 @@ class Create extends Component
         $this->calculateRemainingShares();
 
         return view('livewire.pages.invoices.create', [
-            'invoiceTypes' => InvoiceTypeEnum::getTypesOptionsWithEmojis(),
+            'invoiceTypes' => TypeEnum::getTypesOptionsWithEmojis(),
             'paymentStatuses' => PaymentStatusEnum::getStatusOptionsWithEmojis(),
             'paymentMethods' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
             'paymentFrequencies' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),

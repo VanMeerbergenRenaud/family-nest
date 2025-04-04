@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InvoiceCategoryEnum: string
+enum CategoryEnum: string
 {
     // Abonnements
     case ABO_ALIMENTAIRE = 'Abonnement alimentaire';
@@ -260,16 +260,16 @@ enum InvoiceCategoryEnum: string
         return $this->emoji().'&nbsp;&nbsp;'.$this->value;
     }
 
-    public function getType(): InvoiceTypeEnum
+    public function getType(): TypeEnum
     {
-        foreach (InvoiceTypeEnum::cases() as $type) {
+        foreach (TypeEnum::cases() as $type) {
             if (in_array($this->value, $type->categories())) {
                 return $type;
             }
         }
 
         // Default
-        return InvoiceTypeEnum::DIVERS;
+        return TypeEnum::DIVERS;
     }
 
     public static function getCategoryOptions(): array
@@ -292,7 +292,7 @@ enum InvoiceCategoryEnum: string
         return $options;
     }
 
-    public static function getCategoriesForType(InvoiceTypeEnum $type): array
+    public static function getCategoriesForType(TypeEnum $type): array
     {
         $categories = [];
         foreach (self::cases() as $case) {
@@ -304,7 +304,7 @@ enum InvoiceCategoryEnum: string
         return $categories;
     }
 
-    public static function getCategoriesForTypeWithEmojis(InvoiceTypeEnum $type): array
+    public static function getCategoriesForTypeWithEmojis(TypeEnum $type): array
     {
         $categories = [];
         foreach (self::cases() as $case) {
