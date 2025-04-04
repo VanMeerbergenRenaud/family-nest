@@ -2,7 +2,7 @@
     'label',
     'name',
     'model' => '',
-    'placeholder' => '',
+    'placeholder' => 'jj/mm/aaaa',
     'asterix' => false,
 ])
 

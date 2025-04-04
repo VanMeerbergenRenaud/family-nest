@@ -69,7 +69,7 @@
                                     </div>
 
                                     <div class="flex flex-col">
-                                        <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ ucfirst($invoice->name) }}</span>
+                                        <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ $invoice->name ?? 'Non inconnu' }}</span>
                                     </div>
                                 </div>
                             </td>

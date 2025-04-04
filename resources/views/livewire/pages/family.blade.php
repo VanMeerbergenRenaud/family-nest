@@ -154,7 +154,7 @@
                                         <p class="flex flex-col">
                                            <span
                                                class="text-sm-medium text-gray-900 dark:text-gray-400">
-                                               {{ ucfirst($member->name) }}
+                                               {{ $member->name ?? 'Nom inconnu' }}
                                                @if($member->id === $currentUser)
                                                    <span class="ml-2 text-xs-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full">Vous</span>
                                                @endif

@@ -1,6 +1,6 @@
 <div>
     @if ($spotlightOpen)
-        <div class="fixed z-50 inset-0 overflow-y-auto"
+        <div class="fixed z-80 inset-0 overflow-y-auto"
              aria-labelledby="Barre de recherche"
              role="dialog"
              aria-modal="true"

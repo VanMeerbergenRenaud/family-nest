@@ -6,7 +6,7 @@
 <div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
         <x-invoices.create.summary-item label="Nom de la facture" :alternateBackground="true">
-            {{ ucfirst($form->name) ?? 'Non spécifié' }}
+            {{ $form->name ?? 'Non spécifié' }}
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Type et catégorie">
