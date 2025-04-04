@@ -49,7 +49,7 @@ enum InvoiceTypeEnum: string
 
     public function labelWithEmoji(): string
     {
-        return $this->emoji() . '&nbsp;&nbsp;' . $this->value;
+        return $this->emoji().'&nbsp;&nbsp;'.$this->value;
     }
 
     public function categories(): array

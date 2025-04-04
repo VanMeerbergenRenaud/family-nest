@@ -14,77 +14,77 @@ enum PriorityEnum: string
     public function label(): string
     {
         return match ($this) {
-            static::Critical => 'Critique',
-            static::High => 'Élevée',
-            static::Medium => 'Moyenne',
-            static::Low => 'Basse',
-            static::Minimal => 'Minimale',
-            static::None => 'Aucune',
+            self::Critical => 'Critique',
+            self::High => 'Élevée',
+            self::Medium => 'Moyenne',
+            self::Low => 'Basse',
+            self::Minimal => 'Minimale',
+            self::None => 'Aucune',
         };
     }
 
     public function emoji(): string
     {
         return match ($this) {
-            static::Critical => '🚨',
-            static::High => '⚠️',
-            static::Medium => '📊',
-            static::Low => '🔽',
-            static::Minimal => '🕸️',
-            static::None => '🤷',
+            self::Critical => '🚨',
+            self::High => '⚠️',
+            self::Medium => '📊',
+            self::Low => '🔽',
+            self::Minimal => '🕸️',
+            self::None => '🤷',
         };
     }
 
     public function labelWithEmoji(): string
     {
-        return $this->emoji() . '&nbsp;&nbsp;' . $this->label();
+        return $this->emoji().'&nbsp;&nbsp;'.$this->label();
     }
 
     public function color(): string
     {
         return match ($this) {
-            static::Critical => 'rose',
-            static::High => 'red',
-            static::Medium => 'yellow',
-            static::Low => 'blue',
-            static::Minimal => 'teal',
-            static::None => 'gray',
+            self::Critical => 'rose',
+            self::High => 'red',
+            self::Medium => 'yellow',
+            self::Low => 'blue',
+            self::Minimal => 'teal',
+            self::None => 'gray',
         };
     }
 
     public function notificationDays(): int
     {
         return match ($this) {
-            static::Critical => 7,
-            static::High => 5,
-            static::Medium => 3,
-            static::Low => 2,
-            static::Minimal => 1,
-            static::None => 0,
+            self::Critical => 7,
+            self::High => 5,
+            self::Medium => 3,
+            self::Low => 2,
+            self::Minimal => 1,
+            self::None => 0,
         };
     }
 
     public static function getPriorityOptions(): array
     {
         return [
-            static::Critical->value => static::Critical->label(),
-            static::High->value => static::High->label(),
-            static::Medium->value => static::Medium->label(),
-            static::Low->value => static::Low->label(),
-            static::Minimal->value => static::Minimal->label(),
-            static::None->value => static::None->label(),
+            self::Critical->value => self::Critical->label(),
+            self::High->value => self::High->label(),
+            self::Medium->value => self::Medium->label(),
+            self::Low->value => self::Low->label(),
+            self::Minimal->value => self::Minimal->label(),
+            self::None->value => self::None->label(),
         ];
     }
 
     public static function getPriorityOptionsWithEmojis(): array
     {
         return [
-            static::Critical->value => static::Critical->labelWithEmoji(),
-            static::High->value => static::High->labelWithEmoji(),
-            static::Medium->value => static::Medium->labelWithEmoji(),
-            static::Low->value => static::Low->labelWithEmoji(),
-            static::Minimal->value => static::Minimal->labelWithEmoji(),
-            static::None->value => static::None->labelWithEmoji(),
+            self::Critical->value => self::Critical->labelWithEmoji(),
+            self::High->value => self::High->labelWithEmoji(),
+            self::Medium->value => self::Medium->labelWithEmoji(),
+            self::Low->value => self::Low->labelWithEmoji(),
+            self::Minimal->value => self::Minimal->labelWithEmoji(),
+            self::None->value => self::None->labelWithEmoji(),
         ];
     }
 }

@@ -14,65 +14,65 @@ enum PaymentMethodEnum: string
     public function label(): string
     {
         return match ($this) {
-            static::Card => 'Carte bancaire',
-            static::Cash => 'Espèces',
-            static::Transfer => 'Virement',
-            static::DirectDebit => 'Prélèvement automatique',
-            static::Check => 'Chèque',
-            static::GiftCard => 'Carte cadeau',
+            self::Card => 'Carte bancaire',
+            self::Cash => 'Espèces',
+            self::Transfer => 'Virement',
+            self::DirectDebit => 'Prélèvement automatique',
+            self::Check => 'Chèque',
+            self::GiftCard => 'Carte cadeau',
         };
     }
 
     public function emoji(): string
     {
         return match ($this) {
-            static::Card => '💳',
-            static::Cash => '💵',
-            static::Transfer => '🏦',
-            static::DirectDebit => '🔁',
-            static::Check => '📝',
-            static::GiftCard => '🎁',
+            self::Card => '💳',
+            self::Cash => '💵',
+            self::Transfer => '🏦',
+            self::DirectDebit => '🔁',
+            self::Check => '📝',
+            self::GiftCard => '🎁',
         };
     }
 
     public function labelWithEmoji(): string
     {
-        return $this->emoji() . '&nbsp;&nbsp;' . $this->label();
+        return $this->emoji().'&nbsp;&nbsp;'.$this->label();
     }
 
     public function color(): string
     {
         return match ($this) {
-            static::Card => 'blue',
-            static::Cash => 'green',
-            static::Transfer => 'purple',
-            static::DirectDebit => 'indigo',
-            static::Check => 'gray',
-            static::GiftCard => 'pink',
+            self::Card => 'blue',
+            self::Cash => 'green',
+            self::Transfer => 'purple',
+            self::DirectDebit => 'indigo',
+            self::Check => 'gray',
+            self::GiftCard => 'pink',
         };
     }
 
     public static function getMethodOptions(): array
     {
         return [
-            static::Card->value => static::Card->label(),
-            static::Cash->value => static::Cash->label(),
-            static::Transfer->value => static::Transfer->label(),
-            static::DirectDebit->value => static::DirectDebit->label(),
-            static::Check->value => static::Check->label(),
-            static::GiftCard->value => static::GiftCard->label(),
+            self::Card->value => self::Card->label(),
+            self::Cash->value => self::Cash->label(),
+            self::Transfer->value => self::Transfer->label(),
+            self::DirectDebit->value => self::DirectDebit->label(),
+            self::Check->value => self::Check->label(),
+            self::GiftCard->value => self::GiftCard->label(),
         ];
     }
 
     public static function getMethodOptionsWithEmojis(): array
     {
         return [
-            static::Card->value => static::Card->labelWithEmoji(),
-            static::Cash->value => static::Cash->labelWithEmoji(),
-            static::Transfer->value => static::Transfer->labelWithEmoji(),
-            static::DirectDebit->value => static::DirectDebit->labelWithEmoji(),
-            static::Check->value => static::Check->labelWithEmoji(),
-            static::GiftCard->value => static::GiftCard->labelWithEmoji(),
+            self::Card->value => self::Card->labelWithEmoji(),
+            self::Cash->value => self::Cash->labelWithEmoji(),
+            self::Transfer->value => self::Transfer->labelWithEmoji(),
+            self::DirectDebit->value => self::DirectDebit->labelWithEmoji(),
+            self::Check->value => self::Check->labelWithEmoji(),
+            self::GiftCard->value => self::GiftCard->labelWithEmoji(),
         ];
     }
 }

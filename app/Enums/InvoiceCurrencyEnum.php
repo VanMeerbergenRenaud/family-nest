@@ -146,7 +146,7 @@ enum InvoiceCurrencyEnum: string
 
     public function labelWithEmoji(): string
     {
-        return $this->flag() . '&nbsp;&nbsp;' . $this->value . ' - ' . $this->symbolWithIndicator();
+        return $this->flag().'&nbsp;&nbsp;'.$this->value.' - '.$this->symbolWithIndicator();
     }
 
     public function format(float $amount, string $locale = 'fr_FR'): string
@@ -158,8 +158,9 @@ enum InvoiceCurrencyEnum: string
     {
         $options = [];
         foreach (self::cases() as $case) {
-            $options[$case->value] = $case->value . ' - ' . $case->name();
+            $options[$case->value] = $case->value.' - '.$case->name();
         }
+
         return $options;
     }
 
@@ -169,6 +170,7 @@ enum InvoiceCurrencyEnum: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->labelWithEmoji();
         }
+
         return $options;
     }
 }

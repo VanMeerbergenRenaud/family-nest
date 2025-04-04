@@ -257,7 +257,7 @@ enum InvoiceCategoryEnum: string
 
     public function labelWithEmoji(): string
     {
-        return $this->emoji() . '&nbsp;&nbsp;' . $this->value;
+        return $this->emoji().'&nbsp;&nbsp;'.$this->value;
     }
 
     public function getType(): InvoiceTypeEnum
@@ -278,6 +278,7 @@ enum InvoiceCategoryEnum: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->value;
         }
+
         return $options;
     }
 
@@ -287,6 +288,7 @@ enum InvoiceCategoryEnum: string
         foreach (self::cases() as $case) {
             $options[$case->value] = $case->labelWithEmoji();
         }
+
         return $options;
     }
 
@@ -298,6 +300,7 @@ enum InvoiceCategoryEnum: string
                 $categories[$case->value] = $case->value;
             }
         }
+
         return $categories;
     }
 
@@ -309,6 +312,7 @@ enum InvoiceCategoryEnum: string
                 $categories[$case->value] = $case->labelWithEmoji();
             }
         }
+
         return $categories;
     }
 }
