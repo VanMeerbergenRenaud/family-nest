@@ -279,23 +279,33 @@
                                 />
                             </x-menu.item>
 
-                            <x-menu.item wire:click="toggleColumn('issued_date')">
+                            <x-menu.item wire:click="toggleColumn('type')">
                                 <x-form.checkbox-input
-                                    name="column_issued_date"
-                                    model="visibleColumns.issued_date"
-                                    label="Date d'émission"
-                                    :checked="isset($visibleColumns['issued_date']) && $visibleColumns['issued_date']"
-                                    wire:click="toggleColumn('issued_date')"
+                                    name="column_type"
+                                    model="visibleColumns.type"
+                                    label="Type"
+                                    :checked="isset($visibleColumns['type']) && $visibleColumns['type']"
+                                    wire:click="toggleColumn('type')"
                                 />
                             </x-menu.item>
 
-                            <x-menu.item wire:click="toggleColumn('payment_due_date')">
+                            <x-menu.item wire:click="toggleColumn('category')">
                                 <x-form.checkbox-input
-                                    name="column_payment_due_date"
-                                    model="visibleColumns.payment_due_date"
-                                    label="Date d'échéance"
-                                    :checked="isset($visibleColumns['payment_due_date']) && $visibleColumns['payment_due_date']"
-                                    wire:click="toggleColumn('payment_due_date')"
+                                    name="column_category"
+                                    model="visibleColumns.category"
+                                    label="Catégorie"
+                                    :checked="isset($visibleColumns['category']) && $visibleColumns['category']"
+                                    wire:click="toggleColumn('category')"
+                                />
+                            </x-menu.item>
+
+                            <x-menu.item wire:click="toggleColumn('issuer_name')">
+                                <x-form.checkbox-input
+                                    name="column_issuer_name"
+                                    model="visibleColumns.issuer_name"
+                                    label="Émetteur"
+                                    :checked="isset($visibleColumns['issuer_name']) && $visibleColumns['issuer_name']"
+                                    wire:click="toggleColumn('issuer_name')"
                                 />
                             </x-menu.item>
 
@@ -319,33 +329,23 @@
                                 />
                             </x-menu.item>
 
-                            <x-menu.item wire:click="toggleColumn('issuer_name')">
+                            <x-menu.item wire:click="toggleColumn('issued_date')">
                                 <x-form.checkbox-input
-                                    name="column_issuer_name"
-                                    model="visibleColumns.issuer_name"
-                                    label="Émetteur"
-                                    :checked="isset($visibleColumns['issuer_name']) && $visibleColumns['issuer_name']"
-                                    wire:click="toggleColumn('issuer_name')"
+                                    name="column_issued_date"
+                                    model="visibleColumns.issued_date"
+                                    label="Date d'émission"
+                                    :checked="isset($visibleColumns['issued_date']) && $visibleColumns['issued_date']"
+                                    wire:click="toggleColumn('issued_date')"
                                 />
                             </x-menu.item>
 
-                            <x-menu.item wire:click="toggleColumn('type')">
+                            <x-menu.item wire:click="toggleColumn('payment_due_date')">
                                 <x-form.checkbox-input
-                                    name="column_type"
-                                    model="visibleColumns.type"
-                                    label="Type"
-                                    :checked="isset($visibleColumns['type']) && $visibleColumns['type']"
-                                    wire:click="toggleColumn('type')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('category')">
-                                <x-form.checkbox-input
-                                    name="column_category"
-                                    model="visibleColumns.category"
-                                    label="Catégorie"
-                                    :checked="isset($visibleColumns['category']) && $visibleColumns['category']"
-                                    wire:click="toggleColumn('category')"
+                                    name="column_payment_due_date"
+                                    model="visibleColumns.payment_due_date"
+                                    label="Date d'échéance"
+                                    :checked="isset($visibleColumns['payment_due_date']) && $visibleColumns['payment_due_date']"
+                                    wire:click="toggleColumn('payment_due_date')"
                                 />
                             </x-menu.item>
 
@@ -545,24 +545,17 @@
                             @if($visibleColumns['payment_status'] ?? false)
                                 <td>
                                     @php
-                                        $statusClass = match($invoice->payment_status) {
-                                            'paid' => 'bg-green-100 text-green-800',
-                                            'partially_paid' => 'bg-yellow-100 text-yellow-800',
-                                            'late' => 'bg-red-100 text-red-800',
-                                            default => 'bg-gray-100 text-gray-800',
-                                        };
+                                        $statusEnum = $invoice->payment_status instanceof App\Enums\PaymentStatusEnum
+                                            ? $invoice->payment_status
+                                            : App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status);
 
-                                        $statusText = match($invoice->payment_status) {
-                                            'paid' => 'Payé',
-                                            'partially_paid' => 'Partiellement payé',
-                                            'late' => 'En retard',
-                                            'unpaid' => 'Non payé',
-                                            default => 'Non spécifié',
-                                        };
+                                        $statusClass = $statusEnum ? 'bg-' . $statusEnum->color() . '-100 text-' . $statusEnum->color() . '-800' : 'bg-gray-100 text-gray-800';
+                                        $statusText = $statusEnum ? $statusEnum->label() : 'Non spécifié';
+                                        $statusEmoji = $statusEnum ? $statusEnum->emoji() : '';
                                     @endphp
                                     <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
-                                    {{ $statusText }}
-                                </span>
+                                        {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}
+                                    </span>
                                 </td>
                             @endif
 
@@ -761,24 +754,16 @@
                                         <!-- Pied de la carte -->
                                         <div class="dark:border-gray-800 px-4 py-3 flex justify-between items-center">
                                             @php
-                                                $statusClass = match($invoice->payment_status) {
-                                                    'paid' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-green-100 dark:border-green-800',
-                                                    'partially_paid' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-100 dark:border-amber-800',
-                                                    'late' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-100 dark:border-red-800',
-                                                    default => 'bg-gray-50 text-gray-700 dark:bg-gray-800 dark:text-gray-400 border-gray-100 dark:border-gray-700',
-                                                };
+                                                $statusEnum = $invoice->payment_status instanceof App\Enums\PaymentStatusEnum
+                                                    ? $invoice->payment_status
+                                                    : App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status);
 
-                                                $statusText = match($invoice->payment_status) {
-                                                    'paid' => 'Payé',
-                                                    'partially_paid' => 'Partiellement payé',
-                                                    'late' => 'En retard',
-                                                    'unpaid' => 'Non payé',
-                                                    default => 'Non spécifié',
-                                                };
+                                                $statusClass = $statusEnum ? 'bg-' . $statusEnum->color() . '-100 text-' . $statusEnum->color() . '-800' : 'bg-gray-100 text-gray-800';
+                                                $statusText = $statusEnum ? $statusEnum->label() : 'Non spécifié';
+                                                $statusEmoji = $statusEnum ? $statusEnum->emoji() : '';
                                             @endphp
-                                            <span
-                                                class="px-2.5 py-1 {{ $statusClass }} rounded-full text-xs font-medium border">
-                                                {{ $statusText }}
+                                            <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
+                                                {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}
                                             </span>
 
                                             <div class="flex gap-1">

@@ -47,7 +47,7 @@ class Index extends Component
         'issuer_name' => false,
         'amount' => true,
         'issued_date' => true,
-        'payment_status' => false,
+        'payment_status' => true,
         'payment_due_date' => false,
         'tags' => true,
     ];
@@ -253,12 +253,12 @@ class Index extends Component
     {
         $this->visibleColumns = [
             'name' => true,
-            'issued_date' => true,
             'type' => false,
             'category' => false,
             'issuer_name' => false,
             'amount' => true,
-            'payment_status' => false,
+            'issued_date' => true,
+            'payment_status' => true,
             'payment_due_date' => false,
             'tags' => true,
         ];
