@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
+
 enum CategoryEnum: string
 {
+    use EnumLabelTrait;
+
     // Abonnements
     case ABO_ALIMENTAIRE = 'Abonnement alimentaire';
     case ABO_INTERNET_TELECOM = 'Abonnement internet & télécommunications';
@@ -255,15 +259,11 @@ enum CategoryEnum: string
         };
     }
 
-    public function labelWithEmoji(): string
-    {
-        return $this->emoji().'&nbsp;&nbsp;'.$this->value;
-    }
-
     public function getType(): TypeEnum
     {
         foreach (TypeEnum::cases() as $type) {
-            if (in_array($this->value, $type->categories())) {
+            // Check if the current enum is in the category enums of the type
+            if (in_array($this, $type->categoryEnums())) {
                 return $type;
             }
         }
@@ -274,31 +274,19 @@ enum CategoryEnum: string
 
     public static function getCategoryOptions(): array
     {
-        $options = [];
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->value;
-        }
-
-        return $options;
+        return self::getOptions();
     }
 
     public static function getCategoryOptionsWithEmojis(): array
     {
-        $options = [];
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->labelWithEmoji();
-        }
-
-        return $options;
+        return self::getOptionsWithEmojis();
     }
 
     public static function getCategoriesForType(TypeEnum $type): array
     {
         $categories = [];
-        foreach (self::cases() as $case) {
-            if ($case->getType() === $type) {
-                $categories[$case->value] = $case->value;
-            }
+        foreach ($type->categoryEnums() as $categoryEnum) {
+            $categories[$categoryEnum->value] = $categoryEnum->value;
         }
 
         return $categories;
@@ -307,10 +295,8 @@ enum CategoryEnum: string
     public static function getCategoriesForTypeWithEmojis(TypeEnum $type): array
     {
         $categories = [];
-        foreach (self::cases() as $case) {
-            if ($case->getType() === $type) {
-                $categories[$case->value] = $case->labelWithEmoji();
-            }
+        foreach ($type->categoryEnums() as $categoryEnum) {
+            $categories[$categoryEnum->value] = $categoryEnum->labelWithEmoji();
         }
 
         return $categories;

@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
+
 enum PaymentFrequencyEnum: string
 {
+    use EnumLabelTrait;
+
     case Daily = 'daily';
     case Weekly = 'weekly';
     case Monthly = 'monthly';
@@ -38,11 +42,6 @@ enum PaymentFrequencyEnum: string
         };
     }
 
-    public function labelWithEmoji(): string
-    {
-        return $this->emoji().'&nbsp;&nbsp;'.$this->label();
-    }
-
     public function color(): string
     {
         return match ($this) {
@@ -71,27 +70,11 @@ enum PaymentFrequencyEnum: string
 
     public static function getFrequencyOptions(): array
     {
-        return [
-            self::Daily->value => self::Daily->label(),
-            self::Weekly->value => self::Weekly->label(),
-            self::Monthly->value => self::Monthly->label(),
-            self::Quarterly->value => self::Quarterly->label(),
-            self::SemiAnnually->value => self::SemiAnnually->label(),
-            self::Annually->value => self::Annually->label(),
-            self::OneTime->value => self::OneTime->label(),
-        ];
+        return self::getOptions();
     }
 
     public static function getFrequencyOptionsWithEmojis(): array
     {
-        return [
-            self::Daily->value => self::Daily->labelWithEmoji(),
-            self::Weekly->value => self::Weekly->labelWithEmoji(),
-            self::Monthly->value => self::Monthly->labelWithEmoji(),
-            self::Quarterly->value => self::Quarterly->labelWithEmoji(),
-            self::SemiAnnually->value => self::SemiAnnually->labelWithEmoji(),
-            self::Annually->value => self::Annually->labelWithEmoji(),
-            self::OneTime->value => self::OneTime->labelWithEmoji(),
-        ];
+        return self::getOptionsWithEmojis();
     }
 }

@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
+
 enum PriorityEnum: string
 {
+    use EnumLabelTrait;
+
     case Critical = 'critical';
     case High = 'high';
     case Medium = 'medium';
@@ -35,11 +39,6 @@ enum PriorityEnum: string
         };
     }
 
-    public function labelWithEmoji(): string
-    {
-        return $this->emoji().'&nbsp;&nbsp;'.$this->label();
-    }
-
     public function color(): string
     {
         return match ($this) {
@@ -52,39 +51,13 @@ enum PriorityEnum: string
         };
     }
 
-    public function notificationDays(): int
-    {
-        return match ($this) {
-            self::Critical => 7,
-            self::High => 5,
-            self::Medium => 3,
-            self::Low => 2,
-            self::Minimal => 1,
-            self::None => 0,
-        };
-    }
-
     public static function getPriorityOptions(): array
     {
-        return [
-            self::Critical->value => self::Critical->label(),
-            self::High->value => self::High->label(),
-            self::Medium->value => self::Medium->label(),
-            self::Low->value => self::Low->label(),
-            self::Minimal->value => self::Minimal->label(),
-            self::None->value => self::None->label(),
-        ];
+        return self::getOptions();
     }
 
     public static function getPriorityOptionsWithEmojis(): array
     {
-        return [
-            self::Critical->value => self::Critical->labelWithEmoji(),
-            self::High->value => self::High->labelWithEmoji(),
-            self::Medium->value => self::Medium->labelWithEmoji(),
-            self::Low->value => self::Low->labelWithEmoji(),
-            self::Minimal->value => self::Minimal->labelWithEmoji(),
-            self::None->value => self::None->labelWithEmoji(),
-        ];
+        return self::getOptionsWithEmojis();
     }
 }

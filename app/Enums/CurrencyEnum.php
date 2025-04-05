@@ -2,10 +2,13 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
 use Illuminate\Support\Number;
 
 enum CurrencyEnum: string
 {
+    use EnumLabelTrait;
+
     case EUR = 'EUR';
     case USD = 'USD';
     case GBP = 'GBP';
@@ -144,6 +147,11 @@ enum CurrencyEnum: string
         };
     }
 
+    public function label(): string
+    {
+        return $this->value.' - '.$this->name();
+    }
+
     public function labelWithEmoji(): string
     {
         return $this->flag().'&nbsp;&nbsp;'.$this->value.' - '.$this->symbolWithIndicator();
@@ -166,11 +174,6 @@ enum CurrencyEnum: string
 
     public static function getCurrencyOptionsWithEmojis(): array
     {
-        $options = [];
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->labelWithEmoji();
-        }
-
-        return $options;
+        return self::getOptionsWithEmojis();
     }
 }

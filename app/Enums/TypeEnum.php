@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
+
 enum TypeEnum: string
 {
+    use EnumLabelTrait;
+
     case ABONNEMENTS = 'Abonnements';
     case ACHATS_MAISON = 'Achats de la maison';
     case ALIMENTATION_COURSES = 'Alimentation et Courses';
@@ -47,157 +51,150 @@ enum TypeEnum: string
         };
     }
 
-    public function labelWithEmoji(): string
-    {
-        return $this->emoji().'&nbsp;&nbsp;'.$this->value;
-    }
-
-    public function categories(): array
+    public function categoryEnums(): array
     {
         return match ($this) {
             self::ABONNEMENTS => [
-                'Abonnement alimentaire',
-                'Abonnement internet & télécommunications',
-                'Abonnement jeux Vidéo en ligne',
-                'Abonnement logiciels professionnels',
-                'Abonnement magazines/revues',
-                'Abonnement plateformes de streaming musical',
-                'Abonnement plateformes de streaming vidéo',
-                'Abonnement salles ou clubs de sport',
-                'Abonnement services de mobilité',
-                'Abonnement services en ligne',
-                'Abonnement télévision/IPTV',
-                'Abonnement transports en commun',
+                CategoryEnum::ABO_ALIMENTAIRE,
+                CategoryEnum::ABO_INTERNET_TELECOM,
+                CategoryEnum::ABO_JEUX_VIDEO,
+                CategoryEnum::ABO_LOGICIELS_PRO,
+                CategoryEnum::ABO_MAGAZINES,
+                CategoryEnum::ABO_MOBILITE,
+                CategoryEnum::ABO_SERVICES_LIGNE,
+                CategoryEnum::ABO_SPORT,
+                CategoryEnum::ABO_STREAMING_MUSIQUE,
+                CategoryEnum::ABO_STREAMING_VIDEO,
+                CategoryEnum::ABO_TELEVISION,
+                CategoryEnum::ABO_TRANSPORTS,
             ],
             self::ACHATS_MAISON => [
-                'Aménagement intérieur',
-                'Décoration',
-                'Gros électroménager',
-                'Meubles',
-                'Petit électroménager',
-                'Sécurité',
+                CategoryEnum::AMENAGEMENT,
+                CategoryEnum::DECORATION,
+                CategoryEnum::GROS_ELECTROMENAGER,
+                CategoryEnum::MEUBLES,
+                CategoryEnum::PETIT_ELECTROMENAGER,
+                CategoryEnum::SECURITE,
             ],
             self::ALIMENTATION_COURSES => [
-                'Livraison de repas',
-                'Restaurants',
-                'Supermarché',
+                CategoryEnum::LIVRAISON_REPAS,
+                CategoryEnum::RESTAURANTS,
+                CategoryEnum::SUPERMARCHE,
             ],
             self::ANIMAUX => [
-                'Nourriture',
-                'Vétérinaire',
-                'Toilettage',
-                'Accessoires',
-                'Pension',
-                'Assurance',
-                'Dressage',
-                'Activités',
+                CategoryEnum::ANIMAUX_NOURRITURE,
+                CategoryEnum::ANIMAUX_VETERINAIRE,
+                CategoryEnum::ANIMAUX_TOILETTAGE,
+                CategoryEnum::ANIMAUX_ACCESSOIRES,
+                CategoryEnum::ANIMAUX_PENSION,
+                CategoryEnum::ANIMAUX_ASSURANCE,
+                CategoryEnum::ANIMAUX_DRESSAGE,
+                CategoryEnum::ANIMAUX_ACTIVITES,
             ],
             self::ASSURANCES => [
-                'Assurance habitation',
-                'Assurance incendie',
-                'Assurance santé',
-                'Assurance vie',
-                'Assurance voiture/moto',
+                CategoryEnum::ASSURANCE_HABITATION,
+                CategoryEnum::ASSURANCE_INCENDIE,
+                CategoryEnum::ASSURANCE_SANTE,
+                CategoryEnum::ASSURANCE_VIE,
+                CategoryEnum::ASSURANCE_VOITURE,
             ],
             self::DIVERS => [
-                'Autres',
-                'Cadeaux d\'Anniversaire',
+                CategoryEnum::AUTRES,
+                CategoryEnum::CADEAUX,
             ],
             self::DIVERTISSEMENTS_LOISIRS => [
-                'Instruments de musique',
-                'Loisirs culturels',
-                'Loisirs sportifs',
+                CategoryEnum::INSTRUMENTS_MUSIQUE,
+                CategoryEnum::LOISIRS_CULTURELS,
+                CategoryEnum::LOISIRS_SPORTIFS,
             ],
             self::DONS_CONTRIBUTIONS => [
-                'Cotisations associatives',
-                'Dons caritatifs',
+                CategoryEnum::COTISATIONS_ASSO,
+                CategoryEnum::DONS_CARITATIFS,
             ],
             self::EDUCATION => [
-                'Activités parascolaires/extrascolaires',
-                'Fournitures scolaires',
-                'Frais de scolarité',
-                'Livres scolaires',
-                'Repas/cantine scolaire',
+                CategoryEnum::ACTIVITES_PARASCOLAIRES,
+                CategoryEnum::CANTINE,
+                CategoryEnum::FOURNITURES_SCOLAIRES,
+                CategoryEnum::FRAIS_SCOLARITE,
+                CategoryEnum::LIVRES_SCOLAIRES,
             ],
             self::ENFANTS => [
-                'Achat de vêtements',
-                'Argent de poche',
-                'Crèche ou babysitting',
+                CategoryEnum::ACHAT_VETEMENTS,
+                CategoryEnum::ARGENT_POCHE,
+                CategoryEnum::CRECHE,
             ],
             self::FINANCES => [
-                'Crédit personnel',
-                'Frais bancaires, cartes de crédit',
-                'Frais de notaire ou de contrat',
-                'Prêts personnels',
-                'Revenu de Retraite',
+                CategoryEnum::CREDIT_PERSONNEL,
+                CategoryEnum::FRAIS_BANCAIRES,
+                CategoryEnum::FRAIS_NOTAIRE,
+                CategoryEnum::PRETS_PERSONNELS,
+                CategoryEnum::REVENU_RETRAITE,
             ],
             self::IMPOTS_CONTRIBUTIONS => [
-                'Allocations familiales',
-                'Cotisations sociales',
-                'Impôts sur le revenu',
+                CategoryEnum::ALLOCATIONS_FAMILIALES,
+                CategoryEnum::COTISATIONS_SOCIALES,
+                CategoryEnum::IMPOTS_REVENU,
             ],
             self::LOGEMENT => [
-                'Charges locatives',
-                'Chauffage central',
-                'Crédit immobilier',
-                'Eau',
-                'Électricité',
-                'Gaz',
-                'Hypothèque',
-                'Loyer',
-                'Taxe d\'habitation',
-                'Taxe foncière',
+                CategoryEnum::CHARGES_LOCATIVES,
+                CategoryEnum::CHAUFFAGE,
+                CategoryEnum::CREDIT_IMMOBILIER,
+                CategoryEnum::EAU,
+                CategoryEnum::ELECTRICITE,
+                CategoryEnum::GAZ,
+                CategoryEnum::HYPOTHEQUE,
+                CategoryEnum::LOYER,
+                CategoryEnum::TAXE_FONCIERE,
+                CategoryEnum::TAXE_HABITATION,
             ],
             self::SANTE_BIEN_ETRE => [
-                'Compléments alimentaires',
-                'Frais médicaux',
-                'Médicaments',
-                'Soins paramédicaux',
-                'Thérapie ou coaching',
+                CategoryEnum::COMPLEMENTS_ALIMENTAIRES,
+                CategoryEnum::FRAIS_MEDICAUX,
+                CategoryEnum::MEDICAMENTS,
+                CategoryEnum::SOINS_PARAMEDICAUX,
+                CategoryEnum::THERAPIE,
             ],
             self::SERVICES_DOMICILE => [
-                'Jardinage',
-                'Nettoyage',
-                'Réparations',
+                CategoryEnum::JARDINAGE,
+                CategoryEnum::NETTOYAGE,
+                CategoryEnum::REPARATIONS,
             ],
             self::TECHNOLOGIE => [
-                'Achat d\'électronique',
-                'Jeux vidéos',
-                'Logiciels',
+                CategoryEnum::ACHAT_ELECTRONIQUE,
+                CategoryEnum::JEUX_VIDEOS,
+                CategoryEnum::LOGICIELS,
             ],
             self::TRANSPORT => [
-                'Billets de transport',
-                'Entretien automobile',
-                'Essence',
-                'Frais de stationnement',
-                'Location de voiture',
-                'Réparation automobile',
-                'Transport scolaire',
+                CategoryEnum::BILLETS_TRANSPORT,
+                CategoryEnum::ENTRETIEN_AUTO,
+                CategoryEnum::ESSENCE,
+                CategoryEnum::LOCATION_VOITURE,
+                CategoryEnum::REPARATION_AUTO,
+                CategoryEnum::STATIONNEMENT,
+                CategoryEnum::TRANSPORT_SCOLAIRE,
             ],
             self::VOYAGES => [
-                'Activités de vacances',
-                'Réservation d\'hôtel',
+                CategoryEnum::ACTIVITES_VACANCES,
+                CategoryEnum::HOTEL,
             ],
         };
     }
 
+    public function categories(): array
+    {
+        return array_map(
+            fn (CategoryEnum $category) => $category->value,
+            $this->categoryEnums()
+        );
+    }
+
     public static function getTypesOptions(): array
     {
-        $options = [];
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->value;
-        }
-
-        return $options;
+        return self::getOptions();
     }
 
     public static function getTypesOptionsWithEmojis(): array
     {
-        $options = [];
-        foreach (self::cases() as $case) {
-            $options[$case->value] = $case->labelWithEmoji();
-        }
-
-        return $options;
+        return self::getOptionsWithEmojis();
     }
 }

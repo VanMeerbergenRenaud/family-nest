@@ -2,8 +2,12 @@
 
 namespace App\Enums;
 
+use App\Traits\EnumLabelTrait;
+
 enum PaymentMethodEnum: string
 {
+    use EnumLabelTrait;
+
     case Card = 'card';
     case Cash = 'cash';
     case Transfer = 'transfer';
@@ -35,11 +39,6 @@ enum PaymentMethodEnum: string
         };
     }
 
-    public function labelWithEmoji(): string
-    {
-        return $this->emoji().'&nbsp;&nbsp;'.$this->label();
-    }
-
     public function color(): string
     {
         return match ($this) {
@@ -54,25 +53,11 @@ enum PaymentMethodEnum: string
 
     public static function getMethodOptions(): array
     {
-        return [
-            self::Card->value => self::Card->label(),
-            self::Cash->value => self::Cash->label(),
-            self::Transfer->value => self::Transfer->label(),
-            self::DirectDebit->value => self::DirectDebit->label(),
-            self::Check->value => self::Check->label(),
-            self::GiftCard->value => self::GiftCard->label(),
-        ];
+        return self::getOptions();
     }
 
     public static function getMethodOptionsWithEmojis(): array
     {
-        return [
-            self::Card->value => self::Card->labelWithEmoji(),
-            self::Cash->value => self::Cash->labelWithEmoji(),
-            self::Transfer->value => self::Transfer->labelWithEmoji(),
-            self::DirectDebit->value => self::DirectDebit->labelWithEmoji(),
-            self::Check->value => self::Check->labelWithEmoji(),
-            self::GiftCard->value => self::GiftCard->labelWithEmoji(),
-        ];
+        return self::getOptionsWithEmojis();
     }
 }
