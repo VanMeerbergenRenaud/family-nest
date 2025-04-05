@@ -43,7 +43,7 @@ class Edit extends Component
     public function mount($id)
     {
         $this->invoice = auth()->user()->invoices()
-            ->with('file')
+            ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
         $this->form->setFromInvoice($this->invoice);

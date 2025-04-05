@@ -2,106 +2,87 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 trait InvoiceTagManagement
 {
-    // Propriétés pour stocker les suggestions de tags
     public array $tagSuggestions = [];
 
-    // Indique si le menu d'autocomplétion est visible
     public bool $showTagSuggestions = false;
 
-    /**
-     * Initialise les propriétés liées aux tags
-     */
     public function initializeTagManagement(): void
     {
-        // Initialiser le tableau des tags s'il est null
         if (! is_array($this->form->tags)) {
             $this->form->tags = [];
         }
     }
 
-    /**
-     * Ajoute un tag à la liste des tags
-     */
     public function addTag(): void
     {
-        if (! empty($this->form->tagInput)) {
-            // Vérifier si le tag n'existe pas déjà
-            if (! in_array($this->form->tagInput, $this->form->tags)) {
-                $this->form->tags[] = $this->form->tagInput;
-            }
-            $this->form->tagInput = '';
-            $this->tagSuggestions = [];
-            $this->showTagSuggestions = false;
+        $tag = trim($this->form->tagInput ?? '');
+
+        if (! empty($tag)) {
+            $this->addTagToForm($tag);
         }
     }
 
-    /**
-     * Supprime un tag de la liste des tags
-     */
-    public function removeTag($index): void
+    private function resetTagInput(): void
     {
-        unset($this->form->tags[$index]);
-        $this->form->tags = array_values($this->form->tags); // Réindexer le tableau
+        $this->form->tagInput = '';
+        $this->tagSuggestions = [];
+        $this->showTagSuggestions = false;
     }
 
-    /**
-     * Recherche les suggestions de tags lors de la saisie
-     */
+    public function removeTag($index): void
+    {
+        if (isset($this->form->tags[$index])) {
+            unset($this->form->tags[$index]);
+            $this->form->tags = array_values($this->form->tags); // Réindexer le tableau
+        }
+    }
+
     public function updatedFormTagInput(): void
     {
         $this->tagSuggestions = [];
+        $input = trim($this->form->tagInput ?? '');
 
         // Ne pas chercher si la saisie est trop courte
-        if (strlen($this->form->tagInput) < 1) {
+        if (strlen($input) < 1) {
             $this->showTagSuggestions = false;
 
             return;
         }
 
-        // Utiliser directement la recherche en base de données
-        $this->tagSuggestions = $this->searchTagsInDatabase($this->form->tagInput);
+        $this->tagSuggestions = $this->searchTagsInDatabase($input);
         $this->showTagSuggestions = count($this->tagSuggestions) > 0;
     }
 
-    /**
-     * Recherche les tags dans la base de données
-     *
-     * @param  string  $query  Texte à rechercher
-     * @return array Liste des tags correspondants
-     */
     private function searchTagsInDatabase(string $query): array
     {
         try {
-            // Vérifier si l'utilisateur a des factures avec des tags
-            $hasInvoicesWithTags = DB::table('invoices')
-                ->where('user_id', auth()->id())
-                ->whereNotNull('tags')
-                ->whereRaw("tags::text != '[]'")
-                ->exists();
-
-            // Si aucune facture avec des tags, retourner un tableau vide
-            if (! $hasInvoicesWithTags || empty($query)) {
+            if (empty($query)) {
                 return [];
             }
 
-            // Récupérer toutes les factures de l'utilisateur qui ont des tags
             $invoices = DB::table('invoices')
                 ->where('user_id', auth()->id())
-                ->whereNotNull('tags')
-                ->whereRaw("tags::text != '[]'")
+                ->whereJsonLength('tags', '>', 0)
                 ->select('tags')
                 ->get();
 
-            // Extraire tous les tags uniques
-            $allTags = $this->extractTagsFromInvoices($invoices, $query);
+            if ($invoices->isEmpty()) {
+                return [];
+            }
 
-            // Exclure les tags déjà sélectionnés
-            return array_values(array_diff($allTags, $this->form->tags));
+            $allTags = $this->extractUniqueMatchingTags($invoices, $query);
+
+            $selectedTags = array_map('strtolower', $this->form->tags ?? []);
+
+            return array_values(array_filter($allTags, function ($tag) use ($selectedTags) {
+                return ! in_array(strtolower($tag), $selectedTags);
+            }));
         } catch (\Exception $e) {
             Log::error('Erreur lors de la recherche de tags : '.$e->getMessage());
 
@@ -109,44 +90,17 @@ trait InvoiceTagManagement
         }
     }
 
-    /**
-     * Extrait les tags des factures qui correspondent à la requête
-     *
-     * @param  \Illuminate\Support\Collection  $invoices  Collection de factures
-     * @param  string  $query  Texte à rechercher
-     * @return array Liste des tags uniques
-     */
-    private function extractTagsFromInvoices($invoices, string $query): array
+    private function extractUniqueMatchingTags(Collection $invoices, string $query): array
     {
         $allTags = [];
 
         foreach ($invoices as $invoice) {
             try {
-                // Gérer le double encodage JSON possible
-                $tagsJson = $invoice->tags;
+                $tags = $this->parseJsonTags($invoice->tags);
 
-                // Si la chaîne commence et se termine par des guillemets, retirer ces guillemets
-                if (substr($tagsJson, 0, 1) === '"' && substr($tagsJson, -1) === '"') {
-                    $tagsJson = substr($tagsJson, 1, -1);
-                }
-
-                // Remplacer les séquences d'échappement
-                $tagsJson = str_replace('\\', '', $tagsJson);
-
-                // Décoder le JSON
-                $tagsArray = json_decode($tagsJson, true);
-
-                // Si le décodage a échoué, essayer une autre approche
-                if (! is_array($tagsArray)) {
-                    $tagsArray = json_decode($invoice->tags, true);
-                }
-
-                // Ajouter les tags qui contiennent la requête
-                if (is_array($tagsArray)) {
-                    foreach ($tagsArray as $tag) {
-                        if (is_string($tag) && stripos($tag, $query) !== false) {
-                            $allTags[] = $tag;
-                        }
+                foreach ($tags as $tag) {
+                    if (is_string($tag) && stripos($tag, $query) !== false) {
+                        $allTags[] = $tag;
                     }
                 }
             } catch (\Exception $e) {
@@ -156,20 +110,52 @@ trait InvoiceTagManagement
             }
         }
 
-        // Retourner les tags uniques
         return array_unique($allTags);
     }
 
-    /**
-     * Sélectionne un tag parmi les suggestions
-     */
+    private function parseJsonTags(?string $tagsJson): array
+    {
+        if (empty($tagsJson)) {
+            return [];
+        }
+
+        if (str_starts_with($tagsJson, '"') && str_ends_with($tagsJson, '"')) {
+            $tagsJson = substr($tagsJson, 1, -1);
+        }
+
+        $tagsJson = str_replace('\\', '', $tagsJson);
+
+        $tagsArray = json_decode($tagsJson, true);
+
+        if (! is_array($tagsArray)) {
+            $tagsArray = json_decode($tagsJson, true);
+        }
+
+        return is_array($tagsArray) ? $tagsArray : [];
+    }
+
     public function selectTag($tag): void
     {
-        if (! in_array($tag, $this->form->tags)) {
+        $this->addTagToForm($tag);
+    }
+
+    private function addTagToForm(string $tag): void
+    {
+        $lowerTag = strtolower($tag);
+        $exists = false;
+
+        foreach ($this->form->tags as $existingTag) {
+            if (strtolower($existingTag) === $lowerTag) {
+                $exists = true;
+                break;
+            }
+        }
+
+        if (!$exists) {
             $this->form->tags[] = $tag;
         }
-        $this->form->tagInput = '';
-        $this->tagSuggestions = [];
-        $this->showTagSuggestions = false;
+
+        $this->resetTagInput();
     }
 }
+

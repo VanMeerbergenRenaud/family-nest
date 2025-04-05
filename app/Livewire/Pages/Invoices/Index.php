@@ -47,7 +47,7 @@ class Index extends Component
         'issuer_name' => false,
         'amount' => true,
         'issued_date' => true,
-        'payment_status' => true,
+        'payment_status' => false,
         'payment_due_date' => false,
         'tags' => true,
     ];
@@ -258,7 +258,7 @@ class Index extends Component
             'issuer_name' => false,
             'amount' => true,
             'issued_date' => true,
-            'payment_status' => true,
+            'payment_status' => false,
             'payment_due_date' => false,
             'tags' => true,
         ];
@@ -355,11 +355,13 @@ class Index extends Component
                 return;
             }
 
+            // Attention : Cette fonctionnalité est limitée, car on ne peut pas déclencher plusieurs téléchargements à la fois
+            // dans le navigateur. Pour une véritable solution, TODO: il faudrait créer un zip de tous les fichiers.
             foreach ($invoices as $invoice) {
                 $this->downloadInvoice($invoice->id);
             }
 
-            Toaster::info('Toutes les factures sélectionnées ont été téléchargées.');
+            Toaster::info('Factures sélectionnées en cours de téléchargement.');
         } catch (\Exception) {
             Toaster::error('Erreur lors du téléchargement::Vous n\'avez pas sélectionné de fichiers ou ils sont déjà archivés.');
         }
@@ -424,6 +426,7 @@ class Index extends Component
         try {
             $this->invoice = Invoice::where('id', $invoiceId)
                 ->where('is_archived', false)
+                ->where('user_id', auth()->id())
                 ->firstOrFail();
 
             $this->invoice->update(['is_archived' => true]);
@@ -438,22 +441,25 @@ class Index extends Component
 
     public function archiveSelected(): void
     {
+        if (empty($this->selectedInvoiceIds)) {
+            Toaster::error('Aucune facture sélectionnée.');
+            return;
+        }
+
         try {
-            $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
+            $count = Invoice::whereIn('id', $this->selectedInvoiceIds)
                 ->where('is_archived', false)
-                ->get();
+                ->where('user_id', auth()->id())
+                ->update(['is_archived' => true]);
 
-            if ($invoices->isEmpty()) {
-                Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
-
-                return;
+            if ($count > 1) {
+                Toaster::success("$count factures archivées avec succès.");
+                $this->selectedInvoiceIds = [];
+            } elseif ($count == 1) {
+                Toaster::success('La facture a été archivée avec succès.');
+            }  else {
+                Toaster::error('Aucune facture n\'a pu être archivée.');
             }
-
-            foreach ($invoices as $invoice) {
-                $this->archiveInvoice($invoice->id);
-            }
-
-            Toaster::info('Toutes les factures sélectionnées ont été archivées.');
         } catch (\Exception) {
             Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
         }
@@ -463,7 +469,7 @@ class Index extends Component
     {
         // Récupération des factures avec filtres
         $invoices = auth()->user()->invoices()
-            ->with('file')
+            ->with(['file', 'sharedUsers'])
             ->when($this->sortField,
                 fn ($query) => $query->orderBy($this->sortField, $this->sortDirection)
             )
@@ -471,7 +477,7 @@ class Index extends Component
             ->paginate(8);
 
         $this->recentInvoices = auth()->user()->invoices()
-            ->with('file')
+            ->with(['file', 'sharedUsers'])
             ->where('is_archived', false)
             ->orderBy('updated_at', 'desc')
             ->limit(8)

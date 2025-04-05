@@ -3,6 +3,8 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Livewire\Forms\InvoiceForm;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
@@ -13,13 +15,17 @@ class Archived extends Component
 
     public InvoiceForm $form;
 
-    public bool $showDeleteFormModal = false;
-
-    public bool $showDeleteAllInvoicesFormModal = false;
-
     public bool $showArchiveExempleModal = false;
 
-    // 1. Restore
+    public bool $showDeleteFormModal = false;
+
+    public bool $showDeleteAllFormModal = false;
+
+    public function showArchiveExemple(): void
+    {
+        $this->showArchiveExempleModal = true;
+    }
+
     public function restoreInvoice($invoiceId): void
     {
         $invoice = auth()->user()->invoices()
@@ -29,61 +35,72 @@ class Archived extends Component
 
         $this->form->setFromInvoice($invoice);
 
-        $this->form->restore();
-
-        Toaster::success('Facture restaurée avec succès !');
+        if ($this->form->restore()) {
+            Toaster::success('Facture restaurée avec succès !');
+        } else {
+            Toaster::error('Erreur lors de la restauration de la facture.');
+        }
     }
 
-    // 2. Delete
-    public function showDeleteForm($id): void
+    public function showDeleteInvoiceForm($id): void
     {
         $invoice = auth()->user()->invoices()->findOrFail($id);
-
         $this->form->setFromInvoice($invoice);
-
         $this->showDeleteFormModal = true;
     }
 
     public function deleteDefinitelyInvoice(): void
     {
-        $this->form->delete();
-
-        $this->showDeleteFormModal = false;
-
-        Toaster::success('Facture supprimée définitivement !');
+        if ($this->form->delete()) {
+            $this->showDeleteFormModal = false;
+            Toaster::success('Facture supprimée définitivement !');
+        } else {
+            Toaster::error('Erreur lors de la suppression de la facture.');
+        }
     }
 
-    // 3. Delete all
-    public function deleteAllInvoicesForm(): void
+    public function showDeleteAllInvoicesForm(): void
     {
-        $this->showDeleteAllInvoicesFormModal = true;
+        $this->showDeleteAllFormModal = true;
     }
 
     public function deleteDefinitelyAllInvoice(): void
     {
-        $archivedInvoices = auth()->user()->invoices()
-            ->where('is_archived', true)
-            ->get();
+        try {
+            DB::beginTransaction();
 
-        foreach ($archivedInvoices as $invoice) {
-            $this->form->setFromInvoice($invoice);
-            $this->form->delete();
+            $archivedInvoices = auth()->user()->invoices()
+                ->where('is_archived', true)
+                ->get();
+
+            $count = $archivedInvoices->count();
+
+            if ($count === 0) {
+                Toaster::info('Aucune facture à supprimer.');
+                $this->showDeleteAllFormModal = false;
+
+                return;
+            }
+
+            foreach ($archivedInvoices as $invoice) {
+                $this->form->setFromInvoice($invoice);
+                $this->form->delete();
+            }
+
+            DB::commit();
+            $this->showDeleteAllFormModal = false;
+            Toaster::success("Corbeille vidée avec succès ! $count factures ont été supprimées définitivement.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Toaster::error('Une erreur est survenue lors de la suppression des factures.');
+            Log::error('Erreur lors de la suppression des factures archivées: '.$e->getMessage());
         }
-
-        $this->showDeleteAllInvoicesFormModal = false;
-
-        Toaster::success('Corbeille vidée avec succès !::Vous factures ont été supprimées définitivement.');
-    }
-
-    // 4. Archive exemple
-    public function showArchiveExemple(): void
-    {
-        $this->showArchiveExempleModal = true;
     }
 
     public function render()
     {
         $archivedInvoices = auth()->user()->invoices()
+            ->with('file')
             ->where('is_archived', true)
             ->orderBy('created_at', 'desc')
             ->paginate(7);

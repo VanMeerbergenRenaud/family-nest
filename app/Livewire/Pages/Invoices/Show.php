@@ -34,7 +34,7 @@ class Show extends Component
     public function mount($id)
     {
         $this->invoice = auth()->user()->invoices()
-            ->with('sharedUsers') // Préchargement de la relation pour éviter les requêtes N+1
+            ->with(['sharedUsers', 'file'])
             ->findOrFail($id);
 
         $this->prepareFamilyMembers();

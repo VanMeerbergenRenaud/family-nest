@@ -34,6 +34,7 @@ class Invoice extends Model
         'amount' => 'decimal:2',
         'issued_date' => 'date',
         'payment_due_date' => 'date',
+        'payment_reminder' => 'date',
         'payment_frequency' => PaymentFrequencyEnum::class,
         'payment_status' => PaymentStatusEnum::class,
         'payment_method' => PaymentMethodEnum::class,

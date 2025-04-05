@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Forms;
 
-use App\Enums\CategoryEnum;
 use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
@@ -16,6 +15,7 @@ use App\Traits\FormatFileSizeTrait;
 use App\Traits\HumanDateTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Masmerise\Toaster\Toaster;
@@ -28,7 +28,7 @@ class InvoiceForm extends Form
 
     public ?InvoiceFile $invoiceFile = null;
 
-    // Uploaded file
+    // Fichier téléchargé
     #[Validate]
     public $uploadedFile;
 
@@ -108,10 +108,10 @@ class InvoiceForm extends Form
 
     public $user_id;
 
-    // Available categories
+    // Catégories disponibles
     public $availableCategories = [];
 
-    public function rules()
+    public function rules(): array
     {
         return [
             // Fichier
@@ -159,7 +159,7 @@ class InvoiceForm extends Form
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             // Messages d'erreur pour le fichier d'importation
@@ -201,40 +201,49 @@ class InvoiceForm extends Form
 
     public function updateAvailableCategories(): void
     {
-        if ($this->type) {
-            try {
-                $typeEnum = $this->type instanceof TypeEnum
-                    ? $this->type
-                    : TypeEnum::from($this->type);
+        if (empty($this->type)) {
+            $this->availableCategories = [];
+            return;
+        }
 
-                $categoriesForType = $typeEnum->categories();
+        try {
+            $typeEnum = $this->type instanceof TypeEnum
+                ? $this->type
+                : TypeEnum::tryFrom($this->type);
 
-                $this->availableCategories = [];
-
-                foreach ($categoriesForType as $category) {
-                    foreach (CategoryEnum::cases() as $case) {
-                        if ($case->value === $category) {
-                            // Add the emoji to the label
-                            $this->availableCategories[$category] = $case->labelWithEmoji();
-                            break;
-                        }
-                    }
-
-                    // If no emoji found, fallback to the original category
-                    if (! isset($this->availableCategories[$category])) {
-                        $this->availableCategories[$category] = $category;
-                    }
-                }
-
+            if (! $typeEnum) {
                 return;
-            } catch (\ValueError) {
-                $this->availableCategories = [];
-                Toaster::error('Erreur lors de la récupération des catégories::Vérifiez le type de facture sélectionné.');
+            }
+
+            $this->availableCategories = [];
+
+            foreach ($typeEnum->categoryEnums() as $category) {
+                $this->availableCategories[$category->value] = $category->labelWithEmoji();
+            }
+        } catch (\Throwable $e) {
+            $this->availableCategories = [];
+            Toaster::error('Erreur lors de la récupération des catégories.');
+            Log::error('Erreur lors de la récupération des catégories: '.$e->getMessage());
+        }
+    }
+
+    private function processInvoiceShares(Invoice $invoice): void
+    {
+        $invoice->sharedUsers()->detach();
+
+        if (! empty($this->user_shares)) {
+            foreach ($this->user_shares as $share) {
+                if (isset($share['id']) && (floatval($share['amount'] ?? 0) > 0 || floatval($share['percentage'] ?? 0) > 0)) {
+                    $invoice->sharedUsers()->attach($share['id'], [
+                        'share_amount' => $share['amount'] ?? null,
+                        'share_percentage' => $share['percentage'] ?? null,
+                    ]);
+                }
             }
         }
     }
 
-    // Créer ou modifier une facture
+    // Create or update invoice
     public function saveInvoice(FileStorageService $fileStorageService)
     {
         $this->validate();
@@ -298,9 +307,11 @@ class InvoiceForm extends Form
             // Traitement du fichier si présent
             if ($this->uploadedFile) {
                 // Récupérer l'ancien fichier si édition
-                $oldFile = $this->invoice ? InvoiceFile::where('invoice_id', $invoice->id)
-                    ->where('is_primary', true)
-                    ->first() : null;
+                $oldFile = $this->invoice
+                    ? InvoiceFile::where('invoice_id', $invoice->id)
+                        ->where('is_primary', true)
+                        ->first()
+                    : null;
 
                 // Stocker le fichier
                 $this->invoiceFile = $fileStorageService->processInvoiceFile($invoice, $this->uploadedFile, $oldFile);
@@ -318,24 +329,6 @@ class InvoiceForm extends Form
         }
     }
 
-    private function processInvoiceShares(Invoice $invoice): void
-    {
-        // Supprimer d'abord toutes les anciennes parts
-        $invoice->sharedUsers()->detach();
-
-        // Si nous avons des parts à ajouter
-        if (! empty($this->user_shares)) {
-            foreach ($this->user_shares as $share) {
-                if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
-                    $invoice->sharedUsers()->attach($share['id'], [
-                        'share_amount' => $share['amount'] ?? null,
-                        'share_percentage' => $share['percentage'] ?? null,
-                    ]);
-                }
-            }
-        }
-    }
-
     public function store(FileStorageService $fileStorageService)
     {
         return $this->saveInvoice($fileStorageService);
@@ -344,7 +337,7 @@ class InvoiceForm extends Form
     public function update(FileStorageService $fileStorageService)
     {
         if (! $this->invoice) {
-            throw new \Exception('Impossible de mettre à jour une facture sans son ID');
+            Toaster::error('Impossible de mettre à jour cette facture::Il y a un conflit de données.');
         }
 
         return $this->saveInvoice($fileStorageService);
@@ -401,8 +394,21 @@ class InvoiceForm extends Form
         try {
             DB::beginTransaction();
 
-            // TODO: Supprimer les fichiers de S3 avant de supprimer les enregistrements
+            // Supprimer les fichiers associés
+            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
 
+            foreach ($files as $file) {
+                $filePath = $file->getRawOriginal('file_path');
+                if (Storage::disk('s3')->exists($filePath)) {
+                    Storage::disk('s3')->delete($filePath);
+                }
+                $file->delete();
+            }
+
+            // Supprimer les parts associées
+            $this->invoice->sharedUsers()->detach();
+
+            // Supprimer la facture
             $this->invoice->delete();
 
             DB::commit();
@@ -493,58 +499,18 @@ class InvoiceForm extends Form
         return $this;
     }
 
-    public function getFileInfo(?FileStorageService $fileStorageService = null): ?array
-    {
-        if (! $this->uploadedFile && ! $this->fileName) {
-            return null;
-        }
-
-        if ($fileStorageService) {
-            if ($this->uploadedFile) {
-                return $fileStorageService->getFileInfo($this->uploadedFile);
-            } elseif ($this->fileName) {
-                return $fileStorageService->getFileInfo(null, $this->fileName, $this->fileExtension, $this->fileSize);
-            }
-        }
-
-        // Fallback si le service n'est pas fourni
-        if (! $this->uploadedFile && ! $this->fileName) {
-            return null;
-        }
-
-        $name = $this->fileName ?? ($this->uploadedFile ? $this->uploadedFile->getClientOriginalName() : null);
-        $extension = $this->fileExtension ?? ($this->uploadedFile ? strtolower($this->uploadedFile->getClientOriginalExtension()) : null);
-        $size = $this->fileSize ?? ($this->uploadedFile ? $this->uploadedFile->getSize() : 0);
-
-        return [
-            'name' => $name,
-            'extension' => $extension,
-            'size' => round($size / 1024, 2), // Taille en KB
-            'sizeFormatted' => $this->formatFileSize($size),
-            'isImage' => in_array($extension, ['jpg', 'jpeg', 'png']),
-            'isPdf' => $extension === 'pdf',
-            'isDocx' => $extension === 'docx',
-            'isCsv' => $extension === 'csv',
-        ];
-    }
-
     public function normalizeAmount($amount): ?float
     {
-        // Si le montant est vide ou null, retourner null
         if ($amount === null || $amount === '') {
             return null;
         }
 
-        // Convertir en chaîne si ce n'est pas déjà le cas
         $amount = (string) $amount;
 
-        // Supprimer les espaces (que le mask ajoute comme séparateurs de milliers)
         $amount = str_replace(' ', '', $amount);
 
-        // Convertir la virgule en point (format standard pour PHP)
         $amount = str_replace(',', '.', $amount);
 
-        // Utiliser Number::format pour garantir la précision
         return (float) number_format((float) $amount, 2, '.', '');
     }
 }

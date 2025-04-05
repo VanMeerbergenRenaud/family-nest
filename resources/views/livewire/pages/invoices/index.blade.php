@@ -545,13 +545,11 @@
                             @if($visibleColumns['payment_status'] ?? false)
                                 <td>
                                     @php
-                                        $statusEnum = $invoice->payment_status instanceof App\Enums\PaymentStatusEnum
-                                            ? $invoice->payment_status
-                                            : App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status);
-
-                                        $statusClass = $statusEnum ? 'bg-' . $statusEnum->color() . '-100 text-' . $statusEnum->color() . '-800' : 'bg-gray-100 text-gray-800';
-                                        $statusText = $statusEnum ? $statusEnum->label() : 'Non spécifié';
-                                        $statusEmoji = $statusEnum ? $statusEnum->emoji() : '';
+                                        $statusEnum = $invoice->payment_status;
+                                        $statusColor = $statusEnum?->color() ?? 'gray';
+                                        $statusClass = "bg-{$statusColor}-100 text-{$statusColor}-800";
+                                        $statusText = $statusEnum?->label() ?? 'Non spécifié';
+                                        $statusEmoji = $statusEnum?->emoji() ?? '';
                                     @endphp
                                     <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
                                         {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}
@@ -754,13 +752,11 @@
                                         <!-- Pied de la carte -->
                                         <div class="dark:border-gray-800 px-4 py-3 flex justify-between items-center">
                                             @php
-                                                $statusEnum = $invoice->payment_status instanceof App\Enums\PaymentStatusEnum
-                                                    ? $invoice->payment_status
-                                                    : App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status);
-
-                                                $statusClass = $statusEnum ? 'bg-' . $statusEnum->color() . '-100 text-' . $statusEnum->color() . '-800' : 'bg-gray-100 text-gray-800';
-                                                $statusText = $statusEnum ? $statusEnum->label() : 'Non spécifié';
-                                                $statusEmoji = $statusEnum ? $statusEnum->emoji() : '';
+                                                $statusEnum = $invoice->payment_status;
+                                                $statusColor = $statusEnum?->color() ?? 'gray';
+                                                $statusClass = "bg-{$statusColor}-100 text-{$statusColor}-800";
+                                                $statusText = $statusEnum?->label() ?? 'Non spécifié';
+                                                $statusEmoji = $statusEnum?->emoji() ?? '';
                                             @endphp
                                             <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
                                                 {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}

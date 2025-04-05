@@ -34,7 +34,7 @@
             </div>
 
             @if(!$archivedInvoices->isEmpty())
-                <button wire:click="deleteAllInvoicesForm" class="button-danger">
+                <button wire:click="showDeleteAllInvoicesForm" class="button-danger">
                     Vider la corbeille
                 </button>
             @endif
@@ -105,7 +105,7 @@
                                                 {{ __('Restaurer') }}
                                             </x-menu.item>
 
-                                            <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500">
+                                            <x-menu.item wire:click="showDeleteInvoiceForm({{ $invoice->id }})" class="group hover:text-red-500">
                                                 <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
                                                 {{ __('Supprimer définitivement') }}
                                             </x-menu.item>
@@ -176,8 +176,8 @@
         @endif
 
         <!-- Modale pour vider la corbeille -->
-        @if($showDeleteAllInvoicesFormModal)
-            <x-modal wire:model="showDeleteAllInvoicesFormModal">
+        @if($showDeleteAllFormModal)
+            <x-modal wire:model="showDeleteAllFormModal">
                 <x-modal.panel>
                     <form wire:submit.prevent="deleteDefinitelyAllInvoice">
                         @csrf

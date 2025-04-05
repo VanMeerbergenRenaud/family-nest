@@ -119,38 +119,4 @@ class FileStorageService
             'isCsv' => $extension === 'csv',
         ];
     }
-
-    /**
-     * Generate signed URL for S3 file
-     */
-    public function getSignedUrl(string $filePath, string $fileName, string $fileExtension): ?string
-    {
-        try {
-            if (! Storage::disk('s3')->exists($filePath)) {
-                return null;
-            }
-
-            $contentType = match (strtolower($fileExtension)) {
-                'pdf' => 'application/pdf',
-                'jpg', 'jpeg' => 'image/jpeg',
-                'png' => 'image/png',
-                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                'csv' => 'text/csv',
-                default => 'application/octet-stream',
-            };
-
-            return Storage::disk('s3')->temporaryUrl(
-                $filePath,
-                now()->addMinutes(10),
-                [
-                    'ResponseContentType' => $contentType,
-                    'ResponseContentDisposition' => 'inline; filename="'.$fileName.'"',
-                ]
-            );
-        } catch (\Exception $e) {
-            Log::error('Error generating signed URL: '.$e->getMessage());
-
-            return null;
-        }
-    }
 }
