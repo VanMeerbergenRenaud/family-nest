@@ -26,76 +26,94 @@ class GoogleAuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
+            $avatarUrl = $googleUser->getAvatar();
+
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            if (! $user) {
-                $avatarPath = null;
-                if ($avatarUrl = $googleUser->getAvatar()) {
+            if (!$user) {
+                Log::channel('google_auth')->info('Création d\'un nouvel utilisateur', [
+                    'email' => $googleUser->getEmail(),
+                ]);
+
+                $user = User::create([
+                    'name' => $googleUser->getName(),
+                    'email' => $googleUser->getEmail(),
+                ]);
+
+                if ($avatarUrl) {
                     try {
-                        $avatarPath = 'avatars/'.Str::uuid().'.jpg';
+                        $avatarDir = 'avatars/user_' . $user->id;
+
+                        $filename = Str::random(40) . '.jpeg';
+
+                        $avatarPath = $avatarDir . '/' . $filename;
 
                         $avatarContent = file_get_contents($avatarUrl);
 
                         if ($avatarContent) {
                             Storage::disk('s3')->put($avatarPath, $avatarContent);
+
+                            $user->update(['avatar' => $avatarPath]);
+
                             Log::channel('google_auth')->info('Avatar téléchargé avec succès', [
-                                'path' => $avatarPath,
+                                'path' => $avatarPath
                             ]);
                         }
                     } catch (\Exception $e) {
-                        $avatarPath = null;
                         Log::channel('google_auth')->error('Erreur lors du téléchargement de l\'avatar', [
-                            'message' => $e->getMessage(),
+                            'message' => $e->getMessage()
                         ]);
                     }
                 }
 
-                $user = User::create([
-                    'name' => $googleUser->getName(),
-                    'email' => $googleUser->getEmail(),
-                    'password' => Hash::make(Str::random(24)), // Random password
-                    'avatar' => $googleUser->getAvatar(),
+                event(new Registered($user));
+            } else {
+                Log::channel('google_auth')->info('Utilisateur existant trouvé', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
                 ]);
 
-                event(new Registered($user));
-            }
+                if (!$user->avatar && $avatarUrl) {
+                    try {
+                        $avatarDir = 'avatars/user_' . $user->id;
 
-            if (! $user->avatar && ($avatarUrl = $googleUser->getAvatar())) {
-                try {
-                    $avatarPath = 'avatars/'.Str::uuid().'.jpg';
+                        $filename = Str::random(40) . '.jpeg';
 
-                    $avatarContent = file_get_contents($avatarUrl);
+                        $avatarPath = $avatarDir . '/' . $filename;
 
-                    if ($avatarContent) {
+                        $avatarContent = file_get_contents($avatarUrl);
+
                         if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
                             try {
                                 Storage::disk('s3')->delete($user->avatar);
                                 Log::channel('google_auth')->info('Ancien avatar supprimé', [
                                     'user_id' => $user->id,
-                                    'path' => $user->avatar,
+                                    'path' => $user->avatar
                                 ]);
                             } catch (\Exception $e) {
                                 Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
                                     'message' => $e->getMessage(),
-                                    'user_id' => $user->id,
+                                    'user_id' => $user->id
                                 ]);
                             }
                         }
 
-                        Storage::disk('s3')->put($avatarPath, $avatarContent);
+                        if ($avatarContent) {
+                            Storage::disk('s3')->put($avatarPath, $avatarContent);
 
-                        $user->update(['avatar' => $avatarPath]);
+                            $user->update(['avatar' => $avatarPath]);
 
-                        Log::channel('google_auth')->info('Avatar mis à jour pour l\'utilisateur existant', [
-                            'user_id' => $user->id,
-                            'path' => $avatarPath,
+                            Log::channel('google_auth')->info('Avatar mis à jour pour l\'utilisateur existant', [
+                                'user_id' => $user->id,
+                                'path' => $avatarPath
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [
+                            'message' => $e->getMessage(),
+                            'user_id' => $user->id
                         ]);
                     }
-                } catch (\Exception $e) {
-                    Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [
-                        'message' => $e->getMessage(),
-                        'user_id' => $user->id,
-                    ]);
                 }
             }
 
