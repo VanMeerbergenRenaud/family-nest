@@ -203,6 +203,7 @@ class InvoiceForm extends Form
     {
         if (empty($this->type)) {
             $this->availableCategories = [];
+
             return;
         }
 

@@ -12,7 +12,7 @@
         "ilovepdf/ilovepdf-php": "^1.2",
         "laravel/framework": "^11.9",
         "laravel/scout": "^10.13",
-        "laravel/socialite": "^5.15",
+        "laravel/socialite": "^5.19",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^3.4",

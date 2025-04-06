@@ -47,14 +47,14 @@
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
                 <div class="space-y-3 md:space-y-0 md:flex md:space-x-4">
-                    <button class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                    <a href="{{ route('google.redirect') }}"  class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
                         <x-svg.google class="mr-2.5"/>
                         Continuer&nbsp;avec&nbsp;Google
-                    </button>
-                    <button class="w-full flex-center py-3 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                    </a>
+                    <a href="#" class="w-full flex-center py-3 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
                         <x-svg.apple class="mr-2.5"/>
                         Continuer&nbsp;avec&nbsp;Apple
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Séparateur OU -->

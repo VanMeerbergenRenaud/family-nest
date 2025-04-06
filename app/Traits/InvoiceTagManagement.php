@@ -151,11 +151,10 @@ trait InvoiceTagManagement
             }
         }
 
-        if (!$exists) {
+        if (! $exists) {
             $this->form->tags[] = $tag;
         }
 
         $this->resetTagInput();
     }
 }
-

@@ -443,6 +443,7 @@ class Index extends Component
     {
         if (empty($this->selectedInvoiceIds)) {
             Toaster::error('Aucune facture sélectionnée.');
+
             return;
         }
 
@@ -457,7 +458,7 @@ class Index extends Component
                 $this->selectedInvoiceIds = [];
             } elseif ($count == 1) {
                 Toaster::success('La facture a été archivée avec succès.');
-            }  else {
+            } else {
                 Toaster::error('Aucune facture n\'a pu être archivée.');
             }
         } catch (\Exception) {
