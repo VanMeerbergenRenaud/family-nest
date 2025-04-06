@@ -44,6 +44,13 @@
 
         <div class="container rounded-2xl py-8 px-5 md:px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
 
+            @if (session('google_auth_error'))
+                <p class="mt-4 mb-6 bg-red-50 border border-red-200 py-2 px-4 gap-4 rounded-md text-sm text-red-700 dark:bg-red-100 dark:border-red-300 dark:text-red-600 flex items-center">
+                    <x-svg.error class="h-4 w-4" />
+                    {{ session('google_auth_error') }}
+                </p>
+            @endif
+
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
                 <div class="space-y-3 md:space-y-0 md:flex md:space-x-4">

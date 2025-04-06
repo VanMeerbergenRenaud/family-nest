@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Middleware\GoogleAuthLogMiddleware;
 use App\Livewire\Actions\Logout;
 use App\Livewire\FamilyInvitationHandler;
 use App\Livewire\Pages\Auth\ConfirmPassword;
@@ -38,5 +40,10 @@ Route::get('/invitation/{token}', FamilyInvitationHandler::class)
     ->name('family.invitation');
 
 // Google login route
-Route::get('/google/redirect', [App\Http\Controllers\GoogleLoginController::class, 'redirectToGoogle'])->name('google.redirect');
-Route::get('/google/callback', [App\Http\Controllers\GoogleLoginController::class, 'handleGoogleCallback'])->name('google.callback');
+Route::middleware([GoogleAuthLogMiddleware::class])->group(function () {
+    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
+        ->name('google.redirect');
+
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
+        ->name('google.callback');
+});
