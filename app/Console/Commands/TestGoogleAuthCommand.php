@@ -7,28 +7,15 @@ use Illuminate\Support\Facades\Log;
 
 class TestGoogleAuthCommand extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'auth:test-google';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
     protected $description = 'Test la configuration de l\'authentification Google';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
         $this->info('Vérification de la configuration Google OAuth...');
 
-        // Vérifier les variables d'environnement
+        // Verify environment variables
         if (! env('GOOGLE_CLIENT_ID')) {
             $this->error('❌ GOOGLE_CLIENT_ID est manquant dans le fichier .env');
 
@@ -51,7 +38,7 @@ class TestGoogleAuthCommand extends Command
             $this->info('✓ GOOGLE_REDIRECT_URI est configuré: '.env('GOOGLE_REDIRECT_URI'));
         }
 
-        // Vérifier la configuration dans services.php
+        // Verify Google API credentials
         $services = config('services.google');
         if (! $services) {
             $this->error('❌ Configuration Google manquante dans config/services.php');
@@ -61,14 +48,13 @@ class TestGoogleAuthCommand extends Command
             $this->info('✓ Configuration services.php vérifiée');
         }
 
-        // Vérifier la configuration du canal de log
+        // Verify Google API+ activation
         $logChannel = config('logging.channels.google_auth');
         if (! $logChannel) {
             $this->warn('⚠️ Canal de log google_auth non configuré dans config/logging.php');
         } else {
             $this->info('✓ Canal de log google_auth configuré');
 
-            // Tester l'écriture dans les logs
             try {
                 Log::channel('google_auth')->info('Test de log depuis la commande Artisan');
                 $this->info('✓ Écriture dans les logs réussie');
@@ -77,7 +63,7 @@ class TestGoogleAuthCommand extends Command
             }
         }
 
-        // Vérifier les routes
+        // Verifying routes
         $routes = app('router')->getRoutes();
         $googleRedirectRoute = $routes->getByName('google.redirect');
         $googleCallbackRoute = $routes->getByName('google.callback');
@@ -94,6 +80,7 @@ class TestGoogleAuthCommand extends Command
             $this->info('✓ Route google.callback configurée: '.$googleCallbackRoute->uri());
         }
 
+        // Inform the user about the redirection URL
         $this->info("\nRésumé de la vérification:");
         $this->info('Pour fonctionner correctement, assurez-vous que:');
         $this->info('1. Les identifiants Google sont corrects');

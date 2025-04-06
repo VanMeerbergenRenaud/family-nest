@@ -3,89 +3,112 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Traits\GoogleAuthErrorHandler;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Masmerise\Toaster\Toaster;
 
 class GoogleAuthController extends Controller
 {
-    use GoogleAuthErrorHandler;
-
-    /**
-     * Redirection vers Google pour l'authentification
-     *
-     * @return RedirectResponse
-     */
     public function redirect()
     {
-        Log::channel('google_auth')->info('Redirection vers Google OAuth', [
-            'time' => now()->toDateTimeString(),
-        ]);
-
         return Socialite::driver('google')->redirect();
     }
 
-    /**
-     * Récupération des informations utilisateur depuis Google
-     *
-     * @return RedirectResponse
-     */
-    public function callback()
+    public function callback(): RedirectResponse
     {
         try {
-            Log::channel('google_auth')->info('Début du callback Google OAuth', [
-                'time' => now()->toDateTimeString(),
-            ]);
-
             $googleUser = Socialite::driver('google')->user();
-
-            Log::channel('google_auth')->info('Données Google récupérées', [
-                'email' => $googleUser->getEmail(),
-                'name' => $googleUser->getName(),
-                'id' => $googleUser->getId(),
-            ]);
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (! $user) {
-                Log::channel('google_auth')->info('Création d\'un nouvel utilisateur', [
-                    'email' => $googleUser->getEmail(),
-                ]);
+                $avatarPath = null;
+                if ($avatarUrl = $googleUser->getAvatar()) {
+                    try {
+                        $avatarPath = 'avatars/'.Str::uuid().'.jpg';
+
+                        $avatarContent = file_get_contents($avatarUrl);
+
+                        if ($avatarContent) {
+                            Storage::disk('s3')->put($avatarPath, $avatarContent);
+                            Log::channel('google_auth')->info('Avatar téléchargé avec succès', [
+                                'path' => $avatarPath,
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        $avatarPath = null;
+                        Log::channel('google_auth')->error('Erreur lors du téléchargement de l\'avatar', [
+                            'message' => $e->getMessage(),
+                        ]);
+                    }
+                }
 
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'password' => Hash::make(Str::random(24)), // Mot de passe aléatoire
+                    'password' => Hash::make(Str::random(24)), // Random password
+                    'avatar' => $googleUser->getAvatar(),
                 ]);
 
                 event(new Registered($user));
-            } else {
-                Log::channel('google_auth')->info('Utilisateur existant trouvé', [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
-                ]);
+            }
+
+            if (! $user->avatar && ($avatarUrl = $googleUser->getAvatar())) {
+                try {
+                    $avatarPath = 'avatars/'.Str::uuid().'.jpg';
+
+                    $avatarContent = file_get_contents($avatarUrl);
+
+                    if ($avatarContent) {
+                        if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
+                            try {
+                                Storage::disk('s3')->delete($user->avatar);
+                                Log::channel('google_auth')->info('Ancien avatar supprimé', [
+                                    'user_id' => $user->id,
+                                    'path' => $user->avatar,
+                                ]);
+                            } catch (\Exception $e) {
+                                Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
+                                    'message' => $e->getMessage(),
+                                    'user_id' => $user->id,
+                                ]);
+                            }
+                        }
+
+                        Storage::disk('s3')->put($avatarPath, $avatarContent);
+
+                        $user->update(['avatar' => $avatarPath]);
+
+                        Log::channel('google_auth')->info('Avatar mis à jour pour l\'utilisateur existant', [
+                            'user_id' => $user->id,
+                            'path' => $avatarPath,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [
+                        'message' => $e->getMessage(),
+                        'user_id' => $user->id,
+                    ]);
+                }
             }
 
             Auth::login($user);
-            Session::regenerate();
 
-            Log::channel('google_auth')->info('Authentification réussie', [
-                'user_id' => $user->id,
-                'time' => now()->toDateTimeString(),
-            ]);
+            Session::regenerate();
 
             return redirect()->intended(route('dashboard'));
 
-        } catch (\Exception $e) {
-            $errorMessage = $this->handleGoogleAuthError($e, 'callback');
+        } catch (\Exception) {
+            Toaster::error('Erreur lors de l\'authentification avec Google::Veuillez réessayer à nouveau.');
 
-            return redirect()->route('login')->with('google_auth_error', $errorMessage);
+            return redirect()->route('login');
         }
     }
 }
