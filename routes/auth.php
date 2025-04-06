@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AppleAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Middleware\GoogleAuthLogMiddleware;
@@ -35,10 +36,6 @@ Route::middleware('auth')->group(function () {
 Route::post('logout', Logout::class)
     ->name('logout');
 
-// Invite user route
-Route::get('/invitation/{token}', FamilyInvitationHandler::class)
-    ->name('family.invitation');
-
 // Google login route
 Route::middleware([GoogleAuthLogMiddleware::class])->group(function () {
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])
@@ -47,3 +44,7 @@ Route::middleware([GoogleAuthLogMiddleware::class])->group(function () {
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])
         ->name('google.callback');
 });
+
+// Invite user route
+Route::get('/invitation/{token}', FamilyInvitationHandler::class)
+    ->name('family.invitation');

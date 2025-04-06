@@ -6,7 +6,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -31,13 +30,10 @@ class GoogleAuthController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (!$user) {
-                Log::channel('google_auth')->info('Création d\'un nouvel utilisateur', [
-                    'email' => $googleUser->getEmail(),
-                ]);
-
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
+                    'password' => bcrypt(Str::random(20)),
                 ]);
 
                 if ($avatarUrl) {
@@ -54,10 +50,6 @@ class GoogleAuthController extends Controller
                             Storage::disk('s3')->put($avatarPath, $avatarContent);
 
                             $user->update(['avatar' => $avatarPath]);
-
-                            Log::channel('google_auth')->info('Avatar téléchargé avec succès', [
-                                'path' => $avatarPath
-                            ]);
                         }
                     } catch (\Exception $e) {
                         Log::channel('google_auth')->error('Erreur lors du téléchargement de l\'avatar', [
@@ -86,10 +78,6 @@ class GoogleAuthController extends Controller
                         if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
                             try {
                                 Storage::disk('s3')->delete($user->avatar);
-                                Log::channel('google_auth')->info('Ancien avatar supprimé', [
-                                    'user_id' => $user->id,
-                                    'path' => $user->avatar
-                                ]);
                             } catch (\Exception $e) {
                                 Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
                                     'message' => $e->getMessage(),
@@ -102,11 +90,6 @@ class GoogleAuthController extends Controller
                             Storage::disk('s3')->put($avatarPath, $avatarContent);
 
                             $user->update(['avatar' => $avatarPath]);
-
-                            Log::channel('google_auth')->info('Avatar mis à jour pour l\'utilisateur existant', [
-                                'user_id' => $user->id,
-                                'path' => $avatarPath
-                            ]);
                         }
                     } catch (\Exception $e) {
                         Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [

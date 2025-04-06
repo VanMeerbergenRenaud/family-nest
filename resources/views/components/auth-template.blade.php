@@ -45,7 +45,7 @@
         <div class="container rounded-2xl py-8 px-5 md:px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
 
             @if (session('google_auth_error'))
-                <p class="mt-4 mb-6 bg-red-50 border border-red-200 py-2 px-4 gap-4 rounded-md text-sm text-red-700 dark:bg-red-100 dark:border-red-300 dark:text-red-600 flex items-center">
+                <p class="mt-4 mb-5 bg-red-50 border border-red-200 py-2 px-4 gap-4 rounded-md text-sm text-red-700 dark:bg-red-100 dark:border-red-300 dark:text-red-600 flex items-center">
                     <x-svg.error class="h-4 w-4" />
                     {{ session('google_auth_error') }}
                 </p>
@@ -53,13 +53,13 @@
 
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
-                <div class="space-y-3 md:space-y-0 md:flex md:space-x-4">
+                <div class="space-y-3 md:space-y-0 md:flex md:space-x-4 min-w-[26rem]">
                     <a href="{{ route('google.redirect') }}"  class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
-                        <x-svg.google class="mr-2.5"/>
+                        <x-svg.google class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Google
                     </a>
-                    <a href="#" class="w-full flex-center py-3 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
-                        <x-svg.apple class="mr-2.5"/>
+                    <a href="#" class="cursor-not-allowed w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                        <x-svg.apple class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Apple
                     </a>
                 </div>
