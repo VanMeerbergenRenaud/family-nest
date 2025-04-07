@@ -83,8 +83,6 @@ class Create extends Component
 
     public function createInvoice(FileStorageService $fileStorageService): void
     {
-        Toaster::success('Bienvenue dans le module de création de factures !');
-
         $invoice = $this->form->store($fileStorageService);
 
         if ($invoice) {

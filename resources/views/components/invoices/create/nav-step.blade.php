@@ -47,7 +47,7 @@
     </div>
 
     <!-- Navigation desktop -->
-    <div class="hidden lg:flex lg:items-center lg:justify-center lg:flex-row lg:flex-wrap lg:py-2">
+    <div class="hidden lg:flex-center flex-row flex-wrap gap-y-4 px-4 py-2 ml-4">
         <template x-for="(step, index) in steps" :key="index">
             <div class="flex-center cursor-pointer whitespace-nowrap group transition-colors duration-300 ease-in-out"
                  @click="goToStep(index + 1)">
