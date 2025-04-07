@@ -47,6 +47,19 @@
                             :temporaryUrl="$form->uploadedFile->temporaryUrl()"
                             :onRemove="'removeUploadedFile'"
                         />
+
+                        {{-- Bouton OCR --}}
+                        @if($showOcrButton && !$isOcrProcessing)
+                            <button
+                                type="button"
+                                wire:click="processOcr"
+                                class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
+                                wire:loading.attr="disabled"
+                            >
+                                <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
+                                Autocompléter avec OCR
+                            </button>
+                        @endif
                     @endif
                 </div>
 

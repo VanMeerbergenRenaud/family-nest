@@ -55,4 +55,12 @@ return [
         'public_key' => env('ILOVEPDF_PUBLIC_KEY'),
         'secret_key' => env('ILOVEPDF_SECRET_KEY'),
     ],
+
+    // AWS Textract
+    'textract' => [
+        'enabled' => env('AWS_TEXTRACT_ENABLED', false),
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => 'eu-central-1',
+    ],
 ];

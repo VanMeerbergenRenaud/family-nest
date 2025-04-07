@@ -9,8 +9,10 @@ use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Services\FileStorageService;
+use App\Services\TextractService;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceTagManagement;
+use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
@@ -22,6 +24,13 @@ class Create extends Component
     public InvoiceForm $form;
 
     public $family_members = [];
+
+    // OCR properties
+    public $isOcrProcessing = false;
+
+    public $ocrData = null;
+
+    public $showOcrButton = false;
 
     public function mount()
     {
@@ -69,10 +78,13 @@ class Create extends Component
     {
         $this->form->removeFile();
         $this->form->resetErrorBag('uploadedFile');
+        $this->showOcrButton = false;
     }
 
     public function createInvoice(FileStorageService $fileStorageService): void
     {
+        Toaster::success('Bienvenue dans le module de création de factures !');
+
         $invoice = $this->form->store($fileStorageService);
 
         if ($invoice) {
@@ -80,6 +92,89 @@ class Create extends Component
             $this->redirectRoute('invoices.index', $invoice);
         } else {
             Toaster::error('Une erreur s\'est produite lors de la création de la facture.');
+        }
+    }
+
+    /*
+     * OCR :
+     * 1. Display the OCR button when a file is uploaded.
+     * 2. Process the OCR and extract data from the uploaded file.
+     * 3. Apply the OCR data to the form fields.
+    */
+
+    public function updatedFormUploadedFile(): void
+    {
+        $this->showOcrButton = true;
+    }
+
+    public function processOcr(TextractService $textractService): void
+    {
+        if (! $this->form->uploadedFile) {
+            Toaster::error('Veuillez d\'abord télécharger un fichier.');
+
+            return;
+        }
+
+        $this->isOcrProcessing = true;
+
+        try {
+            $path = $this->form->uploadedFile->storeAs('temp', $this->form->uploadedFile->getClientOriginalName(), 'local');
+            $fullPath = storage_path('app/'.$path);
+
+            $result = $textractService->analyzeInvoice($fullPath);
+
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+
+            if ($result['success']) {
+                $this->ocrData = $result['data'];
+                $this->applyOcrDataToForm();
+                Toaster::success('Analyse OCR terminée avec succès.');
+            } else {
+                Toaster::error('Échec de l\'analyse OCR: '.($result['message'] ?? 'Erreur inconnue'));
+            }
+        } catch (\Exception $e) {
+            Toaster::error('Une erreur est survenue: '.$e->getMessage());
+            Log::error('Exception lors du traitement OCR: '.$e->getMessage());
+        } finally {
+            $this->isOcrProcessing = false;
+        }
+    }
+
+    protected function applyOcrDataToForm(): void
+    {
+        if (! $this->ocrData) {
+            return;
+        }
+
+        if (! empty($this->ocrData['name'])) {
+            $this->form->name = $this->ocrData['name'];
+        }
+
+        if (! empty($this->ocrData['reference'])) {
+            $this->form->reference = $this->ocrData['reference'];
+        }
+
+        if (! empty($this->ocrData['issuer_name'])) {
+            $this->form->issuer_name = $this->ocrData['issuer_name'];
+        }
+
+        if (! empty($this->ocrData['issuer_website'])) {
+            $this->form->issuer_website = $this->ocrData['issuer_website'];
+        }
+
+        if (! empty($this->ocrData['amount'])) {
+            $this->form->amount = $this->ocrData['amount'];
+            $this->calculateRemainingShares();
+        }
+
+        if (! empty($this->ocrData['issued_date'])) {
+            $this->form->issued_date = $this->ocrData['issued_date'];
+        }
+
+        if (! empty($this->ocrData['payment_due_date'])) {
+            $this->form->payment_due_date = $this->ocrData['payment_due_date'];
         }
     }
 
