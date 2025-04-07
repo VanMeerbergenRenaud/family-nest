@@ -6,6 +6,7 @@ use App\Models\Family;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -31,7 +32,7 @@ class FamilyInvitation extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "{$this->inviter->name} vous invite à rejoindre sa famille sur FamilyFinance",
+            subject: "{$this->inviter->name} vous invite à rejoindre sa famille sur FamilyNest",
         );
     }
 
@@ -72,5 +73,15 @@ class FamilyInvitation extends Mailable
                 'url' => $url,
             ],
         );
+    }
+
+    /**
+     * Get the attachments for the message.
+     *
+     * @return array<int, Attachment>
+     */
+    public function attachments(): array
+    {
+        return [];
     }
 }

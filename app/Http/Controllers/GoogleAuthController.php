@@ -29,7 +29,7 @@ class GoogleAuthController extends Controller
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            if (!$user) {
+            if (! $user) {
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -38,11 +38,11 @@ class GoogleAuthController extends Controller
 
                 if ($avatarUrl) {
                     try {
-                        $avatarDir = 'avatars/user_' . $user->id;
+                        $avatarDir = 'avatars/user_'.$user->id;
 
-                        $filename = Str::random(40) . '.jpeg';
+                        $filename = Str::random(40).'.jpeg';
 
-                        $avatarPath = $avatarDir . '/' . $filename;
+                        $avatarPath = $avatarDir.'/'.$filename;
 
                         $avatarContent = file_get_contents($avatarUrl);
 
@@ -53,7 +53,7 @@ class GoogleAuthController extends Controller
                         }
                     } catch (\Exception $e) {
                         Log::channel('google_auth')->error('Erreur lors du téléchargement de l\'avatar', [
-                            'message' => $e->getMessage()
+                            'message' => $e->getMessage(),
                         ]);
                     }
                 }
@@ -65,13 +65,13 @@ class GoogleAuthController extends Controller
                     'email' => $user->email,
                 ]);
 
-                if (!$user->avatar && $avatarUrl) {
+                if (! $user->avatar && $avatarUrl) {
                     try {
-                        $avatarDir = 'avatars/user_' . $user->id;
+                        $avatarDir = 'avatars/user_'.$user->id;
 
-                        $filename = Str::random(40) . '.jpeg';
+                        $filename = Str::random(40).'.jpeg';
 
-                        $avatarPath = $avatarDir . '/' . $filename;
+                        $avatarPath = $avatarDir.'/'.$filename;
 
                         $avatarContent = file_get_contents($avatarUrl);
 
@@ -81,7 +81,7 @@ class GoogleAuthController extends Controller
                             } catch (\Exception $e) {
                                 Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
                                     'message' => $e->getMessage(),
-                                    'user_id' => $user->id
+                                    'user_id' => $user->id,
                                 ]);
                             }
                         }
@@ -94,7 +94,7 @@ class GoogleAuthController extends Controller
                     } catch (\Exception $e) {
                         Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [
                             'message' => $e->getMessage(),
-                            'user_id' => $user->id
+                            'user_id' => $user->id,
                         ]);
                     }
                 }

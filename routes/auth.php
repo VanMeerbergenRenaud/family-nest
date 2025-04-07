@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AppleAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Middleware\GoogleAuthLogMiddleware;
