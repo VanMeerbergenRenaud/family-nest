@@ -15,7 +15,7 @@
         </button>
     @endif
 
-    <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
+    <div class="pb-16 lg:pb-12 rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
         {{-- Aperçu pour les images --}}
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
