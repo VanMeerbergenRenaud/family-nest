@@ -1,6 +1,12 @@
 <div>
     <h1 class="sr-only">Créer une facture</h1>
 
+    {{-- Message d'attente pour le traitement OCR --}}
+    <x-invoices.create.loading-overlay
+        title="Analyse OCR en cours..."
+        description="Nous utilisons un logiciel de reconnaissance OCR pour extraire les informations de votre facture. Cela peut prendre quelques secondes..."
+    />
+
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,

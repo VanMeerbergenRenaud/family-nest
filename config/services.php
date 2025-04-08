@@ -63,4 +63,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => 'eu-central-1',
     ],
+
+    // OCR Space (Laravel)
+    'ocr_space' => [
+        'enabled' => env('OCR_SPACE_ENABLED', false),
+        'key' => env('OCR_SPACE_API_KEY', 'helloworld'),
+    ],
 ];

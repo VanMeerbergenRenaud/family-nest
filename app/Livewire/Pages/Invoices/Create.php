@@ -109,13 +109,15 @@ class Create extends Component
     {
         if (! $this->form->uploadedFile) {
             Toaster::error('Veuillez d\'abord télécharger un fichier.');
-
             return;
         }
 
         $this->isOcrProcessing = true;
 
         try {
+            // Notifier le front-end que le traitement commence
+            $this->dispatch('ocr-processing-started');
+
             $path = $this->form->uploadedFile->storeAs('temp', $this->form->uploadedFile->getClientOriginalName(), 'local');
             $fullPath = storage_path('app/'.$path);
 
@@ -130,13 +132,16 @@ class Create extends Component
                 $this->applyOcrDataToForm();
                 Toaster::success('Analyse OCR terminée avec succès.');
             } else {
-                Toaster::error('Échec de l\'analyse OCR: '.($result['message'] ?? 'Erreur inconnue'));
+                Toaster::error('Échec de l\'analyse OCR::Vérifiez le fichier ou le format.');
+                Log::error('Échec de l\'analyse OCR: '.$result['message']);
             }
         } catch (\Exception $e) {
-            Toaster::error('Une erreur est survenue: '.$e->getMessage());
+            Toaster::error('Une erreur est survenue::Vérifiez le fichier ou le format du document.');
             Log::error('Exception lors du traitement OCR: '.$e->getMessage());
         } finally {
             $this->isOcrProcessing = false;
+            // Notifier le front-end que le traitement est terminé
+            $this->dispatch('ocr-processing-completed');
         }
     }
 
