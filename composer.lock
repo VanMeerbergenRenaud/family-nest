@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b0ccb77fddab9a27bcd09b3b4639de8",
+    "content-hash": "7df398ea3d71b1ff542712a9557b7e3d",
     "packages": [
         {
             "name": "algolia/algoliasearch-client-php",
@@ -217,16 +217,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.342.13",
+            "version": "3.342.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "713bdb1ff0c2eb519932c111fc450f6b5462b69f"
+                "reference": "f4d501414c553ddeea2efc9c77f72e58bd899823"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/713bdb1ff0c2eb519932c111fc450f6b5462b69f",
-                "reference": "713bdb1ff0c2eb519932c111fc450f6b5462b69f",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/f4d501414c553ddeea2efc9c77f72e58bd899823",
+                "reference": "f4d501414c553ddeea2efc9c77f72e58bd899823",
                 "shasum": ""
             },
             "require": {
@@ -308,9 +308,9 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.13"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.342.21"
             },
-            "time": "2025-03-25T18:06:01+00:00"
+            "time": "2025-04-04T18:20:53+00:00"
         },
         {
             "name": "beberlei/assert",

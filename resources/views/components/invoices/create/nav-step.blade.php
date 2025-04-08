@@ -1,4 +1,4 @@
-<div class="mb-2 lg:mb-6">
+<div class="mb-2 lg:mb-10">
     <!-- Navigation mobile -->
     <div class="lg:hidden flex items-center justify-between px-4 pb-3 bg-gray-50 dark:bg-gray-800 md:max-w-[60vw] mx-auto">
 
@@ -47,23 +47,36 @@
     </div>
 
     <!-- Navigation desktop -->
-    <div class="hidden lg:flex-center lg:flex-row lg:flex-wrap lg:px-6 lg:py-4 lg:rounded-xl lg:space-x-2">
+    <div class="hidden lg:flex-center flex-row flex-wrap gap-y-4 px-4 py-2 ml-4">
         <template x-for="(step, index) in steps" :key="index">
-            <div class="flex-center cursor-pointer whitespace-nowrap mb-4" @click="goToStep(index + 1)">
+            <div class="flex-center cursor-pointer whitespace-nowrap group transition-colors duration-300 ease-in-out"
+                 @click="goToStep(index + 1)">
+                <!-- Step number in rounded square -->
+                <div class="w-8 h-8 rounded-lg flex-center mr-3 transition-colors duration-300 ease-in-out"
+                     :class="{
+                     'bg-slate-700 text-white': currentStep === index + 1,
+                     'bg-gray-100 text-gray-600 group-hover:bg-gray-200 group-hover:text-slate-900': currentStep !== index + 1
+                 }">
+                    <span x-text="index + 1" class="text-sm-medium"></span>
+                </div>
 
-                <span class="w-8 h-8 rounded-full flex-center mr-3"
-                      :class="{ 'bg-slate-700 text-white': currentStep === index + 1, 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200': currentStep !== index + 1 }">
-                    <span x-text="index + 1" class="text-sm"></span>
-                </span>
-
-                <span class="text-md-regular text-slate-700 dark:text-slate-200"
-                      :class="{ 'font-medium underline': currentStep === index + 1 }"
+                <!-- Step text -->
+                <span class="mr-3 text-md-regular transition-colors duration-300 ease-in-out"
+                      :class="{
+                      'font-medium text-slate-700': currentStep === index + 1,
+                      'text-gray-700 group-hover:text-slate-600': currentStep !== index + 1
+                  }"
                       x-text="step">
-                </span>
+            </span>
 
-                <span x-show="index < steps.length - 1" class="mx-2 text-slate-400 dark:text-slate-500">
-                    <x-svg.chevron-right class="w-4 h-4 md:w-6 md:h-6"/>
-                </span>
+                <!-- Dashed line between steps -->
+                <div x-show="index < steps.length - 1"
+                     class="mr-3 w-12 border-t transition-colors duration-300 ease-in-out"
+                     :class="{
+                     'border-slate-400 border-dashed': currentStep === index + 1,
+                     'border-gray-300 border-dashed': currentStep !== index + 1
+                 }">
+                </div>
             </div>
         </template>
     </div>

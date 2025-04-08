@@ -8,6 +8,7 @@
         "php": "^8.2",
         "ext-zip": "*",
         "algolia/scout-extended": "^3.1",
+        "aws/aws-sdk-php": "^3.342",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "ilovepdf/ilovepdf-php": "^1.2",
         "laravel/framework": "^11.9",

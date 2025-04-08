@@ -1,6 +1,12 @@
 <div>
     <h1 class="sr-only">Créer une facture</h1>
 
+    {{-- Message d'attente pour le traitement OCR --}}
+    <x-invoices.create.loading-overlay
+        title="Analyse OCR en cours..."
+        description="Nous utilisons un logiciel de reconnaissance OCR pour extraire les informations de votre facture. Cela peut prendre quelques secondes..."
+    />
+
     {{-- Formulaire pour créer une facture : multi step  --}}
     <div x-data="{
             currentStep: 1,
@@ -47,11 +53,24 @@
                             :temporaryUrl="$form->uploadedFile->temporaryUrl()"
                             :onRemove="'removeUploadedFile'"
                         />
+
+                        {{-- Bouton OCR --}}
+                        @if($showOcrButton && !$isOcrProcessing)
+                            <button
+                                type="button"
+                                wire:click="processOcr"
+                                class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
+                                wire:loading.attr="disabled"
+                            >
+                                <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
+                                Autocompléter avec OCR
+                            </button>
+                        @endif
                     @endif
                 </div>
 
                 {{-- Steps : colonne 2 --}}
-                <div class="bg-slate-100 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-slate-200">
+                <div class="relative bg-slate-100 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-slate-200">
 
                     {{-- Étape 1: Informations générales --}}
                     <x-invoices.create.form-step
@@ -300,14 +319,22 @@
                                 <x-svg.arrows.left class="stroke-white"/>
                                 Précédent
                             </button>
+                            <button
+                                type="submit"
+                                x-show="currentStep > 1 && currentStep < steps.length"
+                                class="max-sm:hidden ml-auto relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
+                                aria-label="Terminer et valider toutes les étapes"
+                            >
+                                Terminer et valider
+                                <span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 text-xs bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
+                                     NB: Cette action valide toutes les étapes et<br>enregistre la facture si il n'y a pas d'erreur.
+                              </span>
+                            </button>
                             <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="ml-auto button-secondary">
                                 Suivant
                                 <x-svg.arrows.right class="stroke-white"/>
                             </button>
-                            <button type="submit" x-show="currentStep < steps.length" class="button-primary">
-                                Tout valider
-                            </button>
-                            <button type="submit" x-show="currentStep === steps.length" class="button-tertiary">
+                            <button type="submit" x-show="currentStep === steps.length" class="button-tertiary" wire:loading.attr="disabled" @if($errors->any()) disabled @endif>
                                 Valider
                                 <x-svg.valid class="text-white"/>
                             </button>

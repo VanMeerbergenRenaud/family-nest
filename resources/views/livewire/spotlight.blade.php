@@ -78,8 +78,7 @@
                                                                 description="({{ $result->amount }} {{ $result->currency }})"
                                                                 state="{{ $result->is_archived ? '#archivée' : null }}"
                                                             >
-                                                                <x-svg.invoice
-                                                                    class="h-5 w-5 group-hover:text-gray-800"/>
+                                                                <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800" />
                                                             </x-spotlight.result>
                                                         @endif
 
