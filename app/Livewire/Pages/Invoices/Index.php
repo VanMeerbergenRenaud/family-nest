@@ -33,6 +33,8 @@ class Index extends Component
 
     public bool $showInvoicePreviewModal = false;
 
+    public bool $showSidebarInvoiceDetails = false;
+
     // Filtres et colonnes...
     public $sortField = 'name';
 
@@ -78,6 +80,20 @@ class Index extends Component
         'amount_asc' => 'Montant (du moins cher au plus cher)',
         'amount_desc' => 'Montant (du plus cher au moins cher)',
     ];
+
+    public function showSidebarInvoice($id): void
+    {
+        $this->invoice = auth()->user()->invoices()
+            ->with(['file', 'sharedUsers'])
+            ->findOrFail($id);
+
+        $this->showSidebarInvoiceDetails = true;
+    }
+
+    public function toggleSidebar(): void
+    {
+        $this->showSidebarInvoiceDetails = ! $this->showSidebarInvoiceDetails;
+    }
 
     // Méthodes pour le dossier
     public function openFolder($folder, $title): void

@@ -1,5 +1,5 @@
-<div class="grid grid-cols-[40vw_auto] mx-auto lg:gap-8">
-    <div class="relative flex-center overflow-hidden border border-slate-200 bg-gray-100 rounded-xl">
+<div class="flex-center flex-col lg:grid lg:grid-cols-[40vw_auto] gap-6">
+    <div class="relative flex-center w-full h-full overflow-hidden border border-slate-200 bg-gray-100 rounded-xl">
         <x-file-viewer
             :$filePath
             :$fileExtension

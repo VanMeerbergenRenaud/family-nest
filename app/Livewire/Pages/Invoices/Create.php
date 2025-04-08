@@ -109,6 +109,7 @@ class Create extends Component
     {
         if (! $this->form->uploadedFile) {
             Toaster::error('Veuillez d\'abord télécharger un fichier.');
+
             return;
         }
 

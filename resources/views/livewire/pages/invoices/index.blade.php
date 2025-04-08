@@ -140,7 +140,7 @@
                                     </p>
                                 </div>
                                 {{-- Menu d'action --}}
-                                <x-invoices.menu-actions :invoice="$invoice" :dotsRotation="true" />
+                                <x-invoices.menu-actions :$invoice :dotsRotation="true" />
                             </div>
                         </li>
                     @endforeach
@@ -615,7 +615,7 @@
                             {{-- Actions --}}
                             <td class="text-right">
                                 <div class="flex justify-end">
-                                    <x-invoices.menu-actions :invoice="$invoice" />
+                                    <x-invoices.menu-actions :$invoice />
                                 </div>
                             </td>
                         </tr>
@@ -715,7 +715,7 @@
                                                 </h3>
                                             </div>
 
-                                            <x-invoices.menu-actions :invoice="$invoice" />
+                                            <x-invoices.menu-actions :$invoice />
                                         </div>
 
                                         <!-- Corps de la carte -->
@@ -839,5 +839,25 @@
                 </x-modal.panel>
             </x-modal>
         @endif
+    @endif
+
+    @if($showSidebarInvoiceDetails)
+        <x-sidebar wire:model="showSidebarInvoiceDetails" :isSidebarOpen="$showSidebarInvoiceDetails">
+            <x-slot:header>
+                <p class="pl-2 text-lg-semibold text-gray-900">
+                    {{ __('Résumé des informations de la facture') }}
+                </p>
+            </x-slot:header>
+           <x-slot:content>
+                <x-invoices.create.summary :form="$this->invoice" />
+            </x-slot:content>
+            <x-slot:footer>
+                <div class="flex justify-end">
+                    <button type="button" class="button-secondary" wire:click="toggleSidebar">
+                        {{ __('Fermer') }}
+                    </button>
+                </div>
+            </x-slot:footer>
+        </x-sidebar>
     @endif
 </div>

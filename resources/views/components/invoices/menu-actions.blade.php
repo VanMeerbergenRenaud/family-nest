@@ -1,5 +1,5 @@
 @props([
-    'invoice',
+    'invoice' => null,
     'dotsRotation' => false,
 ])
 
@@ -14,7 +14,7 @@
             {{ __('Voir l‘aperçu') }}
         </x-menu.item>
 
-        <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}">
+        <x-menu.item wire:click="showSidebarInvoice({{ $invoice->id }})">
             <x-svg.binocular class="w-4 h-4 group-hover:text-gray-900"/>
             {{ __('Voir en détail') }}
         </x-menu.item>

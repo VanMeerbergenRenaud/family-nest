@@ -6,11 +6,11 @@ use Aws\Textract\TextractClient;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class TextractService
 {
-    protected TextractClient|null $textractClient = null;
+    protected ?TextractClient $textractClient = null;
+
     protected string $ocrSpaceApiKey;
 
     public function __construct()
@@ -26,12 +26,14 @@ class TextractService
             ]);
         }
 
-        $this->ocrSpaceApiKey = config('services.ocr_space.key', 'helloworld');
+        if (config('services.ocr_space.enabled')) {
+            $this->ocrSpaceApiKey = config('services.ocr_space.key', 'helloworld');
+        }
     }
 
     public function analyzeInvoice(string|UploadedFile $file): array
     {
-        if (!config('services.textract.enabled') && !config('services.ocr_space.enabled')) {
+        if (! config('services.textract.enabled') && ! config('services.ocr_space.enabled')) {
             return ['success' => false, 'message' => 'Aucun service OCR n\'est activé'];
         }
 
@@ -50,13 +52,14 @@ class TextractService
                     return [
                         'success' => true,
                         'data' => $this->processTextractResponse($result),
-                        'service' => 'textract'
+                        'service' => 'textract',
                     ];
                 } catch (\Exception $e) {
-                    Log::warning('AWS Textract a échoué: ' . $e->getMessage());
+                    Log::warning('AWS Textract a échoué: '.$e->getMessage());
 
                     if (config('services.ocr_space.enabled')) {
                         Log::info('Tentative avec OCR.space comme solution de secours...');
+
                         return $this->analyzeWithOcrSpace($file);
                     }
 
@@ -68,8 +71,9 @@ class TextractService
 
             throw new \Exception('Aucun service OCR disponible');
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'analyse OCR: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Erreur lors de l\'analyse OCR: ' . $e->getMessage()];
+            Log::error('Erreur lors de l\'analyse OCR: '.$e->getMessage());
+
+            return ['success' => false, 'message' => 'Erreur lors de l\'analyse OCR: '.$e->getMessage()];
         }
     }
 
@@ -95,23 +99,24 @@ class TextractService
                 if (isset($ocrResult['IsErroredOnProcessing']) && $ocrResult['IsErroredOnProcessing'] === false) {
                     $allText = '';
                     foreach ($ocrResult['ParsedResults'] as $parsedResult) {
-                        $allText .= $parsedResult['ParsedText'] . ' ';
+                        $allText .= $parsedResult['ParsedText'].' ';
                     }
 
                     return [
                         'success' => true,
                         'data' => $this->processOcrText($allText),
-                        'service' => 'ocr.space'
+                        'service' => 'ocr.space',
                     ];
                 } else {
                     throw new \Exception($ocrResult['ErrorMessage'] ?? 'Erreur inconnue avec OCR.space');
                 }
             } else {
-                throw new \Exception('Erreur de communication avec OCR.space: ' . $response->status());
+                throw new \Exception('Erreur de communication avec OCR.space: '.$response->status());
             }
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'analyse OCR.space: ' . $e->getMessage());
-            return ['success' => false, 'message' => 'Erreur lors de l\'analyse OCR.space: ' . $e->getMessage()];
+            Log::error('Erreur lors de l\'analyse OCR.space: '.$e->getMessage());
+
+            return ['success' => false, 'message' => 'Erreur lors de l\'analyse OCR.space: '.$e->getMessage()];
         }
     }
 
@@ -128,7 +133,7 @@ class TextractService
 
         // Rechercher le nom du fournisseur
         foreach (array_slice($lines, 0, 5) as $line) {
-            if (!preg_match('/(facture|invoice|devis|reçu)/i', $line) && strlen($line) > 2 && strlen($line) < 60) {
+            if (! preg_match('/(facture|invoice|devis|reçu)/i', $line) && strlen($line) > 2 && strlen($line) < 60) {
                 $extractedData['issuer_name'] = $line;
                 break;
             }
@@ -139,14 +144,14 @@ class TextractService
             // Date d'émission
             '/(date\s+d[\'e]mission|date\s+facture|date\s+du\s+document|émis\s+le|emis\s+le|date\s+:)\s*:?\s*(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+[a-zéûôàçù]+\s+\d{2,4})/i',
             // Date d'échéance
-            '/(date\s+d[\'e]ch[ée]ance|[ée]ch[ée]ance|date\s+limite|paiement\s+avant\s+le|due\s+date|payer\s+avant\s+le)\s*:?\s*(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+[a-zéûôàçù]+\s+\d{2,4})/i'
+            '/(date\s+d[\'e]ch[ée]ance|[ée]ch[ée]ance|date\s+limite|paiement\s+avant\s+le|due\s+date|payer\s+avant\s+le)\s*:?\s*(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4}|\d{1,2}\s+[a-zéûôàçù]+\s+\d{2,4})/i',
         ];
 
         foreach ($lines as $line) {
-            if (!$extractedData['issued_date'] && preg_match($datePatterns[0], $line, $matches)) {
+            if (! $extractedData['issued_date'] && preg_match($datePatterns[0], $line, $matches)) {
                 $extractedData['issued_date'] = $this->parseDate($matches[2]);
             }
-            if (!$extractedData['payment_due_date'] && preg_match($datePatterns[1], $line, $matches)) {
+            if (! $extractedData['payment_due_date'] && preg_match($datePatterns[1], $line, $matches)) {
                 $extractedData['payment_due_date'] = $this->parseDate($matches[2]);
             }
 
@@ -155,22 +160,22 @@ class TextractService
                 $extractedData['amount'] = str_replace(',', '.', preg_replace('/[^\d.,]/', '', $matches[1]));
             }
 
-            if (!$extractedData['issuer_website'] &&
+            if (! $extractedData['issuer_website'] &&
                 preg_match('/https?:\/\/\S+|www\.\S+\.[a-z]{2,}/i', $line, $matches)) {
                 $extractedData['issuer_website'] = $matches[0];
-                if (!str_starts_with($extractedData['issuer_website'], 'http')) {
-                    $extractedData['issuer_website'] = 'http://' . $extractedData['issuer_website'];
+                if (! str_starts_with($extractedData['issuer_website'], 'http')) {
+                    $extractedData['issuer_website'] = 'http://'.$extractedData['issuer_website'];
                 }
             }
 
-            if (!$extractedData['reference'] &&
+            if (! $extractedData['reference'] &&
                 preg_match('/(facture|invoice|n°|numero|number|ref|référence|reference)\s*:?\s*([A-Z0-9\-_\/]+)/i', $line, $matches)) {
                 $extractedData['reference'] = $matches[2];
             }
         }
 
         // Rechercher des dates dans le texte brut si pas encore trouvé
-        if (!$extractedData['issued_date'] && preg_match('/\b(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4})\b/', $allText, $matches)) {
+        if (! $extractedData['issued_date'] && preg_match('/\b(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4})\b/', $allText, $matches)) {
             $extractedData['issued_date'] = $this->parseDate($matches[1]);
         }
 
@@ -186,7 +191,7 @@ class TextractService
                 }
             }
 
-            $factureName = 'Facture ' . $cleanIssuerName;
+            $factureName = 'Facture '.$cleanIssuerName;
 
             if ($extractedData['issued_date']) {
                 $date = \DateTime::createFromFormat('Y-m-d', $extractedData['issued_date']);
@@ -194,12 +199,12 @@ class TextractService
                     $frenchMonths = [
                         1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
                         5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
-                        9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre'
+                        9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
                     ];
 
-                    $month = $frenchMonths[(int)$date->format('n')];
+                    $month = $frenchMonths[(int) $date->format('n')];
                     $year = $date->format('Y');
-                    $factureName .= ' ' . $month . ' ' . $year;
+                    $factureName .= ' '.$month.' '.$year;
                 }
             }
 
@@ -239,9 +244,9 @@ class TextractService
         Log::debug('Textract text lines:', $lines);
 
         foreach (array_slice($lines, 0, 7) as $index => $line) {
-            if (!preg_match('/(facture|invoice|devis|reçu|commande|date|total|montant|\d{2}\/\d{2}\/\d{4}|\d{2}\.\d{2}\.\d{4})/i', $line) &&
-                !preg_match('/^\d+(\.\d+)?$/', $line) && strlen($line) < 60 && strlen($line) > 2 &&
-                !preg_match('/^[!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\;\'\:\"\,\.\/\<\>\?\\\\]+$/', $line)) {
+            if (! preg_match('/(facture|invoice|devis|reçu|commande|date|total|montant|\d{2}\/\d{2}\/\d{4}|\d{2}\.\d{2}\.\d{4})/i', $line) &&
+                ! preg_match('/^\d+(\.\d+)?$/', $line) && strlen($line) < 60 && strlen($line) > 2 &&
+                ! preg_match('/^[!\@\#\$\%\^\&\*\(\)\_\+\-\=\[\]\{\}\;\'\:\"\,\.\/\<\>\?\\\\]+$/', $line)) {
 
                 $hasWords = false;
                 foreach (explode(' ', $line) as $word) {
@@ -271,8 +276,8 @@ class TextractService
         $extractedData = $this->processOcrText($allText, $keyValuePairs);
 
         // Si aucun fournisseur dans processOcrText, utiliser les potentiels noms d'entreprise
-        if (!$extractedData['issuer_name'] && !empty($potentialCompanyNames)) {
-            usort($potentialCompanyNames, fn($a, $b) => $b['score'] - $a['score']);
+        if (! $extractedData['issuer_name'] && ! empty($potentialCompanyNames)) {
+            usort($potentialCompanyNames, fn ($a, $b) => $b['score'] - $a['score']);
             $extractedData['issuer_name'] = trim($potentialCompanyNames[0]['text'], " \t\n\r\0\x0B.,;:!?\"'()[]{}<>*/\\");
 
             // Régénérer le nom de la facture
@@ -281,16 +286,16 @@ class TextractService
                 $cleanIssuerName = substr(explode(' ', $cleanIssuerName)[0], 0, 30);
             }
 
-            $factureName = 'Facture ' . $cleanIssuerName;
+            $factureName = 'Facture '.$cleanIssuerName;
             if ($extractedData['issued_date']) {
                 $date = \DateTime::createFromFormat('Y-m-d', $extractedData['issued_date']);
                 if ($date) {
                     $frenchMonths = [
                         1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
                         5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
-                        9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre'
+                        9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
                     ];
-                    $factureName .= ' ' . $frenchMonths[(int)$date->format('n')] . ' ' . $date->format('Y');
+                    $factureName .= ' '.$frenchMonths[(int) $date->format('n')].' '.$date->format('Y');
                 }
             }
             $extractedData['name'] = $factureName;
@@ -299,12 +304,12 @@ class TextractService
         // Rechercher spécifiquement des clés dans keyValuePairs
         foreach ($keyValuePairs as $key => $value) {
             if (preg_match('/(fournisseur|societe|company|emetteur|issuer|vendor|entreprise|fourni par|par|from|nom)/i', $key) &&
-                !preg_match('/^\d+$/', $value)) {
+                ! preg_match('/^\d+$/', $value)) {
                 $extractedData['issuer_name'] = $value;
             }
             if (preg_match('/(montant|amount|total|ttc|à payer|a payer|somme|price|prix)/i', $key)) {
                 preg_match('/[\d\s.,€$]+/', $value, $matches);
-                if (!empty($matches)) {
+                if (! empty($matches)) {
                     $extractedData['amount'] = str_replace(',', '.', preg_replace('/[^\d.,]/', '', $matches[0]));
                 }
             }
@@ -335,7 +340,8 @@ class TextractService
         foreach ($frenchMonths as $month => $number) {
             if (preg_match('/(\d{1,2})\s*'.$month.'\s*(\d{4}|\d{2})/i', $dateString, $matches)) {
                 $day = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
-                $year = strlen($matches[2]) == 2 ? '20' . $matches[2] : $matches[2];
+                $year = strlen($matches[2]) == 2 ? '20'.$matches[2] : $matches[2];
+
                 return "$year-$number-$day";
             }
         }
@@ -350,8 +356,8 @@ class TextractService
         if (preg_match('/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})\b/', $dateString, $matches)) {
             $day = $matches[1];
             $month = $matches[2];
-            $year = strlen($matches[3]) == 2 ? '20' . $matches[3] : $matches[3];
-            if (checkdate((int)$month, (int)$day, (int)$year)) {
+            $year = strlen($matches[3]) == 2 ? '20'.$matches[3] : $matches[3];
+            if (checkdate((int) $month, (int) $day, (int) $year)) {
                 return sprintf('%04d-%02d-%02d', $year, $month, $day);
             }
         }
@@ -372,6 +378,7 @@ class TextractService
                 }
             }
         }
+
         return null;
     }
 
@@ -388,18 +395,20 @@ class TextractService
                                     foreach ($childRelationship['Ids'] as $childId) {
                                         foreach ($blocks as $childBlock) {
                                             if ($childBlock['Id'] === $childId && $childBlock['BlockType'] === 'WORD') {
-                                                $valueText .= $childBlock['Text'] . ' ';
+                                                $valueText .= $childBlock['Text'].' ';
                                             }
                                         }
                                     }
                                 }
                             }
+
                             return trim($valueText);
                         }
                     }
                 }
             }
         }
+
         return null;
     }
 }

@@ -3,7 +3,7 @@
     'family_members' => collect(),
 ])
 
-<div class="bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+<div class="w-full bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
         <x-invoices.create.summary-item label="Nom de la facture" :alternateBackground="true">
             {{ $form->name ?? 'Non spécifié' }}
