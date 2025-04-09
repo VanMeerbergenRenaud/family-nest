@@ -69,6 +69,8 @@ class Index extends Component
 
     public $invoiceIdsOnPage = [];
 
+    public $selectedPaymentStatus = null;
+
     // Filtres disponibles
     public $availableFilters = [
         'name_asc' => 'Par ordre alphabétique (A-Z)',
@@ -358,28 +360,50 @@ class Index extends Component
         }
     }
 
-    public function downloadSelected(): void
+    public function markAsPaymentStatusSelected(): void
     {
         try {
+            if (empty($this->selectedInvoiceIds)) {
+                Toaster::error('Aucune facture sélectionnée.');
+                return;
+            }
+
+            if ($this->selectedPaymentStatus === null) {
+                Toaster::error('Veuillez sélectionner un statut de paiement.');
+                return;
+            }
+
             $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
                 ->where('is_archived', false)
                 ->get();
 
             if ($invoices->isEmpty()) {
                 Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
-
                 return;
             }
 
-            // Attention : Cette fonctionnalité est limitée, car on ne peut pas déclencher plusieurs téléchargements à la fois
-            // dans le navigateur. Pour une véritable solution, TODO: il faudrait créer un zip de tous les fichiers.
+            $count = $invoices->count();
             foreach ($invoices as $invoice) {
-                $this->downloadInvoice($invoice->id);
+                $invoice->payment_status = $this->selectedPaymentStatus;
+                $invoice->save();
             }
 
-            Toaster::info('Factures sélectionnées en cours de téléchargement.');
-        } catch (\Exception) {
-            Toaster::error('Erreur lors du téléchargement::Vous n\'avez pas sélectionné de fichiers ou ils sont déjà archivés.');
+            $statusEnum = PaymentStatusEnum::from($this->selectedPaymentStatus);
+            $statusEmoji = $statusEnum->emoji();
+            $statusLabel = $statusEnum->label();
+
+            if ($count > 1) {
+                Toaster::success("$count factures marquées comme \"$statusLabel\" avec succès.");
+            } else {
+                Toaster::success("La facture a été marquée comme \"$statusLabel\" avec succès.");
+            }
+
+            $this->selectedInvoiceIds = [];
+            $this->selectedPaymentStatus = null;
+
+        } catch (\Exception $e) {
+            Toaster::error('Erreur lors de la modification des factures sélectionnées');
+            \Log::error('Erreur lors de la modification des factures sélectionnées: '.$e->getMessage());
         }
     }
 

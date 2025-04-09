@@ -189,21 +189,11 @@
 
         <x-invoices.create.summary-item label="Statut de paiement">
             @if($form->payment_status && $form->payment_status instanceof \App\Enums\PaymentStatusEnum)
-                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                      {{ $form->payment_status === 'paid'
-                            ? 'bg-green-100 text-green-800'
-                            : ($form->payment_status === 'late' ? 'bg-red-100 text-red-800'
-                            : ($form->payment_status === 'partially_paid' ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800')) }}"
-                >
-                    {{ $form->payment_status === 'paid' ? 'Payée'
-                    : ($form->payment_status === 'late' ? 'En retard'
-                    : ($form->payment_status === 'partially_paid' ? 'Partiellement payée'
-                    : 'Non payée')) }}
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    {{ $form->payment_status->emoji() }}&nbsp;&nbsp;{{ $form->payment_status->label() }}
                 </span>
             @else
-                <span
-                    class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                     Non spécifié
                 </span>
             @endif

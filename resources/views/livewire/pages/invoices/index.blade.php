@@ -499,9 +499,9 @@
                                 </label>
                             </td>
                             @if($visibleColumns['name'] ?? false)
-                                <td wire:click="showInvoiceModal({{ $invoice->id }})" class="cursor-pointer">
+                                <td>
                                     {{-- Affichage du nom du fichier --}}
-                                    <div class="flex items-center">
+                                    <div class="flex items-center cursor-pointer" wire:click="showInvoiceModal({{ $invoice->id }})">
                                         @php
                                             $extension = $invoice->file->file_extension ?? null;
                                         @endphp
@@ -555,7 +555,7 @@
                                     @php
                                         $statusEnum = $invoice->payment_status;
                                         $statusColor = $statusEnum?->color() ?? 'gray';
-                                        $statusClass = "bg-{$statusColor}-100 text-{$statusColor}-800";
+                                        $statusClass = "bg-$statusColor-100 text-{$statusColor}-800";
                                         $statusText = $statusEnum?->label() ?? 'Non spécifié';
                                         $statusEmoji = $statusEnum?->emoji() ?? '';
                                     @endphp
@@ -646,10 +646,14 @@
             @endif
         </section>
 
-        {{-- Bulk actions --}}
+        <!-- Bulk actions -->
         <div x-show="$wire.selectedInvoiceIds.length > 0" x-cloak class="h-20 lg:h-12">{{-- White space--}}</div>
-        <div x-transition x-show="$wire.selectedInvoiceIds.length > 0" x-cloak class="fixed bottom-4 left-4 right-4 lg:left-24 mx-auto max-w-md w-fit z-70 rounded-md lg:rounded-xl bg-white border border-gray-200">
-            <div class="flex flex-wrap items-center justify-between gap-y-4 pl-5 pr-3 py-2">
+        <div x-cloak
+             x-transition
+             x-show="$wire.selectedInvoiceIds.length > 0"
+             class="fixed bottom-4 left-6 right-6 lg:left-24 mx-auto w-auto lg:w-fit z-70 rounded-md lg:rounded-xl bg-white border border-gray-200"
+        >
+            <div class="flex max-lg:flex-wrap items-center justify-between gap-y-4 p-2.5 lg:pl-5 lg:pr-2.5">
                 <!-- Selected count indicator -->
                 <div class="flex items-center gap-1">
                     <span x-text="$wire.selectedInvoiceIds.length" class="text-gray-900 text-sm mr-0.5"></span>
@@ -659,10 +663,10 @@
                     </span>
                 </div>
 
-                <div class="max-sm:hidden h-5 w-px bg-gray-300 mx-3"></div>
+                <div class="max-lg:hidden h-5 w-px bg-gray-300 mx-3"></div>
 
                 <!-- Action buttons -->
-                <div class="ml-1 flex items-center gap-3">
+                <div class="lg:ml-1 flex flex-wrap items-center gap-2">
                     <!-- Archive button -->
                     <form wire:submit="archiveSelected">
                         <button type="submit" class="button-primary group hover:text-red-500">
@@ -671,12 +675,36 @@
                         </button>
                     </form>
 
-                    <!-- Download button -->
-                    <form wire:submit="downloadSelected">
-                        <button type="submit" class="button-tertiary">
-                            <x-svg.download-down class="text-white" />
-                            Télécharger
-                        </button>
+                    <!-- Mark as 'paid, unpaid, late,..' select -->
+                    <form wire:submit="markAsPaymentStatusSelected">
+                        <label for="selectedPaymentStatus" class="sr-only">Statut de paiement</label>
+                        <div x-data="{ selectedOption: '' }" class="flex flex-wrap items-center gap-2">
+                            <div class="relative inline-block">
+                                <select
+                                    id="selectedPaymentStatus"
+                                    wire:model="selectedPaymentStatus"
+                                    x-model="selectedOption"
+                                    class="button-primary h-[2.625rem] pr-9 pl-3 appearance-none cursor-pointer"
+                                >
+                                    <option value="" selected>Changer le statut</option>
+                                    @foreach(App\Enums\PaymentStatusEnum::cases() as $status)
+                                        <option value="{{ $status->value }}">
+                                            {{ $status->emoji() }}&nbsp;&nbsp;{{ $status->label() }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <!-- Flèche personnalisée -->
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                    <x-svg.arrows.right class="rotate-90" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="button-secondary bg-slate-700 hover:bg-slate-800" x-show="selectedOption">
+                                <x-svg.validate class="text-white"/>
+                                Appliquer
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -819,7 +847,7 @@
         @if($showInvoicePreviewModal)
             <x-modal wire:model="showInvoicePreviewModal">
                 <x-modal.panel class="max-w-4xl">
-                    <p class="sticky top-0 p-5 px-8 max-w-full text-xl font-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
+                    <p class="sticky top-0 p-5 px-8 max-w-full text-xl-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                         {{ __('Aperçu de la facture') }}
                     </p>
 
@@ -857,22 +885,26 @@
     @endif
 
     @if($showSidebarInvoiceDetails)
-        <x-sidebar wire:model="showSidebarInvoiceDetails" :isSidebarOpen="$showSidebarInvoiceDetails">
-            <x-slot:header>
-                <p class="pl-2 text-lg-semibold text-gray-900">
+        <x-modal wire:model="showSidebarInvoiceDetails">
+            <x-modal.panel position="center-right" height="95vh">
+                <p class="sticky top-0 p-5 pr-15 max-w-full text-xl-bold border-b border-slate-200 bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                     {{ __('Résumé des informations de la facture') }}
                 </p>
-            </x-slot:header>
-           <x-slot:content>
-                <x-invoices.create.summary :form="$this->invoice" />
-            </x-slot:content>
-            <x-slot:footer>
-                <div class="flex justify-end">
-                    <button type="button" class="button-secondary" wire:click="toggleSidebar">
-                        {{ __('Fermer') }}
-                    </button>
+
+                <div class="p-4">
+                    <x-invoices.create.summary :form="$this->invoice" />
                 </div>
-            </x-slot:footer>
-        </x-sidebar>
+
+                <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">
+                    <div class="flex justify-end w-full gap-3">
+                        <x-modal.close>
+                            <button type="button" class="button-secondary">
+                                {{ __('Fermer') }}
+                            </button>
+                        </x-modal.close>
+                    </div>
+                </x-modal.footer>
+            </x-modal.panel>
+        </x-modal>
     @endif
 </div>
