@@ -37,6 +37,15 @@ class TextractService
             return ['success' => false, 'message' => 'Aucun service OCR n\'est activé'];
         }
 
+        $fileSize = $file instanceof UploadedFile ? $file->getSize() : filesize($file);
+
+        if ($fileSize >= 10 * 1024 * 1024 && config('services.textract.enabled')) {
+            Log::warning('Fichier trop volumineux pour AWS Textract ('.round($fileSize / 1024 / 1024, 2).' Mo)');
+            if (config('services.ocr_space.enabled')) {
+                return $this->analyzeWithOcrSpace($file);
+            }
+        }
+
         try {
             if (config('services.textract.enabled')) {
                 try {
@@ -108,7 +117,13 @@ class TextractService
                         'service' => 'ocr.space',
                     ];
                 } else {
-                    throw new \Exception($ocrResult['ErrorMessage'] ?? 'Erreur inconnue avec OCR.space');
+                    $errorMessage = isset($ocrResult['ErrorMessage'])
+                        ? (is_array($ocrResult['ErrorMessage'])
+                            ? json_encode($ocrResult['ErrorMessage'])
+                            : $ocrResult['ErrorMessage'])
+                        : 'Erreur inconnue avec OCR.space';
+
+                    throw new \Exception($errorMessage);
                 }
             } else {
                 throw new \Exception('Erreur de communication avec OCR.space: '.$response->status());
@@ -175,7 +190,7 @@ class TextractService
         }
 
         // Rechercher des dates dans le texte brut si pas encore trouvé
-        if (! $extractedData['issued_date'] && preg_match('/\b(\d{1,2}[\/\.\-]\d{1,2}[\/\.\-]\d{2,4})\b/', $allText, $matches)) {
+        if (! $extractedData['issued_date'] && preg_match('/\b(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})\b/', $allText, $matches)) {
             $extractedData['issued_date'] = $this->parseDate($matches[1]);
         }
 

@@ -126,9 +126,16 @@
                     @foreach($recentInvoices as $invoice)
                         <li wire:key="invoice-{{ $invoice->id }}"
                             class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                            @php
+                                $extension = $invoice->file->file_extension ?? null;
+                            @endphp
                             <div class="flex items-center justify-between gap-4">
-                                <div class="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg">
-                                    <x-svg.file-size class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
+                                <div wire:click="showInvoiceModal({{ $invoice->id }})" class="cursor-pointer bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 p-2 rounded-lg">
+                                    @if(View::exists('components.svg.file.' . $extension))
+                                        <x-dynamic-component :component="'svg.file.' . $extension" class="w-6 h-6"/>
+                                    @else
+                                        <x-svg.file.default class="w-6 h-6"/>
+                                    @endif
                                 </div>
                                 <div>
                                     <h3 class="text-sm-medium text-gray-900 dark:text-white">
@@ -481,7 +488,7 @@
                     </thead>
                     <tbody>
                     @foreach ($invoices as $invoice)
-                        <tr wire:key="invoice-{{ $invoice->id }}" class="relative pl-8">
+                        <tr wire:key="invoice-{{ $invoice->id }}" class="relative pl-8 group hover:bg-gray-50/70">
                             {{-- Nom du fichier --}}
                             <td class="whitespace-nowrap pr-0 pl-6 w-4">
                                 <label class="relative flex items-center cursor-pointer w-fit">
@@ -492,7 +499,8 @@
                                 </label>
                             </td>
                             @if($visibleColumns['name'] ?? false)
-                                <td>
+                                <td wire:click="showInvoiceModal({{ $invoice->id }})" class="cursor-pointer">
+                                    {{-- Affichage du nom du fichier --}}
                                     <div class="flex items-center">
                                         @php
                                             $extension = $invoice->file->file_extension ?? null;
@@ -620,6 +628,13 @@
                             </td>
                         </tr>
                     @endforeach
+                    @if($invoices->count() <= 5)
+                        <tr>
+                            <td colspan="100%" class="h-64">
+                                <p class="sr-only">Espace vide</p>
+                            </td>
+                        </tr>
+                    @endif
                     </tbody>
                 </table>
             </div>

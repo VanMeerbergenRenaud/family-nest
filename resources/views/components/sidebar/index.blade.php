@@ -18,7 +18,7 @@
              aria-label="Fermer la sidebar"></div>
 
         <!-- Container -->
-        <div class="absolute min-w-full top-0 right-0 bottom-0 md:min-w-[25vw] max-w-[40vw] bg-white overflow-y-auto scrollbar-none rounded-2.5 rounded-[0.65rem] md:top-2.5 md:right-2.5 md:bottom-2.5 md:left-auto left-0
+        <div class="absolute min-w-full top-0 right-0 bottom-0 md:min-w-[30vw] max-w-[40vw] bg-white overflow-y-auto scrollbar-none rounded-2.5 rounded-[0.65rem] md:top-2.5 md:right-2.5 md:bottom-2.5 md:left-auto left-0
             {{ $isSidebarOpen ? 'translate-y-0 md:translate-x-0' : 'translate-y-full md:translate-y-0 md:translate-x-full' }}"
         >
             <div class="relative h-full min-h-[calc(100vh-1.5rem)] bg-white overflow-y-auto scrollbar-thin">
