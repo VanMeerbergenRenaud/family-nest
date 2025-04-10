@@ -5,7 +5,7 @@
         </x-slot>
     @endif
 
-    <h1 class="sr-only">Modifier la facture</h1>
+    <h2 role="heading" aria-level="2" class="sr-only">Modifier une facture</h2>
 
     {{-- Formulaire pour modifier une facture : multi step  --}}
     <div x-data="{
@@ -53,7 +53,9 @@
 
                                 <!-- Informations sur le fichier -->
                                 <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $form->fileName }}</h2>
+                                    <h3 role="heading" aria-level="3" class="text-md-medium text-gray-800 truncate">
+                                        <span class="sr-only">Fichier :</span>{{ $form->fileName }}
+                                    </h3>
                                     <p class="flex-center text-sm-regular text-gray-600">
                                         {{ strtoupper($form->fileExtension) }}
                                     </p>

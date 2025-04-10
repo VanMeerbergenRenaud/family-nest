@@ -367,11 +367,13 @@ class Index extends Component
         try {
             if (empty($this->selectedInvoiceIds)) {
                 Toaster::error('Aucune facture sélectionnée.');
+
                 return;
             }
 
             if ($this->selectedPaymentStatus === null) {
                 Toaster::error('Veuillez sélectionner un statut de paiement.');
+
                 return;
             }
 
@@ -381,6 +383,7 @@ class Index extends Component
 
             if ($invoices->isEmpty()) {
                 Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
+
                 return;
             }
 

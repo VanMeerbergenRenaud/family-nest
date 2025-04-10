@@ -1,4 +1,6 @@
 <x-guest-layout>
+    <h1 role="heading" aria-level="1" class="sr-only">Bienvenue sur FamilyNest</h1>
+
     <!-- Hero Section avec éléments flottants -->
     <div class="relative min-h-screen w-full overflow-hidden bg-white"
          x-data="{
@@ -22,7 +24,7 @@
             <div class="rounded-xl bg-white p-4 shadow-lg">
                 <div class="flex items-center space-x-2">
                     <div class="h-3 w-3 rounded-full bg-[#e15b64]"></div>
-                    <h3 class="font-medium text-gray-800">Simplifiez vos finances</h3>
+                    <p class="font-medium text-gray-800">Simplifiez vos finances</p>
                 </div>
                 <div class="mt-3 space-y-2">
                     <div class="flex items-center justify-between">
@@ -68,7 +70,7 @@
                     <div class="flex h-5 w-5 items-center justify-center rounded-full bg-[#88c0d5]/20">
                         <div class="h-2 w-2 rounded-full bg-[#88c0d5]"></div>
                     </div>
-                    <h3 class="font-medium text-gray-800">Factures récentes</h3>
+                    <p class="font-medium text-gray-800">Factures récentes</p>
                 </div>
                 <div class="mt-3 space-y-2">
                     <div class="flex items-center space-x-3">
@@ -142,9 +144,9 @@
             </a>
 
             <div class="max-w-3xl text-center">
-                <h1 class="mb-8 text-4xl font-medium text-gray-900 sm:text-5xl md:text-6xl">
+                <h2 role="heading" aria-level="2" class="mb-8 text-4xl font-medium text-gray-900 sm:text-5xl md:text-6xl">
                     Centralisez et organisez vos factures familiales
-                </h1>
+                </h2>
                 <p class="mb-10 mx-auto max-w-2xl text-[1.125rem] text-gray-500">
                     Dans un monde digital, gérez toutes vos factures efficacement au même endroit.
                     Visualisez vos dépenses, évitez les imprévus et collaborez avec votre famille pour une meilleure maîtrise financière.

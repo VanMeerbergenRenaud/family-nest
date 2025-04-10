@@ -3,6 +3,7 @@
     <aside x-data="{ mobileMenuOpen: false }"
            class="lg:hidden"
     >
+        <h2 role="heading" aria-level="2" class="sr-only">Menu de navigation principal</h2>
 
         {{-- Divider with space --}}
         <div class="relative h-15"></div>

@@ -1,6 +1,6 @@
 <div class="relative py-2 lg:py-3 px-5">
     <nav class="lg:pl-2 flex items-center" aria-label="Fil d'Ariane">
-        <h1 class="sr-only" role="heading" aria-level="1">Menu de navigation avec fil d'Ariane</h1>
+        <h2 role="heading" aria-level="2" class="sr-only" >Menu de navigation avec fil d'Ariane</h2>
         <ol class="inline-flex items-center gap-1" role="list">
             @foreach($segments as $index => $segment)
                 <li wire:key="{{ $index }}" class="inline-flex items-center gap-1" role="listitem">

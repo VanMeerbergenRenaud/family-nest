@@ -1,5 +1,5 @@
 <div>
-    <h1 class="sr-only">Créer une facture</h1>
+    <h2 role="heading" aria-level="2" class="sr-only">Créer une facture</h2>
 
     {{-- Message d'attente pour le traitement OCR --}}
     <x-invoices.create.loading-overlay

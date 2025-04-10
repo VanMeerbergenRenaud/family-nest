@@ -1,6 +1,6 @@
 <div>
     <header class="px-4">
-        <h2 class="text-xl-semibold" role="heading" aria-level="2">
+        <h2 role="heading" aria-level="2" class="text-xl-semibold" role="heading" aria-level="2">
             {{ __('Paramètres généraux') }}
         </h2>
         <p class="text-sm-regular text-gray-500">
@@ -31,8 +31,10 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400">
-                            Profil</h3>
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-indigo-700 dark:group-hover:text-indigo-400"
+                        >
+                            Profil
+                        </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
                             Éditer les informations de votre profil personnel et professionnels.
                         </p>
@@ -67,8 +69,10 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-sky-700 dark:group-hover:text-sky-400">
-                            Stockage</h3>
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-sky-700 dark:group-hover:text-sky-400"
+                        >
+                            Stockage
+                        </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
                             Gérer vos fichiers et surveiller votre espace de stockage restant.
                         </p>
@@ -105,8 +109,10 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-orange-700 dark:group-hover:text-orange-400">
-                            Notifications</h3>
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-orange-700 dark:group-hover:text-orange-400"
+                        >
+                            Notifications
+                        </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
                             Personnaliser les alertes email, push et in-app de votre compte.
                         </p>
@@ -142,7 +148,8 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-purple-700 dark:group-hover:text-purple-400">
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-purple-700 dark:group-hover:text-purple-400"
+                        >
                             Apparence
                         </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
@@ -180,8 +187,10 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-teal-700 dark:group-hover:text-teal-400">
-                            Plan de paiement</h3>
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-teal-700 dark:group-hover:text-teal-400"
+                        >
+                            Plan de paiement
+                        </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">
                             Gérer votre abonnement, facturation et historique de paiement.
                         </p>
@@ -214,7 +223,8 @@
                     </div>
                     <div class="flex-1">
                         <h3 role="heading" aria-level="3"
-                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-red-700 dark:group-hover:text-red-400">
+                            class="text-base font-semibold text-gray-800 dark:text-white transition-colors duration-300 group-hover:text-red-700 dark:group-hover:text-red-400"
+                        >
                             Zone de danger
                         </h3>
                         <p class="mt-1.5 text-sm text-gray-600 dark:text-gray-400">

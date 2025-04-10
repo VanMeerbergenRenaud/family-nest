@@ -9,7 +9,9 @@ use Livewire\Component;
 class Billing extends Component
 {
     public bool $isAnnual = false;
+
     public string $billingCycle = 'monthly';
+
     public string $selectedPlan = 'Essentiel';
 
     protected $listeners = [

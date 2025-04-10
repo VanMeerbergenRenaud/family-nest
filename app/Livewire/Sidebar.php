@@ -3,45 +3,44 @@
 namespace App\Livewire;
 
 use App\Livewire\Actions\Logout;
+use App\Models\User;
 use Livewire\Component;
 
 class Sidebar extends Component
 {
-    public $user;
+    public User $user;
 
     public bool $expanded = true;
 
     public function mount()
     {
         $this->user = auth()->user();
-        // Utiliser une valeur par défaut de true
+
         $this->expanded = session('sidebar_expanded', true);
     }
 
-    public function toggleSidebar()
+    public function toggleSidebar(): void
     {
         $this->expanded = ! $this->expanded;
 
-        // Stocker l'état dans la session
         session(['sidebar_expanded' => $this->expanded]);
 
-        // Émettre l'événement avec l'état mis à jour
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
     }
 
-    public function seeProfile()
+    public function seeProfile(): void
     {
         $this->redirectRoute('settings.profile');
-    }
-
-    public function seeShortcut()
-    {
-        dd('Voir les raccourcis');
     }
 
     public function inviteMember()
     {
         dd('Inviter un membre');
+    }
+
+    public function seeShortcut()
+    {
+        dd('Voir les raccourcis');
     }
 
     public function seeUpdates()
@@ -54,12 +53,12 @@ class Sidebar extends Component
         dd('Voir le support');
     }
 
-    public function seeArchives()
+    public function seeArchives(): void
     {
         $this->redirectRoute('invoices.archived');
     }
 
-    public function logout()
+    public function logout(): void
     {
         app(Logout::class)->__invoke();
         $this->redirectRoute('welcome');

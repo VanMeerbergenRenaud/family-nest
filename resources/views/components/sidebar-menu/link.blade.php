@@ -12,10 +12,10 @@
     $isActive = request()->routeIs(substr($href, strrpos($href, '/') + 1)) || request()->url() === $href;
 @endphp
 
-<li class="rounded-lg {{ $basicColor }}" x-data="{ showTooltip: false }">
+<li class="rounded-lg {{ $basicColor }}" x-data="{ showTooltip: false }" role="listitem">
     <a href="{{ $href }}"
-       class="group flex items-center px-3 py-2 h-10 rounded-lg relative {{ $isActive ? $activeColor : '' }}"
        wire:navigate
+       class="group flex items-center px-3 py-2 h-10 rounded-lg relative {{ $isActive ? $activeColor : '' }}"
        @mouseenter="showTooltip = true"
        @mouseleave="showTooltip = false"
         {{ $attributes }}

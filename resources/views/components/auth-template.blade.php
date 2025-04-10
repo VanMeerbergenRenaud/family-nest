@@ -33,9 +33,9 @@
 
             <!-- Titre & description -->
             <div class="text-center z-2 px-8">
-                <h2 class="text-xl-semibold text-gray-900">
+                <h1 role="heading" aria-level="1" class="text-xl-semibold text-gray-900">
                     {{ $title }}
-                </h2>
+                </h1>
                 <p class="mt-2 text-sm-regular text-gray-700">
                     {{ $description }}
                 </p>

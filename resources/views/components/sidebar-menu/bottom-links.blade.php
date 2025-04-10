@@ -8,10 +8,10 @@
     $activeClass = 'text-indigo-600 dark:text-indigo-500 hover:text-indigo-600';
 @endphp
 
-<ul class="font-medium custom-mt-auto">
-    <li x-data="{ showTooltip: false }">
+<ul class="font-medium custom-mt-auto" role="list">
+    <li x-data="{ showTooltip: false }" role="listitem">
         <button class="{{ $linkClass }}"
-                onclick="window.location.reload();"
+                @click="window.location.reload();"
                 @mouseenter="showTooltip = true"
                 @mouseleave="showTooltip = false">
             <x-heroicon-o-arrow-path class="{{ $svgClass }}"/>
@@ -31,10 +31,11 @@
     </li>
     <li x-data="{ showTooltip: false }">
         <a href="{{ route('settings.index') }}"
-           class="{{ $linkClass }} @if (request()->routeIs('settings.index')) {{ $activeClass }} @endif"
            wire:navigate
            @mouseenter="showTooltip = true"
-           @mouseleave="showTooltip = false">
+           @mouseleave="showTooltip = false"
+           class="{{ $linkClass }} @if (request()->routeIs('settings.index')) {{ $activeClass }} @endif"
+        >
             <x-heroicon-o-cog class="{{ $svgClass }} @if (request()->routeIs('settings.index')) {{ $activeClass }} @endif"/>
             @if($expanded)
                 <span class="ml-3">Paramètres</span>
@@ -53,10 +54,11 @@
     </li>
     <li x-data="{ showTooltip: false }">
         <a href="{{ route('help-center') }}"
-           class="{{ $linkClass }} @if (request()->routeIs('help-center')) {{ $activeClass }} @endif"
            wire:navigate
            @mouseenter="showTooltip = true"
-           @mouseleave="showTooltip = false">
+           @mouseleave="showTooltip = false"
+           class="{{ $linkClass }} @if (request()->routeIs('help-center')) {{ $activeClass }} @endif"
+        >
             <x-heroicon-o-question-mark-circle class="{{ $svgClass }} @if (request()->routeIs('help-center')) {{ $activeClass }} @endif"/>
             @if($expanded)
                 <span class="ml-3">Centre d'aide</span>

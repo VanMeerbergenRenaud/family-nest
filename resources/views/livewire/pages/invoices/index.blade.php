@@ -1,14 +1,14 @@
 <div>
-    <h1 class="sr-only">Factures de {{ auth()->user()->name }}</h1>
+    <h2 role="heading" aria-level="2" class="sr-only">Factures de {{ auth()->user()->name }}</h2>
 
     @if($invoices->isEmpty())
         <div class="w-full mx-auto bg-white rounded-3xl border border-slate-200">
             <div class="relative px-8 pb-8 flex-center flex-col text-center overflow-hidden">
                 <div class="absolute -top-10 w-full h-100 pointer-events-none" style="background-image: url('{{ asset('img/empty-invoice.png') }}'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
                 <!-- Textes -->
-                <h2 class="text-2xl font-semibold text-gray-900 mt-46 mb-4">
+                <h3 role="heading" aria-level="3" class="text-2xl font-semibold text-gray-900 mt-46 mb-4">
                     Aucune facture créée jusqu'à présent
-                </h2>
+                </h3>
 
                 <p class="text-gray-500 mb-8 max-w-md mx-auto">
                     Vous n'avez pas encore créé de facture. Pour commencer, cliquez sur le bouton ci-dessous pour ajouter votre première facture sans plus attendre.
@@ -33,7 +33,9 @@
     @else
         {{-- Section de navigation par dossiers --}}
         <section class="mb-8">
-            <h2 class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Catégories</h2>
+            <h3 role="heading" aria-level="3" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">
+                Catégories
+            </h3>
 
             <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
                 {{-- Favoris --}}
@@ -124,7 +126,9 @@
 
         {{-- Section des fichiers récents --}}
         <section class="mb-10">
-            <h2 role="heading" aria-level="2" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Factures récentes</h2>
+            <h3 role="heading" aria-level="3" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">
+                Factures récentes
+            </h3>
 
             @if($recentInvoices->isEmpty())
                 <div class="p-6 bg-white dark:bg-gray-800 rounded-xl w-full border border-slate-200">
@@ -147,9 +151,9 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <h3 class="text-sm-medium text-gray-900 dark:text-white">
+                                    <h4 role="heading" aria-level="4" class="text-sm-medium text-gray-900 dark:text-white">
                                         {{ Str::limit($invoice->name, 16) }}
-                                    </h3>
+                                    </h4>
                                     <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
                                         {{ $invoice->dateForHumans($invoice->created_at) }}
                                         • {{ $invoice->amount ?? 'Montant vide' }} {{ $this->getInvoiceCurrencySymbol($invoice) }}
@@ -170,7 +174,7 @@
             {{-- En-tête --}}
             <div
                 class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
-                <h2 class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h2>
+                <h3 role="heading" aria-level="3" class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h3>
                 <div class="flex flex-wrap gap-2">
                     {{-- Filtres --}}
                     <x-menu>

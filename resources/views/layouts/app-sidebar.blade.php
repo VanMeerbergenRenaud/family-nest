@@ -5,6 +5,8 @@
     </head>
     <body>
         <header>
+            <h1 role="heading" aria-level="1" class="sr-only">{{ $title ?? 'Titre par défaut' }}</h1>
+
             {{ $banner ?? null }}
         </header>
 

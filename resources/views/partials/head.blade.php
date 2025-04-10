@@ -25,7 +25,7 @@
 @if (Route::currentRouteName() === 'welcome')
     <title>{{ config('app.name', 'FamilyNest') }}</title>
 @else
-    <title>{{ $title ?? 'Hello' }}&nbsp;|&nbsp;FamilyNest</title>
+    <title>{{ $title ?? 'Titre de la page' }}&nbsp;|&nbsp;FamilyNest</title>
 @endif
 
 <!-- Scripts -->

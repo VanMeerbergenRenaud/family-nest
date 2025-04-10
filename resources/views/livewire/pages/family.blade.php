@@ -36,12 +36,12 @@
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
+                <h3 role="heading" aria-level="3" class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
                     {{ $family->name }}
                     <span class="relative -top-0.5 ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
                        {{ $members->total() }}
                    </span>
-                </h2>
+                </h3>
                 <div class="flex flex-wrap gap-2">
                     {{-- Filter --}}
                     <x-menu>
@@ -294,7 +294,7 @@
 
                     <div class="p-6">
                         <!-- Titre et Description -->
-                        <h2 class="text-xl font-semibold">Créer une famille</h2>
+                        <h2 role="heading" aria-level="2" class="text-xl font-semibold">Créer une famille</h2>
                         <p class="text-gray-500 text-sm mt-1 mb-2">
                             Pour commencer à gérer vos dépenses ensemble
                         </p>
@@ -349,7 +349,7 @@
                                          alt="Exemple de 3 avatars"
                                          class="h-16 w-auto rounded-full object-cover bg-transparent">
                                 </div>
-                                <h2 class="text-2xl font-semibold">Inviter un membre</h2>
+                                <h2 role="heading" aria-level="2" class="text-2xl font-semibold">Inviter un membre</h2>
                                 <p class="text-gray-600 dark:text-gray-400 px-4 lg:px-12">
                                     Invitez un membre de votre famille ou un proche pour mieux gérer vos dépenses ensemble.
                                 </p>
@@ -428,9 +428,9 @@
                             <x-svg.advertising/>
 
                             <div>
-                                <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                <h2 role="heading" aria-level="2" class="mb-4 text-xl-semibold">
                                     {{ __('Supprimer la famille') }}
-                                </h3>
+                                </h2>
                                 <p class="mt-2 text-md-regular text-gray-500">
                                     {{ __('Êtes-vous sûre de vouloir supprimer toute la famille') }}
                                     <strong class="font-semibold"> {{ ucfirst($family->name) }}&nbsp;?</strong>

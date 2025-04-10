@@ -76,9 +76,9 @@
 
             <div class="ml-3 flex-grow">
                 @if($title)
-                    <h3 class="text-sm-medium {{ $settings['title'] }}">
+                    <h4 role="heading" aria-level="4" class="text-sm-medium {{ $settings['title'] }}">
                         {{ $title }}
-                    </h3>
+                    </h4>
                 @endif
 
                 <div class="mt-2 text-sm {{ $settings['text'] }}">
@@ -111,9 +111,9 @@
             @endif
 
             @if($title)
-                <h3 class="text-sm-medium {{ $settings['title'] }}">
+                <p class="text-sm-medium {{ $settings['title'] }}">
                     {{ $title }}
-                </h3>
+                </p>
             @endif
         </div>
 

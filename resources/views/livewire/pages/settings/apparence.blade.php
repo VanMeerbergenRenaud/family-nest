@@ -9,7 +9,7 @@
         <!-- Logo app -->
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
             <div class="px-4 py-3 border-b border-slate-200 dark:border-gray-700">
-                <h3 class="text-sm-medium text-gray-900 dark:text-white">Logo de l'entreprise</h3>
+                <h3 role="heading" aria-level="3" class="text-sm-medium text-gray-900 dark:text-white">Logo de l'entreprise</h3>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Mettez à jour le logo de votre entreprise affiché dans votre application.
                 </p>
@@ -33,7 +33,7 @@
         <!-- Preferences -->
         <div class="bg-white dark:bg-gray-900 rounded-lg border border-slate-200 dark:border-gray-800 overflow-hidden">
             <div class="px-6 py-4">
-                <h3 class="text-sm-medium text-gray-900 dark:text-white">Préférence d'affichage</h3>
+                <h3 role="heading" aria-level="3" class="text-sm-medium text-gray-900 dark:text-white">Préférence d'affichage</h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                     Choisissez le mode d'affichage qui vous convient le mieux
                 </p>
@@ -98,7 +98,7 @@
         <!-- Languages -->
         <div class="flex items-center justify-between gap-4 px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
             <div>
-                <h3 class="text-sm-medium text-gray-900 dark:text-white">Langue</h3>
+                <h3 role="heading" aria-level="3" class="text-sm-medium text-gray-900 dark:text-white">Langue</h3>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Choisissez la langue par défaut pour l'interface de l'application.
                 </p>
@@ -115,7 +115,7 @@
         <!-- Reset -->
         <div class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 overflow-hidden">
             <div>
-                <h3 class="text-sm-medium text-gray-900 dark:text-white">Réinitialiser les paramètres</h3>
+                <h3 role="heading" aria-level="3" class="text-sm-medium text-gray-900 dark:text-white">Réinitialiser les paramètres</h3>
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Restaurez tous les paramètres d'apparence à leurs valeurs par défaut.
                 </p>

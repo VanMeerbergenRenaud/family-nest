@@ -1,7 +1,6 @@
 <div class="p-6">
-    <h1 class="sr-only">Zone de danger</h1>
     <div class="mb-6">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-400" role="heading" aria-level="2">
+        <h2 role="heading" aria-level="2" class="text-xl font-semibold text-gray-900 dark:text-gray-400" role="heading" aria-level="2">
             {{ __('Supprimer le compte') }}
         </h2>
 

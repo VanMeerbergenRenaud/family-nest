@@ -1,10 +1,7 @@
 <div class="py-2">
-
-    <h1 class="sr-only">Plan de paiement</h1>
-
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6 px-4">
         <div>
-            <h2 class="text-xl font-medium text-gray-800">Sélectionnez votre formule</h2>
+            <h2 role="heading" aria-level="2" class="text-xl font-medium text-gray-800">Sélectionnez votre formule</h2>
             <p class="text-sm text-gray-600 mt-1">Prix transparents et sans engagement</p>
         </div>
 
@@ -44,7 +41,7 @@
     @if(!$isAnnual)
         <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
             <div>
-                <h3 class="text-base font-medium text-gray-800">
+                <h3 role="heading" aria-level="3" class="text-base font-medium text-gray-800">
                     Essai gratuit de 1 mois disponible
                     <span class="relative -top-0.5 ml-1.5 bg-teal-800 text-white text-xs px-1.5 py-0.5 rounded">
                         ÉCONOMISEZ 15%
@@ -208,11 +205,11 @@
                 >
                     @if ($plan['tag'])
                         <div class="flex justify-between items-start mb-1">
-                            <h3 class="text-lg font-medium text-gray-800">{{ $plan['name'] }}</h3>
+                            <h3 role="heading" aria-level="3" class="text-lg font-medium text-gray-800">{{ $plan['name'] }}</h3>
                             <span class="absolute top-3 right-3 text-xs-medium bg-teal-100 text-teal-800 px-3 py-1 rounded-full uppercase">{{ $plan['tag'] }}</span>
                         </div>
                     @else
-                        <h3 class="text-lg font-medium text-gray-800 mb-1">{{ $plan['name'] }}</h3>
+                        <h3 role="heading" aria-level="3" class="text-lg font-medium text-gray-800 mb-1">{{ $plan['name'] }}</h3>
                     @endif
                     <p class="text-md text-gray-600 mb-5">{{ $plan['description'] }}</p>
 
@@ -236,7 +233,7 @@
                     @foreach ($allFeatures as $featureName => $featureProps)
                         @if(isset($featureProps['title']) && $featureProps['title'])
                             <li class="pt-3 pb-1 border-t border-gray-100 first:border-t-0 first:pt-0" wire:key="feature-title-{{ $plan['name'] }}-{{ $featureName }}">
-                                <h4 class="font-medium text-gray-800">{{ $featureName }}</h4>
+                                <h4 role="heading" aria-level="4" class="font-medium text-gray-800">{{ $featureName }}</h4>
                             </li>
                         @else
                             <li class="flex items-start" wire:key="feature-{{ $plan['name'] }}-{{ $featureName }}">

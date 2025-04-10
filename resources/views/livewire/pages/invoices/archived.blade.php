@@ -27,7 +27,7 @@
     @else
         <div class="flex justify-between items-center flex-wrap gap-4 mt-2 md:px-4 mb-6">
             <div>
-                <h1 class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h1>
+                <h2 role="heading" aria-level="2" class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h2>
                 <p class="text-sm-regular text-gray-500 max-w-4xl">
                     Les éléments affichés ci-dessous sont des factures que vous avez archivées. Vous pouvez les restaurer ou les supprimer définitivement. Lorsqu'une facture est archivée elle n'apparaît plus dans la liste des factures de votre tableau de bord.
                 </p>

@@ -127,7 +127,8 @@ class FamilyInvitationHandler extends Component
     {
         // Invitation expirée
         if (! $this->invitation || $this->invitation->isExpired()) {
-            return view('livewire.family-invitation.expired')->layout('layouts.guest');
+            return view('livewire.family-invitation.expired')
+                ->layout('layouts.guest');
         }
 
         // Utilisateur connecté avec email correspondant

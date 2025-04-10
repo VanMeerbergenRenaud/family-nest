@@ -70,7 +70,7 @@
         {{-- Informations sur le fichier --}}
         @if(isset($fileInfo['name']))
             <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                <h2 class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] }}</h2>
+                <h4 role="heading" aria-level="4" class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] }}</h4>
                 <p class="flex-center space-x-1.5 text-gray-600">
                     <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
                     <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>

@@ -65,9 +65,9 @@
                                             <x-divider class="dark:bg-gray-700"/>
 
                                             <div class="bg-white dark:bg-gray-800 py-3 px-2">
-                                                <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
+                                                <p class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
                                                     {{ $section }}
-                                                </h3>
+                                                </p>
                                                 <ul role="list" class="flex flex-col gap-1">
                                                     @foreach ($items as $result)
                                                         @if ($result instanceof \App\Models\Invoice)
@@ -113,9 +113,9 @@
                                     </p>
                                 </div>
                                 <div class="bg-white dark:bg-gray-800 py-3 px-2">
-                                    <h3 class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
+                                    <p class="text-sm-medium text-gray-500 dark:text-gray-400 mb-2 pl-2.5">
                                         Suggestions
-                                    </h3>
+                                    </p>
                                     <ul role="list" class="flex flex-col gap-1">
                                         <x-spotlight.result href="{{ route('invoices.create') }}"
                                                             text="Ajouter une nouvelle facture" shortcut="⌘ X">
