@@ -144,8 +144,8 @@ enum CategoryEnum: string
             self::ABO_SERVICES_LIGNE => '🌐',
             self::ABO_SPORT => '🏋️',
             self::ABO_STREAMING_MUSIQUE => '🎵',
-            self::ABO_STREAMING_VIDEO => '📺',
-            self::ABO_TELEVISION => '📡',
+            self::ABO_STREAMING_VIDEO => '🎥',
+            self::ABO_TELEVISION => '📺',
             self::ABO_TRANSPORTS => '🚌',
 
             // Achats de la maison
@@ -169,7 +169,7 @@ enum CategoryEnum: string
             self::ANIMAUX_PENSION => '🏠',
             self::ANIMAUX_ASSURANCE => '📝',
             self::ANIMAUX_DRESSAGE => '🦮',
-            self::ANIMAUX_ACTIVITES => '🐕',
+            self::ANIMAUX_ACTIVITES => '🎠',
 
             // Divers
             self::AUTRES => '📦',
@@ -177,7 +177,7 @@ enum CategoryEnum: string
 
             // Divertissements et Loisirs
             self::INSTRUMENTS_MUSIQUE => '🎸',
-            self::LOISIRS_CULTURELS => '🎭',
+            self::LOISIRS_CULTURELS => '🎪',
             self::LOISIRS_SPORTIFS => '⚽',
 
             // Dons et Contributions
@@ -194,7 +194,7 @@ enum CategoryEnum: string
             // Enfants
             self::ACHAT_VETEMENTS => '👕',
             self::ARGENT_POCHE => '💸',
-            self::CRECHE => '👶',
+            self::CRECHE => '👩🏻‍🍼',
 
             // Finances
             self::CREDIT_PERSONNEL => '💳',
@@ -205,23 +205,23 @@ enum CategoryEnum: string
 
             // Impôts et Contributions Sociales
             self::ALLOCATIONS_FAMILIALES => '👨‍👩‍👧‍👦',
-            self::COTISATIONS_SOCIALES => '📊',
-            self::IMPOTS_REVENU => '💸',
+            self::COTISATIONS_SOCIALES => '👥',
+            self::IMPOTS_REVENU => '📜',
 
             // Logement
             self::CHARGES_LOCATIVES => '🏢',
-            self::CHAUFFAGE => '🔥',
-            self::CREDIT_IMMOBILIER => '🏠',
+            self::CHAUFFAGE => '🌡️',
+            self::CREDIT_IMMOBILIER => '🏦',
             self::EAU => '💧',
             self::ELECTRICITE => '⚡',
-            self::GAZ => '🔥',
+            self::GAZ => '💨',
             self::HYPOTHEQUE => '📄',
             self::LOYER => '🔑',
             self::TAXE_FONCIERE => '📋',
             self::TAXE_HABITATION => '🏘️',
 
             // Santé et Bien-être
-            self::COMPLEMENTS_ALIMENTAIRES => '💊',
+            self::COMPLEMENTS_ALIMENTAIRES => '🍯',
             self::FRAIS_MEDICAUX => '🩺',
             self::MEDICAMENTS => '💊',
             self::SOINS_PARAMEDICAUX => '👨‍⚕️',
@@ -235,7 +235,7 @@ enum CategoryEnum: string
             // Technologie
             self::ACHAT_ELECTRONIQUE => '📱',
             self::JEUX_VIDEOS => '🎮',
-            self::LOGICIELS => '💻',
+            self::LOGICIELS => '🖥️',
 
             // Transport
             self::BILLETS_TRANSPORT => '🎫',

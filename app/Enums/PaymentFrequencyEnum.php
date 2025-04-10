@@ -36,8 +36,8 @@ enum PaymentFrequencyEnum: string
             self::Weekly => '🗓️',
             self::Monthly => '📆',
             self::Quarterly => '🗂️',
-            self::SemiAnnually => '📚',
-            self::Annually => '🏛️',
+            self::SemiAnnually => '📖',
+            self::Annually => '🎈',
             self::OneTime => '⚡',
         };
     }

@@ -19,8 +19,8 @@ enum PaymentStatusEnum: string
     public function label(): string
     {
         return match ($this) {
-            self::Unpaid => 'Non payée',
             self::Paid => 'Payée',
+            self::Unpaid => 'Non payée',
             self::Late => 'En retard',
             self::PartiallyPaid => 'Partiellement payée',
             self::Cancelled => 'Annulée',
@@ -32,21 +32,22 @@ enum PaymentStatusEnum: string
     public function emoji(): string
     {
         return match ($this) {
-            self::Unpaid => '⏳',
             self::Paid => '✅',
-            self::Late => '⚠️',
-            self::PartiallyPaid => '💰',
+            self::Unpaid => '⏳',
+            self::Late => '⏰',
+            self::PartiallyPaid => '💸',
             self::Cancelled => '❌',
-            self::Refunded => '↩️',
+            self::Refunded => '️🏦',
             self::Disputed => '⚖️',
+
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::Unpaid => 'gray',
             self::Paid => 'green',
+            self::Unpaid => 'gray',
             self::Late => 'red',
             self::PartiallyPaid => 'yellow',
             self::Cancelled => 'slate',

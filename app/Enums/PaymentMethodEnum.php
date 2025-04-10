@@ -33,7 +33,7 @@ enum PaymentMethodEnum: string
             self::Card => '💳',
             self::Cash => '💵',
             self::Transfer => '🏦',
-            self::DirectDebit => '🔁',
+            self::DirectDebit => '🔄',
             self::Check => '📝',
             self::GiftCard => '🎁',
         };
