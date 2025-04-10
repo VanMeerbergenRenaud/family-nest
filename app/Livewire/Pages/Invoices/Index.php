@@ -528,10 +528,15 @@ class Index extends Component
 
         $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
 
+        $archivedInvoices = auth()->user()->invoices()
+            ->where('is_archived', true)
+            ->get();
+
         return view('livewire.pages.invoices.index', [
             'invoices' => $invoices,
             'folderStats' => $folderStats,
             'paymentStatuses' => PaymentStatusEnum::getStatusOptions(),
+            'archivedInvoices' => $archivedInvoices,
         ])->layout('layouts.app-sidebar');
     }
 }

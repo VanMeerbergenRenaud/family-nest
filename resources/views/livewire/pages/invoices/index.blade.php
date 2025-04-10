@@ -14,11 +14,20 @@
                     Vous n'avez pas encore créé de facture. Pour commencer, cliquez sur le bouton ci-dessous pour ajouter votre première facture sans plus attendre.
                 </p>
 
-                <!-- Boutons -->
-                <a href="{{ route('invoices.create') }}" class="button-tertiary">
-                    <x-svg.add2 class="text-white"/>
-                    Ajouter ma première facture
-                </a>
+                <!-- Buttons -->
+                <div class="flex-center flex-wrap gap-2">
+                    <a href="{{ route('invoices.create') }}" class="button-tertiary">
+                        <x-svg.add2 class="text-white"/>
+                        Ajouter ma première facture
+                    </a>
+
+                    @if($archivedInvoices->isNotEmpty())
+                        <a href="{{ route('invoices.archived') }}" class="button-secondary">
+                            <x-svg.archive class="text-white"/>
+                            Voir mes archives
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     @else
@@ -390,7 +399,7 @@
                     <thead>
                     <tr>
                         {{-- Checkboxes... --}}
-                        <td class="whitespace-nowrap pr-0 pl-6 w-4">
+                        <td class="p-0 pl-2">
                             <x-invoices.index.check-all />
                         </td>
                         {{-- Colonne "Nom du fichier" (toujours visible) --}}
@@ -490,8 +499,8 @@
                     @foreach ($invoices as $invoice)
                         <tr wire:key="invoice-{{ $invoice->id }}" class="relative pl-8 group hover:bg-gray-50/70">
                             {{-- Nom du fichier --}}
-                            <td class="whitespace-nowrap pr-0 pl-6 w-4">
-                                <label class="relative flex items-center cursor-pointer w-fit">
+                            <td class="p-0 pl-2">
+                                <label class="relative flex items-center cursor-pointer whitespace-nowrap p-4 w-fit">
                                     <input wire:model="selectedInvoiceIds" value="{{ $invoice->id }}" type="checkbox" class="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded border border-slate-300 checked:bg-blue-700 checked:border-blue-700" />
                                     <span class="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                                         <x-svg.check class="text-white h-3 w-3" />
@@ -886,7 +895,7 @@
 
     @if($showSidebarInvoiceDetails)
         <x-modal wire:model="showSidebarInvoiceDetails">
-            <x-modal.panel position="center-right" height="95vh">
+            <x-modal.panel position="center-right" height="97vh">
                 <p class="sticky top-0 p-5 pr-15 max-w-full text-xl-bold border-b border-slate-200 bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                     {{ __('Résumé des informations de la facture') }}
                 </p>

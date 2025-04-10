@@ -13,7 +13,7 @@
         'top' => 'items-start justify-center pt-16',
         'bottom' => 'items-end justify-center pb-16',
         'top-right' => 'items-start justify-end pt-16 pr-4',
-        'center-right' => 'items-center justify-end p-4',
+        'center-right' => 'items-center justify-end pr-3',
         'bottom-right' => 'items-end justify-end pb-16 pr-4',
     ];
 
@@ -55,7 +55,7 @@
 
     <!-- Panel -->
     <div @keydown.escape.window="open = false"
-         class="relative min-h-full p-4 flex {{ $positionClass }}"
+         class="relative min-h-full p-3 flex {{ $positionClass }}"
     >
         <div x-dialog:panel x-transition.in x-transition.out.opacity class="relative w-full {{ $sizeClass }} bg-white dark:bg-gray-800 rounded-xl shadow-[0_0_0.5rem_rgba(0,0,0,0.2)] dark:shadow-[0_0_0.5rem_rgba(255,255,255,0.1)] overflow-hidden" {!! $styleAttr !!}>
 
