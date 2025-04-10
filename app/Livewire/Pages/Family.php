@@ -8,11 +8,13 @@ use App\Models\FamilyInvitation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Famille')]
 class Family extends Component
 {
     use WithPagination;

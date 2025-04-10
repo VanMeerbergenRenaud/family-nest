@@ -6,9 +6,11 @@ use App\Livewire\Forms\UserPasswordForm;
 use App\Livewire\Forms\UserProfileForm;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
+#[Title('Réglages de profil')]
 class Profile extends Component
 {
     use WithFileUploads;

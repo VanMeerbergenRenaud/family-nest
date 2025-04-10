@@ -9,10 +9,12 @@ use App\Models\InvoiceFile;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Factures')]
 class Index extends Component
 {
     use InvoiceFileUrlTrait;

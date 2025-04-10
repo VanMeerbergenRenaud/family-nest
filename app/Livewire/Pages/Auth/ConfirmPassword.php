@@ -5,10 +5,12 @@ namespace App\Livewire\Pages\Auth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
+#[Title('Confirmer le mot de passe')]
 class ConfirmPassword extends Component
 {
     #[Validate]

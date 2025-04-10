@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pages;
 
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Thèmes')]
 class Themes extends Component
 {
     public bool $showThemeExempleModal;

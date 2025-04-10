@@ -3,8 +3,10 @@
 namespace App\Livewire\Pages;
 
 use App\Models\Invoice;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Tableau de bord')]
 class Dashboard extends Component
 {
     public $user;

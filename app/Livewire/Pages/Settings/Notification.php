@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pages\Settings;
 
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Réglages des notifications')]
 class Notification extends Component
 {
     public function render()

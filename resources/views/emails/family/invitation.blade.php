@@ -190,7 +190,7 @@
                 <div class="email-container">
                     <div class="email-card">
                         <div class="header">
-                            <img src="{{ asset('img/logo.svg')}}" alt="Logo FamilyNest" class="logo">
+                            <img src="{{ asset('img/favicon.svg')}}" alt="Logo FamilyNest" class="logo">
                             <h1 class="heading">Invitation à rejoindre une famille</h1>
                         </div>
 

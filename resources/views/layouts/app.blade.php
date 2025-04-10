@@ -5,7 +5,6 @@
     </head>
     <body>
         <header>
-            {{-- Slot pour bannière mode édition --}}
             {{ $banner ?? null }}
 
             <div class="relative flex-center px-4 pb-1 pt-2">

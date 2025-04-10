@@ -4,8 +4,10 @@ namespace App\Livewire\Pages\Settings;
 
 use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Réglages de suppression')]
 class Danger extends Component
 {
     public $password = '';

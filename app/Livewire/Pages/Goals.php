@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pages;
 
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Objectifs')]
 class Goals extends Component
 {
     public bool $showGoalExempleModal;

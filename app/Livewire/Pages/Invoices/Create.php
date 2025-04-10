@@ -13,10 +13,12 @@ use App\Services\TextractService;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceTagManagement;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Ajouter la facture')]
 class Create extends Component
 {
     use InvoiceShareCalculationTrait, InvoiceTagManagement, WithFileUploads;

@@ -4,9 +4,11 @@ namespace App\Livewire\Pages\Auth;
 
 use App\Livewire\Forms\RegisterForm;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
+#[Title('Inscription')]
 class Register extends Component
 {
     public RegisterForm $form;

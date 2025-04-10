@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pages\Settings;
 
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Réglages de plan de paiement')]
 class Billing extends Component
 {
     public bool $isAnnual = false;

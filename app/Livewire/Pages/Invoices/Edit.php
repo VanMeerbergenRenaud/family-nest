@@ -13,10 +13,12 @@ use App\Services\FileStorageService;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceTagManagement;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Modifier la facture')]
 class Edit extends Component
 {
     use InvoiceFileUrlTrait;

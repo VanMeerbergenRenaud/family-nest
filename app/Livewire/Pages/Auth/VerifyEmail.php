@@ -6,9 +6,11 @@ use App\Livewire\Actions\Logout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('layouts.guest')]
+#[Title('Vérifier l\'email')]
 class VerifyEmail extends Component
 {
     public function sendVerification(): void

@@ -9,8 +9,10 @@ use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Détails de facture')]
 class Show extends Component
 {
     use InvoiceFileUrlTrait;

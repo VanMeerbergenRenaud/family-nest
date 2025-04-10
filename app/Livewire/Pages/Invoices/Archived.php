@@ -5,10 +5,12 @@ namespace App\Livewire\Pages\Invoices;
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Archives')]
 class Archived extends Component
 {
     use WithPagination;

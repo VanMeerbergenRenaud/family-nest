@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Pages;
 
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
+#[Title('Calendrier')]
 class Calendar extends Component
 {
     public bool $showCalendarExempleModal;
