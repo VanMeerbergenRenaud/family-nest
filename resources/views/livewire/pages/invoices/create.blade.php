@@ -314,23 +314,27 @@
 
                     {{-- Boutons de Navigation --}}
                     <div class="mt-6 border-t-[0.1rem] w-full border-dashed border-gray-200 dark:border-gray-700">
-                        <div class="mt-4 flex flex-wrap justify-between gap-4">
+                        <div
+                            class="mt-4 flex flex-wrap gap-4"
+                            :class="{'justify-between': currentStep > 1, 'justify-end': currentStep === 1}"
+                        >
                             <button type="button" x-show="currentStep > 1" @click="prevStep" class="button-secondary">
                                 <x-svg.arrows.left class="stroke-white"/>
                                 Précédent
                             </button>
                             <button
                                 type="submit"
-                                x-show="currentStep > 1 && currentStep < steps.length"
-                                class="max-sm:hidden ml-auto relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
+                                x-show="currentStep < steps.length"
+                                class="max-sm:hidden relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                                 aria-label="Terminer et valider toutes les étapes"
                             >
                                 Terminer et valider
-                                <span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 text-xs bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
-                                     NB: Cette action valide toutes les étapes et<br>enregistre la facture si il n'y a pas d'erreur.
+                                <span class="absolute left-1/2 -translate-x-1/2 bottom-full mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 flex gap-2 bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
+                                     <x-svg.info class="mt-0.5 text-white w-3 h-3" />
+                                    <span class="text-xs text-left max-w-xs">Cette action valide toutes les étapes et<br>enregistre la facture si il n'y a pas d'erreur.</span>
                               </span>
                             </button>
-                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="ml-auto button-secondary">
+                            <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="button-secondary">
                                 Suivant
                                 <x-svg.arrows.right class="stroke-white"/>
                             </button>

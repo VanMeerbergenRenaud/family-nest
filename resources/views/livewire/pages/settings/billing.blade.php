@@ -39,7 +39,7 @@
 
     <!-- Bannière d'essai gratuit -->
     @if(!$isAnnual)
-        <div class="bg-white rounded-xl border border-slate-200 p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
+        <div class="bg-white lg:mx-2 rounded-xl border border-slate-200 p-4 mb-6 flex flex-col md:flex-row justify-between items-center gap-3">
             <div>
                 <h3 role="heading" aria-level="3" class="text-base font-medium text-gray-800">
                     Essai gratuit de 1 mois disponible
@@ -62,7 +62,7 @@
     <!-- Sélection du plan par radio-group -->
     <x-radio-group
         wire:model.live="selectedPlan"
-        class="grid grid-cols-1 md:grid-cols-3 gap-4"
+        class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:mx-2"
     >
         @php
             $allFeatures = [
