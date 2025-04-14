@@ -247,13 +247,35 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <x-form.field-date label="Date d'émission" name="form.issued_date" model="form.issued_date" />
                             <x-form.field-date label="Date de paiement" name="form.payment_due_date" model="form.payment_due_date"/>
-                            <x-form.field-date label="Rappel de paiement" name="form.payment_reminder" model="form.payment_reminder"/>
                             <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
                                 <option value="" selected>Sélectionner une fréquence</option>
                                 @foreach($paymentFrequencies as $value => $label)
                                     <option value="{{ $value }}">{!! $label !!}</option>
                                 @endforeach
                             </x-form.select>
+
+                            {{-- Toggle pour le rappel de paiement --}}
+                            <div x-data="{ showReminder: false }" class="relative mb-24 lg:mt-6  h-fit p-3 bg-white border border-slate-200 rounded-lg">
+                                <div class="flex items-center">
+                                    <x-form.checkbox-input
+                                        x-model="showReminder"
+                                        label="Ajouter un rappel de paiement"
+                                        name="form.toggle"
+                                        model="form.toggle"
+                                        x-on:change="if (!showReminder) $wire.set('form.payment_reminder', null)"
+                                    />
+                                </div>
+
+                                {{-- Utilisation de x-menu pour afficher l'input en position absolue --}}
+                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-gray-50 border border-slate-200 rounded-lg w-full z-10">
+                                    <x-form.field-date
+                                        label="Rappel de paiement"
+                                        name="form.payment_reminder"
+                                        model="form.payment_reminder"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </x-invoices.create.form-step>
 

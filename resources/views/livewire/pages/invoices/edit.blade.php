@@ -215,7 +215,10 @@
                                     </div>
 
                                     <div class="flex items-center">
-                                        @php $shareSummary = $this->getShareSummary(); @endphp
+                                        @php
+                                            $shareSummary = $this->getShareSummary();
+                                        @endphp
+
                                         @if($shareSummary['totalShares'] > 0)
                                             <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                 {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
@@ -232,9 +235,11 @@
                                 <div x-show="showShareInterface" x-cloak class="mt-3 p-3 border border-gray-200 rounded-md">
                                     <div class="flex justify-between items-center mb-3">
                                         <div class="flex items-center space-x-3">
-                                            <button type="button"
-                                                    wire:click="distributeEvenly()"
-                                                    class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition text-xs">
+                                            <button
+                                                type="button"
+                                                wire:click="distributeEvenly()"
+                                                class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition text-xs"
+                                            >
                                                 Partager équitablement
                                             </button>
 
@@ -262,8 +267,11 @@
                                     </div>
 
                                     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
-                                        @foreach($family_members as $member)
-                                            @php $memberShare = $this->getMemberShareInfo($member->id); @endphp
+                                        @foreach($family_members->unique('id')  as $member)
+                                            @php
+                                                $memberShare = $this->getMemberShareInfo($member->id);
+                                            @endphp
+
                                             <li class="flex items-center p-2 border {{ $memberShare['hasShare'] ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
@@ -315,13 +323,45 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <x-form.field-date label="Date d'émission" name="form.issued_date" model="form.issued_date" />
                             <x-form.field-date label="Date de paiement" name="form.payment_due_date" model="form.payment_due_date"/>
-                            <x-form.field-date label="Rappel de paiement" name="form.payment_reminder" model="form.payment_reminder"/>
+
                             <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
                                 <option value="" selected>Sélectionner une fréquence</option>
                                 @foreach($paymentFrequencies as $value => $label)
                                     <option value="{{ $value }}">{!! $label !!}</option>
                                 @endforeach
                             </x-form.select>
+
+                            {{-- Toggle pour le rappel de paiement --}}
+                            <div x-data="{
+                                    showReminder: @json(!is_null($form->payment_reminder)),
+                                    toggleReminder() {
+                                        if (!this.showReminder) {
+                                            $wire.set('form.payment_reminder', null);
+                                        }
+                                    }
+                                }"
+                                 class="relative mb-24 lg:mt-6  h-fit p-3 bg-white border border-slate-200 rounded-lg"
+                            >
+                                <div class="flex items-center">
+                                    <x-form.checkbox-input
+                                        x-model="showReminder"
+                                        label="Ajouter un rappel de paiement"
+                                        name="form.toggle"
+                                        model="form.toggle"
+                                        x-on:change="if (!showReminder) $wire.set('form.payment_reminder', null)"
+                                    />
+                                </div>
+
+                                {{-- Utilisation de x-menu pour afficher l'input en position absolue --}}
+                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-gray-50 border border-slate-200 rounded-lg w-full z-10">
+                                    <x-form.field-date
+                                        label="Rappel de paiement"
+                                        name="form.payment_reminder"
+                                        model="form.payment_reminder"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </x-invoices.create.form-step>
 

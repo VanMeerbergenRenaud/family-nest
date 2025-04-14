@@ -70,7 +70,6 @@ class Edit extends Component
 
         if ($family) {
             $this->family_members = $family->users()
-                ->where('users.id', '!=', auth()->id())
                 ->get();
         }
 

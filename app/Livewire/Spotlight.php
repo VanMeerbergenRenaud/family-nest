@@ -6,16 +6,18 @@ use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Livewire\Component;
-use Livewire\Attributes\Reactive;
 
 class Spotlight extends Component
 {
     public Collection $results;
+
     public string $search = '';
+
     public bool $spotlightOpen = false;
 
     // Navigation keyboard
     public int $selectedIndex = -1;
+
     public array $navigableItems = [];
 
     public function mount(): void
@@ -125,7 +127,7 @@ class Spotlight extends Component
         }
 
         // Add suggestions if no results
-        if ($this->results->isEmpty() && !empty($this->search)) {
+        if ($this->results->isEmpty() && ! empty($this->search)) {
             $this->addSuggestions();
         }
     }
@@ -180,7 +182,7 @@ class Spotlight extends Component
 
     public function selectCurrent(): void
     {
-        if (!$this->hasValidSelection()) {
+        if (! $this->hasValidSelection()) {
             return;
         }
 
@@ -205,11 +207,12 @@ class Spotlight extends Component
 
     public function isItemSelected(string $itemId, string $itemType): bool
     {
-        if (!$this->hasValidSelection()) {
+        if (! $this->hasValidSelection()) {
             return false;
         }
 
         $selectedItem = $this->navigableItems[$this->selectedIndex];
+
         return $selectedItem['id'] == $itemId && $selectedItem['type'] == $itemType;
     }
 

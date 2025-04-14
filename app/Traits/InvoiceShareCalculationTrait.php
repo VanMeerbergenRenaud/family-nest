@@ -220,21 +220,22 @@ trait InvoiceShareCalculationTrait
 
     private function getPayerInfo($familyMembers): array
     {
-        $payer = ['name' => 'Non spécifié', 'id' => null, 'avatar' => null];
+        $payer = [
+            'id' => null,
+            'name' => 'Non spécifié',
+            'avatar' => null,
+        ];
 
         if ($this->form->paid_by_user_id) {
-            foreach ($familyMembers as $member) {
-                if ($member->id == $this->form->paid_by_user_id) {
-                    $payer = [
-                        'name' => $member->name,
-                        'id' => $member->id,
-                        'avatar' => $member->avatar_url,
-                    ];
-                    break;
-                }
+            $payerMember = $familyMembers->firstWhere('id', $this->form->paid_by_user_id);
+
+            if ($payerMember) {
+                $payer = [
+                    'name' => $payerMember->name,
+                    'id' => $payerMember->id,
+                    'avatar' => $payerMember->avatar_url,
+                ];
             }
-        } else {
-            $payer['name'] = $this->form->issuer_name ?? 'Non spécifié';
         }
 
         return $payer;

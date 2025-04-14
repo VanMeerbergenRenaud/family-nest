@@ -11,7 +11,7 @@
 <li wire:key="{{ $id }}_{{ $type }}">
     <a href="{{ $href }}"
        class="relative flex items-center space-x-2 rounded-lg p-2 group {{ $this->isItemSelected($id, $type) ? 'bg-gray-100 dark:bg-gray-700' : 'hover:bg-gray-100 dark:hover:bg-gray-700' }}"
-       wire:click.prevent="setSelectedItem('{{ $id }}', '{{ $type }}')"
+       wire:click="setSelectedItem('{{ $id }}', '{{ $type }}')"
        @if ($this->isItemSelected($id, $type)) id="selected-item" @endif>
         {{-- Icon or img --}}
         <div class="flex-shrink-0">

@@ -255,9 +255,9 @@ class InvoiceForm extends Form
             // Normaliser le montant avant stockage
             $amount = $this->normalizeAmount($this->amount);
 
-            // Si le payeur n'est pas défini, le définir sur l'utilisateur connecté
-            if (! $this->paid_by_user_id) {
-                $this->paid_by_user_id = auth()->id();
+            // Si le payeur n'est pas dans la bonne famille, on le force à être l'utilisateur authentifié
+            if (! $this->paid_by_user_id || ! auth()->user()->families->contains($this->paid_by_user_id)) {
+                $this->paid_by_user_id = auth()->user()->id;
             }
 
             // Préparation des données communes
@@ -272,7 +272,7 @@ class InvoiceForm extends Form
                 // Détails financiers
                 'amount' => $amount,
                 'currency' => $this->currency,
-                'paid_by_user_id' => $this->paid_by_user_id,
+                'paid_by_user_id' => $this->paid_by_user_id ?? auth()->user()->id,
                 'family_id' => $this->family_id,
                 // Dates
                 'issued_date' => $this->issued_date,
@@ -446,12 +446,33 @@ class InvoiceForm extends Form
 
         // Charger les parts d'utilisateurs
         $this->user_shares = [];
-        foreach ($invoice->sharedUsers as $user) {
+
+        if (auth()->user()->families->isEmpty()) {
+            // Si l'utilisateur n'a pas de famille, répartition à 100% pour lui-même
             $this->user_shares[] = [
-                'id' => $user->id,
-                'amount' => $user->pivot->share_amount,
-                'percentage' => $user->pivot->share_percentage,
+                'id' => auth()->user()->id,
+                'amount' => $invoice->amount,
+                'percentage' => 100,
             ];
+        } else {
+            // Si l'utilisateur a une famille
+            if ($invoice->sharedUsers->isEmpty()) {
+                // Aucune répartition incluse, répartition à 100% pour l'utilisateur authentifié
+                $this->user_shares[] = [
+                    'id' => auth()->user()->id,
+                    'amount' => $invoice->amount,
+                    'percentage' => 100,
+                ];
+            } else {
+                // Charger les parts des utilisateurs associés
+                foreach ($invoice->sharedUsers as $user) {
+                    $this->user_shares[] = [
+                        'id' => $user->id,
+                        'amount' => $user->pivot->share_amount,
+                        'percentage' => $user->pivot->share_percentage,
+                    ];
+                }
+            }
         }
 
         // Dates - Les formater au format Y-m-d pour les champs input

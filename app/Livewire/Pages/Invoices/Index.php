@@ -519,7 +519,7 @@ class Index extends Component
                 ->findOrFail($invoiceId);
 
             $newInvoice = $originalInvoice->replicate();
-            $newInvoice->name = $originalInvoice->name . ' (version copiée)';
+            $newInvoice->name = $originalInvoice->name.' (version copiée)';
             $newInvoice->is_favorite = false; // Ne pas copier l'état favori
             $newInvoice->created_at = now();
             $newInvoice->updated_at = now();
@@ -541,7 +541,7 @@ class Index extends Component
 
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de la copie de la facture::Veuillez réessayer.');
-            \Log::error('Erreur lors de la copie de la facture: ' . $e->getMessage());
+            \Log::error('Erreur lors de la copie de la facture: '.$e->getMessage());
         }
     }
 

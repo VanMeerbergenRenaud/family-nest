@@ -66,6 +66,17 @@ class Invoice extends Model
             ->withTimestamps();
     }
 
+    // Get the user who paid the invoice
+    public function paidByUser()
+    {
+        // TODO: Only the user of the family or the auth user
+        if (! auth()->user()) {
+            return;
+        }
+
+        return $this->belongsTo(User::class, 'paid_by_user_id');
+    }
+
     // Configuration for Algolia
     public function toSearchableArray(): array
     {

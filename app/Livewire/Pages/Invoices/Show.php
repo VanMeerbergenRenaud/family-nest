@@ -66,6 +66,12 @@ class Show extends Component
         $this->family_members->prepend(auth()->user());
     }
 
+    public function getUserName()
+    {
+        // Récupérer le nom de l'utilisateur qui a payé la facture
+        return $this->invoice->paidByUser;
+    }
+
     /**
      * Prépare les données de formulaire pour utiliser le trait InvoiceShareCalculationTrait
      */
@@ -77,6 +83,11 @@ class Show extends Component
             'paid_by_user_id' => $this->invoice->paid_by_user_id,
             'user_shares' => [],
         ];
+
+        // S'assurer que l'ID du payeur est bien défini
+        if (! $this->form->paid_by_user_id && $this->invoice->paid_by_user_id) {
+            $this->form->paid_by_user_id = $this->invoice->paid_by_user_id;
+        }
 
         foreach ($this->invoice->sharedUsers as $user) {
             $this->form->user_shares[] = [

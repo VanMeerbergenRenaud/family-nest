@@ -60,27 +60,61 @@
                 $shareSummary = $this->getShareDetailSummary($family_members);
                 $currencySymbol = '';
                 try {
-                    $currencyEnum = \App\Enums\CurrencyEnum::from($form->currency ?? 'EUR');
-                    $currencySymbol = $currencyEnum->symbol();
+                    $currencyEnum = \App\Enums\CurrencyEnum::tryFrom($form->currency ?? 'EUR');
+                    $currencySymbol = $currencyEnum?->symbol() ?? '€';
                 } catch (\ValueError $e) {
                     $currencySymbol = $form->currency ?? '€';
+                }
+
+                // Si l'utilisateur n'a pas de familles, répartition à 100% pour lui-même
+                if ($family_members->isEmpty()) {
+                    $shareSummary = [
+                        'hasAmount' => true,
+                        'hasDetails' => true,
+                        'formattedShared' => $form->amount ?? 0,
+                        'totalPercentage' => 100,
+                        'memberDetails' => [
+                            [
+                                'id' => auth()->user()->id,
+                                'name' => auth()->user()->name,
+                                'avatar' => auth()->user()->avatar_url ?? asset('img/img_placeholder.jpg'),
+                                'formattedAmount' => $form->amount ?? 0,
+                                'sharePercentage' => 100,
+                                'formattedPercentage' => 100,
+                                'isPayer' => true,
+                            ],
+                        ],
+                    ];
                 }
             @endphp
             @if($shareSummary['hasAmount'])
                 <div class="space-y-2">
                     <!-- Nom du payeur -->
                     <div class="flex justify-between items-center">
+                        @php
+                            $payerId = $form->paid_by_user_id ?? null;
+                            $payerName = auth()->user()->name; // Par défaut, le payeur est l'utilisateur authentifié
+                            $payerAvatar = auth()->user()->avatar_url ?? asset('img/img_placeholder.jpg');
+
+                            // Si l'utilisateur a une famille, chercher le payeur dans les membres de la famille
+                            if ($payerId && $family_members->isNotEmpty()) {
+                                foreach ($family_members as $member) {
+                                    if ($member->id == $payerId) {
+                                        $payerName = $member->name;
+                                        $payerAvatar = $member->avatar_url ?? asset('img/img_placeholder.jpg');
+                                        break;
+                                    }
+                                }
+                            }
+                        @endphp
+
                         <p class="max-sm:mt-1.5 text-sm-regular">
                             Payeur :
-                            @if($shareSummary['payer']['name'] !== "Non spécifié")
-                                <span class="text-sm-medium">
-                            <img src="{{ $shareSummary['payer']['avatar'] ?? asset('img/img_placeholder.jpg') }}" alt=""
-                                 class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
-                            {{ $shareSummary['payer']['name'] }}
-                        </span>
-                            @else
-                                <span class="text-sm-medium">Non spécifié</span>
-                            @endif
+                            <span class="text-sm-medium">
+                                <img src="{{ $payerAvatar }}" alt=""
+                                     class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
+                                {{ $payerName }}
+                            </span>
                         </p>
                     </div>
 
@@ -129,12 +163,12 @@
                                                  alt="" class="w-6 h-6 rounded-full inline-block">
                                             <span class="text-sm text-gray-700">{{ $member['name'] }}</span>
                                         </div>
-                                        <p class="text-sm-medium text-gray-800">{{ $member['formattedAmount'] }}
-                                            &nbsp;{{ $currencySymbol }}</p>
+                                        <p class="text-sm-medium text-gray-800">
+                                            {{ $member['formattedAmount'] }}&nbsp;{{ $currencySymbol }}
+                                        </p>
                                         <div class="flex items-center gap-2">
-                                            <div class="w-10 h-1 bg-gray-100 rounded-full">
-                                                <div
-                                                    class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}"
+                                            <div class="w-12 h-1 bg-gray-100 rounded-full">
+                                                <div class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}"
                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
                                             </div>
                                             <span class="text-xs text-gray-500 ml-1">{{ $member['formattedPercentage'] }}%</span>
@@ -177,7 +211,7 @@
                 </p>
                 <p class="text-sm-regular">
                     Fréquence: <span class="text-sm-medium">
-                        @if($form->payment_frequency && $form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
+                        @if($form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
                             {{ $form->payment_frequency->label() }}
                         @else
                             Non spécifiée
@@ -188,7 +222,7 @@
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Statut de paiement">
-            @if($form->payment_status && $form->payment_status instanceof \App\Enums\PaymentStatusEnum)
+            @if($form->payment_status instanceof \App\Enums\PaymentStatusEnum)
                 <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
                     {{ $form->payment_status->emoji() }}&nbsp;&nbsp;{{ $form->payment_status->label() }}
                 </span>
@@ -201,7 +235,7 @@
             <div class="mt-1 ml-1 flex flex-col gap-1.5">
                 <p class="text-sm-regular">
                     Méthode: <span class="text-sm-medium">
-                        @if($form->payment_method && $form->payment_method instanceof \App\Enums\PaymentMethodEnum)
+                        @if($form->payment_method instanceof \App\Enums\PaymentMethodEnum)
                             {{ $form->payment_method->label() }}
                         @else
                             Non spécifiée
@@ -210,7 +244,7 @@
                 </p>
                 <p class="text-sm-regular">
                     Priorité: <span class="text-sm-medium">
-                        @if($form->priority && $form->priority instanceof \App\Enums\PriorityEnum)
+                        @if($form->priority instanceof \App\Enums\PriorityEnum)
                             {{ $form->priority->label() }}
                         @else
                             Non spécifiée
@@ -235,8 +269,7 @@
                 <ul class="flex flex-wrap gap-2">
                     @foreach($form->tags as $tag)
                         <li wire:key="tag-{{ $tag }}">
-                            <span
-                                class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
+                            <span class="px-2 py-1 rounded-full text-xs-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
                                 {{ $tag }}
                             </span>
                         </li>
