@@ -16,11 +16,16 @@ class ConfirmPassword extends Component
     #[Validate]
     public string $password = '';
 
+    public function rules(): array
+    {
+        return [
+            'password' => ['required', 'string'],
+        ];
+    }
+
     public function confirmPassword(): void
     {
-        $this->validate([
-            'password' => ['required', 'string'],
-        ]);
+        $this->validate();
 
         if (! Auth::guard('web')->validate([
             'email' => Auth::user()->email,

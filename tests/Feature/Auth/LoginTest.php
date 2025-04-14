@@ -1,72 +1,95 @@
 <?php
 
+namespace Tests\Feature\Auth;
+
+use App\Livewire\Actions\Logout;
 use App\Models\User;
-use Livewire\Volt\Volt;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+use App\Livewire\Pages\Auth\Login;
 
-test('login screen can be rendered', function () {
-    $response = $this->get('/login');
+class LoginTest extends TestCase
+{
+    use RefreshDatabase;
 
-    $response
-        ->assertOk()
-        ->assertSeeVolt('pages.auth.login');
-});
+    public function test_login_screen_can_be_rendered(): void
+    {
+        $response = $this->get('/login');
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+        $response
+            ->assertOk()
+            ->assertSeeLivewire('pages.auth.login');
+    }
 
-    $component = Volt::test('pages.auth.login')
-        ->set('form.email', $user->email)
-        ->set('form.password', 'password');
+    public function test_users_can_authenticate_using_the_login_screen(): void
+    {
+        $user = User::factory()->create();
 
-    $component->call('login');
+        Livewire::test(Login::class)
+            ->set('form.email', $user->email)
+            ->set('form.password', 'password')
+            ->call('login')
+            ->assertHasNoErrors()
+            ->assertRedirect(route('dashboard', absolute: false));
 
-    $component
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+        $this->assertAuthenticated();
+    }
 
-    $this->assertAuthenticated();
-});
+    public function test_users_can_not_authenticate_with_invalid_password(): void
+    {
+        $user = User::factory()->create();
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+        Livewire::test(Login::class)
+            ->set('form.email', $user->email)
+            ->set('form.password', 'wrong-password')
+            ->call('login')
+            ->assertHasErrors('form.email')
+            ->assertNoRedirect();
 
-    $component = Volt::test('pages.auth.login')
-        ->set('form.email', $user->email)
-        ->set('form.password', 'wrong-password');
+        $this->assertGuest();
+    }
 
-    $component->call('login');
+    public function test_navigation_menu_can_be_rendered(): void
+    {
+        $user = User::factory()->create();
 
-    $component
-        ->assertHasErrors()
-        ->assertNoRedirect();
+        $this->actingAs($user);
 
-    $this->assertGuest();
-});
+        $response = $this->get('/dashboard');
 
-test('navigation menu can be rendered', function () {
-    $user = User::factory()->create();
+        $response
+            ->assertOk()
+            ->assertSeeLivewire('breadcrumb')
+            ->assertSeeLivewire('sidebar');
+    }
 
-    $this->actingAs($user);
+    public function test_users_can_logout(): void
+    {
+        $user = User::factory()->create();
 
-    $response = $this->get('/dashboard');
+        $this->actingAs($user);
+        $this->assertAuthenticated();
 
-    $response
-        ->assertOk()
-        ->assertSeeVolt('navigation');
-});
+        // Appel direct de l'action Logout
+        (new Logout)();
 
-test('users can logout', function () {
-    $user = User::factory()->create();
+        $this->assertGuest();
+    }
 
-    $this->actingAs($user);
+    public function test_users_can_logout_through_route(): void
+    {
+        $user = User::factory()->create();
 
-    $component = Volt::test('navigation');
+        $this->actingAs($user);
+        $this->assertAuthenticated();
 
-    $component->call('logout');
+        // Utilisation de la route POST pour le logout
+        $this->post(route('logout'));
 
-    $component
-        ->assertHasNoErrors()
-        ->assertRedirect('/');
+        // Vérification que l'utilisateur est déconnecté
+        $this->assertGuest();
 
-    $this->assertGuest();
-});
+        $this->assertGuest();
+    }
+}

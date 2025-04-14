@@ -2,26 +2,37 @@
 
 namespace Tests\Feature\Auth;
 
-use Livewire\Volt\Volt;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+use App\Livewire\Pages\Auth\Register;
 
-test('registration screen can be rendered', function () {
-    $response = $this->get('/register');
+class RegisterTest extends TestCase
+{
+    use RefreshDatabase;
 
-    $response
-        ->assertOk()
-        ->assertSeeVolt('pages.auth.register');
-});
+    public function test_registration_screen_can_be_rendered(): void
+    {
+        $response = $this->get('/register');
 
-test('new users can register', function () {
-    $component = Volt::test('pages.auth.register')
-        ->set('form.name', 'Test User')
-        ->set('form.email', 'test@example.com')
-        ->set('form.password', 'password')
-        ->set('form.password_confirmation', 'password');
+        $response
+            ->assertOk()
+            ->assertSeeLivewire('pages.auth.register');
+    }
 
-    $component->call('register');
+    public function test_new_users_can_register(): void
+    {
+        Livewire::test(Register::class)
+            ->set('form.name', 'Test User')
+            ->set('form.email', 'test@example.com')
+            ->set('form.password', 'password')
+            ->call('register')
+            ->assertRedirect(route('dashboard', absolute: false));
 
-    $component->assertRedirect(route('dashboard', absolute: false));
-
-    $this->assertAuthenticated();
-});
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+        ]);
+    }
+}
