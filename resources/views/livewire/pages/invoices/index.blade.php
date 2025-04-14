@@ -172,8 +172,7 @@
         <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
 
             {{-- En-tête --}}
-            <div
-                class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
                 <h3 role="heading" aria-level="3" class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h3>
                 <div class="flex flex-wrap gap-2">
                     {{-- Filtres --}}
@@ -643,7 +642,7 @@
                     @endforeach
                     @if($invoices->count() <= 5)
                         <tr>
-                            <td colspan="100%" class="h-64">
+                            <td colspan="100%" class="h-74">
                                 <p class="sr-only">Espace vide</p>
                             </td>
                         </tr>

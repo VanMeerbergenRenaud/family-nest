@@ -9,10 +9,10 @@
     $basicColor = 'text-gray-700 bg-white dark:text-gray-400 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700';
     $groupColor = 'group-hover:text-gray-900 dark:group-hover:text-gray-100';
     $activeColor = 'text-indigo-600 bg-indigo-100 dark:text-indigo-200 dark:bg-purple-400';
-    $isActive = request()->routeIs(substr($href, strrpos($href, '/') + 1)) || request()->url() === $href;
+    $isActive = request()->routeIs(basename($href)) || request()->url() === $href;
 @endphp
 
-<li class="rounded-lg {{ $basicColor }}" x-data="{ showTooltip: false }" role="listitem">
+<li class="rounded-lg cursor-pointer {{ $basicColor }}" x-data="{ showTooltip: false }" role="listitem">
     <a href="{{ $href }}"
        wire:navigate
        class="group flex items-center px-3 py-2 h-10 rounded-lg relative {{ $isActive ? $activeColor : '' }}"
@@ -37,7 +37,6 @@
                     position="right"
                     :active="$isActive"
                     show="true"
-                    colorStyle="gray"
                 />
             </div>
         @endif

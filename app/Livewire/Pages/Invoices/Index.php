@@ -511,6 +511,40 @@ class Index extends Component
         }
     }
 
+    public function copyInvoice($invoiceId): void
+    {
+        try {
+            $originalInvoice = auth()->user()->invoices()
+                ->with(['file', 'sharedUsers'])
+                ->findOrFail($invoiceId);
+
+            $newInvoice = $originalInvoice->replicate();
+            $newInvoice->name = $originalInvoice->name . ' (version copiée)';
+            $newInvoice->is_favorite = false; // Ne pas copier l'état favori
+            $newInvoice->created_at = now();
+            $newInvoice->updated_at = now();
+            $newInvoice->save();
+
+            if ($originalInvoice->file) {
+                $originalFile = $originalInvoice->file;
+                $newFile = $originalFile->replicate();
+                $newFile->invoice_id = $newInvoice->id;
+                $newFile->save();
+            }
+
+            if ($originalInvoice->tags) {
+                $newInvoice->tags = $originalInvoice->tags;
+                $newInvoice->save();
+            }
+
+            $this->redirectRoute('invoices.edit', $newInvoice->id);
+
+        } catch (\Exception $e) {
+            Toaster::error('Erreur lors de la copie de la facture::Veuillez réessayer.');
+            \Log::error('Erreur lors de la copie de la facture: ' . $e->getMessage());
+        }
+    }
+
     public function render()
     {
         // Récupération des factures avec filtres

@@ -9,6 +9,7 @@
     </x-menu.button>
 
     <x-menu.items>
+        <!-- Actions de visualisation -->
         <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
             <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
             {{ __('Voir l‘aperçu') }}
@@ -16,10 +17,29 @@
 
         <x-menu.item wire:click="showSidebarInvoice({{ $invoice->id }})">
             <x-svg.binocular class="w-4 h-4 group-hover:text-gray-900"/>
-            {{ __('Voir en détail') }}
+            {{ __('Voir les détails') }}
         </x-menu.item>
 
         <x-menu.divider/>
+
+        <!-- Actions d'édition -->
+        <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
+            <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
+            {{ __('Modifier') }}
+        </x-menu.item>
+
+        <x-menu.item wire:click="copyInvoice({{ $invoice->id }})">
+            <x-svg.copy class="w-4 h-4 group-hover:text-gray-900"/>
+            {{ __('Copier le modèle') }}
+        </x-menu.item>
+
+        <x-menu.divider/>
+
+        <!-- Actions secondaires -->
+        <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
+            <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
+            {{ __('Télécharger') }}
+        </x-menu.item>
 
         <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
             @if($invoice->is_favorite)
@@ -31,16 +51,9 @@
             @endif
         </x-menu.item>
 
-        <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
-            <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
-            {{ __('Télécharger') }}
-        </x-menu.item>
+        <x-menu.divider/>
 
-        <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
-            <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
-            {{ __('Modifier') }}
-        </x-menu.item>
-
+        <!-- Action destructive -->
         <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
             <x-svg.archive class="w-4 h-4 group-hover:text-red-500"/>
             {{ __('Archiver') }}
