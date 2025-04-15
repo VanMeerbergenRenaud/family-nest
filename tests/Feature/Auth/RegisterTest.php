@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Livewire\Pages\Auth\Register;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use App\Livewire\Pages\Auth\Register;
 
 class RegisterTest extends TestCase
 {

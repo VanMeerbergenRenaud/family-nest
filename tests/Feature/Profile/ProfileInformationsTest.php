@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Profile;
 
+use App\Livewire\Pages\Settings\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use App\Livewire\Pages\Settings\Profile;
 
 class ProfileInformationsTest extends TestCase
 {
@@ -64,7 +64,7 @@ class ProfileInformationsTest extends TestCase
     {
         $user = User::factory()->create([
             'name' => 'Original Name',
-            'email' => 'original@example.com'
+            'email' => 'original@example.com',
         ]);
 
         $this->actingAs($user);
@@ -75,7 +75,7 @@ class ProfileInformationsTest extends TestCase
 
         $modifiedValues = [
             'name' => $component->get('form.name'),
-            'email' => $component->get('form.email')
+            'email' => $component->get('form.email'),
         ];
 
         $component->call('cancelProfileEdit');
@@ -90,7 +90,7 @@ class ProfileInformationsTest extends TestCase
     public function test_user_can_send_verification_email(): void
     {
         $user = User::factory()->create([
-            'email_verified_at' => null
+            'email_verified_at' => null,
         ]);
 
         $this->actingAs($user);

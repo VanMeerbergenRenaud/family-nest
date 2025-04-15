@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Profile;
 
+use App\Livewire\Pages\Settings\Profile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Tests\TestCase;
-use App\Livewire\Pages\Settings\Profile;
 
 class ProfilePasswordUpdateTest extends TestCase
 {
@@ -60,7 +60,7 @@ class ProfilePasswordUpdateTest extends TestCase
         $previousData = [
             'current_password' => $component->get('passwordForm.current_password'),
             'password' => $component->get('passwordForm.password'),
-            'password_confirmation' => $component->get('passwordForm.password_confirmation')
+            'password_confirmation' => $component->get('passwordForm.password_confirmation'),
         ];
 
         $component->call('cancelPasswordEdit');

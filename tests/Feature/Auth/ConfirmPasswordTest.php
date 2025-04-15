@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Livewire\Pages\Auth\ConfirmPassword;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
-use App\Livewire\Pages\Auth\ConfirmPassword;
 
 class ConfirmPasswordTest extends TestCase
 {

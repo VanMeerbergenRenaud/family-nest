@@ -27,9 +27,10 @@ class InvoiceCreateTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected MockInterface $fileStorageService;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -49,14 +50,14 @@ class InvoiceCreateTest extends TestCase
             'isDocx' => false,
             'isCsv' => false,
             'status' => 'success',
-            'statusMessage' => 'Import du fichier validé'
+            'statusMessage' => 'Import du fichier validé',
         ]);
     }
 
     public function test_invoice_is_persisted_in_database_after_creation(): void
     {
         // Utiliser une vraie instance de FileStorageService au lieu d'un mock
-        $this->app->instance(FileStorageService::class, new FileStorageService());
+        $this->app->instance(FileStorageService::class, new FileStorageService);
 
         $file = UploadedFile::fake()->create('test-invoice.pdf', 1024);
 
@@ -114,8 +115,8 @@ class InvoiceCreateTest extends TestCase
                 [
                     'id' => $this->user->id,
                     'amount' => 59.99,
-                    'percentage' => 100
-                ]
+                    'percentage' => 100,
+                ],
             ])
             ->set('form.issued_date', '2025-04-10')
             ->set('form.payment_due_date', '2025-04-25')
@@ -141,7 +142,7 @@ class InvoiceCreateTest extends TestCase
         $this->assertEquals(CategoryEnum::ABO_INTERNET_TELECOM->value, $invoice->category->value);
         $this->assertEquals('Fournisseur Internet', $invoice->issuer_name);
         $this->assertEquals('https://fournisseur-internet.com', $invoice->issuer_website);
-        $this->assertEquals(59.99, (float)$invoice->amount);
+        $this->assertEquals(59.99, (float) $invoice->amount);
         $this->assertEquals(CurrencyEnum::EUR->value, $invoice->currency);
         $this->assertEquals($this->user->id, $invoice->paid_by_user_id);
         $this->assertEquals(PaymentFrequencyEnum::Monthly->value, $invoice->payment_frequency->value);
@@ -202,14 +203,14 @@ class InvoiceCreateTest extends TestCase
         $userShare = collect($userShares)->firstWhere('id', $this->user->id);
         $memberShare = collect($userShares)->firstWhere('id', $familyMember->id);
 
-        $this->assertGreaterThanOrEqual(49.9, (float)$userShare['percentage']);
-        $this->assertLessThanOrEqual(50.1, (float)$userShare['percentage']);
-        $this->assertGreaterThanOrEqual(49.9, (float)$userShare['amount']);
-        $this->assertLessThanOrEqual(50.1, (float)$userShare['amount']);
-        $this->assertGreaterThanOrEqual(49.9, (float)$memberShare['percentage']);
-        $this->assertLessThanOrEqual(50.1, (float)$memberShare['percentage']);
-        $this->assertGreaterThanOrEqual(49.9, (float)$memberShare['amount']);
-        $this->assertLessThanOrEqual(50.1, (float)$memberShare['amount']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $userShare['percentage']);
+        $this->assertLessThanOrEqual(50.1, (float) $userShare['percentage']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $userShare['amount']);
+        $this->assertLessThanOrEqual(50.1, (float) $userShare['amount']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $memberShare['percentage']);
+        $this->assertLessThanOrEqual(50.1, (float) $memberShare['percentage']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $memberShare['amount']);
+        $this->assertLessThanOrEqual(50.1, (float) $memberShare['amount']);
     }
 
     public function test_can_remove_an_uploaded_file(): void
@@ -228,7 +229,7 @@ class InvoiceCreateTest extends TestCase
         $this->assertFalse($component->get('showOcrButton'));
     }
 
-    public function test_switches_OCR_button_visibility_when_file_is_uploaded(): void
+    public function test_switches_oc_r_button_visibility_when_file_is_uploaded(): void
     {
         $component = Livewire::test(Create::class);
         $this->assertFalse($component->get('showOcrButton'));
@@ -263,8 +264,8 @@ class InvoiceCreateTest extends TestCase
                 [
                     'id' => $this->user->id,
                     'amount' => 30,
-                    'percentage' => 30
-                ]
+                    'percentage' => 30,
+                ],
             ])
             ->call('calculateRemainingShares');
 
@@ -277,13 +278,13 @@ class InvoiceCreateTest extends TestCase
             [
                 'id' => $this->user->id,
                 'amount' => 30,
-                'percentage' => 30
+                'percentage' => 30,
             ],
             [
                 'id' => 999,
                 'amount' => 40,
-                'percentage' => 40
-            ]
+                'percentage' => 40,
+            ],
         ])->call('calculateRemainingShares');
 
         $this->assertGreaterThanOrEqual(30.0, $component->get('remainingAmount'));
@@ -306,19 +307,19 @@ class InvoiceCreateTest extends TestCase
         $this->assertCount(1, $userShares);
 
         $userShare = collect($userShares)->firstWhere('id', $this->user->id);
-        $this->assertGreaterThanOrEqual(29.9, (float)$userShare['percentage']);
-        $this->assertLessThanOrEqual(30.1, (float)$userShare['percentage']);
-        $this->assertGreaterThanOrEqual(29.9, (float)$userShare['amount']);
-        $this->assertLessThanOrEqual(30.1, (float)$userShare['amount']);
+        $this->assertGreaterThanOrEqual(29.9, (float) $userShare['percentage']);
+        $this->assertLessThanOrEqual(30.1, (float) $userShare['percentage']);
+        $this->assertGreaterThanOrEqual(29.9, (float) $userShare['amount']);
+        $this->assertLessThanOrEqual(30.1, (float) $userShare['amount']);
 
         $component->call('updateShare', $this->user->id, 50, 'amount');
         $userShares = $component->get('form.user_shares');
         $userShare = collect($userShares)->firstWhere('id', $this->user->id);
 
-        $this->assertGreaterThanOrEqual(49.9, (float)$userShare['amount']);
-        $this->assertLessThanOrEqual(50.1, (float)$userShare['amount']);
-        $this->assertGreaterThanOrEqual(49.9, (float)$userShare['percentage']);
-        $this->assertLessThanOrEqual(50.1, (float)$userShare['percentage']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $userShare['amount']);
+        $this->assertLessThanOrEqual(50.1, (float) $userShare['amount']);
+        $this->assertGreaterThanOrEqual(49.9, (float) $userShare['percentage']);
+        $this->assertLessThanOrEqual(50.1, (float) $userShare['percentage']);
         $this->assertGreaterThanOrEqual(50.0, $component->get('remainingAmount'));
         $this->assertLessThanOrEqual(50.1, $component->get('remainingAmount'));
         $this->assertGreaterThanOrEqual(50.0, $component->get('remainingPercentage'));
@@ -335,13 +336,13 @@ class InvoiceCreateTest extends TestCase
                 [
                     'id' => $this->user->id,
                     'amount' => 30,
-                    'percentage' => 30
+                    'percentage' => 30,
                 ],
                 [
                     'id' => $familyMember->id,
                     'amount' => 40,
-                    'percentage' => 40
-                ]
+                    'percentage' => 40,
+                ],
             ])
             ->set('family_members', collect([$this->user, $familyMember]));
 
