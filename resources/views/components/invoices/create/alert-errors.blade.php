@@ -4,8 +4,8 @@
 
 <div class="my-6 lg:px-4 mx-auto max-lg:flex-center max-lg:flex-col gap-4 lg:grid lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-0">
     @php
-        // Fonction réutilisable pour calculer la progression
-        function calculateProgress($form, $errors) {
+        // Utiliser une variable pour stocker la fonction
+        $calculateProgressFn = function($form, $errors) {
             // Champs requis et optionnels
             $requiredFields = ['uploadedFile', 'name', 'amount'];
             $optionalFields = ['type', 'category', 'issuer_name', 'issuer_website', 'issued_date', 'payment_due_date',
@@ -59,10 +59,10 @@
                 'requiredCount' => $filledRequired,
                 'totalRequired' => count($requiredFields)
             ];
-        }
+        };
 
-        // Calculer une seule fois la progression
-        $progressData = calculateProgress($form, $errors);
+        // Calculer une seule fois la progression en appelant la fonction anonyme
+        $progressData = $calculateProgressFn($form, $errors);
         $progressPercentage = $progressData['percentage'];
 
         // Déterminer le type d'alerte et la couleur en fonction du pourcentage
