@@ -14,7 +14,7 @@
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Fournisseur" :alternateBackground="true">
-            {{ $form->issuer_name ?: 'Non spécifié' }}
+            {{ $form->issuer_name ?? 'Non spécifié' }}
             @if($form->issuer_website)
                 <a href="{{ $form->issuer_website }}" target="_blank"
                    title="Visiter le site de l'émetteur"
@@ -57,65 +57,27 @@
 
         <x-invoices.create.summary-item label="Montant et répartition" :alternateBackground="true">
             @php
-                $shareSummary = $this->getShareDetailSummary($family_members);
-                $currencySymbol = '';
-                try {
-                    $currencyEnum = \App\Enums\CurrencyEnum::tryFrom($form->currency ?? 'EUR');
-                    $currencySymbol = $currencyEnum?->symbol() ?? '€';
-                } catch (\ValueError $e) {
-                    $currencySymbol = $form->currency ?? '€';
-                }
-
-                // Si l'utilisateur n'a pas de familles, répartition à 100% pour lui-même
-                if ($family_members->isEmpty()) {
-                    $shareSummary = [
-                        'hasAmount' => true,
-                        'hasDetails' => true,
-                        'formattedShared' => $form->amount ?? 0,
-                        'totalPercentage' => 100,
-                        'memberDetails' => [
-                            [
-                                'id' => auth()->user()->id,
-                                'name' => auth()->user()->name,
-                                'avatar' => auth()->user()->avatar_url ?? asset('img/img_placeholder.jpg'),
-                                'formattedAmount' => $form->amount ?? 0,
-                                'sharePercentage' => 100,
-                                'formattedPercentage' => 100,
-                                'isPayer' => true,
-                            ],
-                        ],
-                    ];
-                }
+                $shareSummary = $this->getShareDetailSummary($this->family_members);
+                $currencySymbol = $this->getCurrencySymbol();
             @endphp
+
             @if($shareSummary['hasAmount'])
                 <div class="space-y-2">
                     <!-- Nom du payeur -->
                     <div class="flex justify-between items-center">
-                        @php
-                            $payerId = $form->paid_by_user_id ?? null;
-                            $payerName = auth()->user()->name; // Par défaut, le payeur est l'utilisateur authentifié
-                            $payerAvatar = auth()->user()->avatar_url ?? asset('img/img_placeholder.jpg');
-
-                            // Si l'utilisateur a une famille, chercher le payeur dans les membres de la famille
-                            if ($payerId && $family_members->isNotEmpty()) {
-                                foreach ($family_members as $member) {
-                                    if ($member->id == $payerId) {
-                                        $payerName = $member->name;
-                                        $payerAvatar = $member->avatar_url ?? asset('img/img_placeholder.jpg');
-                                        break;
-                                    }
-                                }
-                            }
-                        @endphp
-
-                        <p class="max-sm:mt-1.5 text-sm-regular">
-                            Payeur :
-                            <span class="text-sm-medium">
-                                <img src="{{ $payerAvatar }}" alt=""
-                                     class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
-                                {{ $payerName }}
-                            </span>
-                        </p>
+                        @if(isset($shareSummary['memberDetails'][0]))
+                            @php
+                                $payer = collect($shareSummary['memberDetails'])->firstWhere('isPayer', true) ?? $shareSummary['memberDetails'][0];
+                            @endphp
+                            <p class="max-sm:mt-1.5 text-sm-regular">
+                                Payeur :
+                                <span class="text-sm-medium">
+                            <img src="{{ $payer['avatar'] }}" alt=""
+                                 class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
+                            {{ $payer['name'] }}
+                        </span>
+                            </p>
+                        @endif
                     </div>
 
                     <!-- Détail des parts -->
@@ -159,7 +121,7 @@
                                     <li class="flex justify-between items-center gap-2 py-1"
                                         wire:key="share-{{ $member['id'] }}">
                                         <div class="flex items-center gap-2 sm:w-44 mr-2">
-                                            <img src="{{ $member['avatar'] ?? asset('img/img_placeholder.jpg') }}"
+                                            <img src="{{ $member['avatar'] }}"
                                                  alt="" class="w-6 h-6 rounded-full inline-block">
                                             <span class="text-sm text-gray-700">{{ $member['name'] }}</span>
                                         </div>
@@ -169,7 +131,7 @@
                                         <div class="flex items-center gap-2">
                                             <div class="w-12 h-1 bg-gray-100 rounded-full">
                                                 <div class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}"
-                                                    style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
+                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
                                             </div>
                                             <span class="text-xs text-gray-500 ml-1">{{ $member['formattedPercentage'] }}%</span>
                                         </div>
@@ -194,19 +156,34 @@
 
         <x-invoices.create.summary-item label="Dates">
             <div class="flex flex-col gap-1.5">
+                @php
+                    // Fonction de formatage des dates réutilisable
+                    function formatDate($date) {
+                        if (empty($date)) {
+                            return 'Non spécifiée';
+                        }
+
+                        if (is_string($date)) {
+                            $date = \Carbon\Carbon::parse($date);
+                        }
+
+                        return $date->format('d/m/Y');
+                    }
+                @endphp
+
                 <p class="text-sm-regular">
                     Émission: <span class="text-sm-medium">
-                        {{ $form->simpleDateFormat($form->issued_date) }}
+                        {{ formatDate($form->issued_date) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Paiement: <span class="text-sm-medium">
-                        {{ $form->simpleDateFormat($form->payment_due_date) }}
+                        {{ formatDate($form->payment_due_date) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Rappel: <span class="text-sm-medium">
-                        {{ $form->simpleDateFormat($form->payment_reminder) }}
+                        {{ formatDate($form->payment_reminder) }}
                     </span>
                 </p>
                 <p class="text-sm-regular">

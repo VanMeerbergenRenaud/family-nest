@@ -256,8 +256,14 @@ class InvoiceForm extends Form
             $amount = $this->normalizeAmount($this->amount);
 
             // Si le payeur n'est pas dans la bonne famille, on le force à être l'utilisateur authentifié
-            if (! $this->paid_by_user_id || ! auth()->user()->families->contains($this->paid_by_user_id)) {
-                $this->paid_by_user_id = auth()->user()->id;
+            // Vérifier que le payeur est valide, sans forcer l'utilisateur authentifié
+            $validPayerIds = auth()->user()->families->flatMap(function ($family) {
+                return $family->users->pluck('id');
+            })->push(auth()->id())->unique()->toArray();
+
+            $payerId = $this->paid_by_user_id;
+            if (! in_array($payerId, $validPayerIds)) {
+                $payerId = auth()->id();
             }
 
             // Préparation des données communes
@@ -272,7 +278,7 @@ class InvoiceForm extends Form
                 // Détails financiers
                 'amount' => $amount,
                 'currency' => $this->currency,
-                'paid_by_user_id' => $this->paid_by_user_id ?? auth()->user()->id,
+                'paid_by_user_id' => $payerId,
                 'family_id' => $this->family_id,
                 // Dates
                 'issued_date' => $this->issued_date,

@@ -42,6 +42,9 @@ class Create extends Component
 
         $this->form->user_shares = [];
 
+        // Initialiser les parts utilisateur
+        $this->initializeUserShares();
+
         $this->initializeTagManagement();
         $this->calculateRemainingShares();
     }
@@ -49,15 +52,21 @@ class Create extends Component
     private function prepareFamilyMembers(): void
     {
         $family = auth()->user()->family();
-        $this->family_members = collect();
 
+        // Si l'utilisateur a une famille
         if ($family) {
+            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
             $this->family_members = $family->users()
-                ->where('users.id', '!=', auth()->id())
                 ->get();
+        } else {
+            // Si pas de famille, n'inclure que l'utilisateur authentifié
+            $this->family_members = collect([auth()->user()]);
         }
 
-        $this->family_members->prepend(auth()->user());
+        // S'assurer que l'utilisateur authentifié est dans la liste
+        if (! $this->family_members->contains('id', auth()->id())) {
+            $this->family_members->prepend(auth()->user());
+        }
     }
 
     public function updatedFormType(): void
@@ -186,17 +195,12 @@ class Create extends Component
 
     public function render()
     {
-        $this->calculateRemainingShares();
-
         return view('livewire.pages.invoices.create', [
             'invoiceTypes' => TypeEnum::getTypesOptionsWithEmojis(),
             'paymentStatuses' => PaymentStatusEnum::getStatusOptionsWithEmojis(),
             'paymentMethods' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
             'paymentFrequencies' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),
             'priorities' => PriorityEnum::getPriorityOptionsWithEmojis(),
-            'remainingAmount' => $this->remainingAmount,
-            'remainingPercentage' => $this->remainingPercentage,
-            'shareMode' => $this->shareMode,
         ])->layout('layouts.app');
     }
 }

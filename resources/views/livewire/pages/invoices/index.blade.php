@@ -904,7 +904,7 @@
                 </p>
 
                 <div class="p-4">
-                    <x-invoices.create.summary :form="$this->invoice" />
+                    <x-invoices.create.summary :form="$this->invoice" :$family_members />
                 </div>
 
                 <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">

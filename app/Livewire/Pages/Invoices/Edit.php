@@ -57,23 +57,38 @@ class Edit extends Component
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
 
+        // Préparer les données de partage de la facture
         $this->prepareFamilyMembers();
 
-        $this->initializeTagManagement();
+        if (! isset($this->form->paid_by_user_id)) {
+            $this->form->paid_by_user_id = auth()->id();
+        }
+
+        $this->initializeUserShares();
         $this->calculateRemainingShares();
+
+        // Initialiser les tags de la facture
+        $this->initializeTagManagement();
     }
 
     private function prepareFamilyMembers(): void
     {
         $family = auth()->user()->family();
-        $this->family_members = collect();
 
+        // Si l'utilisateur a une famille
         if ($family) {
+            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
             $this->family_members = $family->users()
                 ->get();
+        } else {
+            // Si pas de famille, n'inclure que l'utilisateur authentifié
+            $this->family_members = collect([auth()->user()]);
         }
 
-        $this->family_members->prepend(auth()->user());
+        // S'assurer que l'utilisateur authentifié est dans la liste
+        if (! $this->family_members->contains('id', auth()->id())) {
+            $this->family_members->prepend(auth()->user());
+        }
     }
 
     public function updatedFormType(): void
@@ -118,9 +133,6 @@ class Edit extends Component
             'paymentMethods' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
             'paymentFrequencies' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),
             'priorities' => PriorityEnum::getPriorityOptionsWithEmojis(),
-            'remainingAmount' => $this->remainingAmount,
-            'remainingPercentage' => $this->remainingPercentage,
-            'shareMode' => $this->shareMode,
         ])->layout('layouts.app');
     }
 }

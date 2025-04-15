@@ -3,8 +3,10 @@
 namespace App\Traits;
 
 use App\Enums\CurrencyEnum;
+use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
-use ValueError;
 
 trait InvoiceShareCalculationTrait
 {
@@ -78,7 +80,6 @@ trait InvoiceShareCalculationTrait
 
             foreach ($userIds as $index => $userId) {
                 if ($index === $count - 1) {
-                    // Ajuster le dernier pour éviter les problèmes d'arrondi
                     $share = number_format(100 - $totalAssigned, 2, '.', '');
                 }
 
@@ -91,7 +92,6 @@ trait InvoiceShareCalculationTrait
 
             foreach ($userIds as $index => $userId) {
                 if ($index === $count - 1) {
-                    // Ajuster le dernier pour éviter les problèmes d'arrondi
                     $shareAmount = number_format($amount - $totalAssigned, 2, '.', '');
                 }
 
@@ -168,118 +168,167 @@ trait InvoiceShareCalculationTrait
         return ['hasShare' => false, 'shareIndex' => null, 'shareData' => null];
     }
 
-    public function getCurrencySymbol(): string
+    public function preparePayerSelectionList(): Collection
     {
-        try {
-            return CurrencyEnum::tryFrom($this->form->currency ?? 'EUR')?->symbol() ?? '€';
-        } catch (ValueError) {
-            return $this->form->currency ?? '€';
-        }
-    }
-
-    public function getShareDetailSummary($familyMembers): array
-    {
-        $formAmount = floatval($this->form->amount ?? 0);
-
-        if (empty($formAmount)) {
-            return ['hasAmount' => false];
+        // Si l'utilisateur n'a pas de famille, retourner uniquement l'utilisateur authentifié
+        if (! isset($this->family_members) || $this->family_members->isEmpty()) {
+            return collect([auth()->user()]);
         }
 
-        // Initialiser les informations du payeur
-        $payer = $this->getPayerInfo($familyMembers);
+        // S'assurer que l'utilisateur authentifié est dans la liste s'il n'y est pas déjà
+        $members = clone $this->family_members;
+        if (! $members->contains('id', auth()->id())) {
+            $members->prepend(auth()->user());
+        }
 
-        // Calculer les totaux
-        [$totalShared, $totalPercentage] = $this->calculateShareTotals();
-
-        $remainingAmount = $formAmount - $totalShared;
-        $remainingPercentage = 100 - $totalPercentage;
-
-        $isFullyShared = abs($totalPercentage - 100) < 0.1 || abs($totalShared - $formAmount) < 0.01;
-        $isOverShared = $totalPercentage > 100.1 || $totalShared > ($formAmount + 0.01);
-
-        // Construire les détails des membres
-        $memberDetails = $this->buildMemberDetails($familyMembers);
-
-        return [
-            'hasAmount' => true,
-            'payer' => $payer,
-            'totalShared' => $totalShared,
-            'totalPercentage' => $totalPercentage,
-            'isFullyShared' => $isFullyShared,
-            'isOverShared' => $isOverShared,
-            'remainingAmount' => $remainingAmount,
-            'remainingPercentage' => $remainingPercentage,
-            'formattedTotal' => Number::format($formAmount, 2, locale: 'fr_FR'),
-            'formattedShared' => Number::format($totalShared, 2, locale: 'fr_FR'),
-            'formattedRemaining' => Number::format(abs($remainingAmount), 2, locale: 'fr_FR'),
-            'memberDetails' => $memberDetails,
-            'hasDetails' => ! empty($memberDetails),
-            'currencySymbol' => $this->getCurrencySymbol(),
-        ];
+        return $members;
     }
 
-    private function getPayerInfo($familyMembers): array
+    public function initializeUserShares(): void
     {
-        $payer = [
-            'id' => null,
-            'name' => 'Non spécifié',
-            'avatar' => null,
-        ];
+        if (! isset($this->form->user_shares)) {
+            $this->form->user_shares = [];
 
-        if ($this->form->paid_by_user_id) {
-            $payerMember = $familyMembers->firstWhere('id', $this->form->paid_by_user_id);
+            return;
+        }
 
-            if ($payerMember) {
-                $payer = [
-                    'name' => $payerMember->name,
-                    'id' => $payerMember->id,
-                    'avatar' => $payerMember->avatar_url,
-                ];
+        $sharesById = [];
+        foreach ($this->form->user_shares as $share) {
+            if (isset($share['id'])) {
+                $sharesById[$share['id']] = $share;
             }
         }
 
-        return $payer;
+        $this->form->user_shares = array_values($sharesById);
+        $this->calculateRemainingShares();
     }
 
-    private function calculateShareTotals(): array
+    public function getShareDetailSummary(Collection $familyMembers): array
     {
-        $totalShared = $totalPercentage = 0;
-
-        foreach ($this->form->user_shares ?? [] as $share) {
-            $totalShared += floatval($share['amount'] ?? 0);
-            $totalPercentage += floatval($share['percentage'] ?? 0);
+        if (! isset($this->form->amount) || empty($this->form->amount) || $this->form->amount <= 0) {
+            return [
+                'hasAmount' => false,
+                'hasDetails' => false,
+                'formattedShared' => 0,
+                'totalPercentage' => 0,
+                'memberDetails' => [],
+            ];
         }
 
-        return [$totalShared, $totalPercentage];
-    }
+        $userShares = $this->form->user_shares ?? [];
 
-    private function buildMemberDetails($familyMembers): array
-    {
+        if (empty($userShares)) {
+            $payerId = $this->form->paid_by_user_id ?? auth()->id();
+            $payer = null;
+
+            if (! $familyMembers->isEmpty()) {
+                $payer = $familyMembers->firstWhere('id', $payerId);
+            }
+
+            if (! $payer) {
+                $payer = $payerId === auth()->id()
+                    ? auth()->user()
+                    : User::find($payerId) ?? auth()->user();
+            }
+
+            return $this->getArr($payer);
+        }
+
         $memberDetails = [];
+        $totalPercentage = 0;
 
-        foreach ($this->form->user_shares ?? [] as $share) {
-            $memberInfo = [
-                'id' => $share['id'],
-                'name' => 'Membre inconnu',
-                'avatar' => null,
-                'sharePercentage' => floatval($share['percentage'] ?? 0),
-                'shareAmount' => floatval($share['amount'] ?? 0),
-                'isPayer' => (string) $share['id'] === (string) ($this->form->paid_by_user_id ?? ''),
-                'formattedAmount' => Number::format(floatval($share['amount'] ?? 0), 2, locale: 'fr_FR'),
-                'formattedPercentage' => Number::format(floatval($share['percentage'] ?? 0), 2, locale: 'fr_FR'),
-            ];
+        $membersById = $familyMembers->keyBy('id');
 
-            foreach ($familyMembers as $member) {
-                if ((string) $member->id === (string) $share['id']) {
-                    $memberInfo['name'] = $member->name;
-                    $memberInfo['avatar'] = $member->avatar_url;
-                    break;
+        if (! isset($membersById[auth()->id()])) {
+            $membersById[auth()->id()] = auth()->user();
+        }
+
+        foreach ($userShares as $share) {
+            if (! isset($share['id'])) {
+                continue;
+            }
+
+            // Récupérer le membre à partir du mapping
+            $member = $membersById[$share['id']] ?? null;
+
+            if (! $member) {
+                // Si non trouvé dans le mapping, chercher l'utilisateur
+                if ($share['id'] == auth()->id()) {
+                    $member = auth()->user();
+                } else {
+                    // Charger l'utilisateur si nécessaire (rare)
+                    $member = User::find($share['id']);
+                    if (! $member) {
+                        continue;
+                    }
                 }
             }
 
-            $memberDetails[] = $memberInfo;
+            $percentage = isset($share['percentage']) && $share['percentage'] > 0
+                ? $share['percentage']
+                : (isset($share['amount']) && $this->form->amount > 0
+                    ? ($share['amount'] / $this->form->amount) * 100
+                    : 0);
+
+            $amount = isset($share['amount']) && $share['amount'] > 0
+                ? $share['amount']
+                : ($this->form->amount * ($percentage / 100));
+
+            $totalPercentage += $percentage;
+
+            $memberDetails[] = [
+                'id' => $member->id,
+                'name' => $member->name,
+                'avatar' => $member->avatar_url ?? asset('img/img_placeholder.jpg'),
+                'formattedAmount' => number_format($amount, 2, ',', ' '),
+                'sharePercentage' => $percentage,
+                'formattedPercentage' => number_format($percentage, 0),
+                'isPayer' => $member->id == $this->form->paid_by_user_id,
+            ];
         }
 
-        return $memberDetails;
+        return [
+            'hasAmount' => true,
+            'hasDetails' => ! empty($memberDetails),
+            'formattedShared' => number_format((float) $this->form->amount, 2, ',', ' '),
+            'totalPercentage' => $totalPercentage,
+            'memberDetails' => $memberDetails,
+        ];
+    }
+
+    public function getCurrencySymbol(): string
+    {
+        if (! isset($this->form->currency)) {
+            return '€';
+        }
+
+        try {
+            $currencyEnum = CurrencyEnum::tryFrom($this->form->currency);
+
+            return $currencyEnum?->symbol() ?? '€';
+        } catch (\Exception $e) {
+            return '€';
+        }
+    }
+
+    public function getArr(User|Authenticatable|null $authUser): array
+    {
+        return [
+            'hasAmount' => true,
+            'hasDetails' => true,
+            'formattedShared' => number_format((float) $this->form->amount, 2, ',', ' '),
+            'totalPercentage' => 100,
+            'memberDetails' => [
+                [
+                    'id' => $authUser->id,
+                    'name' => $authUser->name,
+                    'avatar' => $authUser->avatar_url ?? asset('img/img_placeholder.jpg'),
+                    'formattedAmount' => number_format((float) $this->form->amount, 2, ',', ' '),
+                    'sharePercentage' => 100,
+                    'formattedPercentage' => number_format(100, 0),
+                    'isPayer' => true,
+                ],
+            ],
+        ];
     }
 }

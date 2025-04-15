@@ -30,18 +30,19 @@ class Show extends Component
 
     public $family_members = [];
 
-    // Objet nécessaire pour utiliser le trait InvoiceShareCalculationTrait
     public $form;
 
     public function mount($id)
     {
         $this->invoice = auth()->user()->invoices()
-            ->with(['sharedUsers', 'file'])
+            ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
+        // Préparation des membres de la famille d'abord
         $this->prepareFamilyMembers();
         $this->prepareFormData();
 
+        // Génération des informations du fichier
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
@@ -49,55 +50,89 @@ class Show extends Component
         $this->fileName = $this->invoice->file->file_name ?? null;
     }
 
-    /**
-     * Récupère les membres de la famille
-     */
     private function prepareFamilyMembers(): void
     {
         $family = auth()->user()->family();
-        $this->family_members = collect();
 
+        // Si l'utilisateur a une famille
         if ($family) {
-            $this->family_members = $family->users()
-                ->where('users.id', '!=', auth()->id())
-                ->get();
+            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
+            $this->family_members = $family->users()->get();
+        } else {
+            // Si pas de famille, n'inclure que l'utilisateur authentifié
+            $this->family_members = collect([auth()->user()]);
         }
 
-        $this->family_members->prepend(auth()->user());
+        // S'assurer que l'utilisateur authentifié est dans la liste
+        if (! $this->family_members->contains('id', auth()->id())) {
+            $this->family_members->prepend(auth()->user());
+        }
     }
 
-    public function getUserName()
-    {
-        // Récupérer le nom de l'utilisateur qui a payé la facture
-        return $this->invoice->paidByUser;
-    }
-
-    /**
-     * Prépare les données de formulaire pour utiliser le trait InvoiceShareCalculationTrait
-     */
     private function prepareFormData(): void
     {
         $this->form = (object) [
-            'amount' => $this->invoice->amount,
-            'currency' => $this->invoice->currency,
+            // Informations générales
+            'name' => $this->invoice->name,
+            'reference' => $this->invoice->reference,
+            'type' => $this->invoice->type,
+            'category' => $this->invoice->category,
+            'issuer_name' => $this->invoice->issuer_name,
+            'issuer_website' => $this->invoice->issuer_website,
+
+            // Détails financiers
+            'amount' => $this->invoice->amount ?? 0,
+            'currency' => $this->invoice->currency ?? 'EUR',
             'paid_by_user_id' => $this->invoice->paid_by_user_id,
+            'family_id' => $this->invoice->family_id,
+
+            // Dates
+            'issued_date' => $this->invoice->issued_date,
+            'payment_due_date' => $this->invoice->payment_due_date,
+            'payment_reminder' => $this->invoice->payment_reminder,
+            'payment_frequency' => $this->invoice->payment_frequency,
+
+            // Statut de paiement
+            'payment_status' => $this->invoice->payment_status,
+            'payment_method' => $this->invoice->payment_method,
+            'priority' => $this->invoice->priority,
+
+            // Notes et tags
+            'notes' => $this->invoice->notes,
+            'tags' => $this->invoice->tags,
+
+            // États
+            'is_favorite' => $this->invoice->is_favorite,
+            'is_archived' => $this->invoice->is_archived,
+
+            // Parts utilisateur
             'user_shares' => [],
         ];
 
-        // S'assurer que l'ID du payeur est bien défini
-        if (! $this->form->paid_by_user_id && $this->invoice->paid_by_user_id) {
-            $this->form->paid_by_user_id = $this->invoice->paid_by_user_id;
+        if (! $this->form->paid_by_user_id) {
+            $this->form->paid_by_user_id = auth()->id();
         }
 
-        foreach ($this->invoice->sharedUsers as $user) {
-            $this->form->user_shares[] = [
-                'id' => $user->id,
-                'amount' => $user->pivot->share_amount ?? 0,
-                'percentage' => $user->pivot->share_percentage ?? 0,
-            ];
+        if ($this->invoice->sharedUsers->isEmpty()) {
+            if ($this->invoice->amount > 0) {
+                $payerId = $this->form->paid_by_user_id;
+                $this->form->user_shares[] = [
+                    'id' => $payerId,
+                    'amount' => $this->invoice->amount,
+                    'percentage' => 100,
+                ];
+            }
+        } else {
+            foreach ($this->invoice->sharedUsers as $user) {
+                $this->form->user_shares[] = [
+                    'id' => $user->id,
+                    'amount' => $user->pivot->share_amount ?? 0,
+                    'percentage' => $user->pivot->share_percentage ?? 0,
+                ];
+            }
         }
 
-        // Calculer les parts restantes
+        $this->initializeUserShares();
         $this->calculateRemainingShares();
     }
 
@@ -108,7 +143,6 @@ class Show extends Component
             'paymentMethodOptions' => PaymentMethodEnum::getMethodOptionsWithEmojis(),
             'paymentFrequencyOptions' => PaymentFrequencyEnum::getFrequencyOptionsWithEmojis(),
             'priorityOptions' => PriorityEnum::getPriorityOptionsWithEmojis(),
-            'shareSummary' => $this->getShareDetailSummary($this->family_members),
         ])->layout('layouts.app-sidebar');
     }
 }

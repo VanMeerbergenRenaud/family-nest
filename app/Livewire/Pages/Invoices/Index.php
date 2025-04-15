@@ -85,11 +85,35 @@ class Index extends Component
         'amount_desc' => 'Montant (du plus cher au moins cher)',
     ];
 
+    public $family_members = [];
+
+
+    private function prepareFamilyMembers(): void
+    {
+        $family = auth()->user()->family();
+
+        // Si l'utilisateur a une famille
+        if ($family) {
+            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
+            $this->family_members = $family->users()->get();
+        } else {
+            // Si pas de famille, n'inclure que l'utilisateur authentifié
+            $this->family_members = collect([auth()->user()]);
+        }
+
+        // S'assurer que l'utilisateur authentifié est dans la liste
+        if (! $this->family_members->contains('id', auth()->id())) {
+            $this->family_members->prepend(auth()->user());
+        }
+    }
+
     public function showSidebarInvoice($id): void
     {
         $this->invoice = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
+
+        $this->prepareFamilyMembers();
 
         $this->showSidebarInvoiceDetails = true;
     }

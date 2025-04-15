@@ -188,7 +188,7 @@
 
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">
                                 <option value="" disabled>Sélectionner une personne</option>
-                                @foreach($family_members as $member)
+                                @foreach($this->preparePayerSelectionList() as $member)
                                     <option value="{{ $member->id }}">
                                         {{ $member->name }}
                                         @if($member->id === auth()->id())
