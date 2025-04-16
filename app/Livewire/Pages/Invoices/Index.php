@@ -6,8 +6,10 @@ use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Traits\ColumnPreferencesTrait;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -17,6 +19,7 @@ use Masmerise\Toaster\Toaster;
 #[Title('Factures')]
 class Index extends Component
 {
+    use ColumnPreferencesTrait;
     use InvoiceFileUrlTrait;
     use InvoiceShareCalculationTrait;
     use WithPagination;
@@ -36,25 +39,6 @@ class Index extends Component
     public bool $showInvoicePreviewModal = false;
 
     public bool $showSidebarInvoiceDetails = false;
-
-    // Filtres et colonnes...
-    public $sortField = 'name';
-
-    public $sortDirection = 'desc';
-
-    public $activeFilter = null;
-
-    public array $visibleColumns = [
-        'name' => true,
-        'type' => false,
-        'category' => false,
-        'issuer_name' => false,
-        'amount' => true,
-        'issued_date' => true,
-        'payment_status' => false,
-        'payment_due_date' => false,
-        'tags' => true,
-    ];
 
     // Ajouter les propriétés pour les modales de dossiers
     public $recentInvoices = [];
@@ -87,6 +71,27 @@ class Index extends Component
 
     public $family_members = [];
 
+    protected $queryString = [
+        'sortField' => ['except' => 'name'],
+        'sortDirection' => ['except' => 'desc'],
+        'activeFilter' => ['except' => null],
+    ];
+
+    // Filtres et colonnes...
+    public $sortField = 'name';
+
+    public $sortDirection = 'desc';
+
+    public $activeFilter = null;
+
+    public function mount()
+    {
+        $this->sortField = Request::query('sortField', $this->sortField);
+        $this->sortDirection = Request::query('sortDirection', $this->sortDirection);
+        $this->activeFilter = Request::query('activeFilter', $this->activeFilter);
+
+        $this->initializeColumnPreferences();
+    }
 
     private function prepareFamilyMembers(): void
     {
