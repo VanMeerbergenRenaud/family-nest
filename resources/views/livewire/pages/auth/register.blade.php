@@ -38,11 +38,26 @@
 
         {{-- General conditions --}}
         <div class="mt-6 md:px-2 flex items-center justify-between gap-3">
-            <x-form.checkbox-input checked name="general_conditions" model="form.general_conditions" label="Accepter les conditions" />
+            <x-form.checkbox-input
+                label="Accepter les conditions"
+                name="general_conditions"
+                model="form.general_conditions"
+                checked
+            />
+
             <button type="button" wire:click="showConditions" class="min-w-fit text-sm-medium text-gray-700 underline" title="Voir les conditions d'utilisation">
                 {{ __("Conditions d'utilisation") }}
             </button>
         </div>
+
+        {{-- Error message --}}
+        @error('form.general_conditions')
+            <p class="my-2 flex flex-col gap-2 font-medium text-red-500 dark:text-red-400">
+                <span class="pl-2 pr-1 text-sm-medium text-red-500 dark:text-red-400">
+                    {{ $message }}
+                </span>
+            </p>
+        @enderror
 
         <div class="mt-8 mb-5">
             <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium md:text-[15px] bg-[#292A2B] text-white hover:bg-black">

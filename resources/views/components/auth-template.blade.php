@@ -53,15 +53,31 @@
 
             <!-- Boutons de connexion via les réseaux sociaux -->
             @if($showSocialLogin)
-                <div class="space-y-3 md:space-y-0 md:flex md:space-x-4 min-w-[26rem]">
+                <div x-data="{ showTooltip: false }"
+                     class="space-y-3 md:space-y-0 md:flex md:space-x-4 min-w-[20rem]"
+                >
                     <a href="{{ route('google.redirect') }}"  class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
                         <x-svg.google class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Google
                     </a>
-                    <a href="#" class="cursor-not-allowed w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
+                    {{--<a href="{{ route('apple.redirect') }}" class="cursor-not-allowed w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
                         <x-svg.apple class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Apple
-                    </a>
+                    </a>--}}
+                    <button class="relative cursor-not-allowed w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200"
+                            @mouseenter="showTooltip = true"
+                            @mouseleave="showTooltip = false"
+                    >
+                        <x-svg.apple class="mr-3"/>
+                        Continuer&nbsp;avec&nbsp;Apple
+                        <div x-cloak x-show="showTooltip">
+                            <x-tooltip
+                                text="Arrive bientôt !"
+                                position="top"
+                                show="true"
+                            />
+                        </div>
+                    </button>
                 </div>
 
                 <!-- Séparateur OU -->

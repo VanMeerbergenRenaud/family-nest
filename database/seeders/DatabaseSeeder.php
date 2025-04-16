@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
         /* Teachers users */
         $dominique = User::factory()->create([
             'name' => 'Dominique Vilain',
-            'email' => 'teachers.test@gmail.com',
+            'email' => 'dominique.vilain@gmail.com',
             'password' => bcrypt('password'),
             'avatar' => asset('img/users/teachers/dominique_vilain.jpeg'),
         ]);

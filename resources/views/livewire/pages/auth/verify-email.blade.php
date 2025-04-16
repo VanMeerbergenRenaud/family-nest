@@ -7,8 +7,8 @@
 
         <!-- Session status -->
         @if (session('status') == 'verification-link-sent')
-            <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-4 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-center">
-                <x-svg.success class="h-4 w-4" />
+            <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-3 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-start">
+                <x-svg.success class="w-8 h-6 text-green-600" />
                 {{ __('Un nouveau lien de vérification a été envoyé à l’adresse e-mail que vous avez fournie lors de votre inscription.') }}
             </p>
         @endif
@@ -22,6 +22,11 @@
             <!-- Logout link -->
             <button type="button" wire:click="logout" class="button-secondary">
                 {{ __('Se déconnecter') }}
+            </button>
+
+            {{-- Continue anymay --}}
+            <button type="button" wire:click="continue" class="button-classic underline">
+                {{ __('Continuer sans vérifier') }}
             </button>
         </div>
     </div>

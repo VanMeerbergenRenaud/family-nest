@@ -36,7 +36,7 @@
 
         {{-- Remember me --}}
         <div class="mt-6 md:px-2 flex items-center justify-between">
-            <x-form.checkbox-input name="remember-me" model="form.remember" label="Se souvenir de moi" />
+            <x-form.checkbox-input checked name="remember-me" model="form.remember" label="Se souvenir de moi" />
             @if (Route::has('password.request'))
                 <a href="{{ route('password.request') }}" class="ml-3 min-w-fit text-sm-medium underline" title="Vers la page de réinitialisation de mot de passe" wire:navigate>
                     {{ __("Mot de passe oublié ?") }}
