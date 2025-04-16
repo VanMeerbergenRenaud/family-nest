@@ -186,22 +186,32 @@
                         {{ formatDate($form->payment_reminder) }}
                     </span>
                 </p>
-                <p class="text-sm-regular">
-                    Fréquence: <span class="text-sm-medium">
-                        @if($form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
-                            {{ $form->payment_frequency->label() }}
-                        @else
-                            Non spécifiée
-                        @endif
-                    </span>
-                </p>
+
+                @php
+                    $frequencyInstance = ($form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
+                        ? $form->payment_frequency
+                        : ((!empty($form->payment_frequency)) ? \App\Enums\PaymentFrequencyEnum::tryFrom($form->payment_frequency) : null);
+                @endphp
+                @if($frequencyInstance)
+                    <p class="text-sm-regular">
+                        Fréquence: <span class="text-sm-medium">
+                            {{ $frequencyInstance->label() }}
+                        </span>
+                    </p>
+                @endif
             </div>
         </x-invoices.create.summary-item>
 
         <x-invoices.create.summary-item label="Statut de paiement">
-            @if($form->payment_status instanceof \App\Enums\PaymentStatusEnum)
+            @php
+                $paymentStatusInstance = ($form->payment_status instanceof \App\Enums\PaymentStatusEnum)
+                    ? $form->payment_status
+                    : ((!empty($form->payment_status)) ? \App\Enums\PaymentStatusEnum::tryFrom($form->payment_status) : null);
+            @endphp
+
+            @if($paymentStatusInstance)
                 <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    {{ $form->payment_status->emoji() }}&nbsp;&nbsp;{{ $form->payment_status->label() }}
+                    {{ $paymentStatusInstance->emoji() }}&nbsp;&nbsp;{{ $paymentStatusInstance->label() }}
                 </span>
             @else
                 <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
@@ -212,8 +222,14 @@
             <div class="mt-1 ml-1 flex flex-col gap-1.5">
                 <p class="text-sm-regular">
                     Méthode: <span class="text-sm-medium">
-                        @if($form->payment_method instanceof \App\Enums\PaymentMethodEnum)
-                            {{ $form->payment_method->label() }}
+                        @php
+                            $paymentMethodInstance = ($form->payment_method instanceof \App\Enums\PaymentMethodEnum)
+                                ? $form->payment_method
+                                : ((!empty($form->payment_method)) ? \App\Enums\PaymentMethodEnum::tryFrom($form->payment_method) : null);
+                        @endphp
+
+                        @if($paymentMethodInstance)
+                            {{ $paymentMethodInstance->label() }}
                         @else
                             Non spécifiée
                         @endif
@@ -221,8 +237,14 @@
                 </p>
                 <p class="text-sm-regular">
                     Priorité: <span class="text-sm-medium">
-                        @if($form->priority instanceof \App\Enums\PriorityEnum)
-                            {{ $form->priority->label() }}
+                        @php
+                            $priorityInstance = ($form->priority instanceof \App\Enums\PriorityEnum)
+                                ? $form->priority
+                                : ((!empty($form->priority)) ? \App\Enums\PriorityEnum::tryFrom($form->priority) : null);
+                        @endphp
+
+                        @if($priorityInstance)
+                            {{ $priorityInstance->label() }}
                         @else
                             Non spécifiée
                         @endif

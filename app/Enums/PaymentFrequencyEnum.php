@@ -25,7 +25,7 @@ enum PaymentFrequencyEnum: string
             self::Quarterly => 'Trimestriel',
             self::SemiAnnually => 'Semestriel',
             self::Annually => 'Annuel',
-            self::OneTime => 'Ponctuel',
+            self::OneTime => 'Unique',
         };
     }
 

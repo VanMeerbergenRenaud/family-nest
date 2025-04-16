@@ -37,7 +37,7 @@ class VerifyEmail extends Component
     public function continue(): void
     {
         // Mark the user as verified for testing purposes
-        if (!Auth::user()->hasVerifiedEmail()) {
+        if (! Auth::user()->hasVerifiedEmail()) {
             Auth::user()->markEmailAsVerified();
         }
 

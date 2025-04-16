@@ -7,7 +7,7 @@
     'description' => null,
 ])
 
-<x-form.field-base :label="$label" :name="$name" :model="$model" :asterix="$asterix" class="w-full px-2">
+<x-form.field-base :label="$label" :name="$name" :model="$model" :asterix="$asterix" class="w-full">
     <div x-data="{ uploading: false, progress: 0 }"
          x-on:livewire-upload-start="uploading = true"
          x-on:livewire-upload-finish="uploading = false"
@@ -64,7 +64,7 @@
                         </div>
 
                         {{-- Title and description --}}
-                        <div class="flex-grow"> {{-- Pas besoin de z-index ici car déjà dans le conteneur z-20 --}}
+                        <div class="flex-grow">
                             <div class="font-medium text-gray-800">{{ $title }}</div>
 
                             @if($description)

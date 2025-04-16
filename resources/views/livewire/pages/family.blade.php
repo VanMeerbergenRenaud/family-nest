@@ -2,12 +2,12 @@
     {{-- Empty state when no family is created --}}
     @if(!$family)
         <x-empty-state
-            title="Aucune famille n'a été créée"
+            title="Votre famille n'a pas encore été créée"
             description="Vous n'avez pas encore de famille ? Créez-en une pour commencer à gérer vos dépenses ensemble."
         >
             <button wire:click="openCreateFamilyModal" class="button-tertiary">
                 <x-svg.add2 class="text-white" />
-                Créer une famille
+                Créer votre famille
             </button>
             <button wire:click="showFamilyExemple" class="button-primary">
                 <x-svg.help class="text-gray-900" />
@@ -29,8 +29,9 @@
 
     {{-- Table of family members --}}
     @if($family)
-        <x-header title="Membres de la famille"
-                  description="Gérez les membres de votre famille et leurs autorisations de compte ici."
+        <x-header
+            title="Membres de la famille"
+            description="Gérez les membres de votre famille et leurs autorisations de compte ici."
         />
 
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">

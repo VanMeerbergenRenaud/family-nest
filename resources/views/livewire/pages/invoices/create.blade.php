@@ -59,11 +59,11 @@
                             <button
                                 type="button"
                                 wire:click="processOcr"
-                                class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
                                 wire:loading.attr="disabled"
+                                class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
                             >
                                 <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
-                                Autocompléter avec OCR
+                                Autocompléter automatiquement
                             </button>
                         @endif
                     @endif
@@ -206,7 +206,7 @@
                                                     <div class="flex items-center">
                                                         <input
                                                             type="number"
-                                                            step="0.01"
+                                                            step="1"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
                                                             wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
@@ -258,16 +258,15 @@
                             <div x-data="{ showReminder: false }" class="relative mb-24 lg:mt-6  h-fit p-3 bg-white border border-slate-200 rounded-lg">
                                 <div class="flex items-center">
                                     <x-form.checkbox-input
-                                        x-model="showReminder"
                                         label="Ajouter un rappel de paiement"
                                         name="form.toggle"
-                                        model="form.toggle"
+                                        x-model="showReminder"
                                         x-on:change="if (!showReminder) $wire.set('form.payment_reminder', null)"
                                     />
                                 </div>
 
                                 {{-- Utilisation de x-menu pour afficher l'input en position absolue --}}
-                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-gray-50 border border-slate-200 rounded-lg w-full z-10">
+                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-white border border-slate-200 rounded-lg w-full z-10">
                                     <x-form.field-date
                                         label="Rappel de paiement"
                                         name="form.payment_reminder"
@@ -315,7 +314,7 @@
                         <x-form.field-textarea label="Notes (détail / commentaire important)" name="form.notes" model="form.notes" placeholder="Inscrivez votre message ici..."/>
 
                         <div class="text-right text-xs text-gray-500 mt-1 mr-2">
-                            Montant de caractère maximum <span class="text-sm">{{ strlen($form->notes) }}</span>/500
+                            Montant de caractère maximum <span class="text-sm">{{ strlen($form->notes ?? '') }}</span>/500
                         </div>
 
                         <x-invoices.tag-manager

@@ -47,8 +47,7 @@
     $settings = $config[$type] ?? $config['info'];
 @endphp
 
-<div
-    class="p-4 w-full h-fit {{ $settings['bg'] }} border {{ $settings['border'] }} rounded-lg" {{ $attributes }}>
+<div class="p-4 w-full h-fit {{ $settings['bg'] }} border {{ $settings['border'] }} rounded-lg" {{ $attributes }}>
 
     {{-- Layout "iconLeft" : icône à gauche, titre et contenu à droite --}}
     @if($layout === 'iconLeft')

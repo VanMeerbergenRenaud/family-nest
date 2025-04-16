@@ -41,7 +41,7 @@
             <x-form.checkbox-input
                 label="Accepter les conditions"
                 name="general_conditions"
-                model="form.general_conditions"
+                wire:model.blur="form.general_conditions"
                 checked
             />
 

@@ -51,7 +51,7 @@ class LoginForm extends Form
         if (Auth::user()->email === 'dominique.vilain@gmail.com') {
             Session::put('special_user', true);
 
-            if (!file_exists(storage_path('app/user_styles'))) {
+            if (! file_exists(storage_path('app/user_styles'))) {
                 mkdir(storage_path('app/user_styles'), 0755, true);
             }
         }

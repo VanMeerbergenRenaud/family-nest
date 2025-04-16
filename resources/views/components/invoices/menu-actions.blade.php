@@ -11,12 +11,12 @@
     <x-menu.items>
         <!-- Actions de visualisation -->
         <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
-            <x-svg.show class="w-4 h-4 group-hover:text-gray-900"/>
-            {{ __('Voir l‘aperçu') }}
+            <x-svg.show class="group-hover:text-gray-900"/>
+            {{ __('Voir l\'aperçu') }}
         </x-menu.item>
 
         <x-menu.item wire:click="showSidebarInvoice({{ $invoice->id }})">
-            <x-svg.binocular class="w-4 h-4 group-hover:text-gray-900"/>
+            <x-svg.binocular class="group-hover:text-gray-900"/>
             {{ __('Voir les détails') }}
         </x-menu.item>
 
@@ -24,29 +24,27 @@
 
         <!-- Actions d'édition -->
         <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
-            <x-svg.edit class="w-4 h-4 group-hover:text-gray-900"/>
+            <x-svg.edit class="group-hover:text-gray-900"/>
             {{ __('Modifier') }}
         </x-menu.item>
 
         <x-menu.item wire:click="copyInvoice({{ $invoice->id }})">
-            <x-svg.copy class="w-4 h-4 group-hover:text-gray-900"/>
-            {{ __('Copier le modèle') }}
+            <x-svg.copy class="group-hover:text-gray-900"/>
+            {{ __('Dupliquer') }}
         </x-menu.item>
-
-        <x-menu.divider/>
 
         <!-- Actions secondaires -->
         <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
-            <x-svg.download class="w-4 h-4 group-hover:text-gray-900"/>
+            <x-svg.download class="group-hover:text-gray-900"/>
             {{ __('Télécharger') }}
         </x-menu.item>
 
         <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})">
             @if($invoice->is_favorite)
-                <x-svg.star class="w-4 h-4 group-hover:text-gray-900 fill-current"/>
+                <x-svg.star class="group-hover:text-gray-900 fill-current"/>
                 {{ __('Retirer des favoris') }}
             @else
-                <x-svg.star class="w-4 h-4 group-hover:text-gray-900"/>
+                <x-svg.star class="group-hover:text-gray-900"/>
                 {{ __('Ajouter aux favoris') }}
             @endif
         </x-menu.item>
@@ -55,7 +53,7 @@
 
         <!-- Action destructive -->
         <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
-            <x-svg.archive class="w-4 h-4 group-hover:text-red-500"/>
+            <x-svg.archive class="group-hover:text-red-500"/>
             {{ __('Archiver') }}
         </x-menu.item>
     </x-menu.items>

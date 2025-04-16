@@ -15,7 +15,7 @@
         </button>
     @endif
 
-    <div class="pb-16 lg:pb-12 rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
+    <div class="pb-16 rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
         {{-- Aperçu pour les images --}}
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
@@ -68,7 +68,7 @@
         @endif
 
         {{-- Informations sur le fichier --}}
-        @if(isset($fileInfo['name']))
+        @if(isset($fileInfo['name']) && !$fileInfo['isImage'])
             <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
                 <h4 role="heading" aria-level="4" class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] }}</h4>
                 <p class="flex-center space-x-1.5 text-gray-600">

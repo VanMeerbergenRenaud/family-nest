@@ -1,4 +1,3 @@
-{{-- loader.blade.php --}}
 @props([
     'target' => null,
     'title' => 'Traitement en cours',

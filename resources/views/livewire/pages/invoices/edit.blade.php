@@ -43,27 +43,29 @@
                                 <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                             </button>
 
-                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-auto">
+                            <div class="rounded-xl border border-slate-200 h-full flex flex-col items-start justify-center p-2 overflow-y-auto">
                                 <x-file-viewer
                                     :filePath="$filePath"
                                     :fileExtension="$fileExtension"
                                     :fileName="$fileName"
-                                    class="w-full h-[40vh] mb-4"
+                                    class="w-full h-full"
                                 />
 
                                 <!-- Informations sur le fichier -->
-                                <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                    <h3 role="heading" aria-level="3" class="text-md-medium text-gray-800 truncate">
-                                        <span class="sr-only">Fichier :</span>{{ $form->fileName }}
-                                    </h3>
-                                    <p class="flex-center text-sm-regular text-gray-600">
-                                        {{ strtoupper($form->fileExtension) }}
-                                    </p>
+                                @if($fileExtension === 'pdf')
+                                    <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
+                                        <h3 role="heading" aria-level="3" class="text-md-medium text-gray-800 truncate">
+                                            <span class="sr-only">Fichier :</span>{{ $form->fileName }}
+                                        </h3>
+                                        <p class="flex-center text-sm-regular text-gray-600">
+                                            {{ strtoupper($form->fileExtension) }}
+                                        </p>
 
-                                    <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
-                                        Fichier existant
-                                    </p>
-                                </div>
+                                        <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
+                                            Fichier existant
+                                        </p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @elseif ($form->uploadedFile)
@@ -79,7 +81,7 @@
                             @php
                                 $fileInfo = app(App\Services\FileStorageService::class)->getFileInfo($form->uploadedFile);
                                 $fileInfo['status'] = !$errors->has('form.uploadedFile') ? 'success' : 'error';
-                                $fileInfo['statusMessage'] = !$errors->has('form.uploadedFile') ? 'Nouveau fichier à importer' : 'Erreur lors de l\'import du fichier';
+                                $fileInfo['statusMessage'] = !$errors->has('form.uploadedFile') ? 'Nouveau fichier importé' : 'Erreur lors de l\'import du fichier';
                             @endphp
 
                             <div class="rounded-xl border border-slate-200 min-h-[30rem] flex-center flex-col p-2 overflow-y-auto">
@@ -109,18 +111,19 @@
                                     </div>
                                 @endif
 
-                                <!-- Informations sur le fichier -->
-                                <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                    <h2 class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] ?? '' }}</h2>
-                                    <p class="flex-center space-x-1.5 text-gray-600">
-                                        <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
-                                        <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>
-                                    </p>
-
-                                    <p class="mt-2 px-3 py-1 text-xs rounded-full {{ ($fileInfo['status'] ?? '') === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} w-fit">
-                                        {{ $fileInfo['statusMessage'] ?? 'Nouveau fichier' }}
-                                    </p>
-                                </div>
+                                <!-- Informations sur le fichier différent des images -->
+                                @if(!$fileInfo['isImage'] ?? false)
+                                    <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
+                                        <h2 class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] ?? '' }}</h2>
+                                        <p class="flex-center space-x-1.5 text-gray-600">
+                                            <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
+                                            <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>
+                                        </p>
+                                        <p class="mt-2 px-3 py-1 text-xs rounded-full {{ ($fileInfo['status'] ?? '') === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} w-fit">
+                                            {{ $fileInfo['statusMessage'] ?? 'Nouveau fichier' }}
+                                        </p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @else
@@ -282,7 +285,7 @@
                                                     <div class="flex items-center">
                                                         <input
                                                             type="number"
-                                                            step="0.01"
+                                                            step="1"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
                                                             wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
@@ -344,16 +347,15 @@
                             >
                                 <div class="flex items-center">
                                     <x-form.checkbox-input
-                                        x-model="showReminder"
                                         label="Ajouter un rappel de paiement"
                                         name="form.toggle"
-                                        model="form.toggle"
+                                        x-model="showReminder"
                                         x-on:change="if (!showReminder) $wire.set('form.payment_reminder', null)"
                                     />
                                 </div>
 
                                 {{-- Utilisation de x-menu pour afficher l'input en position absolue --}}
-                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-gray-50 border border-slate-200 rounded-lg w-full z-10">
+                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-white border border-slate-200 rounded-lg w-full z-10">
                                     <x-form.field-date
                                         label="Rappel de paiement"
                                         name="form.payment_reminder"

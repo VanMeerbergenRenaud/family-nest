@@ -7,7 +7,7 @@
 
 <div class="{{ $class }} relative flex-center bg-gray-100 rounded-xl overflow-y-scroll overflow-x-hidden">
     @if ($filePath)
-        @if(in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+        @if(in_array($fileExtension, ['jpg', 'jpeg', 'png']))
             <img src="{{ $filePath }}" alt="{{ $fileName ?? 'Aperçu du document' }}" class="max-w-full max-h-full object-cover" />
         @elseif($fileExtension === 'pdf')
             <iframe src="{{ $filePath }}" class="absolute top-O bottom-O left-0 right-0 w-full h-full" style="border: none;"></iframe>

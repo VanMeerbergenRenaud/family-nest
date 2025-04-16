@@ -275,6 +275,7 @@
                     </x-menu>
 
                     {{-- Colonnes --}}
+                    {{-- Section des colonnes améliorée --}}
                     <x-menu>
                         <x-menu.button class="button-primary">
                             <x-svg.columns/>
@@ -288,95 +289,31 @@
 
                             <x-menu.divider/>
 
-                            <x-menu.item wire:click="toggleColumn('name')">
-                                <x-form.checkbox-input
-                                    name="column_name"
-                                    model="visibleColumns.name"
-                                    label="Nom du fichier"
-                                    :checked="isset($visibleColumns['name']) && $visibleColumns['name']"
-                                    wire:click="toggleColumn('name')"
-                                />
-                            </x-menu.item>
+                            {{-- Boucle sur toutes les colonnes disponibles pour un code plus propre --}}
+                            @php
+                                $columnLabels = [
+                                    'name' => 'Nom du fichier',
+                                    'type' => 'Type',
+                                    'category' => 'Catégorie',
+                                    'issuer_name' => 'Émetteur',
+                                    'amount' => 'Montant',
+                                    'payment_status' => 'Statut de paiement',
+                                    'issued_date' => 'Date d‘émission',
+                                    'payment_due_date' => 'Date d‘échéance',
+                                    'tags' => 'Tags',
+                                ];
+                            @endphp
 
-                            <x-menu.item wire:click="toggleColumn('type')">
-                                <x-form.checkbox-input
-                                    name="column_type"
-                                    model="visibleColumns.type"
-                                    label="Type"
-                                    :checked="isset($visibleColumns['type']) && $visibleColumns['type']"
-                                    wire:click="toggleColumn('type')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('category')">
-                                <x-form.checkbox-input
-                                    name="column_category"
-                                    model="visibleColumns.category"
-                                    label="Catégorie"
-                                    :checked="isset($visibleColumns['category']) && $visibleColumns['category']"
-                                    wire:click="toggleColumn('category')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('issuer_name')">
-                                <x-form.checkbox-input
-                                    name="column_issuer_name"
-                                    model="visibleColumns.issuer_name"
-                                    label="Émetteur"
-                                    :checked="isset($visibleColumns['issuer_name']) && $visibleColumns['issuer_name']"
-                                    wire:click="toggleColumn('issuer_name')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('amount')">
-                                <x-form.checkbox-input
-                                    name="column_amount"
-                                    model="visibleColumns.amount"
-                                    label="Montant"
-                                    :checked="isset($visibleColumns['amount']) && $visibleColumns['amount']"
-                                    wire:click="toggleColumn('amount')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('payment_status')">
-                                <x-form.checkbox-input
-                                    name="column_payment_status"
-                                    model="visibleColumns.payment_status"
-                                    label="Statut de paiement"
-                                    :checked="isset($visibleColumns['payment_status']) && $visibleColumns['payment_status']"
-                                    wire:click="toggleColumn('payment_status')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('issued_date')">
-                                <x-form.checkbox-input
-                                    name="column_issued_date"
-                                    model="visibleColumns.issued_date"
-                                    label="Date d'émission"
-                                    :checked="isset($visibleColumns['issued_date']) && $visibleColumns['issued_date']"
-                                    wire:click="toggleColumn('issued_date')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('payment_due_date')">
-                                <x-form.checkbox-input
-                                    name="column_payment_due_date"
-                                    model="visibleColumns.payment_due_date"
-                                    label="Date d'échéance"
-                                    :checked="isset($visibleColumns['payment_due_date']) && $visibleColumns['payment_due_date']"
-                                    wire:click="toggleColumn('payment_due_date')"
-                                />
-                            </x-menu.item>
-
-                            <x-menu.item wire:click="toggleColumn('tags')">
-                                <x-form.checkbox-input
-                                    name="column_tags"
-                                    model="visibleColumns.tags"
-                                    label="Tags"
-                                    :checked="isset($visibleColumns['tags']) && $visibleColumns['tags']"
-                                    wire:click="toggleColumn('tags')"
-                                />
-                            </x-menu.item>
+                            @foreach($columnLabels as $columnKey => $columnLabel)
+                                <x-menu.item>
+                                    <x-form.checkbox-input
+                                        label="{{ $columnLabel }}"
+                                        name="column_name_{{ $columnKey }}"
+                                        wire:model.live="visibleColumns.{{ $columnKey }}"
+                                        checked="{{ $this->isColumnVisible($columnKey) ? 'checked' : '' }}"
+                                    />
+                                </x-menu.item>
+                            @endforeach
 
                             <x-menu.divider/>
 
@@ -417,7 +354,7 @@
 
                         {{-- Type --}}
                         @if($visibleColumns['type'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[10rem]">
                                 <button wire:click="sortBy('type')" class="flex items-center">
                                     <span>Type</span>
                                     <x-invoices.index.sortable field="type" :$sortField :$sortDirection />
@@ -427,7 +364,7 @@
 
                         {{-- Catégorie --}}
                         @if($visibleColumns['category'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[10rem]">
                                 <button wire:click="sortBy('category')" class="flex items-center">
                                     <span>Catégorie</span>
                                     <x-invoices.index.sortable field="category" :$sortField :$sortDirection />
@@ -437,7 +374,7 @@
 
                         {{-- Émetteur --}}
                         @if($visibleColumns['issuer_name'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[10rem]">
                                 <button wire:click="sortBy('issuer_name')" class="flex items-center">
                                     <span>Émetteur</span>
                                     <x-invoices.index.sortable field="issuer_name" :$sortField :$sortDirection />
@@ -447,7 +384,7 @@
 
                         {{-- Montant --}}
                         @if($visibleColumns['amount'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[10rem]">
                                 <button wire:click="sortBy('amount')" class="flex items-center">
                                     <span>Montant</span>
                                     <x-invoices.index.sortable field="amount" :$sortField :$sortDirection />
@@ -457,7 +394,7 @@
 
                         {{-- Statut de paiement --}}
                         @if($visibleColumns['payment_status'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[10rem]">
                                 <button wire:click="sortBy('payment_status')" class="flex items-center">
                                     <span>Statut</span>
                                     <x-invoices.index.sortable field="payment_status" :$sortField :$sortDirection />
@@ -467,7 +404,7 @@
 
                         {{-- Date d'émission --}}
                         @if($visibleColumns['issued_date'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[12.5rem]">
                                 <button wire:click="sortBy('issued_date')" class="flex items-center">
                                     <span>Date d'émission</span>
                                     <x-invoices.index.sortable field="issued_date" :$sortField :$sortDirection />
@@ -477,7 +414,7 @@
 
                         {{-- Date d'échéance --}}
                         @if($visibleColumns['payment_due_date'] ?? false)
-                            <th scope="col" class="min-w-[150px]">
+                            <th scope="col" class="min-w-[12.5rem]">
                                 <button wire:click="sortBy('payment_due_date')" class="flex items-center">
                                     <span>Date d'échéance</span>
                                     <x-invoices.index.sortable field="payment_due_date" :$sortField :$sortDirection />
@@ -487,7 +424,7 @@
 
                         {{-- Tags --}}
                         @if($visibleColumns['tags'] ?? false)
-                            <th scope="col" class="min-w-[200px]">
+                            <th scope="col" class="min-w-[12.5rem]">
                                 Tags associés
                             </th>
                         @endif

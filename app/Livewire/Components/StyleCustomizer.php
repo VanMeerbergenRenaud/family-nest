@@ -2,17 +2,21 @@
 
 namespace App\Livewire\Components;
 
-use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
 class StyleCustomizer extends Component
 {
     public bool $showCustomizer = false;
+
     public string $fontFamily = '';
+
     public string $fontSize = 'base';
+
     public string $zoomLevel = '100';
+
     public bool $isOpen = false;
 
     public function mount()
@@ -28,12 +32,12 @@ class StyleCustomizer extends Component
 
     public function togglePanel(): void
     {
-        $this->isOpen = !$this->isOpen;
+        $this->isOpen = ! $this->isOpen;
     }
 
     public function updateStyles(): void
     {
-        if (!$this->showCustomizer) {
+        if (! $this->showCustomizer) {
             return;
         }
 
@@ -46,9 +50,7 @@ class StyleCustomizer extends Component
         $this->redirect(request()->header('Referer'));
     }
 
-    private function loadSavedPreferences()
-    {
-    }
+    private function loadSavedPreferences() {}
 
     private function generateCustomCSS(): string
     {
