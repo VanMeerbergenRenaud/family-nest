@@ -16,17 +16,12 @@
         <div class="mt-5 flex flex-wrap gap-2">
             <!-- Verification link -->
             <button type="button" wire:click="sendVerification" class="button-primary">
-                {{ __('Renvoyer un nouveau.') }}
+                {{ __('Renvoyer le code de vérification') }}
             </button>
 
             <!-- Logout link -->
             <button type="button" wire:click="logout" class="button-secondary">
                 {{ __('Se déconnecter') }}
-            </button>
-
-            {{-- Continue anymay --}}
-            <button type="button" wire:click="continue" class="button-classic underline">
-                {{ __('Continuer sans vérifier') }}
             </button>
         </div>
     </div>

@@ -3,7 +3,10 @@
 namespace App\Livewire\Pages\Auth;
 
 use App\Livewire\Actions\Logout;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -21,9 +24,33 @@ class VerifyEmail extends Component
             return;
         }
 
-        Auth::user()->sendEmailVerificationNotification();
+        try {
+            Auth::user()->sendEmailVerificationNotification();
+            Session::flash('status', 'verification-link-sent');
+        } catch (Exception $e) {
+            // Check if the error is related to MailerSend limits
+            if (str_contains($e->getMessage(), 'reached trial account unique recipients limit') ||
+                str_contains($e->getMessage(), '#MS42225')) {
 
-        Session::flash('status', 'verification-link-sent');
+                // Log the error for administrators
+                Log::warning('MailerSend limit reached. Auto-verifying user: '.Auth::user()->email);
+
+                // Automatically verify the user as a temporary solution
+                DB::table('users')
+                    ->where('id', Auth::user()->id)
+                    ->update(['email_verified_at' => now()]);
+
+                // Notify the user
+                Session::flash('status', 'Votre email a été automatiquement vérifié en raison de limitations techniques temporaires.');
+
+                // Redirect to dashboard
+                $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+            } else {
+                // For other errors, log them but don't auto-verify
+                Log::error('Email verification error: '.$e->getMessage());
+                Session::flash('status', 'Une erreur s\'est produite. Veuillez réessayer plus tard.');
+            }
+        }
     }
 
     public function logout(Logout $logout): void
@@ -31,16 +58,5 @@ class VerifyEmail extends Component
         $logout();
 
         $this->redirect('/', navigate: true);
-    }
-
-    // TODO : Remove on production
-    public function continue(): void
-    {
-        // Mark the user as verified for testing purposes
-        if (! Auth::user()->hasVerifiedEmail()) {
-            Auth::user()->markEmailAsVerified();
-        }
-
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 }
