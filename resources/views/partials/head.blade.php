@@ -21,6 +21,15 @@
 <!-- Favicon -->
 <link rel="icon" href="{{ asset('img/favicon.svg') }}">
 
+{{-- M.Vilain css styles --}}
+@if(auth()->check() && auth()->user()->email === 'dominique.vilain@gmail.com')
+    @if(\Illuminate\Support\Facades\Storage::exists('user_styles/vip_user.css'))
+        <style>
+            {!! \Illuminate\Support\Facades\Storage::get('user_styles/vip_user.css') !!}
+        </style>
+    @endif
+@endif
+
 <!-- Title -->
 @if (Route::currentRouteName() === 'welcome')
     <title>{{ config('app.name', 'FamilyNest') }}</title>

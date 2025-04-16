@@ -4,7 +4,11 @@
               class="mb-5"
     />
 
-    <div class="px-2 space-y-4 max-w-4xl">
+    @if(auth()->check() && auth()->user()->email === 'dominique.vilain@gmail.com')
+        <livewire:components.style-customizer />
+    @endif
+
+    <div class="py-4 px-2 space-y-4 max-w-4xl">
 
         <!-- Logo app -->
         <div class="bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 overflow-hidden">

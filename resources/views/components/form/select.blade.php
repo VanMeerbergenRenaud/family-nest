@@ -11,7 +11,7 @@
             id="{{ $name }}"
             name="{{ $name }}"
             wire:model.blur="{{ $model }}"
-            class="appearance-none bg-white m-0 px-3.5 py-2.5 block w-full text-sm text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error($name) input-invalid @enderror"
+            class="appearance-none bg-white m-0 px-3.5 py-2.5 block w-full cursor-pointer text-sm text-gray-600 border border-slate-200 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 @error($name) input-invalid @enderror"
             {{ $attributes }}
         >
             {{ $slot }}

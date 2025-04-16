@@ -1,4 +1,4 @@
-<div>
+<div class="flex gap-4 flex-col md:flex-row">
     @if($invoices->count() === 0)
         <x-empty-state
             title="Salut {{ $user->name ?? 'inconnu' }} !"
