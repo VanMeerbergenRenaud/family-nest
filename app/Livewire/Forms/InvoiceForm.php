@@ -359,6 +359,7 @@ class InvoiceForm extends Form
         try {
             $this->invoice->update([
                 'is_archived' => true,
+                'is_favorite' => false,
             ]);
 
             $this->is_archived = true;

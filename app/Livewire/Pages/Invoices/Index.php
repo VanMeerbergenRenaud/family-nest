@@ -41,8 +41,6 @@ class Index extends Component
     public bool $showSidebarInvoiceDetails = false;
 
     // Ajouter les propriétés pour les modales de dossiers
-    public $recentInvoices = [];
-
     public bool $showFolderModal = false;
 
     public string $currentFolder = '';
@@ -383,10 +381,8 @@ class Index extends Component
 
             // Rediriger vers l'URL présignée qui forcera le téléchargement
             return redirect()->away($presignedUrl);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Toaster::error('Erreur lors du téléchargement : Le fichier n\'a pas pu être téléchargé.');
-            \Log::error('Erreur téléchargement S3: '.$e->getMessage());
-
             return false;
         }
     }
@@ -423,7 +419,6 @@ class Index extends Component
             }
 
             $statusEnum = PaymentStatusEnum::from($this->selectedPaymentStatus);
-            $statusEmoji = $statusEnum->emoji();
             $statusLabel = $statusEnum->label();
 
             if ($count > 1) {
@@ -435,9 +430,8 @@ class Index extends Component
             $this->selectedInvoiceIds = [];
             $this->selectedPaymentStatus = null;
 
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Toaster::error('Erreur lors de la modification des factures sélectionnées');
-            \Log::error('Erreur lors de la modification des factures sélectionnées: '.$e->getMessage());
         }
     }
 
@@ -475,7 +469,7 @@ class Index extends Component
         return null;
     }
 
-    public function showInvoiceModal($id)
+    public function showInvoiceModal($id): void
     {
         $invoice = auth()->user()->invoices()
             ->with('file')
@@ -503,12 +497,15 @@ class Index extends Component
                 ->where('user_id', auth()->id())
                 ->firstOrFail();
 
-            $this->invoice->update(['is_archived' => true]);
+            $this->invoice->update([
+                'is_archived' => true,
+                'is_favorite' => false,
+            ]);
 
             $this->showFolderModal = false;
 
             Toaster::success('Facture archivée avec succès !');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
         }
     }
@@ -525,16 +522,22 @@ class Index extends Component
             $count = Invoice::whereIn('id', $this->selectedInvoiceIds)
                 ->where('is_archived', false)
                 ->where('user_id', auth()->id())
-                ->update(['is_archived' => true]);
+                ->update([
+                    'is_archived' => true,
+                    'is_favorite' => false,
+                ]);
 
             if ($count > 1) {
                 Toaster::success("$count factures archivées avec succès.");
-                $this->selectedInvoiceIds = [];
             } elseif ($count == 1) {
                 Toaster::success('La facture a été archivée avec succès.');
             } else {
                 Toaster::error('Aucune facture n\'a pu être archivée.');
             }
+
+            $this->selectedInvoiceIds = [];
+            $this->selectedPaymentStatus = null;
+
         } catch (\Exception) {
             Toaster::error('Erreur lors de l\'archivage::Veuillez réessayer.');
         }
@@ -568,9 +571,8 @@ class Index extends Component
 
             $this->redirectRoute('invoices.edit', $newInvoice->id);
 
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Toaster::error('Erreur lors de la copie de la facture::Veuillez réessayer.');
-            \Log::error('Erreur lors de la copie de la facture: '.$e->getMessage());
         }
     }
 
@@ -585,25 +587,25 @@ class Index extends Component
             ->where('is_archived', false)
             ->paginate(8);
 
-        $this->recentInvoices = auth()->user()->invoices()
+        $recentInvoices = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->where('is_archived', false)
             ->orderBy('updated_at', 'desc')
             ->limit(8)
             ->get();
 
-        $folderStats = $this->getFolderStats();
-
-        $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
-
         $archivedInvoices = auth()->user()->invoices()
             ->where('is_archived', true)
             ->get();
 
+        $folderStats = $this->getFolderStats();
+
+        $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
+
         return view('livewire.pages.invoices.index', [
             'invoices' => $invoices,
+            'recentInvoices' => $recentInvoices,
             'folderStats' => $folderStats,
-            'paymentStatuses' => PaymentStatusEnum::getStatusOptions(),
             'archivedInvoices' => $archivedInvoices,
         ])->layout('layouts.app-sidebar');
     }

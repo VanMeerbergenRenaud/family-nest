@@ -600,7 +600,7 @@
         <div x-cloak
              x-transition
              x-show="$wire.selectedInvoiceIds.length > 0"
-             class="fixed bottom-4 left-6 right-6 lg:left-24 mx-auto w-auto lg:w-fit z-70 rounded-md lg:rounded-xl bg-white border border-gray-200"
+             class="fixed bottom-4 left-6 right-6 lg:left-24 mx-auto w-auto lg:w-fit z-70 rounded-md lg:rounded-xl bg-gray-100 border border-gray-200"
         >
             <div class="flex max-lg:flex-wrap items-center justify-between gap-y-4 p-2.5 lg:pl-5 lg:pr-2.5">
                 <!-- Selected count indicator -->
@@ -675,7 +675,7 @@
                     </div>
 
                     <!-- Contenu principal -->
-                    <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto max-h-[60vh]">
+                    <div class="p-6 bg-gray-50 dark:bg-gray-950 overflow-y-auto min-h-[40vh] max-h-[60vh]">
                         @if($folderInvoices->isEmpty())
                             <!-- État vide -->
                             <div class="flex-center flex-col py-16 rounded-lg bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800">

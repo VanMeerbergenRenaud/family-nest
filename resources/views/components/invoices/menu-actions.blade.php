@@ -9,7 +9,6 @@
     </x-menu.button>
 
     <x-menu.items>
-        <!-- Actions de visualisation -->
         <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})">
             <x-svg.show class="group-hover:text-gray-900"/>
             {{ __('Voir l\'aperçu') }}
@@ -22,7 +21,6 @@
 
         <x-menu.divider/>
 
-        <!-- Actions d'édition -->
         <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
             <x-svg.edit class="group-hover:text-gray-900"/>
             {{ __('Modifier') }}
@@ -33,7 +31,6 @@
             {{ __('Dupliquer') }}
         </x-menu.item>
 
-        <!-- Actions secondaires -->
         <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
             <x-svg.download class="group-hover:text-gray-900"/>
             {{ __('Télécharger') }}
@@ -51,7 +48,6 @@
 
         <x-menu.divider/>
 
-        <!-- Action destructive -->
         <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
             <x-svg.archive class="group-hover:text-red-500"/>
             {{ __('Archiver') }}

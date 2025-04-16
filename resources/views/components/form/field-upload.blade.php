@@ -14,7 +14,7 @@
          x-on:livewire-upload-cancel="uploading = false"
          x-on:livewire-upload-error="uploading = false"
          x-on:livewire-upload-progress="progress = $event.detail.progress"
-         class="@error($name) input-invalid @enderror relative border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-gray-700 hover:bg-slate-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+         class="@error($name) input-invalid @enderror relative border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-slate-50 dark:bg-gray-700 hover:bg-slate-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 mx-1"
     >
         <div class="flex-center flex-col p-10 min-h-[25rem]">
             <x-svg.download class="w-5 h-5 mb-5"/>
