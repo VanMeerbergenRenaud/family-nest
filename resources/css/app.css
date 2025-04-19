@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "../../public/fonts/clash-grotesk/clash-grotesk.css";
-@import "../../public/fonts/instrument-sans/instrument-sans.css";
+/*@import "../../public/fonts/clash-grotesk/clash-grotesk.css";
+@import "../../public/fonts/instrument-sans/instrument-sans.css";*/
 
 @source "../views";
 
@@ -8,8 +8,8 @@
 
 @theme {
     --font-opensans: "Open Sans", sans-serif;
-    --font-clashgrotesk: "Clash Grotesk", sans-serif;
-    --font-instrumentsans: "Instrument Sans", sans-serif;
+    /*--font-clashgrotesk: "Clash Grotesk", sans-serif;
+    --font-instrumentsans: "Instrument Sans", sans-serif;*/
 
     --color-light-white: #fafafa;
     --color-blue-dark: #364153;
@@ -152,7 +152,7 @@
     }
 
     .button-success {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-green-400 bg-green-400 hover:bg-green-500 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-green-600 bg-green-600 transition-colors;
     }
 
     .button-rounded {

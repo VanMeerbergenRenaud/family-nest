@@ -6,7 +6,7 @@
         >
             <a href="{{ route('invoices.index') }}" class="button-danger" title="Vers la page des factures">
                 <x-svg.trash class="text-white" />
-                Supprimer une facture
+                {{ __('Archiver une facture') }}
             </a>
             <button wire:click="showArchiveExemple" class="button-primary">
                 <x-svg.help class="text-gray-900" />
@@ -120,7 +120,7 @@
         </div>
 
         @if($archivedInvoices->hasPages())
-            <div class="p-4 border-t border-slate-200">
+            <div class="py-2 px-4 border-t border-slate-200">
                 {{ $archivedInvoices->links() }}
             </div>
         @endif

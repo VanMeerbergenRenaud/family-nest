@@ -246,7 +246,9 @@
                     >
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <x-form.field-date label="Date d'émission" name="form.issued_date" model="form.issued_date" />
+
                             <x-form.field-date label="Date de paiement" name="form.payment_due_date" model="form.payment_due_date"/>
+
                             <x-form.select name="form.payment_frequency" model="form.payment_frequency" label="Fréquence de paiement">
                                 <option value="" selected>Sélectionner une fréquence</option>
                                 @foreach($paymentFrequencies as $value => $label)

@@ -24,7 +24,7 @@
 
         <x-menu.item wire:click="seeProfile">
             <x-svg.user class="group-hover:text-gray-900"/>
-            {{ __('Voir mon profil') }}
+            {{ __('Modifier mon profil') }}
         </x-menu.item>
 
         <x-menu.item wire:click="inviteMember">

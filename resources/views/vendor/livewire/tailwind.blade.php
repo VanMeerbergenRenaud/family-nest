@@ -19,7 +19,7 @@
         {{-- Previous Page Link --}}
         @if ($paginator->onFirstPage())
             <span class="flex-center gap-1.5 px-3 py-2 text-gray-400 rounded-lg cursor-not-allowed select-none">
-                <x-svg.arrows.left/>
+                <x-svg.arrows.left class="text-gray-400" />
                 <span class="hidden sm:inline text-sm-medium">{{ __('Précédent') }}</span>
             </span>
         @else
@@ -27,9 +27,9 @@
                 wire:click="previousPage('{{ $paginator->getPageName() }}')"
                 x-on:click="{{ $scrollIntoViewJsSnippet }}"
                 wire:loading.attr="disabled"
-                class="flex-center gap-1.5 px-3 py-2 text-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition duration-150 ease-in-out"
+                class="flex-center gap-1.5 px-3 py-2 text-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition duration-150 ease-in-out"
             >
-                <x-svg.arrows.left/>
+                <x-svg.arrows.left />
                 <span class="hidden sm:inline text-sm-medium">{{ __('Précédent') }}</span>
             </button>
         @endif
@@ -137,15 +137,15 @@
                 wire:click="nextPage('{{ $paginator->getPageName() }}')"
                 x-on:click="{{ $scrollIntoViewJsSnippet }}"
                 wire:loading.attr="disabled"
-                class="flex-center gap-1.5 px-3 py-2 text-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-50 hover:text-gray-900 transition duration-150 ease-in-out"
+                class="flex-center gap-1.5 px-3 py-2 text-gray-600 bg-white dark:bg-gray-800 rounded-lg hover:bg-gray-100 hover:text-gray-900 transition duration-150 ease-in-out"
             >
                 <span class="hidden sm:inline text-sm-medium">{{ __('Suivant') }}</span>
-                <x-svg.arrows.right/>
+                <x-svg.arrows.right />
             </button>
         @else
             <span class="flex-center gap-1.5 px-3 py-2 text-gray-400 rounded-lg cursor-not-allowed select-none">
                 <span class="hidden sm:inline text-sm-medium">{{ __('Suivant') }}</span>
-                <x-svg.arrows.right/>
+                <x-svg.arrows.right class="text-gray-400" />
             </span>
         @endif
     </nav>

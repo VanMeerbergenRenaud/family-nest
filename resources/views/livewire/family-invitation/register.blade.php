@@ -25,19 +25,19 @@
                 @csrf
 
                 <x-form.field
-                    label="Adresse mail"
+                    label="Adresse e-mail"
                     name="email"
                     type="email"
                     model="form.email"
                     value="{{ $email }}"
-                    disabled
+                    placeholder="votre-email@gmail.com"
                 />
 
                 <x-form.field
                     label="Ajouter votre nom"
                     name="name"
                     model="form.name"
-                    placeholder="exemple : Jean"
+                    placeholder="Votre nom"
                     :asterix="true"
                     autofocus
                 />

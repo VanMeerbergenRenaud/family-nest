@@ -67,7 +67,7 @@ class WelcomeMessage extends Mailable
                     ]),
                 ],
                 precedenceBulkHeader: true,
-                sendAt: new Carbon('2022-01-28 11:53:20'),
+                sendAt: new Carbon(now()->addMinutes(5)),
             );
         } catch (MailerSendAssertException $e) {
             Log::error('MailerSendAssertException: '.$e->getMessage());
