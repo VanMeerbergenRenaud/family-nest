@@ -21,7 +21,11 @@ class Register extends Component
 
         $this->form->register();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        if (config('app.email_verification_enabled', true)) {
+            $this->redirectRoute('verification.notice');
+        } else {
+            $this->redirectRoute('onboarding.family');
+        }
     }
 
     public function showConditions(): void

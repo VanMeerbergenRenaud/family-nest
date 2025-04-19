@@ -227,5 +227,6 @@ return [
         'memberEmail' => 'de l‘adresse mail du membre',
         'memberPermission' => 'des permissions du membre',
         'memberRelation' => 'de la relation du membre',
+        'members.*.email' => 'de l\'adresse mail du membre',
     ],
 ];

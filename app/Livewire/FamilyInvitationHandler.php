@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Enums\FamilyPermissionEnum;
+use App\Enums\FamilyRelationEnum;
 use App\Livewire\Actions\Logout;
 use App\Livewire\Forms\RegisterForm;
 use App\Models\FamilyInvitation;
@@ -23,33 +25,32 @@ class FamilyInvitationHandler extends Component
         $this->token = $token;
         $this->invitation = FamilyInvitation::where('token', $token)->first();
 
-        // Vérifier si l'invitation existe
+        // Check if the invitation exists and is not expired
         if (! $this->invitation || $this->invitation->isExpired()) {
             $this->redirectRoute('welcome');
         }
 
-        // Initialiser l'email dans le formulaire
+        // Initialize the email in the form
         $this->form->email = $this->invitation->email;
 
-        // Vérifier si l'utilisateur connecté a un email différent de l'invitation
+        // Check if the logged-in user has a different email than the invitation
         if (Auth::check() && Auth::user()->email !== $this->invitation->email) {
-            Toaster::warning('Attention ! Vous êtes déjà connecté avec un compte::Veuillez vous déconnecter pour accepter cette invitation.');
+            Toaster::warning('Attention ! Vous êtes déjà connecté avec un autre compte::Veuillez vous déconnecter pour accepter cette invitation.');
         }
     }
 
     public function acceptInvitation(): void
     {
-        // Vérifier si l'invitation est valide
         if (! $this->validateInvitation()) {
-            $this->redirectRoute('welcome', ['error' => 'Cette invitation n\'est plus valide.']);
+            $this->redirectRoute('welcome', ['error' => 'Cette invitation n\'est plus valable.']);
         }
 
         try {
             $this->processInvitation();
             $this->redirectRoute('family');
         } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'acceptation de l\'invitation', ['error' => $e->getMessage()]);
-            Toaster::error('Une erreur est survenue::L\'invitation n\'a pas pu être acceptée.');
+            Log::error('Error while accepting the invitation', ['error' => $e->getMessage()]);
+            Toaster::error('Une erreur s\'est produite. L\'invitation n\'a pas pu être acceptée.');
         }
     }
 
@@ -60,35 +61,30 @@ class FamilyInvitationHandler extends Component
         }
 
         try {
-            // Méthode RegisterForm pour créer le compte
             $this->form->register();
 
-            // Lier l'utilisateur à la famille
             $this->processInvitation();
 
-            // Redirection selon configuration
             $route = config('app.email_verification_enabled', true)
                 ? 'verification.notice'
-                : 'family';
+                : 'onboarding.family';
 
             $this->redirectRoute($route);
 
         } catch (\Exception $e) {
-            Log::error('Erreur création compte', ['error' => $e->getMessage()]);
-            Toaster::error('Une erreur est survenue::Le compte n\'a pas pu être créé.');
+            Log::error('Error creating account', ['error' => $e->getMessage()]);
+            Toaster::error('Une erreur s\'est produite::Le compte n\'a pas pu être créé.');
         }
     }
 
     private function validateInvitation(): bool
     {
-        // Vérification de l'invitation
         if (! $this->invitation || $this->invitation->isExpired()) {
-            Toaster::error('Cette invitation n\'est plus valide.');
+            Toaster::error('Cette invitation n\'est plus valable.');
 
             return false;
         }
 
-        // Vérification de l'email
         if (Auth::check() && Auth::user()->email !== $this->invitation->email) {
             Toaster::error('Vous êtes déjà connecté::Veuillez vous déconnecter pour accepter cette invitation.');
 
@@ -100,19 +96,34 @@ class FamilyInvitationHandler extends Component
 
     private function processInvitation(): void
     {
-        // Récupération des données d'invitation avec valeurs par défaut
-        $permission = $this->invitation->permission ?? 'viewer';
-        $relation = $this->invitation->relation ?? 'member';
-        $isAdmin = $this->invitation->is_admin ?? false;
+        // Retrieve invitation data and convert it to enums.
+        $permissionValue = $this->invitation->permission ?? FamilyPermissionEnum::Viewer->value;
+        $relationValue = $this->invitation->relation ?? FamilyRelationEnum::Member->value;
 
-        // Lier l'utilisateur à la famille
+        // Attempt to create enum instances from the retrieved values.
+        $permission = FamilyPermissionEnum::tryFrom($permissionValue);
+        $relation = FamilyRelationEnum::tryFrom($relationValue);
+
+        // If the enum values are not valid, use default enum values.
+        if (! $permission) {
+            $permission = FamilyPermissionEnum::Viewer;
+        }
+
+        if (! $relation) {
+            $relation = FamilyRelationEnum::Member;
+        }
+
+        // Check if the user has admin privileges based on the enum value.
+        $isAdmin = $permission->isAdmin();
+
+        // Attach the user to the family with the specified permission, relation, and admin status.
         $this->invitation->family->users()->attach(Auth::id(), [
-            'permission' => $permission,
-            'relation' => $relation,
+            'permission' => $permission->value,
+            'relation' => $relation->value,
             'is_admin' => $isAdmin,
         ]);
 
-        // Supprimer l'invitation
+        // Delete the processed invitation.
         $this->invitation->delete();
     }
 
@@ -125,13 +136,13 @@ class FamilyInvitationHandler extends Component
 
     public function render()
     {
-        // Invitation expirée
+        // Expired invitation
         if (! $this->invitation || $this->invitation->isExpired()) {
             return view('livewire.family-invitation.expired')
                 ->layout('layouts.guest');
         }
 
-        // Utilisateur connecté avec email correspondant
+        // Logged-in user with matching email
         if (Auth::check() && Auth::user()->email === $this->invitation->email) {
             return view('livewire.family-invitation.accept', [
                 'invitation' => $this->invitation,
@@ -139,14 +150,14 @@ class FamilyInvitationHandler extends Component
             ])->layout('layouts.guest');
         }
 
-        // Utilisateur connecté avec email différent
+        // Logged-in user with different email
         if (Auth::check()) {
             return view('livewire.family-invitation.wrong-account', [
                 'invitation' => $this->invitation,
             ])->layout('layouts.guest');
         }
 
-        // Utilisateur non connecté
+        // Non-logged-in user
         return view('livewire.family-invitation.register', [
             'invitation' => $this->invitation,
             'email' => $this->invitation->email,

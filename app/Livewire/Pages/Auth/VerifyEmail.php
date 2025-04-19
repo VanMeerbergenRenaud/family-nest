@@ -19,6 +19,13 @@ class VerifyEmail extends Component
     public function sendVerification(): void
     {
         if (Auth::user()->hasVerifiedEmail()) {
+
+            if (! Auth::user()->family()) {
+                $this->redirectRoute('onboarding.family');
+
+                return;
+            }
+
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
 
             return;
@@ -32,7 +39,7 @@ class VerifyEmail extends Component
             if (str_contains($e->getMessage(), 'reached trial account unique recipients limit') ||
                 str_contains($e->getMessage(), '#MS42225')) {
 
-                // Log the error for administrators
+                // Log the error for administrators (me)
                 Log::warning('MailerSend limit reached. Auto-verifying user: '.Auth::user()->email);
 
                 // Automatically verify the user as a temporary solution
@@ -40,13 +47,14 @@ class VerifyEmail extends Component
                     ->where('id', Auth::user()->id)
                     ->update(['email_verified_at' => now()]);
 
-                // Notify the user
                 Session::flash('status', 'Votre email a été automatiquement vérifié en raison de limitations techniques temporaires.');
 
-                // Redirect to dashboard
-                $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+                if (! Auth::user()->family()) {
+                    $this->redirectRoute('onboarding.family');
+                } else {
+                    $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+                }
             } else {
-                // For other errors, log them but don't auto-verify
                 Log::error('Email verification error: '.$e->getMessage());
                 Session::flash('status', 'Une erreur s\'est produite. Veuillez réessayer plus tard.');
             }

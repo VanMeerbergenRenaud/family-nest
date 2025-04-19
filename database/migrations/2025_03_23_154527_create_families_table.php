@@ -23,8 +23,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('family_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('permission')->default('viewer'); // admin, editor, viewer
-            $table->string('relation')->default('member'); // spouse, father, mother, brother, sister, son, daughter, colleague, colocataire, friend, other
+            $table->string('permission')->default('viewer');
+            $table->string('relation')->default('member');
             $table->boolean('is_admin')->default(false);
             $table->timestamps();
 
@@ -41,8 +41,8 @@ return new class extends Migration
         // Table pivot pour gérer les répartitions de factures entre membres
         Schema::create('invoice_user', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('invoice_id')->constrained()->onDelete('cascade');
             $table->decimal('share_amount', 10, 2)->nullable()->comment('Montant fixe de la part');
             $table->decimal('share_percentage', 5, 2)->nullable()->comment('Pourcentage de la part');
             $table->timestamps();

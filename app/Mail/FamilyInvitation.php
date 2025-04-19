@@ -2,11 +2,12 @@
 
 namespace App\Mail;
 
+use App\Enums\FamilyPermissionEnum;
+use App\Enums\FamilyRelationEnum;
 use App\Models\Family;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -15,9 +16,6 @@ class FamilyInvitation extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(
         public Family $family,
         public User $inviter,
@@ -26,40 +24,17 @@ class FamilyInvitation extends Mailable
         public string $relation
     ) {}
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "{$this->inviter->name} vous invite à rejoindre sa famille sur FamilyNest",
+            subject: "Salut, {$this->inviter->name} vous invite à rejoindre sa famille sur FamilyNest",
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
-        $roleLabels = [
-            'admin' => 'Administrateur',
-            'editor' => 'Éditeur',
-            'viewer' => 'Lecteur',
-        ];
-
-        $relationLabels = [
-            'spouse' => 'Conjoint(e)',
-            'father' => 'Père',
-            'mother' => 'Mère',
-            'brother' => 'Frère',
-            'sister' => 'Sœur',
-            'son' => 'Fils',
-            'daughter' => 'Fille',
-            'colleague' => 'Collègue',
-            'colocataire' => 'Colocataire',
-            'friend' => 'Ami(e)',
-            'other' => 'Autre',
-        ];
+        $permission = FamilyPermissionEnum::tryFrom($this->role);
+        $relation = FamilyRelationEnum::tryFrom($this->relation);
 
         $url = route('family.invitation', ['token' => $this->token]);
 
@@ -68,18 +43,13 @@ class FamilyInvitation extends Mailable
             with: [
                 'family' => $this->family,
                 'inviter' => $this->inviter,
-                'role' => $roleLabels[$this->role] ?? ucfirst($this->role),
-                'relation' => $relationLabels[$this->relation] ?? ucfirst($this->relation),
+                'role' => $permission ? $permission->label() : ucfirst($this->role),
+                'relation' => $relation ? $relation->label() : ucfirst($this->relation),
                 'url' => $url,
             ],
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, Attachment>
-     */
     public function attachments(): array
     {
         return [];

@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\FamilyPermissionEnum;
+use App\Enums\FamilyRelationEnum;
 use App\Models\Family;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
@@ -15,83 +17,83 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Création de l'utilisateur principal
-        $mainUser = User::factory()->create([
+        /* Main user */
+        $renaud = User::factory()->create([
             'name' => 'Renaud Vmb',
             'email' => 'renaud.vmb@gmail.com',
             'password' => bcrypt('password'),
-            'avatar' => asset('img/users/renaud_vmb.png'),
         ]);
 
-        /* Teachers users */
+        $france = User::factory()->create([
+            'name' => 'France Mélon',
+            'email' => 'france.test@gmail.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $martin = User::factory()->create([
+            'name' => 'Martin Van Meerbergen',
+            'email' => 'martin.test@gmail.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        $mamy = User::factory()->create([
+            'name' => 'Mamy',
+            'email' => 'mamy.test@gmail.com',
+            'password' => bcrypt('password'),
+        ]);
+
+        /* Teacher users */
         $dominique = User::factory()->create([
             'name' => 'Dominique Vilain',
             'email' => 'dominique.vilain@gmail.com',
             'password' => bcrypt('password'),
-            'avatar' => asset('img/users/teachers/dominique_vilain.jpeg'),
         ]);
 
-        $toon = User::factory()->create([
-            'name' => 'Toon Van Den Bos',
-            'email' => 'toon.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/teachers/toon_van_den_bos.jpeg'),
+        // Create a family for the main user
+        $renaudFamily = Family::factory()->create([
+            'name' => 'Famille Van Meerbergen',
         ]);
 
-        $myriam = User::factory()->create([
-            'name' => 'Myriam Dupont',
-            'email' => 'myriam.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/teachers/myriam_dupont.jpeg'),
-        ]);
-
-        $daniel = User::factory()->create([
-            'name' => 'Daniel Schreurs',
-            'email' => 'daniel.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/teachers/daniel_schreurs.jpeg'),
-        ]);
-
-        $francois = User::factory()->create([
-            'name' => 'François Parmentier',
-            'email' => 'francois.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/teachers/francois_parmentier.jpeg'),
-        ]);
-
-        $cedric = User::factory()->create([
-            'name' => 'Cédric Muller',
-            'email' => 'cedric.test@gmail.com',
-            'password' => bcrypt('password_1'),
-        ]);
-
-        // Création d'une famille pour les professeurs
-        $teachersFamily = Family::factory()->create([
-            'name' => 'Professeurs HEPL',
-        ]);
-
-        // Ajouter les enseignants avec comme professeur principal Dominique
-        $teachersFamily->users()->attach($dominique->id, [
-            'permission' => 'admin',
-            'relation' => 'self',
+        // Attach other users to the family of the main user
+        $renaudFamily->users()->attach($renaud->id, [
+            'permission' => FamilyPermissionEnum::Admin->value,
+            'relation' => FamilyRelationEnum::Self->value,
             'is_admin' => true,
         ]);
 
-        $teachersFamily->users()->attach([
-            $toon->id => ['permission' => 'editor', 'relation' => 'colleague'],
-            $myriam->id => ['permission' => 'editor', 'relation' => 'colleague'],
-            $daniel->id => ['permission' => 'editor', 'relation' => 'colleague'],
-            $francois->id => ['permission' => 'viewer', 'relation' => 'colleague'],
-            $cedric->id => ['permission' => 'viewer', 'relation' => 'colleague'],
+        // Add relationships for the main user
+        $renaudFamily->users()->attach([
+            $france->id => [
+                'permission' => FamilyPermissionEnum::Editor->value,
+                'relation' => FamilyRelationEnum::Parent->value,
+            ],
+            $martin->id => [
+                'permission' => FamilyPermissionEnum::Viewer->value,
+                'relation' => FamilyRelationEnum::Brother->value,
+            ],
+            $mamy->id => [
+                'permission' => FamilyPermissionEnum::Viewer->value,
+                'relation' => FamilyRelationEnum::Grandparent->value,
+            ],
         ]);
 
-        /* Factures pour l'utilisateur principal */
+        // Create invoices for users
         $invoices = Invoice::factory(20)->create([
-            'user_id' => $mainUser->id,
+            'user_id' => $renaud->id,
         ]);
 
-        // Créer un fichier pour chaque facture
+        $invoicesTeacher = Invoice::factory(5)->create([
+            'user_id' => $dominique->id,
+        ]);
+
+        // Create invoice files for users
         foreach ($invoices as $invoice) {
+            InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+        }
+
+        foreach ($invoicesTeacher as $invoice) {
             InvoiceFile::factory()->create([
                 'invoice_id' => $invoice->id,
             ]);
