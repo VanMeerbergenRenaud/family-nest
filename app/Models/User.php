@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FamilyPermissionEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -16,7 +17,12 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable, Searchable;
 
-    protected $fillable = ['name', 'email', 'password', 'avatar'];
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'avatar',
+    ];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -28,6 +34,7 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    // Get the temporary URL for the user's avatar
     public function getAvatarUrlAttribute(): ?string
     {
         if (! $this->avatar) {
@@ -46,23 +53,19 @@ class User extends Authenticatable implements MustVerifyEmail
                 );
             }
         } catch (\Exception $e) {
-            Toaster::error('L‘avatar ne s‘est pas chargé correctement');
+            Toaster::error('Le fichier n\'a pas pu être trouvé::Erreur de connexion au serveur.');
         }
 
         return null;
     }
 
+    // Relationship: A user has many invoices
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
-    public function paidInvoices(): HasMany
-    {
-        return $this->hasMany(Invoice::class, 'paid_by_user_id');
-    }
-
-    // Members of the family
+    // Relationship: A user belongs to many families with additional pivot data
     public function families(): BelongsToMany
     {
         return $this->belongsToMany(Family::class)
@@ -70,14 +73,37 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
-    // Members of the family with admin permission
+    // Get the first family the user belongs to
     public function family()
     {
         return $this->families()->first();
     }
 
-    // Verify if the user is the admin of the family
-    public function isAdminOfFamily(): bool
+    // Check if the user has a family
+    public function hasFamily(): bool
+    {
+        return $this->families()->exists();
+    }
+
+    public function getFamilyPermissionAttribute(): ?FamilyPermissionEnum
+    {
+        $family = $this->family();
+
+        if (! $family) {
+            return null;
+        }
+
+        $pivotData = $this->families()->where('family_id', $family->id)->first()->pivot ?? null;
+
+        if (! $pivotData) {
+            return null;
+        }
+
+        return FamilyPermissionEnum::tryFrom($pivotData->permission);
+    }
+
+    // Check if the user is an admin in their family
+    public function isAdmin(): bool
     {
         $family = $this->family();
 
@@ -85,31 +111,39 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        return $this->families()->wherePivot('family_id', $family->id)
-            ->wherePivot('is_admin', true)
+        return $this->families()
+            ->wherePivot('family_id', $family->id)
+            ->wherePivot('permission', FamilyPermissionEnum::Admin->value)
             ->exists();
     }
 
-    // Get the role of the user in the family
-    public function getFamilyPermissionAttribute(): string
+    // Check if the user is an editor in their family
+    public function isEditor(): bool
     {
         $family = $this->family();
 
         if (! $family) {
-            return 'Administrateur';
+            return false;
         }
 
-        $permission = $this->families()->wherePivot('family_id', $family->id)
-            ->first()
-            ->pivot
-            ->permission;
+        return $this->families()
+            ->wherePivot('family_id', $family->id)
+            ->wherePivot('permission', FamilyPermissionEnum::Editor->value)
+            ->exists();
+    }
 
-        // Translate the permission to French
-        return match ($permission) {
-            'admin' => 'Administrateur',
-            'editor' => 'Éditeur',
-            'viewer' => 'Spectateur',
-            default => ucfirst($permission),
-        };
+    // Check if the user is a viewer in their family
+    public function isViewer(): bool
+    {
+        $family = $this->family();
+
+        if (! $family) {
+            return false;
+        }
+
+        return $this->families()
+            ->wherePivot('family_id', $family->id)
+            ->wherePivot('permission', FamilyPermissionEnum::Viewer->value)
+            ->exists();
     }
 }

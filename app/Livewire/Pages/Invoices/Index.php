@@ -383,6 +383,7 @@ class Index extends Component
             return redirect()->away($presignedUrl);
         } catch (\Exception) {
             Toaster::error('Erreur lors du téléchargement : Le fichier n\'a pas pu être téléchargé.');
+
             return false;
         }
     }
@@ -410,6 +411,15 @@ class Index extends Component
                 Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
 
                 return;
+            }
+
+            // Check if the user can make changes to the selected invoices
+            foreach ($invoices as $invoice) {
+                if (! auth()->user()->can('update', $invoice)) {
+                    Toaster::error('Vous n\'avez pas la permission de modifier cette facture.');
+
+                    return;
+                }
             }
 
             $count = $invoices->count();
@@ -497,6 +507,12 @@ class Index extends Component
                 ->where('user_id', auth()->id())
                 ->firstOrFail();
 
+            if (! auth()->user()->can('archive', $this->invoice)) {
+                Toaster::error('Vous n\'avez pas la permission d\'archiver cette facture.');
+
+                return;
+            }
+
             $this->invoice->update([
                 'is_archived' => true,
                 'is_favorite' => false,
@@ -516,6 +532,26 @@ class Index extends Component
             Toaster::error('Aucune facture sélectionnée.');
 
             return;
+        }
+
+        // Check if the user can archive the selected invoices
+        $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
+            ->where('is_archived', false)
+            ->where('user_id', auth()->id())
+            ->get();
+
+        if ($invoices->isEmpty()) {
+            Toaster::error('Aucune facture sélectionnée ou déjà archivée.');
+
+            return;
+        }
+
+        foreach ($invoices as $invoice) {
+            if (! auth()->user()->can('archive', $invoice)) {
+                Toaster::error('Vous n\'avez pas la permission d\'archiver cette facture.');
+
+                return;
+            }
         }
 
         try {
@@ -549,6 +585,12 @@ class Index extends Component
             $originalInvoice = auth()->user()->invoices()
                 ->with(['file', 'sharedUsers'])
                 ->findOrFail($invoiceId);
+
+            if (! auth()->user()->can('update', $originalInvoice)) {
+                Toaster::error('Vous n\'avez pas la permission de copier cette facture.');
+
+                return;
+            }
 
             $newInvoice = $originalInvoice->replicate();
             $newInvoice->name = $originalInvoice->name.' (version copiée)';

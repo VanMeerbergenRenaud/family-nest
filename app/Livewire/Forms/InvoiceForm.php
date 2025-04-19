@@ -131,7 +131,7 @@ class InvoiceForm extends Form
             'amount' => 'required|numeric|min:0|max:999999999.99',
             'currency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, CurrencyEnum::cases())),
             'paid_by_user_id' => 'exists:users,id',
-            'family_id' => 'nullable|exists:families,id',
+            'family_id' => 'required|exists:families,id',
             'user_shares' => 'nullable|array',
             'user_shares.*.id' => 'required|exists:users,id',
             'user_shares.*.amount' => 'nullable|numeric|min:0',
@@ -176,6 +176,7 @@ class InvoiceForm extends Form
             'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
             'amount.max' => 'Le montant doit être inférieur à 999 999 999,99. À moins que vous ne soyez John D. Rockefeller, auquel cas nous vous suggérons de nous contactez !',
             'paid_by_user_id.exists' => 'L\'utilisateur sélectionné n\'existe pas.',
+            'family_id.required' => 'La famille est obligatoire, veuillez en créer une si vous n\'en avez pas.',
             'family_id.exists' => 'La famille sélectionnée n\'existe pas.',
             'user_shares.*.amount' => 'Le montant de la part doit être un nombre valide.',
             'user_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
@@ -247,6 +248,8 @@ class InvoiceForm extends Form
     // Create or update invoice
     public function saveInvoice(FileStorageService $fileStorageService)
     {
+        $this->family_id = auth()->user()->family()->id;
+
         $this->validate();
 
         try {

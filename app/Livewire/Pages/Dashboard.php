@@ -13,11 +13,11 @@ class Dashboard extends Component
 
     public $family;
 
-    public $invoices;
+    public $allInvoicesOfFamily = [];
 
     public $allInvoicesOfUser = [];
 
-    public $allInvoicesOfFamily = [];
+    public $allInvoicesOfOtherUsers = [];
 
     public bool $showDashboardExempleModal = false;
 
@@ -26,27 +26,18 @@ class Dashboard extends Component
         $this->user = auth()->user();
         $this->family = $this->user->family();
 
-        $this->invoices = Invoice::where('user_id', $this->user->id)
-            ->where('is_archived', false)
-            ->orderBy('amount', 'desc')
-            ->get();
-
-        // Get all the user's invoices
-        $this->allInvoicesOfUser = auth()->user()->invoices()
-            ->where('is_archived', false)
-            ->orderBy('amount', 'desc')
-            ->get();
-
         if ($this->family) {
-            $familyMemberIds = $this->family->users->pluck('id')->toArray();
-
-            // Get all the invoices of the family
             $this->allInvoicesOfFamily = Invoice::where('family_id', $this->family->id)
-                ->orWhereIn('user_id', $familyMemberIds)
-                ->where('is_archived', false)
-                ->orderBy('amount', 'desc')
                 ->get();
         }
+
+        $this->allInvoicesOfUser = Invoice::where('family_id', $this->family->id)
+            ->where('user_id', $this->user->id)
+            ->get();
+
+        $this->allInvoicesOfOtherUsers = Invoice::where('family_id', $this->family->id)
+            ->where('user_id', '!=', $this->user->id)
+            ->get();
     }
 
     public function showDashboardExemple(): void

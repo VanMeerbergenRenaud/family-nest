@@ -9,7 +9,6 @@ use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
 use App\Models\Invoice;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,23 +17,10 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class InvoiceFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Invoice::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $users = User::all();
-        $userId = $users->count() > 0 ? $users->random()->id : 1;
-
         $type = $this->faker->randomElement(TypeEnum::cases())->value;
         $category = $this->faker->randomElement(TypeEnum::from($type)->categories());
 
@@ -53,7 +39,7 @@ class InvoiceFactory extends Factory
             // Détails financiers
             'amount' => $this->faker->randomFloat(2, 10, 1000),
             'currency' => $this->faker->randomElement(CurrencyEnum::cases())->value,
-            'paid_by_user_id' => $this->faker->randomElement($users->pluck('id')->toArray()),
+            'paid_by_user_id' => 1,
 
             // Dates
             'issued_date' => Carbon::instance($issuedDate)->format('Y-m-d'),
@@ -68,15 +54,15 @@ class InvoiceFactory extends Factory
 
             // Notes et tags
             'notes' => $this->faker->paragraph(),
-            'tags' => $this->faker->words($this->faker->numberBetween(1, 5)),
+            'tags' => $this->faker->words($this->faker->numberBetween(5, 10)),
 
             // États
-            'is_archived' => $this->faker->boolean(20),
+            'is_archived' => $this->faker->boolean(10),
             'is_favorite' => $this->faker->boolean(5),
 
             // Clés étrangères
-            'user_id' => $userId,
-            'family_id' => $this->faker->randomElement($users->pluck('family_id')->toArray()),
+            'user_id' => 1,
+            'family_id' => 1,
         ];
     }
 }

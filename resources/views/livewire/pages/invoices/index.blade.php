@@ -121,6 +121,21 @@
                         </span>
                     </div>
                 </button>
+
+                {{-- Semaine prochaine --}}
+                @if($archivedInvoices->isNotEmpty())
+                    <a href="{{ route('invoices.archived') }}"  class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-teal-100 dark:bg-teal-900">
+                        <div class="flex flex-col text-left">
+                            <div class="mb-3.5 p-3 rounded-lg w-fit bg-teal-200 dark:bg-teal-900">
+                                <x-svg.archive class="w-6 h-6 text-teal-500 dark:text-teal-400"/>
+                            </div>
+                            <span class="text-md-medium text-gray-900 dark:text-white">Archives</span>
+                            <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
+                                {{ $archivedInvoices->count() }} Fichiers
+                            </span>
+                        </div>
+                    </a>
+                @endif
             </div>
         </section>
 
@@ -172,7 +187,7 @@
         <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
 
             {{-- En-tête --}}
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 pl-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
                 <h3 role="heading" aria-level="3" class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h3>
                 <div class="flex flex-wrap gap-2">
                     {{-- Filtres --}}
@@ -589,7 +604,7 @@
             </div>
             <!-- Pagination -->
             @if($invoices->hasPages())
-                <div class="p-4 border-t border-slate-200">
+                <div class="py-2 px-4 border-t border-slate-200">
                     {{ $invoices->links() }}
                 </div>
             @endif
@@ -810,7 +825,7 @@
                                 :filePath="$filePath"
                                 :fileExtension="$fileExtension"
                                 :fileName="$fileName"
-                                class="min-h-[60vh]"
+                                class="min-h-[60vh] max-h-[75vh]"
                             />
                         </div>
                     </div>

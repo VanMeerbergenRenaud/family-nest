@@ -21,15 +21,17 @@
 
         <x-menu.divider/>
 
-        <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
-            <x-svg.edit class="group-hover:text-gray-900"/>
-            {{ __('Modifier') }}
-        </x-menu.item>
+        @can('update', $invoice)
+            <x-menu.item type="link" href="{{ route('invoices.edit', $invoice->id) }}">
+                <x-svg.edit class="group-hover:text-gray-900"/>
+                {{ __('Modifier') }}
+            </x-menu.item>
 
-        <x-menu.item wire:click="copyInvoice({{ $invoice->id }})">
-            <x-svg.copy class="group-hover:text-gray-900"/>
-            {{ __('Dupliquer') }}
-        </x-menu.item>
+            <x-menu.item wire:click="copyInvoice({{ $invoice->id }})">
+                <x-svg.copy class="group-hover:text-gray-900"/>
+                {{ __('Dupliquer') }}
+            </x-menu.item>
+        @endcan
 
         <x-menu.item wire:click="downloadInvoice({{ $invoice->id }})">
             <x-svg.download class="group-hover:text-gray-900"/>
@@ -46,11 +48,13 @@
             @endif
         </x-menu.item>
 
-        <x-menu.divider/>
+        @can('archive', $invoice)
+            <x-menu.divider/>
 
-        <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
-            <x-svg.archive class="group-hover:text-red-500"/>
-            {{ __('Archiver') }}
-        </x-menu.item>
+            <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
+                <x-svg.archive class="group-hover:text-red-500"/>
+                {{ __('Archiver') }}
+            </x-menu.item>
+        @endcan
     </x-menu.items>
 </x-menu>
