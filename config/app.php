@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\ServiceProvider;
+
 return [
 
     /*
@@ -122,5 +124,37 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Email Verification
+    |--------------------------------------------------------------------------
+    |
+    | Cette option détermine si la vérification d'email est activée pour
+    | les nouveaux utilisateurs. Si activée, les utilisateurs devront vérifier
+    | leur adresse email avant de pouvoir accéder au système complet.
+    |
+    */
+
+    'email_verification_enabled' => env('EMAIL_VERIFICATION_ENABLED', true),
+
+    /*
+    | --------------------------------------------------------------------------
+    | Application Providers
+    | --------------------------------------------------------------------------
+    |
+    | The service providers listed here will be loaded on the request to your
+    | application. Feel free to add your own services to this array to grant
+    | expanded functionality to your applications.
+    */
+
+    'providers' => ServiceProvider::defaultProviders()->merge([
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
+        App\Providers\EventServiceProvider::class,
+        App\Providers\RouteServiceProvider::class,
+        App\Providers\RedirectServiceProvider::class,
+    ])->toArray(),
 
 ];

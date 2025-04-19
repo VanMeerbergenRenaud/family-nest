@@ -36,6 +36,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\RedirectFirstLogin::class,
         ],
 
         'api' => [
@@ -65,5 +66,7 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'google.log' => \App\Http\Middleware\GoogleAuthLogMiddleware::class,
+        'has.family' => \App\Http\Middleware\HasFamily::class,
+        'family.role' => \App\Http\Middleware\CheckFamilyRole::class,
     ];
 }
