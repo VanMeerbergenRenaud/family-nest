@@ -37,7 +37,9 @@ class VerifyEmail extends Component
         } catch (Exception $e) {
             // Check if the error is related to MailerSend limits
             if (str_contains($e->getMessage(), 'reached trial account unique recipients limit') ||
-                str_contains($e->getMessage(), '#MS42225')) {
+                str_contains($e->getMessage(), '#MS42225') ||
+                str_contains($e->getMessage(), '#MS42222') ||
+                str_contains($e->getMessage(), 'email quota limit')) {
 
                 // Log the error for administrators (me)
                 Log::warning('MailerSend limit reached. Auto-verifying user: '.Auth::user()->email);
