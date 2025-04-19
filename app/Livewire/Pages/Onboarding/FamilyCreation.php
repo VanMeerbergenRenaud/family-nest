@@ -5,24 +5,22 @@ namespace App\Livewire\Pages\Onboarding;
 use App\Enums\FamilyPermissionEnum;
 use App\Enums\FamilyRelationEnum;
 use App\Jobs\SendFamilyInvitation;
-use App\Models\Family as FamilyModel;
+use App\Livewire\Forms\FamilyForm;
 use App\Models\FamilyInvitation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
 #[Title('Créer votre famille')]
 class FamilyCreation extends Component
 {
-    public int $step = 1;
+    public FamilyForm $form;
 
-    #[Validate('required|min:2|max:255')]
-    public string $familyName = '';
+    public int $step = 1;
 
     public array $members = [];
 
@@ -106,7 +104,7 @@ class FamilyCreation extends Component
     {
         if ($this->step === 1) {
             $this->validate([
-                'familyName' => 'required|min:2|max:255',
+                'form.familyName' => 'required|min:2|max:255',
             ]);
         } elseif ($this->step === 2) {
             $allValid = true;
@@ -140,16 +138,15 @@ class FamilyCreation extends Component
     public function submitForm(): void
     {
         try {
-            $family = FamilyModel::create([
-                'name' => $this->familyName,
-            ]);
+            // Utiliser le formulaire pour créer la famille
+            $this->form->create();
+            $family = $this->form->family;
 
-            // Attach the authenticated user as the family admin
-            $family->users()->attach(Auth::id(), [
-                'permission' => FamilyPermissionEnum::Admin->value,
-                'relation' => FamilyRelationEnum::Self->value,
-                'is_admin' => true,
-            ]);
+            if (! $family) {
+                Toaster::error('Une erreur est survenue lors de la création de la famille');
+
+                return;
+            }
 
             $invitationCount = 0;
 
@@ -218,6 +215,7 @@ class FamilyCreation extends Component
         $availableRelations = FamilyRelationEnum::getRelationOptions();
 
         return view('livewire.pages.onboarding.family-creation', [
+            'familyName' => $this->form->familyName,
             'availablePermissions' => $availablePermissions,
             'availableRelations' => $availableRelations,
         ])->layout('layouts.onboarding');

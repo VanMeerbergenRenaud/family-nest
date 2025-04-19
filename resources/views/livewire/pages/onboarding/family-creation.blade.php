@@ -52,9 +52,9 @@
                 <div class="max-w-lg mx-auto md:px-4">
                     <x-form.field
                         label="Nom de votre famille"
-                        name="familyName"
-                        model="familyName"
-                        placeholder="Ex: Famille Dupont"
+                        name="form.familyName"
+                        model="form.familyName"
+                        placeholder="Exemple: Famille Dupont"
                         :asterix="true"
                         autofocus
                         required
@@ -192,7 +192,7 @@
                     <div class="divide-y divide-gray-100">
                         <div class="flex items-center justify-between py-4">
                             <span class="text-sm text-gray-500">Nom de la famille</span>
-                            <span class="text-sm-medium text-slate-800">{{ $familyName }}</span>
+                            <span class="text-sm-medium text-slate-800">{{ $form->familyName }}</span>
                         </div>
                         <div class="flex items-center justify-between py-4">
                             <span class="text-sm text-gray-500">Créateur</span>
@@ -338,7 +338,7 @@
                 </h2>
 
                 <p class="text-gray-600 max-w-md text-center">
-                    Votre famille <span class="font-medium text-slate-800">{{ $familyName }}</span> a été créée avec succès.
+                    Votre famille <span class="font-medium text-slate-800">{{ $form->familyName }}</span> a été créée avec succès.
                     @if($this->hasInvitedMembers())
                         <span class="block mt-2">Les invitations ont été envoyées aux membres que vous avez ajoutés.</span>
                     @endif

@@ -30,7 +30,7 @@
     {{-- Table of family members --}}
     @if($family)
         <x-header
-            title="Membres de la famille"
+            title="{{ $family->name ?? __('Votre famille') }}"
             description="Gérez les membres de votre famille et leurs autorisations de compte ici."
         />
 
@@ -135,40 +135,16 @@
 
         <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
-            <div
-                class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 pl-6 border-b border-gray-200 dark:border-gray-700">
                 <h3 role="heading" aria-level="3" class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
-                    {{ $family->name ?? 'Nom de la famille' }}
-                    <span
-                        class="relative -top-0.5 ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
+                    {{ __('Membres de la famille') }}
+                    <span aria-hidden="true" class="relative -top-0.5 ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
                        {{ $members->total() }}
                    </span>
                 </h3>
                 <div class="flex flex-wrap gap-2">
-                    {{-- Filter - Tous les utilisateurs peuvent voir les filtres --}}
-                    <x-menu>
-                        <x-menu.button class="button-primary flex items-center">
-                            <x-svg.filter/>
-                            Filtres
-                        </x-menu.button>
-                        <x-menu.items class="mt-2 w-64">
-                            <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
-                            <x-menu.divider/>
-                            <x-menu.item>
-                                <x-svg.in-progress class="transition-colors duration-200"/>
-                                En cours
-                            </x-menu.item>
-                            <x-menu.divider/>
-                            <x-menu.item wire:click="resetSort"
-                                         class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
-                                <x-svg.reset/>
-                                Réinitialiser
-                            </x-menu.item>
-                        </x-menu.items>
-                    </x-menu>
-
-                    {{-- Invite a member - Seulement Admin ou Editor peuvent inviter --}}
-                    @if($canEdit)
+                    {{-- Inviter un membre - Seulement Admin ou Editor peuvent inviter --}}
+                    @if($isAdmin)
                         <button type="button" wire:click="addMember" class="button-tertiary">
                             <x-svg.add2 class="text-white"/>
                             {{ __("Ajouter un membre") }}
@@ -187,7 +163,7 @@
                         <thead>
                         <tr>
                             <th scope="col">
-                                <button wire:click="sortBy('name')" class="flex items-center">
+                                <button type="button" wire:click="sortBy('name')" class="flex items-center">
                                     <span>Nom du membre</span>
                                     @if ($sortField === 'name')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -204,7 +180,7 @@
                                 </button>
                             </th>
                             <th scope="col">
-                                <button wire:click="sortBy('permission')" class="flex items-center">
+                                <button type="button" wire:click="sortBy('permission')" class="flex items-center">
                                     <span>Rôle</span>
                                     @if ($sortField === 'permission')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -221,7 +197,7 @@
                                 </button>
                             </th>
                             <th scope="col">
-                                <button wire:click="sortBy('relation')" class="flex items-center">
+                                <button type="button" wire:click="sortBy('relation')" class="flex items-center">
                                     <span>Relation</span>
                                     @if ($sortField === 'relation')
                                         <svg class="ml-2 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -333,7 +309,7 @@
                                         </x-menu.button>
                                         <x-menu.items>
                                             @if($member->id === $currentUser)
-                                                <p class="text-left text-sm-medium text-gray-500 pt-1 pb-2 px-2">
+                                                <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
                                                     Mon profil
                                                 </p>
                                                 <x-menu.item wire:click="showUserProfile({{ $member->id }})" class="group">
@@ -355,7 +331,7 @@
                                             @if($isAdmin && $member->id !== $currentUser)
                                                 <x-menu.divider/>
 
-                                                <p class="text-left text-sm-medium text-gray-500 pt-1 pb-2 px-2">
+                                                <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
                                                     Changement de rôle
                                                 </p>
 
@@ -405,7 +381,7 @@
                                             @if($isAdmin && $member->id === $currentUser)
                                                 <x-menu.divider/>
 
-                                                <p class="text-left text-sm-medium text-gray-500 py-1 px-2">
+                                                <p class="text-left text-xs-medium uppercase text-gray-500 py-1 px-2">
                                                     Ma famille
                                                 </p>
                                                 {{-- Modifier le nom de la famille --}}
@@ -604,7 +580,7 @@
                 </form>
             </x-modal.panel>
         </x-modal>
-@endif
+    @endif
 
     {{-- Modal pour modifier le nom de la famille --}}
     @if($showModifyFamilyNameModal && $isAdmin)
@@ -615,7 +591,7 @@
 
                     <div class="p-6">
                         <!-- Titre et Description -->
-                        <h2 role="heading" aria-level="2" class="text-xl font-semibold">Modifier le nom de la famille</h2>
+                        <h2 role="heading" aria-level="2" class="text-xl-semibold">Modifier le nom de la famille</h2>
                         <p class="text-gray-500 text-sm mt-1 mb-2">
                             Changez le nom de votre famille
                         </p>
@@ -627,8 +603,8 @@
                             <x-form.field
                                 label="Nouveau nom de la famille"
                                 name="newFamilyName"
-                                model="newFamilyName"
-                                placeholder="Ex: Famille Dupont"
+                                model="form.newFamilyName"
+                                placeholder="Exemple: Famille Dupont"
                                 :asterix="true"
                                 autofocus
                             />
@@ -674,8 +650,8 @@
                             <x-form.field
                                 label="Nom de la famille"
                                 name="familyName"
-                                model="familyName"
-                                placeholder="Ex: Famille Dupont"
+                                model="form.familyName"
+                                placeholder="Exemple: Famille Dupont"
                                 :asterix="true"
                                 autofocus
                             />
@@ -701,7 +677,7 @@
     @endif
 
     {{-- Modal to add a member to the family (accessible seulement si editor ou admin) --}}
-    @if($showAddMemberModal && $canEdit)
+    @if($showAddMemberModal && $isAdmin)
         <x-modal wire:model="showAddMemberModal">
             <x-modal.panel>
                 <form wire:submit.prevent="sendInvitation">
@@ -730,7 +706,7 @@
                                 <x-form.field
                                     label="Adresse email"
                                     name="memberEmail"
-                                    model="memberEmail"
+                                    model="form.memberEmail"
                                     placeholder="exemple@gmail.com"
                                     type="email"
                                     :asterix="true"
@@ -740,7 +716,7 @@
                                     <x-form.select
                                         label="Rôle dans la famille"
                                         name="memberPermission"
-                                        model="memberPermission"
+                                        model="form.memberPermission"
                                         :asterix="true"
                                     >
                                         {{-- Si admin, peut attribuer tous les rôles --}}
@@ -765,7 +741,7 @@
                                     <x-form.select
                                         label="Relation avec vous"
                                         name="memberRelation"
-                                        model="memberRelation"
+                                        model="form.memberRelation"
                                         :asterix="true"
                                     >
                                         @foreach(App\Enums\FamilyRelationEnum::getRelationOptions() as $value => $label)
