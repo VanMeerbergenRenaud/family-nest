@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HasFamily
 {
+    /**
+     * Checks if the user has an associated family.
+     * Redirects to the family page if not.
+     */
     public function handle(Request $request, Closure $next): Response
     {
         if (! Auth::check()) {
@@ -17,9 +21,8 @@ class HasFamily
         }
 
         $user = Auth::user();
-        $family = $user->family();
 
-        if (! $family) {
+        if (! $user->hasFamily()) {
             Toaster::info('Vous devez d\'abord créer ou rejoindre une famille pour accéder à cette fonctionnalité.');
 
             return redirect()->route('family');

@@ -10,18 +10,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectFirstLogin
 {
+    /**
+     * Redirects the user to the onboarding process on their first login,
+     * or if they haven't set up their family yet.
+     */
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
             $user = Auth::user();
-
-            // Check if this is a new registration
             $newRegistration = Session::has('new_registration');
 
-            // Check if the user has a family
-            if ((! $user->family() || $newRegistration) && ! $request->routeIs('onboarding*')) {
-
-                // Remove the session flag once it's been used
+            if ((! $user->hasFamily() || $newRegistration) && ! $request->routeIs('onboarding*')) {
                 if ($newRegistration) {
                     Session::forget('new_registration');
                 }

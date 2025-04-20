@@ -618,7 +618,7 @@
                                     {{ __('Annuler') }}
                                 </button>
                             </x-modal.close>
-                            <button type="submit" class="button-secondary" wire:loading.attr="disabled">
+                            <button type="button" wire:click="updateFamilyName" class="button-secondary" wire:loading.attr="disabled">
                                 {{ __('Enregistrer') }}
                                 <x-svg.validate class="text-white" />
                             </button>

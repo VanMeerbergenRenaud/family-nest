@@ -8,25 +8,24 @@ use App\Livewire\Forms\FamilyForm;
 use App\Models\FamilyInvitation;
 use App\Models\User;
 use App\Traits\HumanDateTrait;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Masmerise\Toaster\Toaster;
 
 #[Title('Famille')]
 class Family extends Component
 {
     use HumanDateTrait, WithPagination;
 
-    // Propriété du formulaire
     public FamilyForm $form;
 
-    // État de tri
-    public $sortField = 'name';
+    // Sort status
+    public string $sortField = 'name';
 
-    public $sortDirection = 'asc';
+    public string $sortDirection = 'asc';
 
-    // États modaux
+    // Modal states
     public bool $showAddMemberModal = false;
 
     public bool $showCreateFamilyModal = false;
@@ -41,8 +40,8 @@ class Family extends Component
 
     public bool $showModifyFamilyNameModal = false;
 
-    // Utilisateur sélectionné
-    public $selectedUser = null;
+    // Selected user and associated data
+    public ?User $selectedUser = null;
 
     public array $selectedUserInvoiceCounts = [];
 
@@ -50,24 +49,14 @@ class Family extends Component
 
     public function mount()
     {
-        // Charger la famille avec la relation user pour avoir les permissions en une seule requête
         $family = auth()->user()->family();
         $this->form->setFamily($family);
     }
 
-    public function showFamilyExemple(): void
+    public function sortBy(string $field): void
     {
-        $this->showFamilyExempleModal = true;
-    }
-
-    public function sortBy($field): void
-    {
-        if ($this->sortField === $field) {
-            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-            $this->sortField = $field;
-            $this->sortDirection = 'asc';
-        }
+        $this->sortDirection = ($this->sortField === $field && $this->sortDirection === 'asc') ? 'desc' : 'asc';
+        $this->sortField = $field;
     }
 
     public function resetSort(): void
@@ -76,22 +65,9 @@ class Family extends Component
         $this->sortDirection = 'asc';
     }
 
-    public function addMember(): void
+    public function showFamilyExemple(): void
     {
-        if (! $this->form->family || ! $this->form->canEdit) {
-            return;
-        }
-
-        // Initialiser avec les valeurs par défaut des enums
-        $this->form->memberPermission = FamilyPermissionEnum::Viewer->value;
-        $this->form->memberRelation = FamilyRelationEnum::Member->value;
-        $this->form->memberEmail = '';
-        $this->showAddMemberModal = true;
-    }
-
-    public function deleteMember($id): void
-    {
-        $this->form->deleteMember($id);
+        $this->showFamilyExempleModal = true;
     }
 
     public function openCreateFamilyModal(): void
@@ -100,25 +76,34 @@ class Family extends Component
         $this->showCreateFamilyModal = true;
     }
 
-    public function sendInvitation(): void
-    {
-        $result = $this->form->sendInvitation();
-
-        if (isset($result['error'])) {
-            $this->addError($result['error'], $result['message']);
-
-            return;
-        }
-
-        if (isset($result['success']) && $result['success']) {
-            $this->showAddMemberModal = false;
-        }
-    }
-
     public function createFamily(): void
     {
         $this->form->create();
         $this->showCreateFamilyModal = false;
+    }
+
+    public function addMember(): void
+    {
+        if (! $this->form->family || ! $this->form->canEdit) {
+            return;
+        }
+
+        $this->form->memberPermission = FamilyPermissionEnum::Viewer->value;
+        $this->form->memberRelation = FamilyRelationEnum::Member->value;
+        $this->form->memberEmail = '';
+        $this->showAddMemberModal = true;
+    }
+
+    public function sendInvitation(): void
+    {
+        if ($this->form->sendInvitation()) {
+            $this->showAddMemberModal = false;
+        }
+    }
+
+    public function deleteMember(int $id): void
+    {
+        $this->form->deleteMember($id);
     }
 
     public function showDeleteFamilyMFormModal(): void
@@ -157,56 +142,6 @@ class Family extends Component
         $this->form->deleteInvitation($invitationId);
     }
 
-    public function showUserProfile(int $userId): void
-    {
-        try {
-            if (! $this->form->family) {
-                return;
-            }
-
-            // Récupérer l'utilisateur avec Eloquent pour avoir accès à l'accesseur avatar_url
-            $this->selectedUser = User::join('family_user', 'users.id', '=', 'family_user.user_id')
-                ->where('family_user.family_id', $this->form->family->id)
-                ->where('users.id', $userId)
-                ->select(
-                    'users.*',
-                    'family_user.permission',
-                    'family_user.relation',
-                    'family_user.is_admin',
-                    'family_user.created_at as pivot_created_at'
-                )
-                ->withCount([
-                    'invoices as total_invoices',
-                    'invoices as late_invoices' => function ($query) {
-                        $query->where('payment_status', 'late');
-                    },
-                    'invoices as unpaid_invoices' => function ($query) {
-                        $query->where('payment_status', 'unpaid');
-                    },
-                    'invoices as pending_invoices' => function ($query) {
-                        $query->where('payment_status', 'pending');
-                    },
-                ])
-                ->first();
-
-            if (! $this->selectedUser) {
-                return;
-            }
-
-            // Stocker les compteurs
-            $this->selectedUserInvoiceCounts = [
-                'total' => $this->selectedUser->total_invoices,
-                'late' => $this->selectedUser->late_invoices,
-                'unpaid' => $this->selectedUser->unpaid_invoices,
-                'pending' => $this->selectedUser->pending_invoices,
-            ];
-
-            $this->showUserProfilInfos = true;
-        } catch (\Exception $e) {
-            // Gestion d'erreur déjà faite dans le contrôleur
-        }
-    }
-
     public function showModifyFamilyNameFormModal(): void
     {
         if (! $this->form->isAdmin) {
@@ -223,14 +158,58 @@ class Family extends Component
         $this->showModifyFamilyNameModal = false;
     }
 
+    public function showUserProfile(int $userId): void
+    {
+        try {
+            if (! $this->form->family) {
+                return;
+            }
+
+            $this->selectedUser = User::query()
+                ->join('family_user', 'users.id', '=', 'family_user.user_id')
+                ->where('family_user.family_id', $this->form->family->id)
+                ->where('users.id', $userId)
+                ->select(
+                    'users.*',
+                    'family_user.permission',
+                    'family_user.relation',
+                    'family_user.is_admin',
+                    'family_user.created_at as pivot_created_at'
+                )
+                ->withCount([
+                    'invoices as total_invoices',
+                    'invoices as late_invoices' => fn ($query) => $query->where('payment_status', 'late'),
+                    'invoices as unpaid_invoices' => fn ($query) => $query->where('payment_status', 'unpaid'),
+                    'invoices as pending_invoices' => fn ($query) => $query->where('payment_status', 'pending'),
+                ])
+                ->first();
+
+            if (! $this->selectedUser) {
+                return;
+            }
+
+            $this->selectedUserInvoiceCounts = [
+                'total' => $this->selectedUser->total_invoices,
+                'late' => $this->selectedUser->late_invoices,
+                'unpaid' => $this->selectedUser->unpaid_invoices,
+                'pending' => $this->selectedUser->pending_invoices,
+            ];
+
+            $this->showUserProfilInfos = true;
+        } catch (\Exception $e) {
+            Toaster::error('Récupération des informations échouée::Vérifiez que vous êtes membre de la famille.');
+            \Log::error('Error retrieving user profile', ['error' => $e->getMessage(), 'userId' => $userId]);
+        }
+    }
+
     public function render()
     {
         $members = collect();
         $pendingInvitations = collect();
 
         if ($this->form->family) {
-            // Utiliser Eloquent au lieu de DB::table
-            $members = User::join('family_user', 'users.id', '=', 'family_user.user_id')
+            $members = User::query()
+                ->join('family_user', 'users.id', '=', 'family_user.user_id')
                 ->where('family_user.family_id', $this->form->family->id)
                 ->select(
                     'users.*',
@@ -242,21 +221,15 @@ class Family extends Component
                 )
                 ->withCount([
                     'invoices as total_invoices',
-                    'invoices as late_invoices' => function ($query) {
-                        $query->where('payment_status', 'late');
-                    },
-                    'invoices as unpaid_invoices' => function ($query) {
-                        $query->where('payment_status', 'unpaid');
-                    },
-                    'invoices as pending_invoices' => function ($query) {
-                        $query->where('payment_status', 'pending');
-                    },
+                    'invoices as late_invoices' => fn ($query) => $query->where('payment_status', 'late'),
+                    'invoices as unpaid_invoices' => fn ($query) => $query->where('payment_status', 'unpaid'),
+                    'invoices as pending_invoices' => fn ($query) => $query->where('payment_status', 'pending'),
                 ])
                 ->orderBy($this->sortField, $this->sortDirection)
                 ->paginate(6);
 
-            // Préparer les compteurs pour la vue
             $this->invoiceCountsCache = [];
+
             foreach ($members as $member) {
                 $this->invoiceCountsCache[$member->id] = [
                     'total' => $member->total_invoices,
@@ -266,7 +239,6 @@ class Family extends Component
                 ];
             }
 
-            // Récupérer les invitations en attente
             $pendingInvitations = FamilyInvitation::where('family_id', $this->form->family->id)
                 ->orderBy('created_at', 'desc')
                 ->get();

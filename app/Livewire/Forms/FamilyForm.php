@@ -5,8 +5,9 @@ namespace App\Livewire\Forms;
 use App\Enums\FamilyPermissionEnum;
 use App\Enums\FamilyRelationEnum;
 use App\Jobs\SendFamilyInvitation;
-use App\Models\Family as FamilyModel;
+use App\Models\Family;
 use App\Models\FamilyInvitation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -16,7 +17,7 @@ use Masmerise\Toaster\Toaster;
 
 class FamilyForm extends Form
 {
-    public ?FamilyModel $family = null;
+    public ?Family $family = null;
 
     #[Validate]
     public string $familyName = '';
@@ -59,22 +60,26 @@ class FamilyForm extends Form
         ];
     }
 
-    public function setFamily($family): void
+    public function setFamily(?Family $family): void
     {
         $this->family = $family;
 
-        if ($this->family) {
-            $permission = FamilyPermissionEnum::tryFrom(
-                $this->family->users()
-                    ->where('users.id', auth()->id())
-                    ->first()
-                    ->pivot->permission ?? 'viewer'
-            );
+        if (! $this->family) {
+            $this->isAdmin = $this->canEdit = false;
 
-            if ($permission) {
-                $this->isAdmin = $permission->isAdmin();
-                $this->canEdit = $permission->canEdit();
-            }
+            return;
+        }
+
+        $permission = FamilyPermissionEnum::tryFrom(
+            $this->family->users()
+                ->where('users.id', Auth::id())
+                ->first()
+                ?->pivot->permission ?? 'viewer'
+        );
+
+        if ($permission) {
+            $this->isAdmin = $permission->isAdmin();
+            $this->canEdit = $permission->canEdit();
         }
     }
 
@@ -85,19 +90,16 @@ class FamilyForm extends Form
         }
     }
 
-    public function create(): void
+    public function create(): ?Family
     {
         $this->validate(['familyName' => 'required|min:2|max:255']);
 
         try {
             DB::beginTransaction();
 
-            $family = FamilyModel::create([
-                'name' => $this->familyName,
-            ]);
+            $family = Family::create(['name' => $this->familyName]);
 
-            // Attacher l'utilisateur actuel à la famille avec le rôle Admin
-            $family->users()->attach(auth()->id(), [
+            $family->users()->attach(Auth::id(), [
                 'permission' => FamilyPermissionEnum::Admin->value,
                 'relation' => FamilyRelationEnum::Self->value,
                 'is_admin' => true,
@@ -105,69 +107,70 @@ class FamilyForm extends Form
 
             DB::commit();
 
-            $this->reset(['familyName']);
-
-            // Mettre à jour les permissions
-            $this->isAdmin = true;
-            $this->canEdit = true;
-            $this->family = $family;
+            $this->reset('familyName');
+            $this->setFamily($family);
 
             Toaster::success('Famille créée avec succès');
 
-            return;
-
+            return $family;
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur de création de famille: '.$e->getMessage());
             Toaster::error('Erreur lors de la création de la famille::Vérifiez que le nom de la famille et réessayez.');
+
+            return null;
         }
     }
 
-    public function updateName(): void
+    public function updateName(): bool
     {
         $this->validate(['newFamilyName' => 'required|min:2|max:255']);
 
         if (! $this->family || ! $this->isAdmin) {
             Toaster::error('Vous n\'avez pas les permissions pour modifier le nom de la famille.');
 
-            return;
+            return false;
         }
 
         try {
             $this->family->update(['name' => $this->newFamilyName]);
-            $this->reset(['newFamilyName']);
+            $this->reset('newFamilyName');
 
             Toaster::success('Nom de famille modifié avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur modification nom famille: '.$e->getMessage());
             Toaster::error('Erreur lors de la modification du nom de famille');
+
+            return false;
         }
     }
 
-    public function delete(): void
+    public function delete(): bool
     {
         if (! $this->family || ! $this->isAdmin) {
             Toaster::error('Vous n\'avez pas les permissions pour supprimer la famille.');
 
-            return;
+            return false;
         }
 
         try {
             $this->family->delete();
-
-            // Réinitialiser les permissions
-            $this->isAdmin = false;
-            $this->canEdit = false;
-            $this->family = null;
+            $this->setFamily(null);
 
             Toaster::success('Famille supprimée avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur suppression famille: '.$e->getMessage());
             Toaster::error('Erreur lors de la suppression de la famille');
+
+            return false;
         }
     }
 
-    public function sendInvitation(): void
+    public function sendInvitation(): bool
     {
         $this->validate([
             'memberEmail' => 'required|email',
@@ -178,209 +181,238 @@ class FamilyForm extends Form
         if (! $this->family || ! $this->canEdit) {
             Toaster::error('Vous n\'avez pas les permissions pour inviter un membre.');
 
-            return;
+            return false;
         }
 
-        // Si l'utilisateur est éditeur mais pas admin, il ne peut pas inviter un admin
         if (! $this->isAdmin && $this->memberPermission === FamilyPermissionEnum::Admin->value) {
             Toaster::error('Seul un administrateur peut attribuer le rôle d\'administrateur.');
 
-            return;
+            return false;
         }
 
-        // Vérifications en une seule requête
-        $existingUser = DB::table('users')
-            ->where('email', $this->memberEmail)
+        $memberExists = DB::table('family_user')
+            ->where('family_id', $this->family->id)
+            ->join('users', 'family_user.user_id', '=', 'users.id')
+            ->where('users.email', $this->memberEmail)
             ->exists();
 
-        if ($existingUser) {
-            $memberExists = DB::table('family_user')
-                ->where('family_id', $this->family->id)
-                ->join('users', 'family_user.user_id', '=', 'users.id')
-                ->where('users.email', $this->memberEmail)
-                ->exists();
+        if ($memberExists) {
+            Toaster::error('Cet utilisateur est déjà membre de la famille.');
 
-            if ($memberExists) {
-                Toaster::error('Cet utilisateur est déjà membre de la famille.');
-            }
+            return false;
         }
 
-        // Vérifier si une invitation a déjà été envoyée à l'email
         $invitationExists = FamilyInvitation::where('family_id', $this->family->id)
             ->where('email', $this->memberEmail)
             ->exists();
 
         if ($invitationExists) {
             Toaster::error('Une invitation a déjà été envoyée à cet email.');
+
+            return false;
         }
 
         try {
-            $token = Str::uuid();
             $permission = FamilyPermissionEnum::tryFrom($this->memberPermission);
-            $isAdmin = $permission && $permission->isAdmin();
-
-            // Créer l'invitation
             $invitation = FamilyInvitation::create([
                 'family_id' => $this->family->id,
-                'invited_by' => auth()->id(),
+                'invited_by' => Auth::id(),
                 'email' => $this->memberEmail,
-                'token' => $token,
+                'token' => Str::uuid(),
                 'permission' => $this->memberPermission,
                 'relation' => $this->memberRelation,
-                'is_admin' => $isAdmin,
+                'is_admin' => $permission?->isAdmin() ?? false,
                 'expires_at' => now()->addDays(7),
                 'send_failed' => false,
             ]);
 
-            // Envoyer l'invitation email via un job
-            SendFamilyInvitation::dispatch(
-                $invitation,
-                $this->family,
-                auth()->user()
-            );
+            SendFamilyInvitation::dispatch($invitation, $this->family, Auth::user());
 
             $this->reset(['memberEmail', 'memberPermission', 'memberRelation']);
-
             Toaster::success('Invitation envoyée avec succès');
 
-            return;
-
+            return true;
         } catch (\Exception $e) {
             Log::error("Erreur d'envoi d'invitation: ".$e->getMessage());
             Toaster::error("Erreur lors de l'envoi d'invitation::Vérifiez correctement cette adresse email et réessayez.");
 
-            return;
+            return false;
         }
     }
 
-    public function changeRole(int $userId, string $newRole): void
+    public function createInvitations(array $invitationData): int
+    {
+        if (! $this->family || ! $this->canEdit) {
+            Toaster::error('Vous n\'avez pas les permissions pour inviter des membres.');
+
+            return 0;
+        }
+
+        $sentCount = 0;
+
+        foreach ($invitationData as $member) {
+            try {
+                $permission = FamilyPermissionEnum::tryFrom($member['permission']);
+
+                if (! $this->isAdmin && $permission === FamilyPermissionEnum::Admin) {
+                    continue;
+                }
+
+                $invitation = FamilyInvitation::create([
+                    'family_id' => $this->family->id,
+                    'invited_by' => Auth::id(),
+                    'email' => $member['email'],
+                    'token' => Str::uuid(),
+                    'permission' => $member['permission'],
+                    'relation' => $member['relation'],
+                    'is_admin' => $permission?->isAdmin() ?? false,
+                    'expires_at' => now()->addDays(7),
+                    'send_failed' => false,
+                ]);
+
+                SendFamilyInvitation::dispatch($invitation, $this->family, Auth::user());
+                $sentCount++;
+            } catch (\Exception $e) {
+                Log::error("Erreur d'envoi d'invitation: ".$e->getMessage());
+            }
+        }
+
+        return $sentCount;
+    }
+
+    public function changeRole(int $userId, string $newRole): bool
     {
         if (! $this->family || ! $this->isAdmin) {
             Toaster::error('Vous n\'avez pas les permissions pour modifier les rôles.');
 
-            return;
+            return false;
         }
 
-        // Vérifier que le nouveau rôle est valide avec l'enum
         $permission = FamilyPermissionEnum::tryFrom($newRole);
         if (! $permission) {
             Toaster::error('Rôle invalide.');
 
-            return;
+            return false;
         }
 
         try {
-            // Mettre à jour le rôle du membre
-            DB::table('family_user')
-                ->where('family_id', $this->family->id)
-                ->where('user_id', $userId)
-                ->update([
-                    'permission' => $newRole,
-                    'is_admin' => $permission->isAdmin(),
-                ]);
+            $this->family->users()->updateExistingPivot($userId, [
+                'permission' => $newRole,
+                'is_admin' => $permission->isAdmin(),
+            ]);
 
             Toaster::success('Rôle modifié avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur modification rôle: '.$e->getMessage());
             Toaster::error('Erreur lors de la modification du rôle');
+
+            return false;
         }
     }
 
-    public function deleteMember(int $userId): void
+    public function deleteMember(int $userId): bool
     {
         if (! $this->family || ! $this->isAdmin) {
             Toaster::error('Vous n\'avez pas les permissions pour supprimer le membre.');
 
-            return;
+            return false;
         }
 
         try {
-            DB::table('family_user')
-                ->where('family_id', $this->family->id)
-                ->where('user_id', $userId)
-                ->delete();
-
+            $this->family->users()->detach($userId);
             Toaster::success('Membre supprimé avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur suppression membre: '.$e->getMessage());
             Toaster::error('Erreur lors de la suppression du membre');
+
+            return false;
         }
     }
 
-    public function deleteAllMembers(): void
+    public function deleteAllMembers(): bool
     {
         if (! $this->family || ! $this->isAdmin) {
             Toaster::error('Vous n\'avez pas les permissions pour supprimer les membres.');
 
-            return;
+            return false;
         }
 
         try {
-            // Détacher tous les membres sauf l'utilisateur actuel en une seule requête
-            DB::table('family_user')
-                ->where('family_id', $this->family->id)
-                ->where('user_id', '!=', auth()->id())
-                ->delete();
-
+            $this->family->users()->wherePivot('user_id', '!=', Auth::id())->detach();
             Toaster::success('Membres supprimés avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur suppression membres: '.$e->getMessage());
             Toaster::error('Erreur lors de la suppression des membres');
+
+            return false;
         }
     }
 
-    public function resendInvitation(int $invitationId): void
+    public function resendInvitation(int $invitationId): bool
     {
         if (! $this->canEdit) {
             Toaster::error('Vous n\'avez pas les permissions nécessaires.');
 
-            return;
+            return false;
         }
 
         try {
-            // Récupérer l'invitation avec sa famille en une seule requête
-            $invitation = FamilyInvitation::with('family')
-                ->where('id', $invitationId)
-                ->first();
+            $invitation = FamilyInvitation::whereHas('family', function ($query) {
+                $query->where('id', $this->family->id);
+            })->find($invitationId);
 
             if (! $invitation) {
-                Toaster::error('Invitation non trouvée.');
+                Toaster::error('Invitation non trouvée ou n\'appartient pas à votre famille.');
 
-                return;
+                return false;
             }
 
-            // Vérifier que l'invitation appartient à la famille de l'utilisateur
-            if ($invitation->family->id !== $this->family->id) {
-                Toaster::error('Cette invitation n\'appartient pas à votre famille.');
-
-                return;
-            }
-
-            // Renvoyer l'invitation
             $invitation->resend();
-
             Toaster::success('Invitation renvoyée avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur renvoi invitation: '.$e->getMessage());
             Toaster::error('Erreur lors du renvoi de l\'invitation');
+
+            return false;
         }
     }
 
-    public function deleteInvitation(int $invitationId): void
+    public function deleteInvitation(int $invitationId): bool
     {
         if (! $this->canEdit) {
             Toaster::error('Vous n\'avez pas les permissions nécessaires.');
 
-            return;
+            return false;
         }
 
         try {
-            FamilyInvitation::destroy($invitationId);
+            $invitation = FamilyInvitation::whereHas('family', function ($query) {
+                $query->where('id', $this->family->id);
+            })->find($invitationId);
 
+            if (! $invitation) {
+                Toaster::error('Invitation non trouvée ou n\'appartient pas à votre famille.');
+
+                return false;
+            }
+
+            $invitation->delete();
             Toaster::success('Invitation supprimée avec succès');
+
+            return true;
         } catch (\Exception $e) {
             Log::error('Erreur suppression invitation: '.$e->getMessage());
             Toaster::error('Erreur lors de la suppression de l\'invitation');
+
+            return false;
         }
     }
 }

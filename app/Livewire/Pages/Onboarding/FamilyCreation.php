@@ -4,12 +4,10 @@ namespace App\Livewire\Pages\Onboarding;
 
 use App\Enums\FamilyPermissionEnum;
 use App\Enums\FamilyRelationEnum;
-use App\Jobs\SendFamilyInvitation;
 use App\Livewire\Forms\FamilyForm;
-use App\Models\FamilyInvitation;
+use App\Services\FamilyService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,10 +22,18 @@ class FamilyCreation extends Component
 
     public array $members = [];
 
+    protected FamilyService $familyService;
+
+    public function boot(FamilyService $familyService)
+    {
+        $this->familyService = $familyService;
+    }
+
     public function mount()
     {
+        // Rediriger si l'utilisateur a déjà une famille
         if (Auth::user()->family()) {
-            $this->redirectRoute('dashboard');
+            return $this->redirectRoute('dashboard');
         }
 
         $this->addMember();
@@ -44,7 +50,7 @@ class FamilyCreation extends Component
         ];
     }
 
-    public function removeMember($index): void
+    public function removeMember(int $index): void
     {
         if (isset($this->members[$index])) {
             unset($this->members[$index]);
@@ -52,7 +58,7 @@ class FamilyCreation extends Component
         }
     }
 
-    public function validateMemberEmail($index): void
+    public function validateMemberEmail(int $index): void
     {
         if (! isset($this->members[$index])) {
             return;
@@ -72,18 +78,13 @@ class FamilyCreation extends Component
                 "members.$index.email" => [
                     'email',
                     function ($attribute, $value, $fail) use ($email) {
+                        // Ne pas s'inviter soi-même
                         if ($email === Auth::user()->email) {
                             $fail('Vous ne pouvez pas vous inviter vous-même');
                         }
 
-                        $count = 0;
-                        foreach ($this->members as $member) {
-                            if ($member['email'] === $email) {
-                                $count++;
-                            }
-                        }
-
-                        if ($count > 1) {
+                        // Pas de doublons dans la liste
+                        if (collect($this->members)->pluck('email')->filter()->countBy()->get($email, 0) > 1) {
                             $fail('Cet email est déjà dans la liste');
                         }
                     },
@@ -92,7 +93,6 @@ class FamilyCreation extends Component
 
             $this->members[$index]['valid'] = true;
             $this->members[$index]['error'] = '';
-
         } catch (ValidationException $e) {
             $this->members[$index]['valid'] = false;
             $this->members[$index]['error'] = $e->validator->errors()->first("members.$index.email");
@@ -138,9 +138,8 @@ class FamilyCreation extends Component
     public function submitForm(): void
     {
         try {
-            // Utiliser le formulaire pour créer la famille
-            $this->form->create();
-            $family = $this->form->family;
+            // Créer la famille en utilisant le formulaire
+            $family = $this->form->create();
 
             if (! $family) {
                 Toaster::error('Une erreur est survenue lors de la création de la famille');
@@ -148,48 +147,22 @@ class FamilyCreation extends Component
                 return;
             }
 
-            $invitationCount = 0;
+            // Filtrer les membres valides
+            $validMembers = $this->familyService->prepareInvitationsData($this->members, $family->id);
 
-            foreach ($this->members as $member) {
-                if (empty($member['email']) || ! $member['valid']) {
-                    continue;
-                }
-
-                $token = Str::uuid();
-                $permission = FamilyPermissionEnum::tryFrom($member['permission']);
-                $isAdmin = $permission && $permission->isAdmin();
-
-                $invitation = FamilyInvitation::create([
-                    'family_id' => $family->id,
-                    'invited_by' => Auth::id(),
-                    'email' => $member['email'],
-                    'token' => $token,
-                    'permission' => $member['permission'],
-                    'relation' => $member['relation'],
-                    'is_admin' => $isAdmin,
-                    'expires_at' => now()->addDays(7),
-                    'send_failed' => false,
-                ]);
-
-                SendFamilyInvitation::dispatch(
-                    $invitation,
-                    $family,
-                    Auth::user()
-                );
-
-                $invitationCount++;
-            }
+            // Utiliser le formulaire pour créer les invitations
+            $invitationsCount = $this->form->createInvitations($validMembers);
 
             $this->step = 4;
 
-            if ($invitationCount > 0) {
-                Toaster::success("Votre famille a été créée et $invitationCount invitation(s) ont été envoyées!");
+            if ($invitationsCount > 0) {
+                Toaster::success("Votre famille a été créée et $invitationsCount invitation(s) ont été envoyées!");
             } else {
                 Toaster::success('Votre famille a été créée avec succès!');
             }
         } catch (\Exception $e) {
-            Toaster::error('Une erreur est survenue lors de la création de la famille');
             Log::error('Erreur lors de la création de la famille: '.$e->getMessage());
+            Toaster::error('Une erreur est survenue lors de la création de la famille');
         }
     }
 
@@ -206,18 +179,15 @@ class FamilyCreation extends Component
 
     public function hasInvitedMembers(): bool
     {
-        return count(array_filter($this->members, fn ($member) => ! empty($member['email']))) > 0;
+        return collect($this->members)->pluck('email')->filter()->isNotEmpty();
     }
 
     public function render()
     {
-        $availablePermissions = FamilyPermissionEnum::getPermissionOptions();
-        $availableRelations = FamilyRelationEnum::getRelationOptions();
-
         return view('livewire.pages.onboarding.family-creation', [
             'familyName' => $this->form->familyName,
-            'availablePermissions' => $availablePermissions,
-            'availableRelations' => $availableRelations,
+            'availablePermissions' => FamilyPermissionEnum::getPermissionOptions(),
+            'availableRelations' => FamilyRelationEnum::getRelationOptions(),
         ])->layout('layouts.onboarding');
     }
 }

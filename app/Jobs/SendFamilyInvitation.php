@@ -20,24 +20,19 @@ class SendFamilyInvitation implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    // The number of attempts for the job.
     public int $tries = 3;
 
-    // The delay between attempts in seconds.
     public int $backoff = 10;
 
     public function __construct(
         public FamilyInvitationModel $invitation,
         public Family $family,
         public User $inviter
-    ) {
-        //
-    }
+    ) {}
 
     public function handle(): void
     {
         try {
-            // Check if the invitation still exists in the database
             if (! FamilyInvitationModel::find($this->invitation->id)) {
                 Log::info('Invitation already deleted, skipping email sending', [
                     'invitation_id' => $this->invitation->id,
@@ -54,17 +49,18 @@ class SendFamilyInvitation implements ShouldQueue
                 $this->invitation->relation
             ));
 
-            // Mark as successfully sent
             $this->invitation->update([
                 'send_failed' => false,
                 'send_error' => null,
                 'sent_at' => now(),
             ]);
 
-            // Update the cache to inform the user interface
-            Cache::put('invitation_status_'.$this->invitation->id, 'success', now()->addMinutes(10));
+            Cache::put(
+                "invitation_status_{$this->invitation->id}",
+                'success',
+                now()->addMinutes(10)
+            );
 
-            // Log success
             Log::info('Family invitation sent successfully', [
                 'invitation_id' => $this->invitation->id,
                 'email' => $this->invitation->email,
@@ -78,10 +74,12 @@ class SendFamilyInvitation implements ShouldQueue
                 'attempt' => $this->attempts(),
             ]);
 
-            // Update the cache to inform the user interface
-            Cache::put('invitation_status_'.$this->invitation->id, 'error:'.$e->getMessage(), now()->addMinutes(30));
+            Cache::put(
+                "invitation_status_{$this->invitation->id}",
+                "error:{$e->getMessage()}",
+                now()->addMinutes(30)
+            );
 
-            // If this is the last attempt, mark the error in the database
             if ($this->attempts() >= $this->tries) {
                 $this->invitation->update([
                     'send_failed' => true,
@@ -89,11 +87,7 @@ class SendFamilyInvitation implements ShouldQueue
                 ]);
             }
 
-            Log::error('Family invitation job failed', [
-                'invitation_id' => $this->invitation->id,
-                'email' => $this->invitation->email,
-                'attempt' => $this->attempts(),
-            ]);
+            throw $e;
         }
     }
 
@@ -105,13 +99,15 @@ class SendFamilyInvitation implements ShouldQueue
             'error' => $exception->getMessage(),
         ]);
 
-        // Update the database
         $this->invitation->update([
             'send_failed' => true,
             'send_error' => $exception->getMessage(),
         ]);
 
-        // Update the cache with final status
-        Cache::put('invitation_status_'.$this->invitation->id, 'failed:'.$exception->getMessage(), now()->addHours(1));
+        Cache::put(
+            "invitation_status_{$this->invitation->id}",
+            "failed:{$exception->getMessage()}",
+            now()->addHours(1)
+        );
     }
 }

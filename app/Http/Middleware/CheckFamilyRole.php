@@ -11,24 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckFamilyRole
 {
-    protected FamilyRoleService $roleService;
+    public function __construct(
+        protected FamilyRoleService $roleService
+    ) {}
 
-    public function __construct(FamilyRoleService $roleService)
-    {
-        $this->roleService = $roleService;
-    }
-
-    /**
-     * Handle incoming requests and check user's roles.
-     *
-     * @param  Request  $request  The incoming request.
-     * @param  Closure  $next  The next middleware in the pipeline.
-     * @param  string  ...$roles  The required roles for accessing the route.
-     * @return Response The response to the request.
-     */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        // Rediriger l'utilisateur non authentifié vers la page de connexion
         if (! Auth::check()) {
             return redirect()->route('login');
         }
@@ -36,7 +24,6 @@ class CheckFamilyRole
         $user = Auth::user();
         $family = $user->family();
 
-        // Traitement utilisateur sans famille
         if (! $family) {
             if ($request->routeIs('family')) {
                 return $next($request);
@@ -45,18 +32,19 @@ class CheckFamilyRole
             return redirect()->route('family');
         }
 
-        // Vérification des rôles
-        $hasRequiredRole = $this->checkUserRoles($user, $family, $roles);
-
-        if (! $hasRequiredRole) {
+        if (! $this->userHasRequiredRole($user, $family, $roles)) {
             return redirect()->route('family');
         }
 
         return $next($request);
     }
 
-    private function checkUserRoles($user, $family, array $roles): bool
+    private function userHasRequiredRole($user, $family, array $roles): bool
     {
+        if ($this->roleService->isAdmin($user, $family)) {
+            return true;
+        }
+
         foreach ($roles as $role) {
             $permissionEnum = FamilyPermissionEnum::tryFrom($role);
 
@@ -66,7 +54,7 @@ class CheckFamilyRole
 
             $hasRole = match ($permissionEnum) {
                 FamilyPermissionEnum::Admin => $this->roleService->isAdmin($user, $family),
-                FamilyPermissionEnum::Editor => $this->roleService->hasRole($user, $permissionEnum->value, $family),
+                FamilyPermissionEnum::Editor => $this->roleService->isEditorOrAbove($user, $family),
                 FamilyPermissionEnum::Viewer => $this->roleService->isViewer($user, $family),
             };
 

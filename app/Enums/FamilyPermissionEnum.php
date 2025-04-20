@@ -55,7 +55,7 @@ enum FamilyPermissionEnum: string
 
     public function canEdit(): bool
     {
-        return $this === self::Admin || $this === self::Editor;
+        return in_array($this, [self::Admin, self::Editor]);
     }
 
     public static function getPermissionOptions(): array
