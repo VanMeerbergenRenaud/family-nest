@@ -427,7 +427,9 @@ class InvoiceForm extends Form
         $this->type = $invoice->type instanceof \BackedEnum
             ? $invoice->type->value
             : $invoice->type;
-        $this->category = $invoice->category;
+        $this->category = $invoice->category instanceof \BackedEnum
+            ? $invoice->category->value
+            : $invoice->category;
         $this->issuer_name = $invoice->issuer_name;
         $this->issuer_website = $invoice->issuer_website;
 

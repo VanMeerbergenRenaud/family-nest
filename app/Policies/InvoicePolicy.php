@@ -2,14 +2,21 @@
 
 namespace App\Policies;
 
-use App\Enums\FamilyPermissionEnum;
 use App\Models\Invoice;
 use App\Models\User;
+use App\Services\FamilyRoleService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class InvoicePolicy
 {
     use HandlesAuthorization;
+
+    protected FamilyRoleService $familyRoleService;
+
+    public function __construct(FamilyRoleService $familyRoleService)
+    {
+        $this->familyRoleService = $familyRoleService;
+    }
 
     public function viewAny(User $user): bool
     {
@@ -22,9 +29,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        return $user->families()
-            ->where('family_id', $invoice->family_id)
-            ->exists();
+        return $this->familyRoleService->isViewer($user, $invoice->family);
     }
 
     public function create(User $user): bool
@@ -35,13 +40,7 @@ class InvoicePolicy
             return false;
         }
 
-        return $user->families()
-            ->where('family_id', $family->id)
-            ->whereIn('permission', [
-                FamilyPermissionEnum::Admin->value,
-                FamilyPermissionEnum::Editor->value,
-            ])
-            ->exists();
+        return $this->familyRoleService->isEditorOrAbove($user, $family);
     }
 
     public function update(User $user, Invoice $invoice): bool
@@ -50,13 +49,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        return $user->families()
-            ->where('family_id', $invoice->family_id)
-            ->whereIn('permission', [
-                FamilyPermissionEnum::Admin->value,
-                FamilyPermissionEnum::Editor->value,
-            ])
-            ->exists();
+        return $this->familyRoleService->isEditorOrAbove($user, $invoice->family);
     }
 
     public function archive(User $user, Invoice $invoice): bool
@@ -65,10 +58,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        return $user->families()
-            ->where('family_id', $invoice->family_id)
-            ->where('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
+        return $this->familyRoleService->isAdmin($user, $invoice->family);
     }
 
     public function delete(User $user, Invoice $invoice): bool
@@ -77,10 +67,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        return $user->families()
-            ->where('family_id', $invoice->family_id)
-            ->where('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
+        return $this->familyRoleService->isAdmin($user, $invoice->family);
     }
 
     public function share(User $user, Invoice $invoice): bool
@@ -89,12 +76,6 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        return $user->families()
-            ->where('family_id', $invoice->family_id)
-            ->whereIn('permission', [
-                FamilyPermissionEnum::Admin->value,
-                FamilyPermissionEnum::Editor->value,
-            ])
-            ->exists();
+        return $this->familyRoleService->isEditorOrAbove($user, $invoice->family);
     }
 }

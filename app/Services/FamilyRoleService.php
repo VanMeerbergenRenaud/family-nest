@@ -5,9 +5,29 @@ namespace App\Services;
 use App\Enums\FamilyPermissionEnum;
 use App\Models\Family;
 use App\Models\User;
+use Illuminate\Support\Collection;
 
 class FamilyRoleService
 {
+    protected array $permissionsCache = [];
+
+    /**
+     * Checks if the user has the administrator role in the given family.
+     * If no family is provided, it uses the user's default family.
+     */
+    protected function getUserFamilyPermissions(User $user, Family $family): Collection
+    {
+        $cacheKey = $user->id.'_'.$family->id;
+
+        if (! isset($this->permissionsCache[$cacheKey])) {
+            $this->permissionsCache[$cacheKey] = $user->families()
+                ->where('family_id', $family->id)
+                ->pluck('permission');
+        }
+
+        return $this->permissionsCache[$cacheKey];
+    }
+
     /**
      * Checks if the user has the administrator role in the given family.
      * If no family is provided, it uses the user's default family.
@@ -20,10 +40,9 @@ class FamilyRoleService
             return false;
         }
 
-        return $user->families()
-            ->where('family_id', $family->id)
-            ->wherePivot('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
+        $permissions = $this->getUserFamilyPermissions($user, $family);
+
+        return $permissions->contains(FamilyPermissionEnum::Admin->value);
     }
 
     /**
@@ -38,10 +57,10 @@ class FamilyRoleService
             return false;
         }
 
-        return $user->families()
-            ->where('family_id', $family->id)
-            ->whereIn('permission', [FamilyPermissionEnum::Admin->value, FamilyPermissionEnum::Editor->value])
-            ->exists();
+        $permissions = $this->getUserFamilyPermissions($user, $family);
+
+        return $permissions->contains(FamilyPermissionEnum::Admin->value) ||
+               $permissions->contains(FamilyPermissionEnum::Editor->value);
     }
 
     /**
@@ -56,8 +75,8 @@ class FamilyRoleService
             return false;
         }
 
-        return $user->families()
-            ->where('family_id', $family->id)
-            ->exists();
+        $permissions = $this->getUserFamilyPermissions($user, $family);
+
+        return $permissions->isNotEmpty();
     }
 }
