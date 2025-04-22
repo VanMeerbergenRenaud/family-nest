@@ -101,49 +101,4 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return FamilyPermissionEnum::tryFrom($pivotData->permission);
     }
-
-    // Check if the user is an admin in their family
-    public function isAdmin(): bool
-    {
-        $family = $this->family();
-
-        if (! $family) {
-            return false;
-        }
-
-        return $this->families()
-            ->wherePivot('family_id', $family->id)
-            ->wherePivot('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
-    }
-
-    // Check if the user is an editor in their family
-    public function isEditor(): bool
-    {
-        $family = $this->family();
-
-        if (! $family) {
-            return false;
-        }
-
-        return $this->families()
-            ->wherePivot('family_id', $family->id)
-            ->wherePivot('permission', FamilyPermissionEnum::Editor->value)
-            ->exists();
-    }
-
-    // Check if the user is a viewer in their family
-    public function isViewer(): bool
-    {
-        $family = $this->family();
-
-        if (! $family) {
-            return false;
-        }
-
-        return $this->families()
-            ->wherePivot('family_id', $family->id)
-            ->wherePivot('permission', FamilyPermissionEnum::Viewer->value)
-            ->exists();
-    }
 }

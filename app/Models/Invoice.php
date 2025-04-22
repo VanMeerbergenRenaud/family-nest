@@ -44,7 +44,7 @@ class Invoice extends Model
         'is_favorite' => 'boolean',
     ];
 
-    protected $with = ['file'];
+    protected $with = ['file', 'family', 'sharedUsers'];
 
     public function user(): BelongsTo
     {
@@ -64,6 +64,11 @@ class Invoice extends Model
         return $this->belongsToMany(User::class, 'invoice_user')
             ->withPivot('share_amount', 'share_percentage')
             ->withTimestamps();
+    }
+
+    public function family(): BelongsTo
+    {
+        return $this->belongsTo(Family::class);
     }
 
     // Get the user who paid the invoice

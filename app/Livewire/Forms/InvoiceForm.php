@@ -229,22 +229,6 @@ class InvoiceForm extends Form
         }
     }
 
-    private function processInvoiceShares(Invoice $invoice): void
-    {
-        $invoice->sharedUsers()->detach();
-
-        if (! empty($this->user_shares)) {
-            foreach ($this->user_shares as $share) {
-                if (isset($share['id']) && (floatval($share['amount'] ?? 0) > 0 || floatval($share['percentage'] ?? 0) > 0)) {
-                    $invoice->sharedUsers()->attach($share['id'], [
-                        'share_amount' => $share['amount'] ?? null,
-                        'share_percentage' => $share['percentage'] ?? null,
-                    ]);
-                }
-            }
-        }
-    }
-
     // Create or update invoice
     public function saveInvoice(FileStorageService $fileStorageService)
     {
@@ -440,7 +424,9 @@ class InvoiceForm extends Form
         // Informations générales
         $this->name = $invoice->name;
         $this->reference = $invoice->reference;
-        $this->type = $invoice->type;
+        $this->type = $invoice->type instanceof \BackedEnum
+            ? $invoice->type->value
+            : $invoice->type;
         $this->category = $invoice->category;
         $this->issuer_name = $invoice->issuer_name;
         $this->issuer_website = $invoice->issuer_website;
@@ -489,12 +475,20 @@ class InvoiceForm extends Form
         $this->issued_date = $invoice->issued_date ? date('Y-m-d', strtotime($invoice->issued_date)) : null;
         $this->payment_due_date = $invoice->payment_due_date ? date('Y-m-d', strtotime($invoice->payment_due_date)) : null;
         $this->payment_reminder = $invoice->payment_reminder ? date('Y-m-d', strtotime($invoice->payment_reminder)) : null;
-        $this->payment_frequency = $invoice->payment_frequency;
+        $this->payment_frequency = $invoice->payment_frequency instanceof \BackedEnum
+            ? $invoice->payment_frequency->value
+            : $invoice->payment_frequency;
 
         // Statut de paiement
-        $this->payment_status = $invoice->payment_status;
-        $this->payment_method = $invoice->payment_method;
-        $this->priority = $invoice->priority;
+        $this->payment_status = $invoice->payment_status instanceof \BackedEnum
+            ? $invoice->payment_status->value
+            : $invoice->payment_status;
+        $this->payment_method = $invoice->payment_method instanceof \BackedEnum
+            ? $invoice->payment_method->value
+            : $invoice->payment_method;
+        $this->priority = $invoice->priority instanceof \BackedEnum
+            ? $invoice->priority->value
+            : $invoice->priority;
 
         // Notes et tags
         $this->notes = $invoice->notes;
@@ -544,5 +538,47 @@ class InvoiceForm extends Form
         $amount = str_replace(',', '.', $amount);
 
         return (float) number_format((float) $amount, 2, '.', '');
+    }
+
+    /**
+     * Normalise les montants des parts avant la sauvegarde
+     * Sans forcer automatiquement une répartition à 100% ou au montant total
+     */
+    private function normalizeShares(): void
+    {
+        if (empty($this->user_shares)) {
+            return;
+        }
+
+        // Simplement normaliser les valeurs numériques sans ajuster les totaux
+        foreach ($this->user_shares as &$share) {
+            // Normaliser le pourcentage et le montant à 2 décimales
+            $share['percentage'] = round(floatval($share['percentage'] ?? 0), 2);
+            $share['amount'] = round(floatval($share['amount'] ?? 0), 2);
+        }
+    }
+
+    /**
+     * Traite les parts d'utilisateurs avant de les sauvegarder
+     */
+    private function processInvoiceShares(Invoice $invoice): void
+    {
+        // Normaliser les parts sans forcer le total à 100% ou au montant complet
+        $this->normalizeShares();
+
+        // Détacher toutes les parts existantes
+        $invoice->sharedUsers()->detach();
+
+        // Si des parts sont définies, les attacher
+        if (! empty($this->user_shares)) {
+            foreach ($this->user_shares as $share) {
+                if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
+                    $invoice->sharedUsers()->attach($share['id'], [
+                        'share_amount' => $share['amount'],
+                        'share_percentage' => $share['percentage'],
+                    ]);
+                }
+            }
+        }
     }
 }

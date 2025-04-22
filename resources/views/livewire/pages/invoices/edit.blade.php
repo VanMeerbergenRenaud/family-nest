@@ -148,7 +148,7 @@
                         class="grid grid-cols-1 gap-4 "
                     >
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
+                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="exemple : Facture Internet - Octobre 2024" :asterix="true" />
                             <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="INV-12345" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -285,7 +285,7 @@
                                                     <div class="flex items-center">
                                                         <input
                                                             type="number"
-                                                            step="1"
+                                                            step="0.01"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
                                                             wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"

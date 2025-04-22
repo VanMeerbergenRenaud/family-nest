@@ -519,7 +519,7 @@
                                     @php
                                         $statusEnum = $invoice->payment_status;
                                         $statusColor = $statusEnum?->color() ?? 'gray';
-                                        $statusClass = "bg-$statusColor-100 text-{$statusColor}-800";
+                                        $statusClass = "bg-$statusColor-100 text-$statusColor-800";
                                         $statusText = $statusEnum?->label() ?? 'Non spécifié';
                                         $statusEmoji = $statusEnum?->emoji() ?? '';
                                     @endphp
@@ -761,7 +761,7 @@
                                             @php
                                                 $statusEnum = $invoice->payment_status;
                                                 $statusColor = $statusEnum?->color() ?? 'gray';
-                                                $statusClass = "bg-{$statusColor}-100 text-{$statusColor}-800";
+                                                $statusClass = "bg-$statusColor-100 text-$statusColor-800";
                                                 $statusText = $statusEnum?->label() ?? 'Non spécifié';
                                                 $statusEmoji = $statusEnum?->emoji() ?? '';
                                             @endphp
@@ -769,18 +769,22 @@
                                                 {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}
                                             </span>
 
+
                                             <div class="flex gap-1">
                                                 <button wire:click="showInvoiceModal({{ $invoice->id }})"
                                                         class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                                         title="Voir">
                                                     <x-svg.show class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
                                                 </button>
-                                                <a href="{{ route('invoices.edit', $invoice->id) }}"
-                                                   wire:navigate
-                                                   class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                                   title="Aller vers la page d'édition">
-                                                    <x-svg.edit class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
-                                                </a>
+
+                                                @can('update', $invoice)
+                                                    <a href="{{ route('invoices.edit', $invoice->id) }}"
+                                                       wire:navigate
+                                                       class="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                                                       title="Aller vers la page d'édition">
+                                                        <x-svg.edit class="w-4 h-4 text-gray-500 dark:text-gray-400"/>
+                                                    </a>
+                                                @endcan
                                             </div>
                                         </div>
                                     </div>

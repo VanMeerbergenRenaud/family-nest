@@ -60,6 +60,7 @@
                                 type="button"
                                 wire:click="processOcr"
                                 wire:loading.attr="disabled"
+                                x-show="currentStep < steps.length"
                                 class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
                             >
                                 <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
@@ -79,7 +80,7 @@
                         class="grid grid-cols-1 gap-4 "
                     >
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="ex : Facture Internet - Octobre 2024" :asterix="true" />
+                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="exemple : Facture Internet - Octobre 2024" :asterix="true" />
                             <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="INV-12345" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -206,7 +207,7 @@
                                                     <div class="flex items-center">
                                                         <input
                                                             type="number"
-                                                            step="1"
+                                                            step="0.01"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
                                                             wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"

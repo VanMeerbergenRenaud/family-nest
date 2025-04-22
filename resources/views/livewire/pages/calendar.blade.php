@@ -1,6 +1,6 @@
 <div>
     <x-empty-state
-        title="Aucun date n'a été déterminé pour l'instant"
+        title="Aucune date n'a été déterminé pour l'instant"
         description="Vous êtes déterminé à mieux gérer vos finances et vos factures ? N’hésitez pas à vous fixer des dates pour vos factures, que ce soit pour vos abonnements ou vos dépenses par exemple."
     >
         <a href="{{ route('invoices.index') }}" class="button-tertiary" title="Vers la page des factures">

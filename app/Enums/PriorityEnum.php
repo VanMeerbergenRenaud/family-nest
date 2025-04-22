@@ -32,7 +32,7 @@ enum PriorityEnum: string
         return match ($this) {
             self::Critical => '🚨',
             self::High => '📈',
-            self::Medium => '⏰',
+            self::Medium => '〰️',
             self::Low => '📉',
             self::Minimal => '📏',
             self::None => '⭕',
