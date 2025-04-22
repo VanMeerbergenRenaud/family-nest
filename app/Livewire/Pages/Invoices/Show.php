@@ -7,6 +7,7 @@ use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Models\Invoice;
+use App\Traits\InvoiceComponentTrait;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use Livewire\Attributes\Title;
@@ -15,6 +16,7 @@ use Livewire\Component;
 #[Title('Détails de facture')]
 class Show extends Component
 {
+    use InvoiceComponentTrait;
     use InvoiceFileUrlTrait;
     use InvoiceShareCalculationTrait;
 
@@ -34,39 +36,21 @@ class Show extends Component
 
     public function mount($id)
     {
+        // Récupérer la facture avec ses relations
         $this->invoice = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
-        // Préparation des membres de la famille d'abord
-        $this->prepareFamilyMembers();
+        // Charger les membres de la famille et préparer les données du formulaire
+        $this->loadFamilyMembers();
         $this->prepareFormData();
 
-        // Génération des informations du fichier
+        // Récupérer les informations du fichier
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
-    }
-
-    private function prepareFamilyMembers(): void
-    {
-        $family = auth()->user()->family();
-
-        // Si l'utilisateur a une famille
-        if ($family) {
-            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
-            $this->family_members = $family->users()->get();
-        } else {
-            // Si pas de famille, n'inclure que l'utilisateur authentifié
-            $this->family_members = collect([auth()->user()]);
-        }
-
-        // S'assurer que l'utilisateur authentifié est dans la liste
-        if (! $this->family_members->contains('id', auth()->id())) {
-            $this->family_members->prepend(auth()->user());
-        }
     }
 
     private function prepareFormData(): void
@@ -109,31 +93,24 @@ class Show extends Component
             'user_shares' => [],
         ];
 
-        if (! $this->form->paid_by_user_id) {
-            $this->form->paid_by_user_id = auth()->id();
-        }
+        // Initialiser les parts utilisateur
+        $this->prepareShares();
+        $this->initializeShares();
+    }
 
-        if ($this->invoice->sharedUsers->isEmpty()) {
-            if ($this->invoice->amount > 0) {
-                $payerId = $this->form->paid_by_user_id;
-                $this->form->user_shares[] = [
-                    'id' => $payerId,
-                    'amount' => $this->invoice->amount,
-                    'percentage' => 100,
-                ];
-            }
-        } else {
+    private function prepareShares(): void
+    {
+        // Si aucune part n'est définie, laisser le tableau vide
+        // La méthode initializeShares() se chargera de créer une part pour le payeur si nécessaire
+        if (! $this->invoice->sharedUsers->isEmpty()) {
             foreach ($this->invoice->sharedUsers as $user) {
                 $this->form->user_shares[] = [
                     'id' => $user->id,
-                    'amount' => $user->pivot->share_amount ?? 0,
-                    'percentage' => $user->pivot->share_percentage ?? 0,
+                    'amount' => floatval($user->pivot->share_amount ?? 0),
+                    'percentage' => floatval($user->pivot->share_percentage ?? 0),
                 ];
             }
         }
-
-        $this->initializeUserShares();
-        $this->calculateRemainingShares();
     }
 
     public function render()

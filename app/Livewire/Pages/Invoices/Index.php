@@ -7,6 +7,7 @@ use App\Enums\PriorityEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Traits\ColumnPreferencesTrait;
+use App\Traits\InvoiceComponentTrait;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use Illuminate\Support\Facades\Request;
@@ -20,6 +21,7 @@ use Masmerise\Toaster\Toaster;
 class Index extends Component
 {
     use ColumnPreferencesTrait;
+    use InvoiceComponentTrait;
     use InvoiceFileUrlTrait;
     use InvoiceShareCalculationTrait;
     use WithPagination;
@@ -40,7 +42,6 @@ class Index extends Component
 
     public bool $showSidebarInvoiceDetails = false;
 
-    // Ajouter les propriétés pour les modales de dossiers
     public bool $showFolderModal = false;
 
     public string $currentFolder = '';
@@ -55,6 +56,15 @@ class Index extends Component
 
     public $selectedPaymentStatus = null;
 
+    public $family_members = [];
+
+    // Filtres et tri
+    public $sortField = 'name';
+
+    public $sortDirection = 'desc';
+
+    public $activeFilter = null;
+
     // Filtres disponibles
     public $availableFilters = [
         'name_asc' => 'Par ordre alphabétique (A-Z)',
@@ -67,20 +77,11 @@ class Index extends Component
         'amount_desc' => 'Montant (du plus cher au moins cher)',
     ];
 
-    public $family_members = [];
-
     protected $queryString = [
         'sortField' => ['except' => 'name'],
         'sortDirection' => ['except' => 'desc'],
         'activeFilter' => ['except' => null],
     ];
-
-    // Filtres et colonnes...
-    public $sortField = 'name';
-
-    public $sortDirection = 'desc';
-
-    public $activeFilter = null;
 
     public function mount()
     {
@@ -91,33 +92,13 @@ class Index extends Component
         $this->initializeColumnPreferences();
     }
 
-    private function prepareFamilyMembers(): void
-    {
-        $family = auth()->user()->family();
-
-        // Si l'utilisateur a une famille
-        if ($family) {
-            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
-            $this->family_members = $family->users()->get();
-        } else {
-            // Si pas de famille, n'inclure que l'utilisateur authentifié
-            $this->family_members = collect([auth()->user()]);
-        }
-
-        // S'assurer que l'utilisateur authentifié est dans la liste
-        if (! $this->family_members->contains('id', auth()->id())) {
-            $this->family_members->prepend(auth()->user());
-        }
-    }
-
     public function showSidebarInvoice($id): void
     {
         $this->invoice = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
-        $this->prepareFamilyMembers();
-
+        $this->loadFamilyMembers();
         $this->showSidebarInvoiceDetails = true;
     }
 
@@ -126,7 +107,6 @@ class Index extends Component
         $this->showSidebarInvoiceDetails = ! $this->showSidebarInvoiceDetails;
     }
 
-    // Méthodes pour le dossier
     public function openFolder($folder, $title): void
     {
         $this->currentFolder = $folder;
@@ -136,7 +116,7 @@ class Index extends Component
             ->with('file')
             ->where('is_archived', false);
 
-        // Requête commune à tous les dossiers
+        // Définir la requête en fonction du dossier sélectionné
         switch ($folder) {
             case 'favorites':
                 $query->where('is_favorite', true);
@@ -167,49 +147,30 @@ class Index extends Component
         $this->showFolderModal = true;
     }
 
-    // Méthode pour obtenir les statistiques des dossiers
     public function getFolderStats(): array
     {
         $invoice = auth()->user()->invoices
             ->where('is_archived', false);
 
         return [
-            'favorites' => [
-                'count' => $invoice->where('is_favorite', true)->count(),
-                'amount' => $invoice->where('is_favorite', true)->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('is_favorite', true)),
-            ],
-            'paid' => [
-                'count' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->count(),
-                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Paid->value)->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Paid->value)),
-            ],
-            'unpaid' => [
-                'count' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->count(),
-                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)),
-            ],
-            'late' => [
-                'count' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->count(),
-                'amount' => $invoice->where('payment_status', PaymentStatusEnum::Late->value)->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('payment_status', PaymentStatusEnum::Late->value)),
-            ],
-            'high_priority' => [
-                'count' => $invoice->where('priority', PriorityEnum::High->value)->count(),
-                'amount' => $invoice->where('priority', PriorityEnum::High->value)->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('priority', PriorityEnum::High->value)),
-            ],
-            'last_week' => [
-                'count' => $invoice->where('issued_date', '>=', now()->subWeek())->count(),
-                'amount' => $invoice->where('issued_date', '>=', now()->subWeek())->sum('amount'),
-                'currency' => $this->getMostCommonCurrency($invoice->where('issued_date', '>=', now()->subWeek())),
-            ],
+            'favorites' => $this->calculateFolderStats($invoice->where('is_favorite', true)),
+            'paid' => $this->calculateFolderStats($invoice->where('payment_status', PaymentStatusEnum::Paid->value)),
+            'unpaid' => $this->calculateFolderStats($invoice->where('payment_status', PaymentStatusEnum::Unpaid->value)),
+            'late' => $this->calculateFolderStats($invoice->where('payment_status', PaymentStatusEnum::Late->value)),
+            'high_priority' => $this->calculateFolderStats($invoice->where('priority', PriorityEnum::High->value)),
+            'last_week' => $this->calculateFolderStats($invoice->where('issued_date', '>=', now()->subWeek())),
         ];
     }
 
-    /**
-     * Détermine le symbole de devise la plus utilisée dans le folder de factures
-     */
+    private function calculateFolderStats($invoices): array
+    {
+        return [
+            'count' => $invoices->count(),
+            'amount' => $invoices->sum('amount'),
+            'currency' => $this->getMostCommonCurrency($invoices),
+        ];
+    }
+
     private function getMostCommonCurrency($invoices): string
     {
         $currencies = $invoices->pluck('currency')->groupBy(function ($currency) {
@@ -220,7 +181,6 @@ class Index extends Component
             return $group->count();
         })->keys()->first();
 
-        // get the symbol for the most common currency
         $this->form = (object) [
             'currency' => $mostCommonCurrency ?? 'EUR',
         ];
@@ -228,9 +188,6 @@ class Index extends Component
         return $this->getCurrencySymbol();
     }
 
-    /**
-     * Récupère le symbole correct pour une facture donnée
-     */
     public function getInvoiceCurrencySymbol($invoice): string
     {
         $this->form = (object) [
@@ -240,9 +197,6 @@ class Index extends Component
         return $this->getCurrencySymbol();
     }
 
-    /**
-     * Formate un montant avec le symbole de la devise appropriée
-     */
     public function formatAmount($amount, $currency = 'EUR'): string
     {
         $this->form = (object) [
@@ -254,7 +208,6 @@ class Index extends Component
         return number_format($amount, 2, ',', ' ').' '.$symbol;
     }
 
-    // Méthodes de filtrage
     public function applyFilter($filter): void
     {
         if (empty($filter)) {
@@ -284,35 +237,6 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function toggleColumn($column): void
-    {
-        if (isset($this->visibleColumns[$column])) {
-            $this->visibleColumns[$column] = ! $this->visibleColumns[$column];
-        }
-    }
-
-    public function isColumnVisible($column): bool
-    {
-        return isset($this->visibleColumns[$column]) && $this->visibleColumns[$column];
-    }
-
-    public function resetColumns(): void
-    {
-        $this->visibleColumns = [
-            'name' => true,
-            'type' => false,
-            'category' => false,
-            'issuer_name' => false,
-            'amount' => true,
-            'issued_date' => true,
-            'payment_status' => false,
-            'payment_due_date' => false,
-            'tags' => true,
-        ];
-
-        $this->js('window.location.reload()');
-    }
-
     public function sortBy($field): void
     {
         $this->activeFilter = null;
@@ -334,7 +258,6 @@ class Index extends Component
         $this->showFolderModal = false;
     }
 
-    // Implémentations des fonctionnalités manquantes
     public function downloadAllFiles(): void
     {
         Toaster::error('Méthode de téléchargement de plusieurs fichiers non implémentée.');
@@ -363,7 +286,6 @@ class Index extends Component
             }
 
             // Pour les gros fichiers, utilisez une redirection avec entêtes modifiés
-            // Générer une URL présignée avec paramètres spécifiques
             $client = Storage::disk('s3')->getClient();
             $bucket = config('filesystems.disks.s3.bucket');
 
@@ -413,7 +335,7 @@ class Index extends Component
                 return;
             }
 
-            // Check if the user can make changes to the selected invoices
+            // Vérifier les permissions
             foreach ($invoices as $invoice) {
                 if (! auth()->user()->can('update', $invoice)) {
                     Toaster::error('Vous n\'avez pas la permission de modifier cette facture.');
@@ -445,7 +367,6 @@ class Index extends Component
         }
     }
 
-    // Méthode auxiliaire pour déterminer le type de contenu
     private function getContentType($extension): string
     {
         $contentTypes = [
@@ -460,23 +381,6 @@ class Index extends Component
         ];
 
         return $contentTypes[strtolower($extension)] ?? 'application/octet-stream';
-    }
-
-    public function getS3FileUrl($invoiceId): ?string
-    {
-        $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)->where('is_primary', true)->first();
-
-        if (! $invoiceFile) {
-            return null;
-        }
-
-        $s3FilePath = $invoiceFile->getRawOriginal('file_path');
-
-        if (Storage::disk('s3')->exists($s3FilePath)) {
-            return Storage::disk('s3')->url($s3FilePath);
-        }
-
-        return null;
     }
 
     public function showInvoiceModal($id): void
@@ -534,7 +438,7 @@ class Index extends Component
             return;
         }
 
-        // Check if the user can archive the selected invoices
+        // Vérifier les factures et les permissions
         $invoices = Invoice::whereIn('id', $this->selectedInvoiceIds)
             ->where('is_archived', false)
             ->where('user_id', auth()->id())
@@ -594,11 +498,12 @@ class Index extends Component
 
             $newInvoice = $originalInvoice->replicate();
             $newInvoice->name = $originalInvoice->name.' (version copiée)';
-            $newInvoice->is_favorite = false; // Ne pas copier l'état favori
+            $newInvoice->is_favorite = false;
             $newInvoice->created_at = now();
             $newInvoice->updated_at = now();
             $newInvoice->save();
 
+            // Copier le fichier associé
             if ($originalInvoice->file) {
                 $originalFile = $originalInvoice->file;
                 $newFile = $originalFile->replicate();
@@ -606,6 +511,7 @@ class Index extends Component
                 $newFile->save();
             }
 
+            // Copier les tags
             if ($originalInvoice->tags) {
                 $newInvoice->tags = $originalInvoice->tags;
                 $newInvoice->save();

@@ -10,6 +10,7 @@ use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Services\FileStorageService;
 use App\Services\TextractService;
+use App\Traits\InvoiceComponentTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceTagManagement;
 use Illuminate\Support\Facades\Log;
@@ -21,79 +22,41 @@ use Masmerise\Toaster\Toaster;
 #[Title('Ajouter la facture')]
 class Create extends Component
 {
-    use InvoiceShareCalculationTrait, InvoiceTagManagement, WithFileUploads;
+    use InvoiceComponentTrait;
+    use InvoiceShareCalculationTrait;
+    use InvoiceTagManagement;
+    use WithFileUploads;
 
     public InvoiceForm $form;
 
     public $family_members = [];
 
     // OCR properties
-    public $isOcrProcessing = false;
+    public bool $isOcrProcessing = false;
 
     public $ocrData = null;
 
-    public $showOcrButton = false;
+    public bool $showOcrButton = false;
 
     public function mount()
     {
-        $this->prepareFamilyMembers();
-
+        $this->loadFamilyMembers();
         $this->form->paid_by_user_id = auth()->id();
-
         $this->form->user_shares = [];
-
-        // Initialiser les parts utilisateur
-        $this->initializeUserShares();
-
+        $this->initializeShares();
         $this->initializeTagManagement();
-        $this->calculateRemainingShares();
     }
 
-    private function prepareFamilyMembers(): void
+    public function updatedFormUploadedFile(): void
     {
-        $family = auth()->user()->family();
-
-        // Si l'utilisateur a une famille
-        if ($family) {
-            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
-            $this->family_members = $family->users()
-                ->get();
-        } else {
-            // Si pas de famille, n'inclure que l'utilisateur authentifié
-            $this->family_members = collect([auth()->user()]);
-        }
-
-        // S'assurer que l'utilisateur authentifié est dans la liste
-        if (! $this->family_members->contains('id', auth()->id())) {
-            $this->family_members->prepend(auth()->user());
-        }
-    }
-
-    public function updatedFormType(): void
-    {
-        $this->form->updateAvailableCategories();
-        $this->form->category = null;
-    }
-
-    public function updatedFormAmount(): void
-    {
-        $this->calculateRemainingShares();
-    }
-
-    public function updatedShareMode(): void
-    {
-        $this->calculateRemainingShares();
-    }
-
-    public function removeUploadedFile(): void
-    {
-        $this->form->removeFile();
-        $this->form->resetErrorBag('uploadedFile');
-        $this->showOcrButton = false;
+        $this->showOcrButton = true;
     }
 
     public function createInvoice(FileStorageService $fileStorageService): void
     {
+        // Validation finale des parts avant sauvegarde
+        $this->validateShares();
+
         $invoice = $this->form->store($fileStorageService);
 
         if ($invoice) {
@@ -102,18 +65,6 @@ class Create extends Component
         } else {
             Toaster::error('Une erreur s\'est produite lors de la création de la facture.');
         }
-    }
-
-    /*
-     * OCR :
-     * 1. Display the OCR button when a file is uploaded.
-     * 2. Process the OCR and extract data from the uploaded file.
-     * 3. Apply the OCR data to the form fields.
-    */
-
-    public function updatedFormUploadedFile(): void
-    {
-        $this->showOcrButton = true;
     }
 
     public function processOcr(TextractService $textractService): void
@@ -130,11 +81,14 @@ class Create extends Component
             // Notifier le front-end que le traitement commence
             $this->dispatch('ocr-processing-started');
 
+            // Stockage temporaire du fichier pour l'OCR
             $path = $this->form->uploadedFile->storeAs('temp', $this->form->uploadedFile->getClientOriginalName(), 'local');
             $fullPath = storage_path('app/'.$path);
 
+            // Analyse OCR
             $result = $textractService->analyzeInvoice($fullPath);
 
+            // Nettoyage du fichier temporaire
             if (file_exists($fullPath)) {
                 unlink($fullPath);
             }
@@ -163,6 +117,7 @@ class Create extends Component
             return;
         }
 
+        // Appliquer les données OCR aux champs du formulaire
         if (! empty($this->ocrData['name'])) {
             $this->form->name = $this->ocrData['name'];
         }
@@ -180,7 +135,7 @@ class Create extends Component
         }
 
         if (! empty($this->ocrData['amount'])) {
-            $this->form->amount = $this->ocrData['amount'];
+            $this->form->amount = $this->form->normalizeAmount($this->ocrData['amount']);
             $this->calculateRemainingShares();
         }
 

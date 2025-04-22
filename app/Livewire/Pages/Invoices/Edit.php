@@ -10,6 +10,7 @@ use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Services\FileStorageService;
+use App\Traits\InvoiceComponentTrait;
 use App\Traits\InvoiceFileUrlTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceTagManagement;
@@ -21,6 +22,7 @@ use Masmerise\Toaster\Toaster;
 #[Title('Modifier la facture')]
 class Edit extends Component
 {
+    use InvoiceComponentTrait;
     use InvoiceFileUrlTrait;
     use InvoiceShareCalculationTrait;
     use InvoiceTagManagement;
@@ -44,77 +46,34 @@ class Edit extends Component
 
     public function mount($id)
     {
+        // Récupérer la facture avec ses relations
         $this->invoice = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
+        // Initialiser le formulaire à partir de la facture
         $this->form->setFromInvoice($this->invoice);
 
+        // Récupérer les informations du fichier
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
-
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
 
         // Préparer les données de partage de la facture
-        $this->prepareFamilyMembers();
-
-        if (! isset($this->form->paid_by_user_id)) {
-            $this->form->paid_by_user_id = auth()->id();
-        }
-
-        $this->initializeUserShares();
-        $this->calculateRemainingShares();
+        $this->loadFamilyMembers();
+        $this->initializeShares();
 
         // Initialiser les tags de la facture
         $this->initializeTagManagement();
     }
 
-    private function prepareFamilyMembers(): void
-    {
-        $family = auth()->user()->family();
-
-        // Si l'utilisateur a une famille
-        if ($family) {
-            // Récupérer les membres de la famille, incluant l'utilisateur authentifié
-            $this->family_members = $family->users()
-                ->get();
-        } else {
-            // Si pas de famille, n'inclure que l'utilisateur authentifié
-            $this->family_members = collect([auth()->user()]);
-        }
-
-        // S'assurer que l'utilisateur authentifié est dans la liste
-        if (! $this->family_members->contains('id', auth()->id())) {
-            $this->family_members->prepend(auth()->user());
-        }
-    }
-
-    public function updatedFormType(): void
-    {
-        $this->form->updateAvailableCategories();
-        $this->form->category = null;
-    }
-
-    public function removeUploadedFile(): void
-    {
-        $this->form->removeFile();
-        $this->form->resetErrorBag('uploadedFile');
-    }
-
-    public function updatedFormAmount(): void
-    {
-        $this->calculateRemainingShares();
-    }
-
-    public function updatedShareMode(): void
-    {
-        $this->calculateRemainingShares();
-    }
-
     public function updateInvoice(FileStorageService $fileStorageService): void
     {
+        // Valider les parts avant la sauvegarde
+        $this->validateShares();
+
         $invoice = $this->form->update($fileStorageService);
 
         if ($invoice) {
