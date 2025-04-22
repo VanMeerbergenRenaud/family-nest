@@ -11,7 +11,7 @@
         "aws/aws-sdk-php": "^3.342",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "ilovepdf/ilovepdf-php": "^1.2",
-        "laravel/framework": "^11.9",
+        "laravel/framework": "^12.8.0",
         "laravel/scout": "^10.13",
         "laravel/socialite": "^5.19",
         "laravel/tinker": "^2.9",
@@ -36,8 +36,8 @@
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.0",
-        "pestphp/pest": "^2.0",
-        "pestphp/pest-plugin-laravel": "^2.0"
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
     },
     "autoload": {
         "psr-4": {
