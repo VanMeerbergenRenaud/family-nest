@@ -188,7 +188,12 @@
 
             {{-- En-tête --}}
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 pl-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
-                <h3 role="heading" aria-level="3" class="text-md-semibold mb-3 sm:mb-0 dark:text-white">Tous les fichiers</h3>
+                <h3 role="heading" aria-level="3" class="text-md-semibold mb-3 sm:mb-0 dark:text-white">
+                    Tous les fichiers
+                    <span aria-hidden="true" class="relative -top-0.5 ml-2 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
+                       {{ \Illuminate\Support\Number::format($invoices->total()) }}
+                   </span>
+                </h3>
                 <div class="flex flex-wrap gap-2">
                     {{-- Filtres --}}
                     <x-menu>

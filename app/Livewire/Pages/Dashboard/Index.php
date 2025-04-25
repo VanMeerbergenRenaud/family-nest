@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Pages;
+namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Invoice;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Tableau de bord')]
-class Dashboard extends Component
+class Index extends Component
 {
     public $user;
 
@@ -47,7 +47,7 @@ class Dashboard extends Component
 
     public function render()
     {
-        return view('livewire.pages.dashboard')
+        return view('livewire.pages.dashboard.index')
             ->layout('layouts.app-sidebar');
     }
 }

@@ -526,7 +526,6 @@ class Index extends Component
 
     public function render()
     {
-        // Récupération des factures avec filtres
         $invoices = auth()->user()->invoices()
             ->with(['file', 'sharedUsers'])
             ->when($this->sortField,

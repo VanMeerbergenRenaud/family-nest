@@ -3,7 +3,8 @@
 use App\Http\Middleware\CheckFamilyRole;
 use App\Http\Middleware\HasFamily;
 use App\Livewire\Pages\Calendar;
-use App\Livewire\Pages\Dashboard;
+use App\Livewire\Pages\Dashboard\Index as IndexDashboard;
+use App\Livewire\Pages\Dashboard\Page;
 use App\Livewire\Pages\Family;
 use App\Livewire\Pages\Goals;
 use App\Livewire\Pages\HelpCenter;
@@ -48,7 +49,7 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
     // All roles
     Route::middleware([CheckFamilyRole::class.':viewer,editor,admin'])->group(function () {
 
-        Route::get('/dashboard', Dashboard::class)->name('dashboard');
+        Route::get('/dashboard', IndexDashboard::class)->name('dashboard');
         Route::get('/themes', Themes::class)->name('themes');
         Route::get('/calendar', Calendar::class)->name('calendar');
         Route::get('/goals', Goals::class)->name('goals');

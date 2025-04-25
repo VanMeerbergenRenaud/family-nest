@@ -37,8 +37,7 @@
         {{-- Section des invitations en attente --}}
         @if($pendingInvitations->count() > 0 && $canEdit)
             <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
-                <div
-                    class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
                     <h3 role="heading" aria-level="3" class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
                         Invitations en attente
                         <span class="relative -top-0.5 ml-2 px-2 py-1 bg-pink-100 text-pink-800 rounded-full text-xs-medium dark:bg-amber-700 dark:text-amber-200">
