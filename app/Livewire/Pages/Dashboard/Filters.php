@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Form;
@@ -18,9 +19,26 @@ class Filters extends Form
     #[Url]
     public $family_member = 'all';
 
+    #[Url]
+    public Range $range = Range::All_Time;
+
+    #[Url]
+    public $start;
+
+    #[Url]
+    public $end;
+
     public function init($user): void
     {
         $this->user = $user;
+    }
+
+    public function initRange(): void
+    {
+        if ($this->range !== Range::Custom) {
+            $this->start = null;
+            $this->end = null;
+        }
     }
 
     public function getStatusEnum(): FilterStatus
@@ -33,9 +51,8 @@ class Filters extends Form
         return collect(FilterStatus::cases())->map(function ($status) {
             $baseQuery = $this->getBaseQueryForCurrentMember();
 
-            $count = $this->applyStatus(
-                $baseQuery,
-                $status,
+            $count = $this->applyRange(
+                $this->applyStatus($baseQuery, $status,)
             )->count();
 
             return [
@@ -109,6 +126,7 @@ class Filters extends Form
     {
         $query = $this->applyStatus($query);
         $query = $this->applyFamilyMember($query);
+        $query = $this->applyRange($query);
 
         return $query;
     }
@@ -136,6 +154,22 @@ class Filters extends Form
         }
 
         return $query->where('user_id', $this->family_member);
+    }
+
+    public function applyRange($query)
+    {
+        if ($this->range === Range::All_Time) {
+            return $query;
+        }
+
+        if ($this->range === Range::Custom) {
+            $start = Carbon::createFromFormat('Y-m-d', $this->start);
+            $end = Carbon::createFromFormat('Y-m-d', $this->end);
+
+            return $query->whereBetween('updated_at', [$start, $end]);
+        }
+
+        return $query->whereBetween('updated_at', $this->range->dates());
     }
 
     public function updatedStatus(): void

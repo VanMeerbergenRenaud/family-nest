@@ -2,14 +2,16 @@
     <div
         x-data="chart"
         x-init="$wire.$on('statusChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
-                   $wire.$on('familyMemberChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); })"
+                $wire.$on('familyMemberChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); })"
         wire:ignore
         wire:loading.class="opacity-50"
-        class="relative h-[10rem] sm:h-[20rem] w-full overflow-hidden bg-white rounded-xl p-4 border border-gray-200"
+        class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
-        <canvas class="w-full"></canvas>
+        <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">Montant des factures par type</h3>
 
-        <div x-show="!hasData" class="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+        <canvas class="pt-10 w-full"></canvas>
+
+        <div x-show="!hasData" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
             <span>Aucune donnée disponible pour ce filtre</span>
         </div>
     </div>
@@ -71,39 +73,27 @@
 
                 let { labels, values } = dataset;
 
+                // Colors for the chart
+                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#14B8A6', '#6B7280', '#4B5563', '#374151', '#1F2937'];
+                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C', '#D97706', '#059669', '#0D9488', '#4B5563', '#374151', '#1F2937'];
+
                 return new Chart(el, {
                     type: 'bar',
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Montant des factures',
+                            label: 'Montant des factures par type',
                             data: values,
                             backgroundColor: function(context) {
-                                const colors = [
-                                    '#4F86C6', '#5DB075', '#E47D7D', '#9747FF',
-                                    '#F7C04A', '#3F8CFF', '#FF9F40', '#4BC0C0',
-                                    '#8884D8', '#FF6384', '#36A2EB', '#FFCD56',
-                                    '#FF91A4', '#C9CBCF', '#7788EE', '#B2E061',
-                                    '#E887B2', '#82DDFA'
-                                ];
-
                                 const index = context.dataIndex % colors.length;
                                 return colors[index];
                             },
                             hoverBackgroundColor: function(context) {
-                                const colors = [
-                                    '#2E5EAA', '#3A8A54', '#C05555', '#7A35DF',
-                                    '#D6A93A', '#2667D6', '#DC7520', '#2F9E9E',
-                                    '#6663BB', '#E33F66', '#1A81C7', '#DBAC38',
-                                    '#DE6A84', '#A6A8AD', '#5465D3', '#8FBD42',
-                                    '#CE6399', '#57BFE5'
-                                ];
-
-                                const index = context.dataIndex % colors.length;
-                                return colors[index];
+                                const index = context.dataIndex % hoverColors.length;
+                                return hoverColors[index];
                             },
                             borderWidth: 0,
-                            borderRadius: 4,
+                            borderRadius: 8,
                             barThickness: 'flex',
                             minBarLength: 10,
                         }]
@@ -112,25 +102,30 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         animation: {
-                            duration: 400,
+                            duration: 600,
+                            easing: 'easeOutQuart'
                         },
                         plugins: {
                             title: {
-                                display: true,
-                                text: 'Montant des factures par type',
-                                font: {
-                                    size: 16,
-                                    weight: 'bold'
-                                },
-                                padding: {
-                                    bottom: 10
-                                }
+                                display: false
                             },
                             legend: { display: false },
                             tooltip: {
                                 mode: 'index',
                                 intersect: false,
                                 displayColors: false,
+                                backgroundColor: 'rgba(17, 24, 39, 0.8)',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                padding: 12,
+                                cornerRadius: 6,
+                                titleFont: {
+                                    size: 13,
+                                    weight: '600',
+                                },
+                                bodyFont: {
+                                    size: 13,
+                                },
                                 callbacks: {
                                     title: function(context) {
                                         return context[0].label;
@@ -153,6 +148,8 @@
                             padding: {
                                 left: 0,
                                 right: 0,
+                                top: 0,
+                                bottom: 0
                             },
                         },
                         scales: {
@@ -161,17 +158,22 @@
                                 grid: {
                                     display: false,
                                 },
+                                border: {
+                                    display: false
+                                },
                                 ticks: {
                                     autoSkip: true,
-                                    maxRotation: 45,
+                                    maxRotation: 35,
                                     minRotation: 0,
+                                    padding: 0,
                                     font: {
-                                        size: 10
+                                        size: 11,
+                                        color: '#6B7280'
                                     },
                                     callback: function(value, index) {
                                         let label = this.getLabelForValue(index);
-                                        if (label && label.length > 15) {
-                                            return label.substring(0, 12) + '...';
+                                        if (label && label.length > 12) {
+                                            return label.substring(0, 10) + '...';
                                         }
                                         return label;
                                     }
@@ -183,10 +185,21 @@
                                 beginAtZero: true,
                                 grid: {
                                     display: true,
-                                    color: '#E5E7EB'
+                                    color: '#F3F4F6',
+                                    lineWidth: 1
                                 },
                                 ticks: {
+                                    padding: 0,
                                     callback: function(value) {
+                                        if (value >= 1000000) {
+                                            return new Intl.NumberFormat('fr-FR', {
+                                                style: 'currency',
+                                                currency: 'EUR',
+                                                notation: 'compact',
+                                                compactDisplay: 'short',
+                                                maximumFractionDigits: 1
+                                            }).format(value);
+                                        }
                                         return new Intl.NumberFormat('fr-FR', {
                                             style: 'currency',
                                             currency: 'EUR',
@@ -194,7 +207,8 @@
                                         }).format(value);
                                     },
                                     font: {
-                                        size: 10
+                                        size: 11,
+                                        color: '#6B7280'
                                     }
                                 },
                             },

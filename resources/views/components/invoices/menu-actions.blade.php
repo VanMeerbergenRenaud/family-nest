@@ -56,5 +56,12 @@
                 {{ __('Archiver') }}
             </x-menu.item>
         @endcan
+
+        @can('delete', $invoice)
+            <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500">
+                <x-svg.trash class="group-hover:text-red-500"/>
+                {{ __('Supprimer') }}
+            </x-menu.item>
+        @endcan
     </x-menu.items>
 </x-menu>

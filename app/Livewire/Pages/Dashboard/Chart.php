@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
@@ -37,19 +38,12 @@ class Chart extends Component
 
     public function fillDataset(): void
     {
+        $family = $this->user->family();
+
         if ($this->filters->family_member === 'all') {
-            $family = $this->user->family();
-            if ($family) {
-                $query = \App\Models\Invoice::where('family_id', $family->id);
-            } else {
-                $query = $this->user->invoices();
-            }
+            $query = Invoice::where('family_id', $family->id);
         } else {
-            if ($this->filters->family_member == $this->user->id) {
-                $query = $this->user->invoices();
-            } else {
-                $query = \App\Models\Invoice::where('user_id', $this->filters->family_member);
-            }
+            $query = Invoice::where('user_id', $this->filters->family_member);
         }
 
         $query = $this->filters->applyStatus($query);
@@ -65,7 +59,7 @@ class Chart extends Component
         ];
     }
 
-    public function hydrate()
+    public function hydrate(): void
     {
         $this->fillDataset();
     }

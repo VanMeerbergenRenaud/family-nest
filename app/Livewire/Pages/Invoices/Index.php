@@ -42,6 +42,8 @@ class Index extends Component
 
     public bool $showSidebarInvoiceDetails = false;
 
+    public bool $showDeleteFormModal = false;
+
     public bool $showFolderModal = false;
 
     public string $currentFolder = '';
@@ -521,6 +523,32 @@ class Index extends Component
 
         } catch (\Exception) {
             Toaster::error('Erreur lors de la copie de la facture::Veuillez réessayer.');
+        }
+    }
+
+    public function showDeleteForm($invoiceId): void
+    {
+        $this->invoice = Invoice::where('id', $invoiceId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        $this->showDeleteFormModal = true;
+    }
+
+    public function deleteDefinitelyInvoice(): void
+    {
+        try {
+            if (!auth()->user()->can('delete', $this->invoice)) {
+                Toaster::error('Vous n\'avez pas la permission de supprimer cette facture.');
+                return;
+            }
+
+            $this->invoice->delete();
+            $this->showDeleteFormModal = false;
+
+            Toaster::success('Facture supprimée avec succès !');
+        } catch (\Exception) {
+            Toaster::error('Erreur lors de la suppression de la facture::Veuillez réessayer.');
         }
     }
 

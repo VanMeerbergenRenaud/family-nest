@@ -1,23 +1,33 @@
+@props([
+    'filters'
+])
+
 <div
+    class="flex items-center gap-2"
     wire:key="filter-status-{{ $filters->family_member }}"
     x-data="{ refreshed: 0 }"
     x-init="$wire.on('familyMemberChanged', () => { refreshed++ })"
 >
-    <x-radio-group class="grid grid-cols-2 md:grid-cols-4 gap-2" wire:model.live="filters.status">
-        @foreach ($filters->statuses() as $status)
-            <x-radio-group.option
-                :value="$status['value']"
-                class="px-3 py-2 flex flex-col rounded-xl border hover:border-blue-400 text-gray-700 cursor-pointer transition-all"
-                class-checked="text-blue-600 border-2 border-blue-400 bg-blue-50"
-                class-not-checked="text-gray-700"
-                wire:loading.class="opacity-50"
-            >
-                <div class="text-sm font-normal">
-                    <span>{{ $status['label'] }}</span>
-                </div>
+    <x-menu>
+        <x-menu.button class="min-w-44 button-primary justify-between">
+            @php
+                $selectedStatus = $filters->statuses()->firstWhere('value', $filters->status);
+                $selectedStatusName = $selectedStatus ? $selectedStatus['label'] : 'Tous';
+            @endphp
+            {{ $selectedStatusName }}
+            <x-svg.chevron-down class="text-gray-400" />
+        </x-menu.button>
 
-                <div class="text-lg font-semibold">{{ $status['count'] }}</div>
-            </x-radio-group.option>
-        @endforeach
-    </x-radio-group>
+        <x-menu.items class="w-56">
+            @foreach ($filters->statuses() as $status)
+                <x-menu.item
+                    wire:click="$set('filters.status', '{{ $status['value'] }}')"
+                    class="{{ $filters->status === $status['value'] ? 'bg-teal-100 text-teal-900 font-medium' : '' }} flex justify-between"
+                >
+                    {{ $status['label'] }}
+                    <span class="text-gray-500 text-xs">{{ $status['count'] }}</span>
+                </x-menu.item>
+            @endforeach
+        </x-menu.items>
+    </x-menu>
 </div>
