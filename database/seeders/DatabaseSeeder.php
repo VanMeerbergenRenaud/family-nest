@@ -78,8 +78,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create invoices for users
-        $invoices = Invoice::factory(20)->create([
+        $invoiceRenaud = Invoice::factory(20)->create([
             'user_id' => $renaud->id,
+        ]);
+
+        $invoiceFrance = Invoice::factory(5)->create([
+            'user_id' => $france->id,
         ]);
 
         $invoicesTeacher = Invoice::factory(5)->create([
@@ -87,7 +91,13 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create invoice files for users
-        foreach ($invoices as $invoice) {
+        foreach ($invoiceRenaud as $invoice) {
+            InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+        }
+
+        foreach ($invoiceFrance as $invoice) {
             InvoiceFile::factory()->create([
                 'invoice_id' => $invoice->id,
             ]);

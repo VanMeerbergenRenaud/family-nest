@@ -4,7 +4,7 @@ use App\Http\Middleware\CheckFamilyRole;
 use App\Http\Middleware\HasFamily;
 use App\Livewire\Pages\Calendar;
 use App\Livewire\Pages\Dashboard\Index as IndexDashboard;
-use App\Livewire\Pages\Dashboard\Page;
+use App\Livewire\Pages\Dashboard\Page as Test;
 use App\Livewire\Pages\Family;
 use App\Livewire\Pages\Goals;
 use App\Livewire\Pages\HelpCenter;
@@ -41,6 +41,7 @@ Route::middleware(['auth', 'verified'])
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/family', Family::class)->name('family');
     Route::get('/help-center', HelpCenter::class)->name('help-center');
+    Route::get('/test/', Test::class)->name('test');
 });
 
 // Route for authenticated users with a family
