@@ -2,12 +2,35 @@
     <div
         x-data="chart"
         x-init="$wire.$on('statusChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
-                $wire.$on('familyMemberChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); })"
+            $wire.$on('familyMemberChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
+            $wire.$on('rangeChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
+            $wire.$on('filtersUpdated', () => { setTimeout(() => refreshChart($wire.dataset), 50); });"
         wire:ignore
         wire:loading.class="opacity-50"
         class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
-        <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">Montant des factures par type</h3>
+        <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">
+            Montant des factures par type
+            @if($filters->range !== \App\Livewire\Pages\Dashboard\Range::All_Time)
+                <span class="text-sm font-normal text-gray-500 ml-2">
+                @if($filters->range === \App\Livewire\Pages\Dashboard\Range::Custom && $filters->start && $filters->end)
+                        ({{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->start)->format('d/m/Y') }} - {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->end)->format('d/m/Y') }})
+                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Future)
+                        (Échéances futures)
+                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_7)
+                        (Prochains 7 jours)
+                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_30)
+                        (Prochains 30 jours)
+                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Week)
+                        (Cette semaine)
+                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Month)
+                        (Ce mois-ci)
+                    @else
+                        ({{ $filters->range->label() }})
+                    @endif
+            </span>
+            @endif
+        </h3>
 
         <canvas class="pt-10 w-full"></canvas>
 

@@ -23,9 +23,31 @@
                 @endif
             </div>
             <p class="text-xs text-gray-500 mt-2.5">
-                En hausse ces 30 derniers jours
+                Factures avec échéance
             </p>
-            <p class="text-xs text-gray-400 mt-1">Analyse depuis {{ now()->subDays(30)->format('d/m/Y') }}</p>
+            <p class="text-xs text-gray-400 mt-1">
+                @if($filters->range === \App\Livewire\Pages\Dashboard\Range::All_Time)
+                    Toutes les échéances
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Custom && $filters->start && $filters->end)
+                    {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->start)->format('d/m/Y') }} - {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->end)->format('d/m/Y') }}
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Future)
+                    Échéances futures
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_7)
+                    {{ \App\Livewire\Pages\Dashboard\Range::Next_7->label() }}
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_30)
+                    {{ \App\Livewire\Pages\Dashboard\Range::Next_30->label() }}
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Today)
+                    Aujourd'hui
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Week)
+                    Cette semaine
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Month)
+                    Ce mois-ci
+                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Year)
+                    Cette année
+                @else
+                    {{ $filters->range->label() }}
+                @endif
+            </p>
         </div>
     </div>
 
@@ -39,9 +61,11 @@
                 </span>
             </div>
             <p class="text-xs text-gray-500 mt-2.5">
-                En hausse ces 30 derniers jours
+                Par facture
             </p>
-            <p class="text-xs text-gray-400 mt-1">Tendance des montants</p>
+            <p class="text-xs text-gray-400 mt-1">
+                Pour la période d'échéance sélectionnée
+            </p>
         </div>
     </div>
 
@@ -55,9 +79,11 @@
                 </span>
             </div>
             <p class="text-xs text-gray-500 mt-2.5">
-                En hausse ces 30 derniers jours
+                Total des factures
             </p>
-            <p class="text-xs text-gray-400 mt-1">Analyse des nouvelles entrées</p>
+            <p class="text-xs text-gray-400 mt-1">
+                Pour la période d'échéance sélectionnée
+            </p>
         </div>
     </div>
 
@@ -71,9 +97,15 @@
                 </span>
             </div>
             <p class="text-xs text-gray-500 mt-2.5">
-                En hausse ces 30 derniers jours
+                @if($totalStats['invoiceCount'] > 0)
+                    {{ number_format(($totalStats['paidInvoices'] / $totalStats['invoiceCount']) * 100, 0) }}% du total
+                @else
+                    0% du total
+                @endif
             </p>
-            <p class="text-xs text-gray-400 mt-1">Suivi des règlements</p>
+            <p class="text-xs text-gray-400 mt-1">
+                Pour la période d'échéance sélectionnée
+            </p>
         </div>
     </div>
 </div>

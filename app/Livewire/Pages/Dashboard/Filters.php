@@ -33,14 +33,6 @@ class Filters extends Form
         $this->user = $user;
     }
 
-    public function initRange(): void
-    {
-        if ($this->range !== Range::Custom) {
-            $this->start = null;
-            $this->end = null;
-        }
-    }
-
     public function getStatusEnum(): FilterStatus
     {
         return FilterStatus::from($this->status);
@@ -163,33 +155,52 @@ class Filters extends Form
         }
 
         if ($this->range === Range::Custom) {
-            $start = Carbon::createFromFormat('Y-m-d', $this->start);
-            $end = Carbon::createFromFormat('Y-m-d', $this->end);
+            if ($this->start && $this->end) {
+                $start = Carbon::createFromFormat('Y-m-d', $this->start)->startOfDay();
+                $end = Carbon::createFromFormat('Y-m-d', $this->end)->endOfDay();
 
-            return $query->whereBetween('updated_at', [$start, $end]);
+                return $query->whereBetween('payment_due_date', [$start, $end]);
+            }
+            return $query;
         }
 
-        return $query->whereBetween('updated_at', $this->range->dates());
+        $dates = $this->range->dates();
+        return $query->whereBetween('payment_due_date', $dates);
     }
 
-    public function updatedStatus(): void
+    public function resetRange(): void
     {
-        $this->dispatch('statusChanged', $this->status);
+        $this->range = Range::All_Time;
+        $this->start = null;
+        $this->end = null;
 
-        $this->familyMembers();
-    }
-
-    public function updatedFamilyMember(): void
-    {
-        $this->dispatch('familyMemberChanged', $this->family_member);
-
-        $this->statuses();
+        $this->dispatch('rangeChanged');
+        $this->dispatch('filtersUpdated');
+        $this->dispatch('refresh-dashboard-components');
     }
 
     public function updated($property): void
     {
-        if ($property === 'status' || $property === 'family_member') {
+        if ($property === 'status') {
+            $this->dispatch('statusChanged');
             $this->dispatch('filtersUpdated');
+        } elseif ($property === 'family_member') {
+            $this->dispatch('familyMemberChanged');
+            $this->dispatch('filtersUpdated');
+        } elseif ($property === 'range' || $property === 'start' || $property === 'end') {
+            $this->dispatch('rangeChanged');
+            $this->dispatch('filtersUpdated');
+            // Force parent to re-render the child components
+            $this->dispatch('refresh-dashboard-components');
         }
+    }
+
+    public function resetAllFilters(): void
+    {
+        $this->status = 'all';
+        $this->family_member = 'all';
+        $this->range = Range::All_Time;
+        $this->start = null;
+        $this->end = null;
     }
 }

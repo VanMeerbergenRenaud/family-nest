@@ -36,6 +36,12 @@ class Chart extends Component
         $this->fillDataset();
     }
 
+    #[On('rangeChanged')]
+    public function refreshDataForRange(): void
+    {
+        $this->fillDataset();
+    }
+
     public function fillDataset(): void
     {
         $family = $this->user->family();
@@ -47,6 +53,7 @@ class Chart extends Component
         }
 
         $query = $this->filters->applyStatus($query);
+        $query = $this->filters->applyRange($query);
 
         $results = $query->select('type', DB::raw('SUM(amount) as total'))
             ->groupBy('type')

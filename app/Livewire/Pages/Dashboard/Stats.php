@@ -21,13 +21,10 @@ class Stats extends Component
     ];
 
     #[On('statusChanged')]
-    public function refreshData(): void
-    {
-        $this->calculateStats();
-    }
-
     #[On('familyMemberChanged')]
-    public function refreshDataForFamilyMember(): void
+    #[On('rangeChanged')]
+    #[On('filtersUpdated')]
+    public function refreshData(): void
     {
         $this->calculateStats();
     }
@@ -37,11 +34,18 @@ class Stats extends Component
         $this->calculateStats();
     }
 
+    public function hydrate(): void
+    {
+        // S'assurer que les statistiques sont recalculées lors de l'hydratation
+        $this->calculateStats();
+    }
+
     public function calculateStats(): void
     {
         $user = auth()->user();
 
-        $currentPeriodQuery = $this->getBaseQuery($user);
+        $baseQuery = $this->getBaseQuery($user);
+        $currentPeriodQuery = $this->filters->applyRange($baseQuery);
         $currentPeriodQuery = $this->filters->applyStatus($currentPeriodQuery);
 
         $currentTotal = $currentPeriodQuery->sum('amount') ?: 0;
@@ -59,10 +63,6 @@ class Stats extends Component
 
     private function getBaseQuery($user)
     {
-        $now = now();
-        $startDate = false ? $now->copy()->subDays(60) : $now->copy()->subDays(30);
-        $endDate = false ? $now->copy()->subDays(30) : $now;
-
         if ($this->filters->family_member === 'all') {
             $family = $user->family();
             if ($family) {
@@ -78,7 +78,7 @@ class Stats extends Component
             }
         }
 
-        return $query->whereBetween('created_at', [$startDate, $endDate]);
+        return $query;
     }
 
     public function render()

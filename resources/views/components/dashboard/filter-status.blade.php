@@ -15,7 +15,7 @@
                 $selectedStatusName = $selectedStatus ? $selectedStatus['label'] : 'Tous';
             @endphp
             {{ $selectedStatusName }}
-            <x-svg.chevron-down class="text-gray-400" />
+            <x-svg.chevron-down class="ml-1 text-gray-500" />
         </x-menu.button>
 
         <x-menu.items class="w-56">

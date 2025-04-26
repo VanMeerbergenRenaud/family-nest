@@ -83,7 +83,11 @@
                         </td>
 
                         <td>
-                            {{ $invoice->payment_due_date }}
+                            @if($invoice->payment_due_date)
+                                {{ $invoice->dateForHumans($invoice->payment_due_date) }}
+                            @else
+                                Non définie
+                            @endif
                         </td>
 
                         <td class="grid justify-end text-right">
