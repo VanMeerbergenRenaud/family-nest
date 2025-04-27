@@ -16,37 +16,34 @@ enum Range: string
     case Future = 'future';
     case Custom = 'custom';
 
-    public function label($start = null, $end = null)
+    public function label($start = null, $end = null): string
     {
         return match ($this) {
-            static::All_Time => 'Toutes les échéances',
-            // Basique
-            static::Year => 'Cette année',
-            static::This_Month => 'Ce mois-ci',
-            static::This_Week => 'Cette semaine',
-            static::Today => 'Aujourd\'hui',
-            // Prochainement
-            static::Next_7 => 'Prochains 7 jours',
-            static::Next_30 => 'Prochains 30 jours',
-            // À venir
-            static::Future => 'Échéances futures',
-            // Custom
-            static::Custom => ($start !== null && $end !== null)
-                ? str($start)->replace('-', '/') . ' - ' . str($end)->replace('-', '/')
+            self::All_Time => 'Toutes les échéances',
+            self::Year => 'Cette année',
+            self::This_Month => 'Ce mois-ci',
+            self::This_Week => 'Cette semaine',
+            self::Today => 'Aujourd\'hui',
+            self::Next_7 => 'Prochains 7 jours',
+            self::Next_30 => 'Prochains 30 jours',
+            self::Future => 'Échéances futures',
+            self::Custom => ($start !== null && $end !== null)
+                ? str($start)->replace('-', '/').' - '.str($end)->replace('-', '/')
                 : 'Période personnalisée',
         };
     }
 
-    public function dates()
+    public function dates(): array
     {
         return match ($this) {
-            static::Year => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
-            static::Today => [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()],
-            static::This_Week => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
-            static::This_Month => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
-            static::Next_7 => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addDays(7)->endOfDay()],
-            static::Next_30 => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()],
-            static::Future => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addYears(100)->endOfDay()],
+            self::Year => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
+            self::This_Month => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            self::This_Week => [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()],
+            self::Today => [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()],
+            self::Next_7 => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addDays(7)->endOfDay()],
+            self::Next_30 => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addDays(30)->endOfDay()],
+            self::Future => [Carbon::now()->addDays(1)->startOfDay(), Carbon::now()->addYears(100)->endOfDay()],
+            default => [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()],
         };
     }
 }

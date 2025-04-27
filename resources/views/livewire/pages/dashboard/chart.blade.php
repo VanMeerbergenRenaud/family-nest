@@ -1,10 +1,7 @@
 <div>
     <div
         x-data="chart"
-        x-init="$wire.$on('statusChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
-            $wire.$on('familyMemberChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
-            $wire.$on('rangeChanged', () => { setTimeout(() => refreshChart($wire.dataset), 50); });
-            $wire.$on('filtersUpdated', () => { setTimeout(() => refreshChart($wire.dataset), 50); });"
+        x-init="init($wire.dataset)"
         wire:ignore
         wire:loading.class="opacity-50"
         class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
@@ -13,22 +10,8 @@
             Montant des factures par type
             @if($filters->range !== \App\Livewire\Pages\Dashboard\Range::All_Time)
                 <span class="text-sm font-normal text-gray-500 ml-2">
-                @if($filters->range === \App\Livewire\Pages\Dashboard\Range::Custom && $filters->start && $filters->end)
-                        ({{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->start)->format('d/m/Y') }} - {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->end)->format('d/m/Y') }})
-                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Future)
-                        (Échéances futures)
-                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_7)
-                        (Prochains 7 jours)
-                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_30)
-                        (Prochains 30 jours)
-                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Week)
-                        (Cette semaine)
-                    @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Month)
-                        (Ce mois-ci)
-                    @else
-                        ({{ $filters->range->label() }})
-                    @endif
-            </span>
+                    ({{ $filters->range->label($filters->start, $filters->end) }})
+                </span>
             @endif
         </h3>
 
@@ -52,25 +35,20 @@
         return {
             hasData: true,
 
-            init() {
+            init(initialData) {
+                this.refreshChart(initialData);
+
+                this.$wire.$watch('dataset', newData => {
+                    this.refreshChart(newData);
+                });
+
                 window.addEventListener('popstate', () => {
                     setTimeout(() => this.refreshChart(this.$wire.dataset), 200);
                 });
-
-                this.refreshChart(this.$wire.dataset);
-
-                this.$wire.$watch('dataset', (newData) => {
-                    this.refreshChart(newData);
-                });
-            },
-
-            destroy() {
-                if (chart) chart.destroy();
-                chart = null;
             },
 
             refreshChart(dataset) {
-                if (!dataset || !dataset.labels || !dataset.values || dataset.labels.length === 0) {
+                if (!dataset || !dataset.labels || dataset.labels.length === 0) {
                     this.hasData = false;
                     if (chart) chart.destroy();
                     chart = null;
@@ -85,36 +63,28 @@
                 }
 
                 setTimeout(() => {
-                    chart = this.initChart(dataset);
+                    const el = this.$wire.$el.querySelector('canvas');
+                    if (!el) return;
+
+                    chart = this.createChart(el, dataset);
                 }, 10);
             },
 
-            initChart(dataset) {
-                let el = this.$wire.$el.querySelector('canvas');
+            createChart(el, dataset) {
+                const { labels, values } = dataset;
 
-                if (!el) return null;
-
-                let { labels, values } = dataset;
-
-                // Colors for the chart
                 const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#14B8A6', '#6B7280', '#4B5563', '#374151', '#1F2937'];
                 const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C', '#D97706', '#059669', '#0D9488', '#4B5563', '#374151', '#1F2937'];
 
                 return new Chart(el, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [{
                             label: 'Montant des factures par type',
                             data: values,
-                            backgroundColor: function(context) {
-                                const index = context.dataIndex % colors.length;
-                                return colors[index];
-                            },
-                            hoverBackgroundColor: function(context) {
-                                const index = context.dataIndex % hoverColors.length;
-                                return hoverColors[index];
-                            },
+                            backgroundColor: context => colors[context.dataIndex % colors.length],
+                            hoverBackgroundColor: context => hoverColors[context.dataIndex % hoverColors.length],
                             borderWidth: 0,
                             borderRadius: 8,
                             barThickness: 'flex',
@@ -129,9 +99,7 @@
                             easing: 'easeOutQuart'
                         },
                         plugins: {
-                            title: {
-                                display: false
-                            },
+                            title: { display: false },
                             legend: { display: false },
                             tooltip: {
                                 mode: 'index',
@@ -150,11 +118,9 @@
                                     size: 13,
                                 },
                                 callbacks: {
-                                    title: function(context) {
-                                        return context[0].label;
-                                    },
-                                    label: function(context) {
-                                        let value = context.raw || 0;
+                                    title: context => context[0].label,
+                                    label: context => {
+                                        const value = context.raw || 0;
                                         return 'Montant: ' + new Intl.NumberFormat('fr-FR', {
                                             style: 'currency',
                                             currency: 'EUR'
@@ -167,23 +133,11 @@
                             mode: 'index',
                             intersect: false
                         },
-                        layout: {
-                            padding: {
-                                left: 0,
-                                right: 0,
-                                top: 0,
-                                bottom: 0
-                            },
-                        },
                         scales: {
                             x: {
                                 display: true,
-                                grid: {
-                                    display: false,
-                                },
-                                border: {
-                                    display: false
-                                },
+                                grid: { display: false },
+                                border: { display: false },
                                 ticks: {
                                     autoSkip: true,
                                     maxRotation: 35,
@@ -194,7 +148,7 @@
                                         color: '#6B7280'
                                     },
                                     callback: function(value, index) {
-                                        let label = this.getLabelForValue(index);
+                                        const label = this.getLabelForValue(index);
                                         if (label && label.length > 12) {
                                             return label.substring(0, 10) + '...';
                                         }
@@ -214,20 +168,21 @@
                                 ticks: {
                                     padding: 0,
                                     callback: function(value) {
-                                        if (value >= 1000000) {
-                                            return new Intl.NumberFormat('fr-FR', {
+                                        const options = value >= 1000000
+                                            ? {
                                                 style: 'currency',
                                                 currency: 'EUR',
                                                 notation: 'compact',
                                                 compactDisplay: 'short',
                                                 maximumFractionDigits: 1
-                                            }).format(value);
-                                        }
-                                        return new Intl.NumberFormat('fr-FR', {
-                                            style: 'currency',
-                                            currency: 'EUR',
-                                            maximumFractionDigits: 0
-                                        }).format(value);
+                                            }
+                                            : {
+                                                style: 'currency',
+                                                currency: 'EUR',
+                                                maximumFractionDigits: 0
+                                            };
+
+                                        return new Intl.NumberFormat('fr-FR', options).format(value);
                                     },
                                     font: {
                                         size: 11,
@@ -237,9 +192,9 @@
                             },
                         },
                     },
-                })
-            },
-        }
-    })
+                });
+            }
+        };
+    });
 </script>
 @endscript

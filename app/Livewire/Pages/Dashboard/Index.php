@@ -2,47 +2,26 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
-use App\Models\Invoice;
+use App\Models\Family;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Tableau de bord')]
 class Index extends Component
 {
-    public $user;
-
-    public $family;
-
-    public $allInvoicesOfFamily = [];
-
-    public $allInvoicesOfUser = [];
-
-    public $allInvoicesOfOtherUsers = [];
-
-    public bool $showDashboardExempleModal = false;
+    public Family $family;
+    public Filters $filters;
 
     public function mount()
     {
-        $this->user = auth()->user();
-        $this->family = $this->user->family();
-
-        if ($this->family) {
-            $this->allInvoicesOfFamily = Invoice::where('family_id', $this->family->id)
-                ->get();
-        }
-
-        $this->allInvoicesOfUser = Invoice::where('family_id', $this->family->id)
-            ->where('user_id', $this->user->id)
-            ->get();
-
-        $this->allInvoicesOfOtherUsers = Invoice::where('family_id', $this->family->id)
-            ->where('user_id', '!=', $this->user->id)
-            ->get();
+        $user = auth()->user();
+        $this->family = $user->family();
+        $this->filters->init($user);
     }
 
-    public function showDashboardExemple(): void
+    public function resetFilters(): void
     {
-        $this->showDashboardExempleModal = true;
+        $this->filters->resetAllFilters();
     }
 
     public function render()

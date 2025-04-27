@@ -6,13 +6,23 @@ use Illuminate\Support\Facades\Session;
 
 trait ColumnPreferencesTrait
 {
-    public array $visibleColumns = [];
+    public array $visibleColumns = [
+        'name' => true,
+        'type' => false,
+        'category' => false,
+        'issuer_name' => true,
+        'amount' => true,
+        'issued_date' => true,
+        'payment_status' => false,
+        'payment_due_date' => false,
+        'tags' => true,
+    ];
 
     protected array $defaultColumns = [
         'name' => true,
         'type' => false,
         'category' => false,
-        'issuer_name' => false,
+        'issuer_name' => true,
         'amount' => true,
         'issued_date' => true,
         'payment_status' => false,

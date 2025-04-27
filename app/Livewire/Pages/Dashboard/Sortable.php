@@ -2,38 +2,36 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 
 trait Sortable
 {
     #[Url]
-    public $sortCol = 'name';
+    public string $sortCol = 'name';
 
     #[Url]
-    public $sortAsc = false;
+    public bool $sortAsc = false;
 
-    public function sortBy($column): void
+    public function sortBy(string $column): void
     {
-        if ($this->sortCol === $column) {
-            $this->sortAsc = ! $this->sortAsc;
-        } else {
-            $this->sortCol = $column;
-            $this->sortAsc = false;
-        }
+        $this->sortAsc = $this->sortCol === $column && !$this->sortAsc;
+        $this->sortCol = $column;
     }
 
     protected function applySorting($query)
     {
-        if ($this->sortCol) {
-            $column = match ($this->sortCol) {
-                'name' => 'name',
-                'type' => 'type',
-                'payment_status' => 'payment_status',
-                'payment_due_date' => 'payment_due_date',
-                'amount' => 'amount',
-            };
+        if (!$this->sortCol) {
+            return $query;
+        }
 
-            $query->orderBy($column, $this->sortAsc ? 'asc' : 'desc');
+        $validColumns = [
+            'name', 'type', 'category', 'issuer_name',
+            'amount', 'payment_status', 'issued_date', 'payment_due_date'
+        ];
+
+        if (in_array($this->sortCol, $validColumns)) {
+            $query->orderBy($this->sortCol, $this->sortAsc ? 'asc' : 'desc');
         }
 
         return $query;

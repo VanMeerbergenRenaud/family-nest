@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
-use App\Models\Invoice;
 use App\Enums\PaymentStatusEnum;
-use Livewire\Attributes\On;
+use Carbon\Carbon;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
@@ -13,72 +13,78 @@ class Stats extends Component
     #[Reactive]
     public Filters $filters;
 
-    public $totalStats = [
-        'totalAmount' => 0,
-        'invoiceCount' => 0,
-        'paidInvoices' => 0,
-        'averageAmount' => 0,
-    ];
-
-    #[On('statusChanged')]
-    #[On('familyMemberChanged')]
-    #[On('rangeChanged')]
-    #[On('filtersUpdated')]
-    public function refreshData(): void
+    #[Computed]
+    public function statistics(): array
     {
-        $this->calculateStats();
-    }
+        $baseQuery = $this->filters->getBaseQuery();
+        $filteredQuery = $this->filters->apply($baseQuery);
 
-    public function mount()
-    {
-        $this->calculateStats();
-    }
+        // Dates importantes pour les calculs
+        $now = Carbon::now();
+        $nextWeek = $now->copy()->addDays(7);
 
-    public function hydrate(): void
-    {
-        // S'assurer que les statistiques sont recalculées lors de l'hydratation
-        $this->calculateStats();
-    }
+        // Factures qui arrivent à échéance dans les 7 prochains jours
+        $upcomingCount = clone $filteredQuery;
+        $upcomingCount = $upcomingCount
+            ->where('payment_status', '!=', PaymentStatusEnum::Paid->value)
+            ->whereBetween('payment_due_date', [$now, $nextWeek])
+            ->count();
 
-    public function calculateStats(): void
-    {
-        $user = auth()->user();
+        // Montant total des factures impayées avec une échéance dépassée
+        $overdueQuery = clone $filteredQuery;
+        $overdueAmount = $overdueQuery
+            ->where('payment_status', '!=', PaymentStatusEnum::Paid->value)
+            ->where('payment_due_date', '<', $now)
+            ->sum('amount');
 
-        $baseQuery = $this->getBaseQuery($user);
-        $currentPeriodQuery = $this->filters->applyRange($baseQuery);
-        $currentPeriodQuery = $this->filters->applyStatus($currentPeriodQuery);
+        // Montant le plus élevé parmi les factures
+        $maxInvoiceQuery = clone $filteredQuery;
+        $maxInvoice = $maxInvoiceQuery->orderBy('amount', 'desc')->first();
+        $maxAmount = $maxInvoice ? $maxInvoice->amount : 0;
 
-        $currentTotal = $currentPeriodQuery->sum('amount') ?: 0;
-        $currentCount = $currentPeriodQuery->count() ?: 0;
-        $currentPaid = $currentPeriodQuery->where('payment_status', PaymentStatusEnum::Paid->value)->count() ?: 0;
-        $currentAverage = $currentCount > 0 ? $currentTotal / $currentCount : 0;
+        // Factures à échéance ce mois-ci
+        $thisMonthStart = $now->copy()->startOfMonth();
+        $thisMonthEnd = $now->copy()->endOfMonth();
+        $thisMonthQuery = clone $filteredQuery;
+        $thisMonthAmount = $thisMonthQuery
+            ->whereBetween('payment_due_date', [$thisMonthStart, $thisMonthEnd])
+            ->sum('amount');
 
-        $this->totalStats = [
-            'totalAmount' => $currentTotal,
-            'invoiceCount' => $currentCount,
-            'paidInvoices' => $currentPaid,
-            'averageAmount' => $currentAverage,
-        ];
-    }
+        // Calcul des statistiques standards
+        $totalAmount = $filteredQuery->sum('amount') ?: 0;
+        $invoiceCount = $filteredQuery->count() ?: 0;
+        $paidAmount = clone $filteredQuery;
+        $paidAmount = $paidAmount
+            ->where('payment_status', PaymentStatusEnum::Paid->value)
+            ->sum('amount');
+        $paidPercentage = $totalAmount > 0 ? round(($paidAmount / $totalAmount) * 100) : 0;
 
-    private function getBaseQuery($user)
-    {
-        if ($this->filters->family_member === 'all') {
-            $family = $user->family();
-            if ($family) {
-                $query = Invoice::where('family_id', $family->id);
-            } else {
-                $query = $user->invoices();
-            }
-        } else {
-            if ($this->filters->family_member == $user->id) {
-                $query = $user->invoices();
-            } else {
-                $query = Invoice::where('user_id', $this->filters->family_member);
+        // Répartition par statut de paiement
+        $statusDistribution = [];
+        foreach (PaymentStatusEnum::cases() as $status) {
+            $statusQuery = clone $filteredQuery;
+            $count = $statusQuery->where('payment_status', $status->value)->count();
+            if ($count > 0) {
+                $statusDistribution[$status->label()] = [
+                    'count' => $count,
+                    'percentage' => $invoiceCount > 0 ? round(($count / $invoiceCount) * 100) : 0,
+                    'color' => $status->color(),
+                    'emoji' => $status->emoji(),
+                ];
             }
         }
 
-        return $query;
+        return [
+            'totalAmount' => $totalAmount,
+            'paidAmount' => $paidAmount,
+            'paidPercentage' => $paidPercentage,
+            'invoiceCount' => $invoiceCount,
+            'upcomingDueCount' => $upcomingCount,
+            'overdueAmount' => $overdueAmount,
+            'maxAmount' => $maxAmount,
+            'thisMonthAmount' => $thisMonthAmount,
+            'statusDistribution' => $statusDistribution,
+        ];
     }
 
     public function render()

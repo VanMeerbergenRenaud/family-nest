@@ -538,8 +538,9 @@ class Index extends Component
     public function deleteDefinitelyInvoice(): void
     {
         try {
-            if (!auth()->user()->can('delete', $this->invoice)) {
+            if (! auth()->user()->can('delete', $this->invoice)) {
                 Toaster::error('Vous n\'avez pas la permission de supprimer cette facture.');
+
                 return;
             }
 

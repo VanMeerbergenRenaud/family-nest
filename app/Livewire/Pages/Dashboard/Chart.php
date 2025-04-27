@@ -2,10 +2,9 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
-use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
@@ -16,44 +15,18 @@ class Chart extends Component
     #[Reactive]
     public Filters $filters;
 
-    public $dataset = [];
+    public array $dataset = [];
 
     public function mount()
     {
         $this->user = auth()->user();
-        $this->fillDataset();
+        $this->refreshData();
     }
 
-    #[On('statusChanged')]
-    public function refreshData(): void
+    public function refreshData()
     {
-        $this->fillDataset();
-    }
-
-    #[On('familyMemberChanged')]
-    public function refreshDataForFamilyMember(): void
-    {
-        $this->fillDataset();
-    }
-
-    #[On('rangeChanged')]
-    public function refreshDataForRange(): void
-    {
-        $this->fillDataset();
-    }
-
-    public function fillDataset(): void
-    {
-        $family = $this->user->family();
-
-        if ($this->filters->family_member === 'all') {
-            $query = Invoice::where('family_id', $family->id);
-        } else {
-            $query = Invoice::where('user_id', $this->filters->family_member);
-        }
-
-        $query = $this->filters->applyStatus($query);
-        $query = $this->filters->applyRange($query);
+        $query = $this->filters->getBaseQuery();
+        $query = $this->filters->apply($query);
 
         $results = $query->select('type', DB::raw('SUM(amount) as total'))
             ->groupBy('type')
@@ -66,13 +39,24 @@ class Chart extends Component
         ];
     }
 
-    public function hydrate(): void
+    #[Computed]
+    public function shouldRefresh()
     {
-        $this->fillDataset();
+        return [
+            'status' => $this->filters->status,
+            'family_member' => $this->filters->family_member,
+            'range' => $this->filters->range,
+            'start' => $this->filters->start,
+            'end' => $this->filters->end,
+        ];
     }
 
     public function render()
     {
+        if ($this->shouldRefresh) {
+            $this->refreshData();
+        }
+
         return view('livewire.pages.dashboard.chart');
     }
 }

@@ -3,73 +3,51 @@
 namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Invoice;
+use App\Traits\ColumnPreferencesTrait;
 use App\Traits\HumanDateTrait;
-use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class Table extends Component
 {
-    use Searchable, Sortable, WithPagination, HumanDateTrait;
+    use ColumnPreferencesTrait, HumanDateTrait, Searchable, Sortable, WithPagination;
 
     #[Reactive]
     public Filters $filters;
 
-    public $selectedInvoiceIds = [];
+    public array $selectedInvoiceIds = [];
 
-    public $invoiceIdsOnPage = [];
+    // Cette propriété sera réactive grâce à la méthode computed
+    public array $invoiceIdsOnPage = [];
 
-    #[On('statusChanged')]
-    public function resetPageAndRefresh(): void
+    // Surveillance des changements de filtres pour reset la pagination
+    public function updated($property)
     {
-        $this->resetPage();
-        $this->selectedInvoiceIds = [];
+        if (str_starts_with($property, 'filters.') || $property === 'search') {
+            $this->resetPage();
+            $this->selectedInvoiceIds = [];
+        }
     }
 
-    #[On('familyMemberChanged')]
-    public function resetPageAndRefreshForFamilyMember(): void
+    #[Computed]
+    public function invoices()
     {
-        $this->resetPage();
-        $this->selectedInvoiceIds = [];
-    }
+        $query = $this->filters->getBaseQuery();
+        $query = $this->filters->apply($query);
+        $query = $this->applySearch($query);
+        $query = $this->applySorting($query);
 
-    #[On('rangeChanged')]
-    public function resetPageAndRefreshForRange(): void
-    {
-        $this->resetPage();
-        $this->selectedInvoiceIds = [];
+        return $query->paginate(10);
     }
 
     public function render()
     {
-        $user = auth()->user();
+        $invoices = $this->invoices;
 
-        if ($this->filters->family_member === 'all') {
-            $family = $user->family();
-            if ($family) {
-                $query = Invoice::where('family_id', $family->id);
-            } else {
-                $query = $user->invoices();
-            }
-        } else {
-            if ($this->filters->family_member == $user->id) {
-                $query = $user->invoices();
-            } else {
-                $query = Invoice::where('user_id', $this->filters->family_member);
-            }
-        }
-
-        $query = $this->filters->applyStatus($query);
-        $query = $this->applySearch($query);
-        $query = $this->filters->applyRange($query);
-        $query = $this->applySorting($query);
-
-        $invoices = $query->paginate(10);
-
-        $this->invoiceIdsOnPage = $invoices->map(
-            fn ($invoice) => (string) $invoice->id
-        )->toArray();
+        // Mettre à jour les IDs sur la page actuelle
+        $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
 
         return view('livewire.pages.dashboard.table', compact('invoices'));
     }

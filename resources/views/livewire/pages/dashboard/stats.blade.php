@@ -1,110 +1,82 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    <!-- Carte 1: Montant total -->
+    <!-- Carte 1: Montant Total -->
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col">
-            <h3 class="text-sm font-medium text-gray-500">Montant Total</h3>
+            <h3 class="text-sm-medium text-gray-600">Montant Total</h3>
             <div class="flex items-center gap-2 mt-2">
                 <span class="text-2xl font-bold text-gray-900">
-                    {{ number_format($totalStats['totalAmount'], 2, ',', ' ') }} €
+                    {{ number_format($this->statistics['totalAmount'], 2, ',', ' ') }} €
                 </span>
-                @if($totalStats['totalAmount'] != 0)
-                    <span @class([
-                        'text-xs font-medium rounded-full py-0.5 px-2 flex items-center gap-1',
-                        'bg-green-100 text-green-700' => $totalStats['totalAmount'] > 0,
-                        'bg-red-100 text-red-700' => $totalStats['totalAmount'] < 0,
-                    ])>
-                        @if($totalStats['totalAmount'] > 0)
-                            <x-svg.arrow-trending-up class="w-3 h-3" />
-                        @else
-                            <x-svg.arrow-trending-down class="w-3 h-3" />
-                        @endif
-                        {{ abs($totalStats['totalAmount']) }}%
-                    </span>
-                @endif
+            </div>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="text-sm text-gray-700">Payé: {{ number_format($this->statistics['paidAmount'], 2, ',', ' ') }} €</span>
+                <span class="ml-1 px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">
+                    {{ $this->statistics['paidPercentage'] }}%
+                </span>
             </div>
             <p class="text-xs text-gray-500 mt-2.5">
-                Factures avec échéance
+                {{ $this->statistics['invoiceCount'] }} factures au total
             </p>
-            <p class="text-xs text-gray-400 mt-1">
-                @if($filters->range === \App\Livewire\Pages\Dashboard\Range::All_Time)
-                    Toutes les échéances
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Custom && $filters->start && $filters->end)
-                    {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->start)->format('d/m/Y') }} - {{ \Carbon\Carbon::createFromFormat('Y-m-d', $filters->end)->format('d/m/Y') }}
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Future)
-                    Échéances futures
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_7)
-                    {{ \App\Livewire\Pages\Dashboard\Range::Next_7->label() }}
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Next_30)
-                    {{ \App\Livewire\Pages\Dashboard\Range::Next_30->label() }}
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Today)
-                    Aujourd'hui
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Week)
-                    Cette semaine
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::This_Month)
-                    Ce mois-ci
-                @elseif($filters->range === \App\Livewire\Pages\Dashboard\Range::Year)
-                    Cette année
+        </div>
+    </div>
+
+    <!-- Carte 2: Montant Impayé à Échéance Dépassée -->
+    <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
+        <div class="flex flex-col">
+            <h3 class="text-sm-medium text-gray-600">Montant en Retard</h3>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="text-2xl font-bold {{ $this->statistics['overdueAmount'] > 0 ? 'text-rose-600' : 'text-gray-900' }}">
+                    {{ number_format($this->statistics['overdueAmount'], 2, ',', ' ') }} €
+                </span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+                Factures impayées dépassant la date d'échéance
+            </p>
+            <p class="text-xs text-gray-400 mt-2">
+                @if($this->statistics['totalAmount'] > 0 && $this->statistics['overdueAmount'] > 0)
+                    {{ round(($this->statistics['overdueAmount'] / $this->statistics['totalAmount']) * 100) }}% du montant total
                 @else
-                    {{ $filters->range->label() }}
+                    Aucun retard pour le moment
                 @endif
             </p>
         </div>
     </div>
 
-    <!-- Carte 2: Montant moyen -->
+    <!-- Carte 3: Échéances du mois en cours -->
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col">
-            <h3 class="text-sm font-medium text-gray-500">Montant Moyen</h3>
+            <h3 class="text-sm-medium text-gray-600">Échéances ce Mois</h3>
             <div class="flex items-center gap-2 mt-2">
                 <span class="text-2xl font-bold text-gray-900">
-                    {{ number_format($totalStats['averageAmount'], 2, ',', ' ') }} €
+                    {{ number_format($this->statistics['thisMonthAmount'], 2, ',', ' ') }} €
                 </span>
             </div>
-            <p class="text-xs text-gray-500 mt-2.5">
-                Par facture
+            <p class="text-xs text-gray-500 mt-1">
+                Total des factures pour {{ Carbon\Carbon::now()->locale('fr')->monthName }}
             </p>
-            <p class="text-xs text-gray-400 mt-1">
-                Pour la période d'échéance sélectionnée
-            </p>
-        </div>
-    </div>
-
-    <!-- Carte 3: Nombre de factures -->
-    <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
-        <div class="flex flex-col">
-            <h3 class="text-sm font-medium text-gray-500">Factures</h3>
-            <div class="flex items-center gap-2 mt-2">
-                <span class="text-2xl font-bold text-gray-900">
-                    {{ number_format($totalStats['invoiceCount'], 0, ',', ' ') }}
-                </span>
-            </div>
-            <p class="text-xs text-gray-500 mt-2.5">
-                Total des factures
-            </p>
-            <p class="text-xs text-gray-400 mt-1">
-                Pour la période d'échéance sélectionnée
-            </p>
-        </div>
-    </div>
-
-    <!-- Carte 4: Factures payées -->
-    <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
-        <div class="flex flex-col">
-            <h3 class="text-sm font-medium text-gray-500">Factures Payées</h3>
-            <div class="flex items-center gap-2 mt-2">
-                <span class="text-2xl font-bold text-gray-900">
-                    {{ number_format($totalStats['paidInvoices'], 0, ',', ' ') }}
-                </span>
-            </div>
-            <p class="text-xs text-gray-500 mt-2.5">
-                @if($totalStats['invoiceCount'] > 0)
-                    {{ number_format(($totalStats['paidInvoices'] / $totalStats['invoiceCount']) * 100, 0) }}% du total
-                @else
-                    0% du total
+            <p class="text-xs text-gray-400 mt-2">
+                @if($this->statistics['totalAmount'] > 0)
+                    {{ round(($this->statistics['thisMonthAmount'] / $this->statistics['totalAmount']) * 100) }}% du montant total filtré
                 @endif
             </p>
-            <p class="text-xs text-gray-400 mt-1">
-                Pour la période d'échéance sélectionnée
+        </div>
+    </div>
+
+    <!-- Carte 4: Factures à venir dans les 7 jours -->
+    <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
+        <div class="flex flex-col">
+            <h3 class="text-sm-medium text-gray-600">À Payer Prochainement</h3>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="text-2xl font-bold text-gray-900">
+                    {{ $this->statistics['upcomingDueCount'] }}
+                </span>
+                <span class="text-sm text-gray-600 font-medium">Facture(s)</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">
+                Arrivent à échéance dans les 7 prochains jours
+            </p>
+            <p class="text-xs text-gray-400 mt-2">
+                Pensez à planifier vos paiements
             </p>
         </div>
     </div>

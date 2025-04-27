@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use Illuminate\Database\Eloquent\Builder;
+
 trait Searchable
 {
-    public $search = '';
+    public string $search = '';
 
-    public function updatedSearchable($property): void
+    public function updatedSearchable(string $property): void
     {
         if ($property === 'search') {
             $this->resetPage();
