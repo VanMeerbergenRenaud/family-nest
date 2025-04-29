@@ -28,7 +28,7 @@
         </x-menu.item>
 
         <x-menu.item wire:click="inviteMember">
-            <x-svg.user-plus class="group-hover:text-gray-900"/>
+            <x-svg.user-plus class="w-4.5 h-4.5 group-hover:text-gray-900 stroke-2"/>
             {{ __('Inviter un membre') }}
         </x-menu.item>
 
@@ -51,14 +51,14 @@
 
         <x-menu.divider />
 
-        <x-menu.item wire:click="seeArchives" class="group hover:text-red-500">
-            <x-svg.trash class="group-hover:text-red-500"/>
-            {{ __('Mes archives') }}
-        </x-menu.item>
-
         <x-menu.item wire:click="logout" class="group hover:text-red-500">
             <x-svg.logout class="group-hover:text-red-500"/>
             {{ __('Se déconnecter') }}
+        </x-menu.item>
+
+        <x-menu.item wire:click="suppressAccount" class="group hover:text-red-500">
+            <x-svg.trash class="group-hover:text-red-500"/>
+            {{ __('Supprimer le compte') }}
         </x-menu.item>
 
     </x-menu.items>

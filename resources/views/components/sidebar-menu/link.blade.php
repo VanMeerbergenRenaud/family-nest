@@ -20,8 +20,8 @@
        @mouseleave="showTooltip = false"
         {{ $attributes }}
     >
-        <span class="stroke-2" :class="{{ $isActive ? 'true' : 'false' }} ? 'text-indigo-600 dark:text-indigo-200' : '{{ $groupColor }}'">
-            <x-dynamic-component :component="'heroicon-o-'.$icon" class="w-4.5 h-4.5 text-current" />
+        <span :class="{{ $isActive ? 'true' : 'false' }} ? 'text-indigo-600 dark:text-indigo-200' : '{{ $groupColor }}'">
+            <x-dynamic-component :component="'svg.' . $icon" class="w-4.5 h-4.5 text-current" />
         </span>
         @if($expanded)
             <span class="ml-2.5" :class="{{ $isActive ? 'true' : 'false' }} ? 'text-indigo-600 dark:text-indigo-200' : '{{ $groupColor }}'">

@@ -44,7 +44,7 @@ class Filters extends Form
     {
         return collect(FilterStatus::cases())->map(function ($status) {
             $count = $this->getBaseQuery()
-                ->when($status !== FilterStatus::All, fn($q) => $q->where('payment_status', $status->value))
+                ->when($status !== FilterStatus::All, fn ($q) => $q->where('payment_status', $status->value))
                 ->count();
 
             return [
@@ -77,7 +77,9 @@ class Filters extends Form
             [
                 'id' => $this->user->id,
                 'name' => $this->user->name.' (Vous)',
-                'invoice_count' => $this->applyStatus($this->user->invoices())->count(),
+                'invoice_count' => $this->applyStatus($baseQuery)
+                    ->where('user_id', $this->user->id)
+                    ->count(),
             ],
         ]);
 
@@ -87,7 +89,9 @@ class Filters extends Form
             ->map(fn ($member) => [
                 'id' => $member->id,
                 'name' => $member->name,
-                'invoice_count' => $this->applyStatus($member->invoices())->count(),
+                'invoice_count' => $this->applyStatus($member->invoices()
+                    ->where('is_archived', false))
+                    ->count(),
             ]);
 
         return $primaryMember->concat($otherMembers);
@@ -115,6 +119,7 @@ class Filters extends Form
     {
         if ($this->family_member === 'all') {
             $family = $this->user->family();
+
             return $family
                 ? $query->where('family_id', $family->id)
                 : $query;
@@ -146,22 +151,31 @@ class Filters extends Form
         $user = $this->user;
         $family = $user->family();
 
-        if ($this->family_member === 'all') {
-            return $family
-                ? Invoice::where('family_id', $family->id)
-                : $user->invoices();
+        // Query de base pour les factures non archivées
+        $query = Invoice::query()->where('is_archived', false);
+
+        // Si on filtre par membre spécifique
+        if ($this->family_member !== 'all') {
+            return $query->where('user_id', $this->family_member);
         }
 
-        return $this->family_member == $user->id
-            ? $user->invoices()
-            : Invoice::where('user_id', $this->family_member);
-    }
+        // Sinon, si c'est "tous les membres"
+        if ($family) {
+            if ($user->isAdmin()) {
+                return $query->where('family_id', $family->id);
+            }
 
-    public function resetRange(): void
-    {
-        $this->range = Range::All_Time;
-        $this->start = null;
-        $this->end = null;
+            // Sinon, on montre seulement ses propres factures et celles partagées avec lui
+            return $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                    ->orWhereHas('sharedUsers', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+            })->where('family_id', $family->id);
+        }
+
+        // Si pas de famille, on montre seulement ses propres factures
+        return $query->where('user_id', $user->id);
     }
 
     public function resetAllFilters(): void

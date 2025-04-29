@@ -8,23 +8,12 @@ trait ColumnPreferencesTrait
 {
     public array $visibleColumns = [
         'name' => true,
+        'reference' => false,
         'type' => false,
         'category' => false,
         'issuer_name' => true,
         'amount' => true,
-        'issued_date' => true,
-        'payment_status' => false,
-        'payment_due_date' => false,
-        'tags' => true,
-    ];
-
-    protected array $defaultColumns = [
-        'name' => true,
-        'type' => false,
-        'category' => false,
-        'issuer_name' => true,
-        'amount' => true,
-        'issued_date' => true,
+        'issued_date' => false,
         'payment_status' => false,
         'payment_due_date' => false,
         'tags' => true,
@@ -35,29 +24,31 @@ trait ColumnPreferencesTrait
     public function initializeColumnPreferences(): void
     {
         $sessionKey = $this->getColumnSessionKey();
-
-        $sessionColumns = Session::get($sessionKey);
-
-        if ($sessionColumns) {
-            $this->visibleColumns = $sessionColumns;
-        } elseif (! empty($this->defaultColumns)) {
-            $this->visibleColumns = $this->defaultColumns;
-        }
+        $this->visibleColumns = Session::get($sessionKey, $this->visibleColumns);
     }
 
     public function toggleColumn($column): void
     {
         if (isset($this->visibleColumns[$column])) {
             $this->visibleColumns[$column] = ! $this->visibleColumns[$column];
-
-            // Sauvegarder les préférences en session
             Session::put($this->getColumnSessionKey(), $this->visibleColumns);
         }
     }
 
     public function resetColumns(): void
     {
-        $this->visibleColumns = $this->defaultColumns;
+        $this->visibleColumns = [
+            'name' => true,
+            'reference' => false,
+            'type' => false,
+            'category' => false,
+            'issuer_name' => true,
+            'amount' => true,
+            'issued_date' => false,
+            'payment_status' => false,
+            'payment_due_date' => false,
+            'tags' => true,
+        ];
 
         Session::put($this->getColumnSessionKey(), $this->visibleColumns);
     }
@@ -69,8 +60,6 @@ trait ColumnPreferencesTrait
 
     protected function getColumnSessionKey(): string
     {
-        $className = class_basename($this);
-
-        return "{$this->columnSessionPrefix}_{$className}";
+        return "{$this->columnSessionPrefix}_".class_basename($this);
     }
 }

@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Livewire\Pages\Dashboard;
+namespace App\Traits;
 
-use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 
-trait Searchable
+trait SearchableTrait
 {
+    #[Url]
     public string $search = '';
 
-    public function updatedSearchable(string $property): void
+    public function updatedSearch(): void
     {
-        if ($property === 'search') {
-            $this->resetPage();
-        }
+        $this->resetPage();
     }
 
     protected function applySearch($query)

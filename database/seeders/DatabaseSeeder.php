@@ -42,13 +42,6 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
-        /* Teacher users */
-        $dominique = User::factory()->create([
-            'name' => 'Dominique Vilain',
-            'email' => 'dominique.vilain@gmail.com',
-            'password' => bcrypt('password'),
-        ]);
-
         // Create a family for the main user
         $renaudFamily = Family::factory()->create([
             'name' => 'Famille Van Meerbergen',
@@ -86,10 +79,6 @@ class DatabaseSeeder extends Seeder
             'user_id' => $france->id,
         ]);
 
-        $invoicesTeacher = Invoice::factory(5)->create([
-            'user_id' => $dominique->id,
-        ]);
-
         // Create invoice files for users
         foreach ($invoiceRenaud as $invoice) {
             InvoiceFile::factory()->create([
@@ -98,12 +87,6 @@ class DatabaseSeeder extends Seeder
         }
 
         foreach ($invoiceFrance as $invoice) {
-            InvoiceFile::factory()->create([
-                'invoice_id' => $invoice->id,
-            ]);
-        }
-
-        foreach ($invoicesTeacher as $invoice) {
             InvoiceFile::factory()->create([
                 'invoice_id' => $invoice->id,
             ]);

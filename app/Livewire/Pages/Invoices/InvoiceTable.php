@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Livewire\Pages\Dashboard;
+namespace App\Livewire\Pages\Invoices;
 
+use App\Livewire\Pages\Dashboard\Filters;
 use App\Traits\ColumnPreferencesTrait;
 use App\Traits\HumanDateTrait;
 use App\Traits\InvoiceTableTrait;
@@ -11,7 +12,11 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
-class Table extends Component
+/**
+ * Composant réutilisable pour les tables d'invoices
+ * Peut être utilisé à la fois par le dashboard et la page invoices
+ */
+class InvoiceTable extends Component
 {
     use ColumnPreferencesTrait,
         HumanDateTrait,
@@ -22,13 +27,22 @@ class Table extends Component
     #[Reactive]
     public Filters $filters;
 
+    public int $perPage = 9;
+
+    public bool $withFilters = true;
+
     public function mount()
     {
         $this->mountSortableTrait();
         $this->mountInvoiceTableTrait();
+
+        if (! isset($this->filters)) {
+            $user = auth()->user();
+            $this->filters->init($user);
+        }
     }
 
-    public function updated($property)
+    public function updated($property): void
     {
         if (str_starts_with($property, 'filters.') || $property === 'search') {
             $this->resetPage();
@@ -39,21 +53,22 @@ class Table extends Component
     #[Computed]
     public function invoices()
     {
-        $query = $this->filters->getBaseQuery();
-        $query = $this->filters->apply($query);
+        $query = $this->withFilters
+            ? $this->filters->apply($this->filters->getBaseQuery())
+            : auth()->user()->invoices()->where('is_archived', false);
+
         $query = $this->applySearch($query);
         $query = $this->applySorting($query);
 
-        return $query->paginate(10);
+        return $query->paginate($this->perPage);
     }
 
     public function render()
     {
         $invoices = $this->invoices;
 
-        // Mettre à jour les IDs sur la page actuelle
         $this->invoiceIdsOnPage = $invoices->map(fn ($invoice) => (string) $invoice->id)->toArray();
 
-        return view('livewire.pages.dashboard.table', compact('invoices'));
+        return view('livewire.pages.invoices.invoice-table', compact('invoices'));
     }
 }

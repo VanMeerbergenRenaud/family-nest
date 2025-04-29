@@ -20,7 +20,6 @@ use App\Livewire\Pages\Settings\Index as IndexSetting;
 use App\Livewire\Pages\Settings\Notification;
 use App\Livewire\Pages\Settings\Profile;
 use App\Livewire\Pages\Settings\Storage;
-use App\Livewire\Pages\Themes;
 use Illuminate\Support\Facades\Route;
 
 // Route for the welcome page
@@ -49,7 +48,6 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
     Route::middleware([CheckFamilyRole::class.':viewer,editor,admin'])->group(function () {
 
         Route::get('/dashboard', IndexDashboard::class)->name('dashboard');
-        Route::get('/themes', Themes::class)->name('themes');
         Route::get('/calendar', Calendar::class)->name('calendar');
         Route::get('/goals', Goals::class)->name('goals');
 

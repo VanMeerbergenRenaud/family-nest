@@ -18,7 +18,6 @@ class Breadcrumb extends Component
         'invoices.edit' => 'Modifier la facture',
         'invoices.show' => 'Détails de la facture',
         'invoices.archived' => 'Archives',
-        'themes' => 'Thèmes',
         'calendar' => 'Calendrier',
         'goals' => 'Objectifs',
         'family' => 'Famille',
