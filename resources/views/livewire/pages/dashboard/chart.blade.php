@@ -1,10 +1,10 @@
 <div>
     <div
-        x-data="chart"
-        x-init="init($wire.dataset)"
-        wire:ignore
-        wire:loading.class="opacity-50"
-        class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
+            x-data="chart"
+            x-init="init($wire.dataset)"
+            wire:ignore
+            wire:loading.class="opacity-50"
+            class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
         <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">
             Montant des factures par type
@@ -71,12 +71,26 @@
             },
 
             createChart(el, dataset) {
-                const { labels, values } = dataset;
+                const cleanData = {
+                    labels: [],
+                    values: []
+                };
 
-                console.log('Data de la chart bien reçu:', dataset);
+                if (dataset && dataset.labels) {
+                    dataset.labels.forEach((label, index) => {
+                        if (label !== null) {
+                            cleanData.labels.push(label);
+                            cleanData.values.push(parseFloat(dataset.values[index] || 0));
+                        }
+                    });
+                }
 
-                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#14B8A6', '#6B7280', '#4B5563', '#374151', '#1F2937'];
-                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C', '#D97706', '#059669', '#0D9488', '#4B5563', '#374151', '#1F2937'];
+                console.log('Données nettoyées:', cleanData);
+
+                const {labels, values} = cleanData;
+
+                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B'];
+                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C'];
 
                 return new Chart(el, {
                     type: 'bar',
@@ -89,7 +103,6 @@
                             hoverBackgroundColor: hoverColors,
                             borderWidth: 0,
                             borderRadius: 8,
-                            barThickness: `flex`,
                             minBarLength: 15,
                         }]
                     },
@@ -101,8 +114,8 @@
                             easing: 'easeOutQuart'
                         },
                         plugins: {
-                            title: { display: false },
-                            legend: { display: false },
+                            title: {display: false},
+                            legend: {display: false},
                             tooltip: {
                                 mode: 'index',
                                 intersect: false,
@@ -138,8 +151,8 @@
                         scales: {
                             x: {
                                 display: true,
-                                grid: { display: false },
-                                border: { display: false },
+                                grid: {display: false},
+                                border: {display: false},
                                 ticks: {
                                     autoSkip: true,
                                     maxRotation: 35,
@@ -149,7 +162,7 @@
                                         size: 11,
                                         color: '#6B7280'
                                     },
-                                    callback: function(value, index) {
+                                    callback: function (value, index) {
                                         const label = this.getLabelForValue(index);
                                         if (label && label.length > 12) {
                                             return label.substring(0, 10) + '...';
@@ -160,7 +173,7 @@
                             },
                             y: {
                                 display: true,
-                                border: { display: false },
+                                border: {display: false},
                                 beginAtZero: true,
                                 grid: {
                                     display: true,
@@ -169,7 +182,7 @@
                                 },
                                 ticks: {
                                     padding: 0,
-                                    callback: function(value) {
+                                    callback: function (value) {
                                         const options = value >= 1000000
                                             ? {
                                                 style: 'currency',
