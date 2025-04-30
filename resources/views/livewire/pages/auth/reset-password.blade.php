@@ -15,6 +15,7 @@
                 autocomplete="email"
                 autofocus
                 required
+                class="lowercase"
             />
 
             <!-- Password -->

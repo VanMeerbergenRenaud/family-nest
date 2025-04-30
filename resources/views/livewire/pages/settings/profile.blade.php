@@ -77,6 +77,7 @@
                         name="form.name"
                         model="form.name"
                         placeholder="Renseigner votre nom"
+                        class="capitalize"
                     />
 
                     <x-form.field
@@ -85,6 +86,7 @@
                         model="form.email"
                         type="email"
                         placeholder="Renseignez votre adresse email"
+                        class="lowercase"
                     />
                 </div>
 

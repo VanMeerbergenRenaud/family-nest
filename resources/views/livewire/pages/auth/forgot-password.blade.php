@@ -25,6 +25,7 @@
                     placeholder="votre-email@gmail.com"
                     autofocus
                     required
+                    class="lowercase"
                 />
             </div>
 

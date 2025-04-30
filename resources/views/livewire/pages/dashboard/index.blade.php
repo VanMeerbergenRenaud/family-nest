@@ -52,19 +52,9 @@
         <div class="w-full flex flex-col gap-4">
             <div class="w-full flex flex-wrap items-center md:justify-between gap-8">
                 <div class="lg:pl-4">
-                    <p class="text-sm text-gray-500 mb-1">{{ $family->name }}</p>
+                    <p class="text-sm text-gray-500 mb-1">{{ __('Famille ') . $family->name }}</p>
                     <h2 role="heading" aria-level="2" class="font-semibold text-xl text-gray-800">Bonjour, {{ auth()->user()->name }}! 👋🏻</h2>
                 </div>
-
-                {{-- Bouton pour inviter un membre à la famille si l'utilisateur est seul --}}
-                @if(count($this->getFamilyMemberIds()) <= 1)
-                    <div class="flex items-center">
-                        <a href="{{ route('family.invite') }}" class="button-tertiary">
-                            <x-svg.user-plus class="mr-1"/>
-                            Inviter un membre
-                        </a>
-                    </div>
-                @endif
 
                 {{-- Zone de filtres --}}
                 <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3 items-start sm:items-end">

@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
 
         // Create a family for the main user
         $renaudFamily = Family::factory()->create([
-            'name' => 'Famille Van Meerbergen',
+            'name' => 'Van Meerbergen',
         ]);
 
         // Attach other users to the family of the main user

@@ -54,10 +54,11 @@
                         label="Nom de votre famille"
                         name="form.familyName"
                         model="form.familyName"
-                        placeholder="Exemple: Famille Dupont"
+                        placeholder="Exemple: Janssens"
                         :asterix="true"
                         autofocus
                         required
+                        class="capitalize"
                     />
                     <p class="mt-2 px-2 text-sm text-gray-500">
                         Ce nom sera visible par tous les membres que vous inviterez.
@@ -99,6 +100,7 @@
                                         wire:change="validateMemberEmail({{ $index }})"
                                         :asterix="true"
                                         required
+                                        class="lowercase"
                                     />
                                     @if(!empty($members[$index]['error']))
                                         <span class="inline-flex text-red-500 text-sm-medium pl-2 max-w-xs mt-1">{{ $members[$index]['error'] }}</span>

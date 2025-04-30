@@ -31,6 +31,7 @@
                     model="form.email"
                     value="{{ $email }}"
                     placeholder="votre-email@gmail.com"
+                    class="lowercase"
                 />
 
                 <x-form.field
@@ -40,6 +41,7 @@
                     placeholder="Votre nom"
                     :asterix="true"
                     autofocus
+                    class="capitalize"
                 />
 
                 <x-form.field-password

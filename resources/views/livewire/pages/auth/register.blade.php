@@ -13,6 +13,7 @@
                 autocomplete="name"
                 autofocus
                 required
+                class="capitalize"
             />
 
             <!-- Email -->
@@ -24,6 +25,7 @@
                 placeholder="votre-email@gmail.com"
                 autocomplete="email"
                 required
+                class="lowercase"
             />
 
             <!-- Password -->

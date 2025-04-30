@@ -25,13 +25,16 @@ trait InvoiceStateCheckTrait
     // Récupère les IDs des membres de la famille de l'utilisateur
     public function getFamilyMemberIds(): array
     {
-        $family = $this->getUserFamily();
-
-        if (! $family) {
-            return [];
+        if (! $this->hasFamily()) {
+            return [auth()->id()];
         }
 
-        return $family->users()->pluck('user_id')->toArray();
+        $family = $this->getUserFamily();
+
+        return $family->users()
+            ->select('users.id')
+            ->pluck('id')
+            ->toArray();
     }
 
     // Vérifie si l'utilisateur ou sa famille a des factures actives

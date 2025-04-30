@@ -110,6 +110,25 @@ class FamilyForm extends Form
             $this->reset('familyName');
             $this->setFamily($family);
 
+            // Si le user possède déjà des factures, les associer à la famille
+            if (auth()->user()->invoices()->exists()) {
+                $userInvoices = DB::table('invoices')
+                    ->where('user_id', auth()->id())
+                    ->where('family_id', null)
+                    ->get();
+
+                foreach ($userInvoices as $invoice) {
+                    DB::table('invoices')
+                        ->where('id', $invoice->id)
+                        ->update([
+                            'family_id' => $family->id,
+                            'paid_by_user_id' => auth()->id(),
+                        ]);
+                }
+
+                Toaster::success('Anciennes factures associées à la famille');
+            }
+
             Toaster::success('Famille créée avec succès');
 
             return $family;
@@ -322,6 +341,12 @@ class FamilyForm extends Form
 
         try {
             $this->family->users()->detach($userId);
+
+            // Mettre le family_id de chaque invoice à NULL
+            DB::table('invoices')
+                ->where('user_id', $userId)
+                ->update(['family_id' => null]);
+
             Toaster::success('Membre supprimé avec succès');
 
             return true;

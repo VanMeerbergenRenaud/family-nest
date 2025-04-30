@@ -253,7 +253,7 @@
                                                     </p>
                                                 </div>
                                                 <div class="space-y-1">
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d‘échéance') }}</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d’échéance') }}</p>
                                                     <p class="text-sm font-medium text-gray-900 dark:text-white">
                                                         {{ $invoice->dateForHumans($invoice->payment_due_date) }}
                                                     </p>

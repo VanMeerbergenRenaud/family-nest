@@ -5,6 +5,13 @@
             title="Votre famille n'a pas encore été créée"
             description="Vous n'avez pas encore de famille ? Créez-en une pour commencer à gérer vos dépenses ensemble."
         >
+            {{-- Si le user n'a pas de famille mais déjà des factures associées --}}
+           @if(auth()->user()->invoices()->exists())
+                <p class="flex gap-3 p-2 items-start text-sm text-blue-600 bg-blue-50 rounded-lg border border-blue-400">
+                    <x-svg.info class="min-w-4 h-4 text-blue-400 mt-1" />
+                    Il semblerait que vous ayez déjà des factures associées à votre compte. Pour les gérer, vous devez créer une nouvelle famille.
+                </p>
+           @endif
             <button wire:click="openCreateFamilyModal" class="button-tertiary">
                 <x-svg.add2 class="text-white"/>
                 Créer votre famille
@@ -30,7 +37,7 @@
     {{-- Table of family members --}}
     @if($family)
         <x-header
-            title="{{ $family->name ?? __('Votre famille') }}"
+            title="{{ __('Famille ') . $family->name ?? __('Votre famille') }}"
             description="Gérez les membres de votre famille et leurs autorisations de compte ici."
         />
 
@@ -546,7 +553,7 @@
                                 </h2>
                                 <p class="mt-2 text-md-regular text-gray-500">
                                     {{ __('Êtes-vous sûr de vouloir supprimer tous les membres de la famille') }}
-                                    <strong class="font-semibold"> {{ $family->name ?? 'Nom de la famille' }}&nbsp;?</strong>
+                                    <strong class="font-semibold"> {{ $family->name ?? __('Nom de la famille') }}&nbsp;?</strong>
                                     {{ __('Tous les membres seront détachés de la famille, sauf vous. Cette action est irréversible.') }}
                                 </p>
                                 <div class="mt-6 mb-2 flex flex-col gap-3">
@@ -603,7 +610,7 @@
                                 label="Nouveau nom de la famille"
                                 name="newFamilyName"
                                 model="form.newFamilyName"
-                                placeholder="Exemple: Famille Dupont"
+                                placeholder="Exemple: Janssens"
                                 :asterix="true"
                                 autofocus
                             />
@@ -650,9 +657,11 @@
                                 label="Nom de la famille"
                                 name="familyName"
                                 model="form.familyName"
-                                placeholder="Exemple: Famille Dupont"
+                                placeholder="Exemple: Janssens"
                                 :asterix="true"
                                 autofocus
+                                required
+                                class="capitalize"
                             />
                         </div>
                     </div>

@@ -119,8 +119,8 @@
                                 'issuer_name' => 'Émetteur',
                                 'amount' => 'Montant',
                                 'payment_status' => 'Statut de paiement',
-                                'issued_date' => 'Date d‘émission',
-                                'payment_due_date' => 'Date d‘échéance',
+                                'issued_date' => 'Date d’émission',
+                                'payment_due_date' => 'Date d’échéance',
                                 'tags' => 'Tags',
                             ];
                         @endphp
