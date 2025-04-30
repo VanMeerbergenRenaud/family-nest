@@ -73,6 +73,8 @@
             createChart(el, dataset) {
                 const { labels, values } = dataset;
 
+                console.log('Data de la chart bien reçu:', dataset);
+
                 const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B', '#10B981', '#14B8A6', '#6B7280', '#4B5563', '#374151', '#1F2937'];
                 const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C', '#D97706', '#059669', '#0D9488', '#4B5563', '#374151', '#1F2937'];
 
@@ -83,12 +85,12 @@
                         datasets: [{
                             label: 'Montant des factures par type',
                             data: values,
-                            backgroundColor: context => colors[context.dataIndex % colors.length],
-                            hoverBackgroundColor: context => hoverColors[context.dataIndex % hoverColors.length],
+                            backgroundColor: colors,
+                            hoverBackgroundColor: hoverColors,
                             borderWidth: 0,
                             borderRadius: 8,
-                            barThickness: 'flex',
-                            minBarLength: 10,
+                            barThickness: `flex`,
+                            minBarLength: 15,
                         }]
                     },
                     options: {
