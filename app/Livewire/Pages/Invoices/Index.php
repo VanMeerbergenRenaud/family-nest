@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Pages\Invoices;
 
-use AllowDynamicProperties;
 use App\Livewire\Pages\Dashboard\Filters;
 use App\Traits\InvoiceFolderTrait;
 use App\Traits\InvoiceShareCalculationTrait;
+use App\Traits\InvoiceStateCheckTrait;
 use App\Traits\InvoiceTableTrait;
 use App\Traits\SearchableTrait;
 use App\Traits\SortableTrait;
@@ -18,6 +18,7 @@ class Index extends Component
 {
     use InvoiceFolderTrait;
     use InvoiceShareCalculationTrait;
+    use InvoiceStateCheckTrait;
     use InvoiceTableTrait;
     use SearchableTrait;
     use SortableTrait;
@@ -33,6 +34,10 @@ class Index extends Component
 
     public function mount()
     {
+        if (! $this->hasFamily()) {
+            return;
+        }
+
         $this->mountInvoiceTableTrait();
         $this->mountSortableTrait();
 
@@ -85,6 +90,7 @@ class Index extends Component
             ->get();
 
         $archivedInvoices = auth()->user()->invoices()
+            ->with(['file', 'sharedUsers'])
             ->where('is_archived', true)
             ->get();
 

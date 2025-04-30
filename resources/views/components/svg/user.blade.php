@@ -1,3 +1,3 @@
-<svg {{ $attributes->merge(['class' => '']) }} width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M13.3334 14C13.3334 13.0696 13.3334 12.6044 13.2186 12.2259C12.9601 11.3736 12.2931 10.7067 11.4408 10.4482C11.0623 10.3333 10.5971 10.3333 9.66675 10.3333H6.33342C5.40304 10.3333 4.93785 10.3333 4.55932 10.4482C3.70705 10.7067 3.04011 11.3736 2.78157 12.2259C2.66675 12.6044 2.66675 13.0696 2.66675 14M11.0001 5C11.0001 6.65685 9.65694 8 8.00008 8C6.34323 8 5.00008 6.65685 5.00008 5C5.00008 3.34315 6.34323 2 8.00008 2C9.65694 2 11.0001 3.34315 11.0001 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<svg {{ $attributes->merge(['class' => '']) }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
 </svg>

@@ -1,5 +1,4 @@
 <div>
-    {{-- Tableau regroupant toutes les factures --}}
     <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
 
         {{-- En-tête --}}
@@ -157,6 +156,7 @@
             </div>
         </div>
 
+        {{-- Table --}}
         <div class="w-full overflow-x-auto scrollbar-hidden">
             <table class="w-full" aria-labelledby="tableTitle">
                 <thead>

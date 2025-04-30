@@ -5,14 +5,11 @@ namespace App\Traits;
 use App\Enums\PaymentStatusEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
 
-/**
- * Trait qui centralise la logique commune aux tables des factures
- * Utilisé à la fois par le dashboard et la page index des factures
- */
 trait InvoiceTableTrait
 {
     use ColumnPreferencesTrait;
@@ -40,6 +37,8 @@ trait InvoiceTableTrait
 
     public ?Invoice $invoice = null;
 
+    protected $cachedArchivedInvoices = null;
+
     public function mountInvoiceTableTrait(): void
     {
         $this->initializeColumnPreferences();
@@ -53,7 +52,25 @@ trait InvoiceTableTrait
         }
     }
 
-    public function downloadInvoice($invoiceId)
+    // Archives
+    public function getArchivedInvoices()
+    {
+        if ($this->cachedArchivedInvoices === null) {
+            $this->cachedArchivedInvoices = auth()->user()->invoices()
+                ->where('is_archived', true)
+                ->get();
+        }
+
+        return $this->cachedArchivedInvoices;
+    }
+
+    public function getArchivedInvoicesCount(): int
+    {
+        return $this->getArchivedInvoices()->count();
+    }
+
+    // Téléchargements
+    public function downloadInvoice($invoiceId): false|RedirectResponse
     {
         $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)
             ->where('is_primary', true)
@@ -105,6 +122,7 @@ trait InvoiceTableTrait
         Toaster::error('Méthode de téléchargement de plusieurs fichiers non implémentée.');
     }
 
+    // Actions
     public function showInvoiceModal($id): void
     {
         $invoice = auth()->user()->invoices()
@@ -197,6 +215,9 @@ trait InvoiceTableTrait
                 'is_favorite' => false,
             ]);
 
+            // Réinitialiser le cache des factures archivées
+            $this->cachedArchivedInvoices = null;
+
             // Fermer le modal du dossier si ouvert
             if (property_exists($this, 'showFolderModal')) {
                 $this->showFolderModal = false;
@@ -250,6 +271,9 @@ trait InvoiceTableTrait
                     'is_favorite' => false,
                 ]);
 
+            // Réinitialiser le cache des factures archivées
+            $this->cachedArchivedInvoices = null;
+
             if ($count > 1) {
                 Toaster::success("$count factures archivées avec succès.");
             } elseif ($count == 1) {
@@ -295,12 +319,18 @@ trait InvoiceTableTrait
             $this->invoice->delete();
             $this->showDeleteFormModal = false;
 
+            // Réinitialiser le cache si la facture était archivée
+            if ($this->invoice->is_archived) {
+                $this->cachedArchivedInvoices = null;
+            }
+
             Toaster::success('Facture supprimée avec succès !');
         } catch (\Exception) {
             Toaster::error('Erreur lors de la suppression de la facture::Veuillez réessayer.');
         }
     }
 
+    // Marquer comme payé
     public function markAsPaymentStatusSelected(): void
     {
         try {
@@ -357,7 +387,7 @@ trait InvoiceTableTrait
         }
     }
 
-    // Helpers
+    // Récupération de l'extension de fichier
     private function getContentType($extension): string
     {
         $contentTypes = [

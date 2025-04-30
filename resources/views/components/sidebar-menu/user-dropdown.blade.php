@@ -23,12 +23,12 @@
     <x-menu.items class="w-[calc(100vw-2rem)] !-mt-3 lg:w-55">
 
         <x-menu.item wire:click="seeProfile">
-            <x-svg.user class="group-hover:text-gray-900"/>
+            <x-svg.user class="w-4.5 h-4.5 group-hover:text-gray-900 stroke-2" />
             {{ __('Modifier mon profil') }}
         </x-menu.item>
 
         <x-menu.item wire:click="inviteMember">
-            <x-svg.user-plus class="w-4.5 h-4.5 group-hover:text-gray-900 stroke-2"/>
+            <x-svg.user-plus class="w-4.5 h-4.5 group-hover:text-gray-900 stroke-2" />
             {{ __('Inviter un membre') }}
         </x-menu.item>
 

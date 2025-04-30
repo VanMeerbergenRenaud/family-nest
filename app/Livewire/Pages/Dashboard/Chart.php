@@ -23,15 +23,38 @@ class Chart extends Component
         $this->refreshData();
     }
 
-    public function refreshData()
+    public function refreshData(): void
     {
         $query = $this->filters->getBaseQuery();
+
+        // Vérifier si des factures existent avant d'appliquer les filtres
+        $hasInvoices = $query->count() > 0;
+
+        if (! $hasInvoices) {
+            $this->dataset = [
+                'values' => [],
+                'labels' => [],
+            ];
+
+            return;
+        }
+
         $query = $this->filters->apply($query);
 
         $results = $query->select('type', DB::raw('SUM(amount) as total'))
             ->groupBy('type')
             ->orderBy('total', 'desc')
             ->get();
+
+        // Si les résultats sont vides après application des filtres
+        if ($results->isEmpty()) {
+            $this->dataset = [
+                'values' => [],
+                'labels' => [],
+            ];
+
+            return;
+        }
 
         $this->dataset = [
             'values' => $results->pluck('total')->toArray(),
@@ -40,7 +63,7 @@ class Chart extends Component
     }
 
     #[Computed]
-    public function shouldRefresh()
+    public function shouldRefresh(): array
     {
         return [
             'status' => $this->filters->status,

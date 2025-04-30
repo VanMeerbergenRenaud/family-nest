@@ -21,7 +21,7 @@
                         Ajouter ma première facture
                     </a>
 
-                    @if($archivedInvoices->isNotEmpty())
+                    @if($this->hasArchivedInvoices())
                         <a href="{{ route('invoices.archived') }}" class="button-secondary">
                             <x-svg.archive class="text-white"/>
                             Voir mes archives
@@ -122,8 +122,8 @@
                     </div>
                 </button>
 
-                {{-- Semaine prochaine --}}
-                @if($archivedInvoices->isNotEmpty())
+                {{-- Archives --}}
+                @if($this->hasArchivedInvoices())
                     <a href="{{ route('invoices.archived') }}"  class="inline-block p-5 pb-4 min-w-52 rounded-xl bg-teal-100 dark:bg-teal-900">
                         <div class="flex flex-col text-left">
                             <div class="mb-3.5 p-3 rounded-lg w-fit bg-teal-200 dark:bg-teal-900">
@@ -131,7 +131,7 @@
                             </div>
                             <span class="text-md-medium text-gray-900 dark:text-white">Archives</span>
                             <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
-                                {{ $archivedInvoices->count() }} Fichiers
+                                {{ $this->getArchivedInvoicesCount() }} Fichiers
                             </span>
                         </div>
                     </a>
@@ -184,7 +184,7 @@
         </section>
 
         {{-- Table de factures --}}
-        <livewire:pages.invoices.invoice-table :filters="$filters" :withFilters="false" />
+        <livewire:pages.invoices.invoice-table :filters="$filters" :withFilters="false" :$archivedInvoices />
 
         <!-- Modales (4) -->
         @if($showFolderModal)
