@@ -14,7 +14,7 @@
             {{ __('Voir l\'aperçu') }}
         </x-menu.item>
 
-        <x-menu.item wire:click="showSidebarInvoice({{ $invoice->id }})">
+        <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}">
             <x-svg.binocular class="group-hover:text-gray-900"/>
             {{ __('Voir les détails') }}
         </x-menu.item>
@@ -54,6 +54,13 @@
             <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500">
                 <x-svg.archive class="group-hover:text-red-500"/>
                 {{ __('Archiver') }}
+            </x-menu.item>
+        @endcan
+
+        @can('delete', $invoice)
+            <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500">
+                <x-svg.trash class="group-hover:text-red-500"/>
+                {{ __('Supprimer') }}
             </x-menu.item>
         @endcan
     </x-menu.items>

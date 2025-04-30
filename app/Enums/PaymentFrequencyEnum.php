@@ -14,6 +14,7 @@ enum PaymentFrequencyEnum: string
     case Quarterly = 'quarterly';
     case SemiAnnually = 'semi_annually';
     case Annually = 'annually';
+    case Random = 'random';
     case OneTime = 'one_time';
 
     public function label(): string
@@ -25,6 +26,7 @@ enum PaymentFrequencyEnum: string
             self::Quarterly => 'Trimestriel',
             self::SemiAnnually => 'Semestriel',
             self::Annually => 'Annuel',
+            self::Random => 'Aléatoire',
             self::OneTime => 'Unique',
         };
     }
@@ -38,6 +40,7 @@ enum PaymentFrequencyEnum: string
             self::Quarterly => '🗂️',
             self::SemiAnnually => '📖',
             self::Annually => '🎈',
+            self::Random => '🎲',
             self::OneTime => '⚡',
         };
     }
@@ -51,6 +54,7 @@ enum PaymentFrequencyEnum: string
             self::Quarterly => 'indigo',
             self::SemiAnnually => 'violet',
             self::Annually => 'purple',
+            self::Random => 'green',
             self::OneTime => 'gray',
         };
     }
@@ -64,6 +68,7 @@ enum PaymentFrequencyEnum: string
             self::Quarterly => 90,
             self::SemiAnnually => 182,
             self::Annually => 365,
+            self::Random => null,
             self::OneTime => null,
         };
     }

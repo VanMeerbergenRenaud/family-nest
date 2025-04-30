@@ -4,7 +4,6 @@ use App\Http\Middleware\CheckFamilyRole;
 use App\Http\Middleware\HasFamily;
 use App\Livewire\Pages\Calendar;
 use App\Livewire\Pages\Dashboard\Index as IndexDashboard;
-use App\Livewire\Pages\Dashboard\Page;
 use App\Livewire\Pages\Family;
 use App\Livewire\Pages\Goals;
 use App\Livewire\Pages\HelpCenter;
@@ -21,7 +20,6 @@ use App\Livewire\Pages\Settings\Index as IndexSetting;
 use App\Livewire\Pages\Settings\Notification;
 use App\Livewire\Pages\Settings\Profile;
 use App\Livewire\Pages\Settings\Storage;
-use App\Livewire\Pages\Themes;
 use Illuminate\Support\Facades\Route;
 
 // Route for the welcome page
@@ -50,7 +48,6 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
     Route::middleware([CheckFamilyRole::class.':viewer,editor,admin'])->group(function () {
 
         Route::get('/dashboard', IndexDashboard::class)->name('dashboard');
-        Route::get('/themes', Themes::class)->name('themes');
         Route::get('/calendar', Calendar::class)->name('calendar');
         Route::get('/goals', Goals::class)->name('goals');
 

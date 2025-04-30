@@ -3,7 +3,7 @@
     'description' => 'Description par défaut',
 ])
 
-<div class="bg-white px-5.5 py-4 rounded-xl border border-slate-200 w-fit max-w-[30rem] h-fit">
+<div class="bg-white px-5.5 py-4 rounded-xl border border-slate-200 w-fit max-w-[32rem] h-fit">
     <h2 class="text-lg-semibold text-gray-800 dark:text-gray-200">
         {{ $title }}
     </h2>

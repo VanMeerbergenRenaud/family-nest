@@ -3,6 +3,8 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Livewire\Forms\InvoiceForm;
+use App\Models\Invoice;
+use App\Traits\InvoiceStateCheckTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
@@ -13,40 +15,46 @@ use Masmerise\Toaster\Toaster;
 #[Title('Archives')]
 class Archived extends Component
 {
-    use WithPagination;
+    use InvoiceStateCheckTrait, WithPagination;
 
     public InvoiceForm $form;
 
-    public bool $showArchiveExempleModal = false;
+    public string $filterType = 'all';
 
     public bool $showDeleteFormModal = false;
 
     public bool $showDeleteAllFormModal = false;
 
-    public function showArchiveExemple(): void
+    protected $queryString = ['filterType'];
+
+    public function setFilterType(string $type): void
     {
-        $this->showArchiveExempleModal = true;
+        $this->filterType = $type;
+        $this->resetPage();
     }
 
     public function restoreInvoice($invoiceId): void
     {
-        $invoice = auth()->user()->invoices()
-            ->where('id', $invoiceId)
-            ->where('is_archived', true)
-            ->firstOrFail();
+        $invoice = Invoice::findOrFail($invoiceId);
+
+        if (! $this->authorizeAction('update', $invoice, 'restaurer')) {
+            return;
+        }
 
         $this->form->setFromInvoice($invoice);
-
-        if ($this->form->restore()) {
-            Toaster::success('Facture restaurée avec succès !');
-        } else {
-            Toaster::error('Erreur lors de la restauration de la facture.');
-        }
+        $this->form->restore()
+            ? Toaster::success('Facture restaurée avec succès !')
+            : Toaster::error('Erreur lors de la restauration de la facture.');
     }
 
     public function showDeleteInvoiceForm($id): void
     {
-        $invoice = auth()->user()->invoices()->findOrFail($id);
+        $invoice = Invoice::findOrFail($id);
+
+        if (! $this->authorizeAction('delete', $invoice, 'supprimer')) {
+            return;
+        }
+
         $this->form->setFromInvoice($invoice);
         $this->showDeleteFormModal = true;
     }
@@ -56,6 +64,7 @@ class Archived extends Component
         if ($this->form->delete()) {
             $this->showDeleteFormModal = false;
             Toaster::success('Facture supprimée définitivement !');
+            $this->redirectRoute('invoices.archived');
         } else {
             Toaster::error('Erreur lors de la suppression de la facture.');
         }
@@ -63,6 +72,13 @@ class Archived extends Component
 
     public function showDeleteAllInvoicesForm(): void
     {
+        // Vérifier s'il y a des factures à supprimer avant d'afficher la modal
+        if ($this->isFilterEmpty()) {
+            Toaster::info('Il n\'y a aucune facture à supprimer.');
+
+            return;
+        }
+
         $this->showDeleteAllFormModal = true;
     }
 
@@ -71,27 +87,20 @@ class Archived extends Component
         try {
             DB::beginTransaction();
 
-            $archivedInvoices = auth()->user()->invoices()
-                ->where('is_archived', true)
-                ->get();
-
-            $count = $archivedInvoices->count();
+            $archivedInvoices = $this->getFilteredInvoicesQuery()->get();
+            $count = $this->batchDeleteInvoices($archivedInvoices);
 
             if ($count === 0) {
-                Toaster::info('Aucune facture à supprimer.');
-                $this->showDeleteAllFormModal = false;
-
-                return;
+                Toaster::info('Aucune facture à supprimer: Il se peut que vous n\'ayez pas les permissions nécessaires.');
+            } else {
+                Toaster::success("Corbeille vidée avec succès ! $count factures ont été supprimées définitivement.");
             }
 
-            foreach ($archivedInvoices as $invoice) {
-                $this->form->setFromInvoice($invoice);
-                $this->form->delete();
-            }
+            $this->showDeleteAllFormModal = false;
 
             DB::commit();
-            $this->showDeleteAllFormModal = false;
-            Toaster::success("Corbeille vidée avec succès ! $count factures ont été supprimées définitivement.");
+
+            $this->redirectRoute('invoices.archived');
         } catch (\Exception $e) {
             DB::rollBack();
             Toaster::error('Une erreur est survenue lors de la suppression des factures.');
@@ -99,16 +108,65 @@ class Archived extends Component
         }
     }
 
+    protected function getFilteredInvoicesQuery()
+    {
+        $query = Invoice::where('is_archived', true);
+
+        if ($this->filterType === 'personal') {
+            $query->where('user_id', auth()->id());
+        } elseif ($this->hasFamily()) {
+            $familyMemberIds = auth()->user()->family()->users()->pluck('user_id')->toArray();
+            $query->whereIn('user_id', $familyMemberIds);
+        }
+
+        return $query;
+    }
+
+    protected function batchDeleteInvoices($invoices): int
+    {
+        $count = 0;
+        foreach ($invoices as $invoice) {
+            if (auth()->user()->can('delete', $invoice)) {
+                $this->form->setFromInvoice($invoice);
+                if ($this->form->delete()) {
+                    $count++;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    protected function authorizeAction(string $action, Invoice $invoice, string $actionName): bool
+    {
+        if (! auth()->user()->can($action, $invoice)) {
+            Toaster::error("Vous n'avez pas la permission de {$actionName} cette facture.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isFilterEmpty(): bool
+    {
+        return $this->getFilteredInvoicesQuery()->count() === 0;
+    }
+
     public function render()
     {
-        $archivedInvoices = auth()->user()->invoices()
-            ->with('file')
-            ->where('is_archived', true)
-            ->orderBy('created_at', 'desc')
-            ->paginate(7);
+        $archivedInvoices = $this->getFilteredInvoicesQuery()
+            ->with(['file', 'user'])
+            ->get();
+
+        $invoicesByYear = $archivedInvoices->groupBy(function ($invoice) {
+            return $invoice->issued_date ? date('Y', strtotime($invoice->issued_date)) : 'Non daté';
+        })->sortKeysDesc();
 
         return view('livewire.pages.invoices.archived', [
-            'archivedInvoices' => $archivedInvoices,
+            'invoicesByYear' => $invoicesByYear,
+            'currentYear' => now()->format('Y'),
+            'isFilterEmpty' => $archivedInvoices->isEmpty(),
         ])->layout('layouts.app-sidebar');
     }
 }

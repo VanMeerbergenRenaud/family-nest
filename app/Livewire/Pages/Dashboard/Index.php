@@ -2,47 +2,77 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use App\Models\Family;
 use App\Models\Invoice;
+use App\Traits\InvoiceStateCheckTrait;
+use App\Traits\InvoiceTableTrait;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Tableau de bord')]
 class Index extends Component
 {
-    public $user;
+    use InvoiceStateCheckTrait;
+    use InvoiceTableTrait;
 
-    public $family;
+    public ?Family $family = null;
 
-    public $allInvoicesOfFamily = [];
+    public Filters $filters;
 
-    public $allInvoicesOfUser = [];
-
-    public $allInvoicesOfOtherUsers = [];
-
-    public bool $showDashboardExempleModal = false;
+    public bool $showInvoiceExempleModal = false;
 
     public function mount()
     {
-        $this->user = auth()->user();
-        $this->family = $this->user->family();
+        $user = auth()->user();
 
-        if ($this->family) {
-            $this->allInvoicesOfFamily = Invoice::where('family_id', $this->family->id)
-                ->get();
+        if ($this->hasFamily()) {
+            $this->family = $this->getUserFamily();
+            $this->filters->init($user);
+            $this->filters->family_member = 'all';
         }
 
-        $this->allInvoicesOfUser = Invoice::where('family_id', $this->family->id)
-            ->where('user_id', $this->user->id)
-            ->get();
-
-        $this->allInvoicesOfOtherUsers = Invoice::where('family_id', $this->family->id)
-            ->where('user_id', '!=', $this->user->id)
-            ->get();
+        $this->mountInvoiceTableTrait();
     }
 
-    public function showDashboardExemple(): void
+    public function getInvoicesQuery(): Invoice
     {
-        $this->showDashboardExempleModal = true;
+        if (! $this->hasFamily()) {
+            $this->redirectRoute('family');
+        }
+
+        $dashboardState = $this->getDashboardState();
+        $query = Invoice::where('is_archived', false);
+
+        switch ($dashboardState) {
+            case 'no_invoices':
+            case 'only_archived_invoices':
+                // Pas de factures actives, retourner une collection vide
+                return Invoice::where('id', 0);
+
+            case 'has_active_invoices':
+                if ($this->filters->family_member === 'all') {
+                    $familyMemberIds = $this->getFamilyMemberIds();
+                    $query->whereIn('user_id', $familyMemberIds);
+                } else {
+                    $query->where('user_id', $this->filters->family_member);
+                }
+                break;
+        }
+
+        return $query;
+    }
+
+    public function showInvoiceExemple(): void
+    {
+        $this->showInvoiceExempleModal = true;
+    }
+
+    public function resetFilters(): void
+    {
+        if ($this->hasFamily()) {
+            $this->filters->resetAllFilters();
+            $this->filters->family_member = 'all';
+        }
     }
 
     public function render()

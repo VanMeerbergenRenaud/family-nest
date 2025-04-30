@@ -53,9 +53,9 @@ class Sidebar extends Component
         dd('Voir le support');
     }
 
-    public function seeArchives(): void
+    public function suppressAccount(): void
     {
-        $this->redirectRoute('invoices.archived');
+        $this->redirectRoute('settings.danger');
     }
 
     public function logout(): void

@@ -101,4 +101,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return FamilyPermissionEnum::tryFrom($pivotData->permission);
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->getFamilyPermissionAttribute() === FamilyPermissionEnum::Admin;
+    }
 }
