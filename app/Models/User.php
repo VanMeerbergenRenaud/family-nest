@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\FamilyPermissionEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -85,25 +86,41 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->families()->exists();
     }
 
+    // Return the value of the label corresponding to the permission of the user in his family
     public function getFamilyPermissionAttribute(): ?FamilyPermissionEnum
     {
-        $family = $this->family();
-
-        if (! $family) {
+        if (! $this->hasFamily()) {
             return null;
         }
 
-        $pivotData = $this->families()->where('family_id', $family->id)->first()->pivot ?? null;
-
-        if (! $pivotData) {
-            return null;
-        }
-
-        return FamilyPermissionEnum::tryFrom($pivotData->permission);
+        return FamilyPermissionEnum::tryFrom(
+            $this->family()->pivot->permission
+        );
     }
 
     public function isAdmin(): bool
     {
         return $this->getFamilyPermissionAttribute() === FamilyPermissionEnum::Admin;
+    }
+
+    /**
+     * Configuration pour Algolia/Laravel Scout
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+        ];
+    }
+
+    public function scopeSearch($query, $searchTerm)
+    {
+        $searchTerm = trim(strtolower($searchTerm));
+
+        return $query->where(function ($query) use ($searchTerm) {
+            $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(email) LIKE ?', ["%{$searchTerm}%"]);
+        });
     }
 }

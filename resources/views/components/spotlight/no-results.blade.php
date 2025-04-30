@@ -1,8 +1,8 @@
 @props(['search'])
 
-<div class="flex items-center justify-start gap-3 py-3 px-4.5 border-slate-200">
-    <p class="text-sm-medium text-gray-500 dark:text-gray-400">
-        Aucun résultat pour "{{ $search }}"
+<div class="flex items-center justify-start flex-wrap gap-3 py-3 px-4.5 border-slate-200">
+    <p class="w-full overflow-clip text-sm-medium text-gray-500 dark:text-gray-400">
+        Aucun résultat pour : "{{ $search }}"
     </p>
     <p class="text-xs text-gray-600 dark:text-gray-500">
         Essayez d'autres mots-clés ou vérifiez l'orthographe.

@@ -22,10 +22,10 @@ class Invoice extends Model
 
     protected $fillable = [
         'name', 'reference', 'type', 'category', 'issuer_name', 'issuer_website',
-        'amount', 'currency', 'paid_by_user_id', 'family_id',
-        'issued_date', 'payment_due_date', 'payment_reminder', 'payment_frequency',
-        'payment_status', 'payment_method', 'priority',
-        'notes', 'tags', 'is_archived', 'is_favorite', 'user_id',
+        'amount', 'currency', 'paid_by_user_id', 'family_id', 'issued_date',
+        'payment_due_date', 'payment_reminder', 'payment_frequency',
+        'payment_status', 'payment_method', 'priority', 'notes',
+        'tags', 'is_archived', 'is_favorite', 'user_id',
     ];
 
     protected $casts = [
@@ -51,14 +51,12 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
-    // File associated with the invoice
     public function file(): HasOne
     {
         return $this->hasOne(InvoiceFile::class)
             ->where('is_primary', true);
     }
 
-    // Users associated with the invoice
     public function sharedUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'invoice_user')
@@ -71,18 +69,9 @@ class Invoice extends Model
         return $this->belongsTo(Family::class);
     }
 
-    // Get the user who paid the invoice
-    public function paidByUser()
-    {
-        // TODO: Only the user of the family or the auth user
-        if (! auth()->user()) {
-            return;
-        }
-
-        return $this->belongsTo(User::class, 'paid_by_user_id');
-    }
-
-    // Configuration for Algolia
+    /**
+     * Configuration Algolia
+     */
     public function toSearchableArray(): array
     {
         return [
@@ -90,29 +79,24 @@ class Invoice extends Model
             'reference' => $this->reference,
             'type' => $this->type,
             'category' => $this->category,
-            'amount' => $this->amount,
             'issuer_name' => $this->issuer_name,
             'tags' => $this->tags,
+            'amount' => (float) $this->amount,
         ];
     }
 
-    // Search invoices using specific terms
     public function scopeSearch($query, $searchTerm)
     {
-        return $query->where(function ($query) use ($searchTerm) {
-            $query->where('name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('reference', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('type', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('category', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('issuer_name', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('amount', 'LIKE', "%{$searchTerm}%")
-                ->orWhere('tags', 'LIKE', "%{$searchTerm}%");
-        });
-    }
+        $searchTerm = strtolower($searchTerm);
 
-    // Only non-archived invoices can be indexed
-    public function shouldBeSearchable(): bool
-    {
-        return ! $this->is_archived;
+        return $query->where(function ($query) use ($searchTerm) {
+            $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(reference) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(type) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(category) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(issuer_name) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhereRaw('LOWER(tags::text) LIKE ?', ["%{$searchTerm}%"])
+                ->orWhere('amount', 'LIKE', "%{$searchTerm}%");
+        });
     }
 }

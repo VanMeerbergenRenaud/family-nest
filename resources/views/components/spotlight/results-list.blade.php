@@ -18,7 +18,7 @@
                                 :href="route('settings.profile')"
                                 :text="$result->name"
                                 :description="$result->email"
-                                :state="$result->getFamilyPermissionAttribute()"
+                                :state="$result->getFamilyPermissionAttribute()->label()"
                             >
                                 <img
                                     class="h-6 w-6 rounded-full bg-gray-100 dark:bg-gray-700"

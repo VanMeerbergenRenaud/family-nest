@@ -15,23 +15,39 @@ class Spotlight extends Component
 
     public bool $spotlightOpen = false;
 
-    // Navigation keyboard
     public int $selectedIndex = -1;
 
     public array $navigableItems = [];
 
+    public bool $showAdvancedSearch = false;
+
+    public int $totalResultsCount = 0;
+
+    // Pagination pour la recherche avancée
+    public int $limit = 8;
+
+    public bool $hasMoreResults = false;
+
+    protected const STANDARD_LIMIT = 8;
+
+    protected const ADVANCED_LIMIT = 50;
+
+    protected const TYPES = [
+        User::class => 'Utilisateurs',
+        Invoice::class => 'Factures',
+    ];
+
     public function mount(): void
     {
-        $this->results = collect();
-        $this->resetNavigation();
+        $this->resetResults();
     }
 
     public function updatedSearch(string $value): void
     {
-        $this->results = collect();
-        $this->resetNavigation();
+        $this->resetResults();
+        $this->showAdvancedSearch = false;
 
-        if (strlen($value) < 1 || $value === ' ') {
+        if (strlen(trim($value)) < 1) {
             return;
         }
 
@@ -43,72 +59,113 @@ class Spotlight extends Component
     {
         $currentUser = auth()->user();
         $family = $currentUser->family();
-        $limitResults = 8;
 
-        if ($family) {
-            $this->fetchFamilyResults($value, $currentUser, $family, $limitResults);
-        } else {
-            $this->fetchIndividualResults($value, $currentUser, $limitResults);
-        }
+        $limit = $this->showAdvancedSearch ? self::ADVANCED_LIMIT : self::STANDARD_LIMIT;
+
+        $this->results = $family
+            ? $this->getFamilyResults($value, $family, $limit)
+            : $this->getIndividualResults($value, $currentUser, $limit);
+
+        // Compter le nombre total de résultats pour savoir s'il y a plus que la limite
+        $this->calculateTotalResults($value, $currentUser, $family);
     }
 
-    protected function fetchFamilyResults(string $value, $currentUser, $family, $limitResults): void
+    protected function calculateTotalResults(string $value, $currentUser, $family = null): void
     {
-        // Search users
+        $count = 0;
+
+        if ($family) {
+            $familyMemberIds = $family->users()->pluck('users.id')->toArray();
+
+            // Compter les utilisateurs
+            $userCount = User::search($value)
+                ->get()
+                ->filter(fn ($user) => $user->families()->where('family_id', $family->id)->exists())
+                ->count();
+
+            // Compter les factures
+            $invoiceCount = Invoice::whereIn('user_id', $familyMemberIds)
+                ->search($value)
+                ->count();
+
+            $count = $userCount + $invoiceCount;
+        } else {
+            // Compter les factures de l'utilisateur
+            $invoiceCount = $currentUser->invoices()
+                ->search($value)
+                ->count();
+
+            // Vérifier si l'utilisateur correspond à la recherche
+            $userMatches = str_contains(strtolower($currentUser->name), strtolower($value)) ||
+                str_contains(strtolower($currentUser->email), strtolower($value));
+
+            $count = $invoiceCount + ($userMatches ? 1 : 0);
+        }
+
+        $this->totalResultsCount = $count;
+        $this->hasMoreResults = $count > self::STANDARD_LIMIT && ! $this->showAdvancedSearch;
+    }
+
+    protected function getFamilyResults(string $value, $family, int $limit): Collection
+    {
+        // Get family member IDs
+        $familyMemberIds = $family->users()->pluck('users.id')->toArray();
+
+        // Search users in family
         $userResults = User::search($value)
             ->get()
             ->filter(fn ($user) => $user->families()->where('family_id', $family->id)->exists())
-            ->take($limitResults);
+            ->take($limit);
 
-        // Search invoices
-        $invoiceResults = $currentUser->invoices()
+        // Search invoices for all family members
+        $invoiceResults = Invoice::whereIn('user_id', $familyMemberIds)
             ->search($value)
-            ->take($limitResults)
+            ->take($limit)
             ->get();
 
-        // Group results by model type
-        $this->results = collect()
-            ->concat($userResults)
-            ->concat($invoiceResults)
-            ->groupBy(function ($item) {
-                return match (true) {
-                    $item instanceof User => 'Utilisateurs',
-                    $item instanceof Invoice => 'Factures',
-                    default => 'Autres résultats',
-                };
-            });
+        return $this->groupResultsByType($userResults, $invoiceResults);
     }
 
-    protected function fetchIndividualResults(string $value, $currentUser, $limitResults): void
+    protected function getIndividualResults(string $value, $currentUser, int $limit): Collection
     {
-        // Search invoices
+        // Search user's invoices
         $invoiceResults = $currentUser->invoices()
             ->search($value)
-            ->take($limitResults)
+            ->take($limit)
             ->get();
 
         // Check if current user matches search
         $userResults = collect();
-        if (stripos($currentUser->name, $value) !== false || stripos($currentUser->email, $value) !== false) {
+        if (str_contains(strtolower($currentUser->name), strtolower($value)) ||
+            str_contains(strtolower($currentUser->email), strtolower($value))) {
             $userResults = collect([$currentUser]);
         }
 
-        // Add results to collection if not empty
-        $this->results = collect();
+        return $this->groupResultsByType($userResults, $invoiceResults);
+    }
+
+    protected function groupResultsByType(Collection $userResults, Collection $invoiceResults): Collection
+    {
+        $results = collect();
 
         if ($userResults->isNotEmpty()) {
-            $this->results->put('Utilisateurs', $userResults);
+            $results->put(self::TYPES[User::class], $userResults);
         }
 
         if ($invoiceResults->isNotEmpty()) {
-            $this->results->put('Factures', $invoiceResults);
+            $results->put(self::TYPES[Invoice::class], $invoiceResults);
         }
+
+        return $results;
     }
 
-    protected function resetNavigation(): void
+    protected function resetResults(): void
     {
+        $this->results = collect();
         $this->selectedIndex = -1;
         $this->navigableItems = [];
+        $this->totalResultsCount = 0;
+        $this->hasMoreResults = false;
     }
 
     protected function buildNavigableItems(): void
@@ -118,39 +175,43 @@ class Spotlight extends Component
         // Add results to navigable items
         foreach ($this->results as $section => $items) {
             foreach ($items as $item) {
+                $type = $item instanceof User ? 'user' : 'invoice';
                 $this->navigableItems[] = [
                     'id' => $item->id,
-                    'type' => $item instanceof User ? 'user' : 'invoice',
-                    'route' => $this->getRouteForItem($item),
+                    'type' => $type,
+                    'route' => $item instanceof User ? route('settings.profile') : route('invoices.show', $item),
                 ];
             }
         }
 
-        // Add suggestions if no results
+        // Ajout du bouton "Voir plus" si nécessaire
+        if ($this->hasMoreResults) {
+            $this->navigableItems[] = [
+                'id' => 'show-more',
+                'type' => 'action',
+                'route' => '#', // Action JavaScript, pas de route
+            ];
+        }
+
+        // Add suggestions if no results with search
         if ($this->results->isEmpty() && ! empty($this->search)) {
             $this->addSuggestions();
         }
     }
 
-    protected function getRouteForItem($item): string
-    {
-        return $item instanceof User
-            ? route('settings.profile')
-            : route('invoices.show', $item);
-    }
-
     protected function addSuggestions(): void
     {
-        $this->navigableItems[] = [
-            'id' => 'create-invoice',
-            'type' => 'suggestion',
-            'route' => route('invoices.create'),
-        ];
-
-        $this->navigableItems[] = [
-            'id' => 'archived-invoices',
-            'type' => 'suggestion',
-            'route' => route('invoices.archived'),
+        $this->navigableItems = [
+            [
+                'id' => 'create-invoice',
+                'type' => 'suggestion',
+                'route' => route('invoices.create'),
+            ],
+            [
+                'id' => 'archived-invoices',
+                'type' => 'suggestion',
+                'route' => route('invoices.archived'),
+            ],
         ];
     }
 
@@ -160,11 +221,9 @@ class Spotlight extends Component
             return;
         }
 
-        if ($this->selectedIndex <= 0) {
-            $this->selectedIndex = count($this->navigableItems) - 1;
-        } else {
-            $this->selectedIndex--;
-        }
+        $this->selectedIndex = $this->selectedIndex <= 0
+            ? count($this->navigableItems) - 1
+            : $this->selectedIndex - 1;
     }
 
     public function navigateDown(): void
@@ -173,11 +232,9 @@ class Spotlight extends Component
             return;
         }
 
-        if ($this->selectedIndex >= count($this->navigableItems) - 1) {
-            $this->selectedIndex = 0;
-        } else {
-            $this->selectedIndex++;
-        }
+        $this->selectedIndex = $this->selectedIndex >= count($this->navigableItems) - 1
+            ? 0
+            : $this->selectedIndex + 1;
     }
 
     public function selectCurrent(): void
@@ -186,22 +243,33 @@ class Spotlight extends Component
             return;
         }
 
-        $this->redirect($this->navigableItems[$this->selectedIndex]['route']);
+        $selectedItem = $this->navigableItems[$this->selectedIndex];
+
+        // Cas spécial pour le bouton "Voir plus"
+        if ($selectedItem['id'] === 'show-more' && $selectedItem['type'] === 'action') {
+            $this->toggleAdvancedSearch();
+
+            return;
+        }
+
+        $this->redirect($selectedItem['route']);
     }
 
-    protected function hasValidSelection(): bool
+    public function toggleAdvancedSearch(): void
     {
-        return $this->selectedIndex >= 0 &&
-            $this->selectedIndex < count($this->navigableItems);
+        $this->showAdvancedSearch = ! $this->showAdvancedSearch;
+        $this->fetchResults($this->search);
+        $this->buildNavigableItems();
     }
 
     public function setSelectedItem(string $itemId, string $itemType): void
     {
-        foreach ($this->navigableItems as $index => $item) {
-            if ($item['id'] == $itemId && $item['type'] == $itemType) {
-                $this->selectedIndex = $index;
-                break;
-            }
+        $index = collect($this->navigableItems)->search(
+            fn ($item) => $item['id'] == $itemId && $item['type'] == $itemType
+        );
+
+        if ($index !== false) {
+            $this->selectedIndex = $index;
         }
     }
 
@@ -214,6 +282,11 @@ class Spotlight extends Component
         $selectedItem = $this->navigableItems[$this->selectedIndex];
 
         return $selectedItem['id'] == $itemId && $selectedItem['type'] == $itemType;
+    }
+
+    protected function hasValidSelection(): bool
+    {
+        return $this->selectedIndex >= 0 && $this->selectedIndex < count($this->navigableItems);
     }
 
     public function render()
