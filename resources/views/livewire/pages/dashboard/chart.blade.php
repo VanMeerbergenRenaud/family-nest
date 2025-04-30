@@ -85,12 +85,10 @@
                     });
                 }
 
-                console.log('Données nettoyées:', cleanData);
-
                 const {labels, values} = cleanData;
 
-                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#EF4444', '#F97316', '#F59E0B'];
-                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#DC2626', '#EA580C'];
+                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#DC2626', '#EF4444', '#F97316', '#F59E0B', '#FBBF24'];
+                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#B91C1C', '#DC2626', '#EA580C', '#F99E0B', '#FBBF24'];
 
                 return new Chart(el, {
                     type: 'bar',

@@ -29,20 +29,34 @@
                 </div>
             @endif
 
-            @if(!$isFilterEmpty)
-                <form wire:submit.prevent="showDeleteAllInvoicesForm">
-                    @csrf
-
-                    <button type="submit" class="button-danger" wire:loading.attr="disabled">
-                        Vider la corbeille
+            @if(!$archivedInvoices->isEmpty())
+                <div class="flex gap-2 items-center">
+                    {{-- Télécharger tout --}}
+                    <button
+                        type="button"
+                        class="button-secondary"
+                        wire:click="downloadArchivedFiles"
+                    >
+                        <x-svg.download class="mr-0.5 text-white"/>
+                        {{ __('Télécharger tout') }}
                     </button>
-                </form>
+
+                    {{-- Vider toutes les archives --}}
+                    <form wire:submit.prevent="showDeleteAllInvoicesForm">
+                        @csrf
+
+                        <button type="submit" class="button-danger">
+                            <x-svg.trash class="mr-0.5 text-white"/>
+                            {{ __('Supprimer les archives') }}
+                        </button>
+                    </form>
+                </div>
             @endif
         </div>
     </div>
 
     <!-- État vide -->
-    @if($isFilterEmpty)
+    @if($archivedInvoices->isEmpty())
         <div class="px-4">
             <div class="flex flex-col items-center justify-center bg-gray-50/60 border border-slate-200/80 rounded-xl p-8">
                 <div class="mb-6 p-2 bg-gray-50 rounded-full border border-slate-200">
@@ -152,9 +166,9 @@
                                                             {{ __('Voir en détail') }}
                                                         </x-menu.item>
 
-                                                        <x-menu.divider />
-
                                                         @can('update', $invoice)
+                                                            <x-menu.divider />
+
                                                             <x-menu.item wire:click="restoreInvoice({{ $invoice->id }})">
                                                                 <x-svg.restore class="w-4 h-4 group-hover:text-gray-900"/>
                                                                 {{ __('Restaurer') }}
@@ -187,7 +201,7 @@
             </div>
         </div>
 
-        <!-- Message si aucune facture dans les années -->
+        <!-- Message si aucune facture archivée trouvée -->
         @if($invoicesByYear->isEmpty())
             <div class="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
                 <x-svg.archive class="w-12 h-12 text-gray-400 mx-auto"/>
@@ -260,6 +274,7 @@
             </x-modal>
         @endif
 
+        <!-- Modal de suppression de toutes les archives -->
         @if($showDeleteAllFormModal)
             <x-modal wire:model="showDeleteAllFormModal">
                 <x-modal.panel>
@@ -270,7 +285,7 @@
                                 <x-svg.advertising/>
                                 <div>
                                     <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
-                                        {{ __('Vider la corbeille') }}
+                                        {{ __('Supprimer les archives') }}
                                     </h3>
                                     <p class="mt-2 text-md-regular text-gray-500">
                                         @php
@@ -297,12 +312,77 @@
                                 </x-modal.close>
                                 <x-modal.close>
                                     <button type="submit" class="button-danger" :disabled="confirmation !== 'VIDER'">
-                                        {{ __('Vider la corbeille') }}
+                                        {{ __('Supprimer toutes les archives') }}
                                     </button>
                                 </x-modal.close>
                             </x-modal.footer>
                         </div>
                     </form>
+                </x-modal.panel>
+            </x-modal>
+        @endif
+
+        <!-- Modal de téléchargement -->
+        @if($showDownloadSelectionModal)
+            <x-modal wire:model="showDownloadSelectionModal">
+                <x-modal.panel>
+                    <form wire:submit.prevent="downloadSelectedArchives">
+                        @csrf
+
+                        <div class="p-5">
+                            <h2 role="heading" aria-level="2" class="text-xl-semibold mb-4">
+                                {{ __('Télécharger les factures archivées') }}
+                            </h2>
+
+                            <x-divider />
+
+                            <div class="mt-6 space-y-6">
+                                @if($this->hasFamily())
+                                    <x-form.select
+                                        label="Sélectionner les factures à télécharger"
+                                        name="download-member-select"
+                                        model="selectedMemberId"
+                                        placeholder="Sélectionner un membre"
+                                    >
+                                        <option value="all">
+                                            {{ __('Toutes les factures archivées') . ' ('. $archivedInvoices->count() .')' }}
+                                        </option>
+                                        @foreach($familyMembers as $member)
+                                            @php
+                                                $archivedInvoicesCount = $member->invoices()->where('is_archived', true)->count();
+                                            @endphp
+                                            <option value="{{ $member->id }}" {{ $archivedInvoicesCount === 0 ? 'disabled' : '' }}>
+                                                {{ __('Archives de') }} {{ $member->name }} ({{ $archivedInvoicesCount }})
+                                            </option>
+                                        @endforeach
+                                    </x-form.select>
+                                @endif
+                            </div>
+                        </div>
+
+                        <x-modal.footer>
+                            <x-modal.close>
+                                <button type="button" class="button-primary">
+                                    {{ __('Annuler') }}
+                                </button>
+                            </x-modal.close>
+                            <button type="submit" class="button-secondary flex items-center">
+                                <x-svg.download class="mr-1.5 text-white"/>
+                                {{ __('Télécharger les archives') }}
+                            </button>
+                        </x-modal.footer>
+                    </form>
+
+                    <!-- Loading spinner pour le téléchargement -->
+                    <div wire:loading.flex wire:target="downloadSelectedArchives" class="fixed inset-0 bg-black/40 z-60 flex-center">
+                        <div class="bg-white rounded-lg p-8 max-w-md w-full flex flex-col items-center">
+                            <x-svg.spinner class="text-blue-500 w-12 h-12 mb-4"/>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Préparation du téléchargement</h3>
+                            <p class="text-sm text-gray-500 text-center">
+                                Nous préparons vos fichiers pour le téléchargement. Cela peut prendre quelques instants selon le nombre de factures.
+                            </p>
+                        </div>
+                    </div>
                 </x-modal.panel>
             </x-modal>
         @endif

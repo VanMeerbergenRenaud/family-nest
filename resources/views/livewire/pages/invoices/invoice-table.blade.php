@@ -147,12 +147,6 @@
                         </div>
                     </x-menu.items>
                 </x-menu>
-
-                {{-- Télécharger tout --}}
-                <button wire:click="downloadAllFiles" class="button-tertiary">
-                    <x-svg.download class="text-white"/>
-                    Télécharger tout
-                </button>
             </div>
         </div>
 
@@ -421,9 +415,9 @@
                                         Veuillez commencer par ajouter une facture !
                                     </p>
                                     <a href="{{ route('invoices.create') }}" title="Vers la page de création d'une facture"
-                                       class="mt-4 button-secondary" wire:navigate>
+                                       class="mt-4 button-tertiary" wire:navigate>
                                         <x-svg.add class="mr-1 text-white"/>
-                                        Ajouter une facture
+                                        {{ __('Ajouter une facture') }}
                                     </a>
                                 </div>
                             @endif

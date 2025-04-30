@@ -5,7 +5,6 @@ namespace App\Traits;
 use App\Enums\PaymentStatusEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
@@ -70,7 +69,7 @@ trait InvoiceTableTrait
     }
 
     // Téléchargements
-    public function downloadInvoice($invoiceId): false|RedirectResponse
+    public function downloadInvoice($invoiceId)
     {
         $invoiceFile = InvoiceFile::where('invoice_id', $invoiceId)
             ->where('is_primary', true)
@@ -115,11 +114,6 @@ trait InvoiceTableTrait
 
             return false;
         }
-    }
-
-    public function downloadAllFiles(): void
-    {
-        Toaster::error('Méthode de téléchargement de plusieurs fichiers non implémentée.');
     }
 
     // Actions

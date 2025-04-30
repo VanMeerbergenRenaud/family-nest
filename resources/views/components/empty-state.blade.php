@@ -10,7 +10,7 @@
     <p class="text-md-regular text-gray-500 mt-2 mb-4.5 pr-2">
         {{ $description }}
     </p>
-    <div class="flex flex-wrap items-center gap-4">
+    <div class="flex flex-wrap items-center gap-3">
         {{ $slot }}
     </div>
 </div>

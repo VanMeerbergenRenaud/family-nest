@@ -3,7 +3,7 @@
         title="Aucune date n'a été déterminé pour l'instant"
         description="Vous êtes déterminé à mieux gérer vos finances et vos factures ? N’hésitez pas à vous fixer des dates pour vos factures, que ce soit pour vos abonnements ou vos dépenses par exemple."
     >
-        <a href="{{ route('invoices.index') }}" class="button-tertiary" title="Vers la page des factures">
+        <a href="{{ route('calendar') }}" class="button-tertiary isDisabled" title="Vers la page des factures">
             <x-svg.add2 class="text-white" />
             Associé une facture à une date
         </a>
