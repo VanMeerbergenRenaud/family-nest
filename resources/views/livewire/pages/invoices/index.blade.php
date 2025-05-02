@@ -333,7 +333,7 @@
 
                     <div class="p-1 border-b border-gray-200 bg-gray-50 dark:bg-gray-900 relative overflow-auto">
                         <div wire:loading.remove>
-                            <x-file-viewer
+                            <x-invoices.file-viewer
                                 :filePath="$filePath"
                                 :fileExtension="$fileExtension"
                                 :fileName="$fileName"
@@ -367,7 +367,7 @@
                     </p>
 
                     <div class="p-4">
-                        <x-invoices.create.summary :form="$this->invoice" :$family_members />
+                        <x-invoices.form.summary :form="$this->invoice" :$family_members />
                     </div>
 
                     <x-modal.footer class="bg-white dark:bg-gray-800 border-t border-gray-400 dark:border-gray-700">

@@ -16,7 +16,7 @@
         >
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">
@@ -54,7 +54,7 @@
         >
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-sky-50 dark:bg-sky-900/30 border border-sky-100 dark:border-sky-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">
@@ -94,7 +94,7 @@
         >
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-50 dark:bg-orange-900/30 border border-orange-100 dark:border-orange-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">
@@ -133,7 +133,7 @@
            wire:navigate>
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-purple-50 dark:bg-purple-900/30 border border-purple-100 dark:border-purple-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">
@@ -172,7 +172,7 @@
            wire:navigate>
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-teal-50 dark:bg-teal-900/30 border border-teal-100 dark:border-teal-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">
@@ -208,7 +208,7 @@
            wire:navigate>
             <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-x-2 -translate-y-2 group-hover:translate-x-0 group-hover:translate-y-0">
                 <div class="flex items-center justify-center h-8 w-8 rounded-full bg-red-50 dark:bg-red-900/30 border border-red-100 dark:border-red-800">
-                    <x-arrow-up-hover />
+                    <x-svg.arrow-up-hover />
                 </div>
             </div>
             <div class="px-5 py-4 group-hover:bg-gray-50/50 dark:group-hover:bg-gray-800/60 transition-colors duration-300">

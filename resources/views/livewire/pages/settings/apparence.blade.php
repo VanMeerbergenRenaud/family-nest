@@ -5,7 +5,7 @@
     />
 
     @if(auth()->check() && auth()->user()->email === 'dominique.vilain@gmail.com')
-        <livewire:components.style-customizer />
+        <livewire:pages.settings.style-customizer />
     @endif
 
     <div class="py-4 px-2 space-y-4 max-w-4xl">
@@ -21,7 +21,7 @@
             <div class="p-5 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="flex-shrink-0 bg-gray-100 border border-slate-200 rounded-lg p-3 h-14 w-14 flex-center">
-                        <x-app-logo class="h-8 w-8 text-white" />
+                        <x-app.logo class="h-8 w-8 text-white" />
                     </div>
                     <div>
                         <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Format recommandé :</p>

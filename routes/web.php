@@ -10,7 +10,7 @@ use App\Livewire\Pages\HelpCenter;
 use App\Livewire\Pages\Invoices\Archived;
 use App\Livewire\Pages\Invoices\Create;
 use App\Livewire\Pages\Invoices\Edit;
-use App\Livewire\Pages\Invoices\Index as IndexInvoice;
+use App\Livewire\Pages\Invoices\Index\Page as IndexInvoice;
 use App\Livewire\Pages\Invoices\Show;
 use App\Livewire\Pages\Onboarding\FamilyCreation;
 use App\Livewire\Pages\Settings\Apparence;
@@ -63,6 +63,7 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
             Route::get('/profile', Profile::class)->name('profile');
             Route::get('/apparence', Apparence::class)->name('appearance');
             Route::get('/notification', Notification::class)->name('notifications');
+            Route::get('/danger', Danger::class)->name('danger');
         });
     });
 
@@ -79,7 +80,6 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
         Route::prefix('settings')->name('settings.')->group(function () {
             Route::get('/storage', Storage::class)->name('storage');
             Route::get('/billing', Billing::class)->name('billing');
-            Route::get('/danger', Danger::class)->name('danger');
         });
     });
 });

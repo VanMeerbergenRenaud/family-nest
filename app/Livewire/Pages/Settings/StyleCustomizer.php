@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Components;
+namespace App\Livewire\Pages\Settings;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -107,5 +107,11 @@ class StyleCustomizer extends Component
         Toaster::success('Styles réinitialisés aux valeurs par défaut');
 
         $this->redirect(request()->header('Referer'));
+    }
+
+    public function render()
+    {
+        return view('livewire.pages.settings.style-customizer')
+            ->layout('layouts.app-sidebar');
     }
 }

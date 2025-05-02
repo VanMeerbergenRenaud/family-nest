@@ -17,19 +17,20 @@
         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <x-svg.search-classic class="w-5 h-5 text-gray-400 dark:text-gray-500" />
         </span>
+
         {{-- Text --}}
         @if($expanded)
             <span class="p-2.5 pl-10 {{ $spanClass }}">
                 Rechercher...
             </span>
-            {{-- Shortcut --}}
+
             <span class="absolute inset-y-0 right-0 flex items-center pr-2 max-lg:hidden">
-                <x-shortcut key="⌘ K"/>
+                <x-app.shortcut key="⌘ K"/>
             </span>
         @else
             <span class="p-2.5 pl-2.5 {{ $spanClass }}"></span>
 
-            {{-- Tooltip pour la recherche --}}
+            {{-- Tooltip --}}
             <div x-cloak x-show="showTooltip">
                 <x-tooltip
                     text="Rechercher"

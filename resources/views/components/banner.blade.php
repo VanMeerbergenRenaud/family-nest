@@ -1,9 +1,3 @@
-{{--
-    Composant: x-edit-mode-banner
-    Description: Bannière minimaliste indiquant le mode édition (pour insertion dans le header)
-    Usage: <x-edit-mode-banner />
---}}
-
 @props([
     'message' => 'Message de bannière',
     'showCloseButton' => true

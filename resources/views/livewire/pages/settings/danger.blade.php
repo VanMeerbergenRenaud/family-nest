@@ -1,57 +1,56 @@
-<div class="p-6">
-    <div class="mb-6">
-        <h2 role="heading" aria-level="2" class="text-xl font-semibold text-gray-900 dark:text-gray-400" role="heading" aria-level="2">
-            {{ __('Supprimer le compte') }}
-        </h2>
+<div>
+    <x-header
+        title="Supprimer le compte"
+        description="Dès que votre compte est supprimé, toutes ses ressources et données seront définitivement supprimées. Avant de supprimer votre compte, veuillez télécharger."
+    />
 
-        <p class="text-sm text-gray-600">
-            {{ __('Dès que votre compte est supprimé, toutes ses ressources et données seront définitivement supprimées. Avant de supprimer votre compte, veuillez télécharger') }}
-        </p>
-    </div>
+    <div class="md:px-4 my-4">
+        <x-modal wire:model="showModal">
+            <x-modal.open>
+                <button type="button" wire:click="openModal" class="button-danger">
+                    {{ __('Supprimer le compte') }}
+                </button>
+            </x-modal.open>
 
-    <x-modal wire:model="showModal">
-        <x-modal.open>
-            <button type="button" wire:click="openModal" class="button-danger">
-                {{ __('Supprimer le compte') }}
-            </button>
-        </x-modal.open>
+            <x-modal.panel>
+                <form wire:submit.prevent="deleteUser">
+                    @csrf
 
-        <x-modal.panel>
-            <form wire:submit.prevent="deleteUser">
-                @csrf
+                    <div class="flex flex-col gap-4 p-8">
+                        <h3 role="heading" aria-level="3" class="text-lg font-semibold">
+                            {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}
+                        </h3>
 
-                <div class="flex flex-col gap-4 p-8">
-                    <h3 role="heading" aria-level="3" class="text-lg font-semibold">
-                        {{ __('Êtes-vous sûr de vouloir supprimer votre compte ?') }}
-                    </h3>
+                        <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                            {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente. Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
+                        </p>
 
-                    <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                        {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente. Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
-                    </p>
+                        <x-form.field-password
+                            label="Mot de passe"
+                            name="password"
+                            type="password"
+                            placeholder="Inscrivez votre mot de passe"
+                            model="password"
+                            autofocus
+                            required
+                        />
+                    </div>
 
-                    <x-form.field-password
-                        label="Mot de passe"
-                        name="password"
-                        type="password"
-                        placeholder="Inscrivez votre mot de passe"
-                        model="password"
-                        autofocus
-                        required
-                    />
-                </div>
+                    <x-modal.footer>
+                        <x-modal.close>
+                            <button type="button" class="button-secondary">
+                                {{ __('Annuler') }}
+                            </button>
+                        </x-modal.close>
 
-                <x-modal.footer>
-                    <x-modal.close>
-                        <button type="button" class="button-secondary">
-                            {{ __('Annuler') }}
+                        <button type="submit" class="button-danger">
+                            {{ __('Supprimer le compte') }}
                         </button>
-                    </x-modal.close>
+                    </x-modal.footer>
+                </form>
+            </x-modal.panel>
+        </x-modal>
 
-                    <button type="submit" class="button-danger">
-                        {{ __('Supprimer le compte') }}
-                    </button>
-                </x-modal.footer>
-            </form>
-        </x-modal.panel>
-    </x-modal>
+        <x-loader.spinner target="deleteUser" />
+    </div>
 </div>

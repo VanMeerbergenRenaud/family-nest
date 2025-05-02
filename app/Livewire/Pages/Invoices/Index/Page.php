@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Livewire\Pages\Invoices;
+namespace App\Livewire\Pages\Invoices\Index;
 
 use App\Livewire\Pages\Dashboard\Filters;
-use App\Traits\InvoiceFolderTrait;
 use App\Traits\InvoiceShareCalculationTrait;
 use App\Traits\InvoiceStateCheckTrait;
 use App\Traits\InvoiceTableTrait;
@@ -14,7 +13,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 
 #[Title('Factures')]
-class Index extends Component
+class Page extends Component
 {
     use InvoiceFolderTrait;
     use InvoiceShareCalculationTrait;

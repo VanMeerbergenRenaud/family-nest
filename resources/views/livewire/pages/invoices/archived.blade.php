@@ -1,16 +1,12 @@
 <div>
-    <!-- En-tête avec filtres -->
-    <div class="flex justify-between items-center flex-wrap gap-4 mt-2 md:px-4 mb-6">
-        <div class="w-full">
-            <h2 role="heading" aria-level="2" class="text-lg-semibold text-gray-800 dark:text-white mb-1">Factures archivées</h2>
-            <p class="text-sm-regular text-gray-500 w-full">
-                Les factures archivées n'apparaissent plus dans la liste des factures de votre tableau de bord.
-            </p>
-        </div>
+    <x-header
+        title="Factures archivées"
+        description="Les factures archivées n'apparaissent plus dans la liste des factures de votre tableau de bord."
+    />
 
-        <div class="flex gap-3 items-center justify-between w-full">
+    <div class="px-4 flex flex-col md:flex-row gap-3 justify-between w-full my-4">
             @if($this->hasFamily())
-                <div class="border border-slate-200 rounded-lg p-1 flex gap-1">
+                <div class="p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
                     @php
                         $types = [
                             'all' => 'Toutes',
@@ -21,7 +17,7 @@
                         <button
                             type="button"
                             wire:click="setFilterType('{{ $type }}')"
-                            class="px-3 py-1.5 text-sm rounded-md {{ $filterType === $type ? 'bg-blue-500 text-white' : 'hover:bg-gray-100' }}"
+                            class="px-3 py-1 text-sm rounded-md {{ $filterType === $type ? 'bg-indigo-500 text-white' : 'hover:bg-gray-200/50' }}"
                         >
                             {{ $label }}
                         </button>
@@ -30,7 +26,7 @@
             @endif
 
             @if(!$archivedInvoices->isEmpty())
-                <div class="flex gap-2 items-center">
+                <div class="flex flex-wrap md:justify-end gap-2 w-full">
                     {{-- Télécharger tout --}}
                     <button
                         type="button"
@@ -41,7 +37,7 @@
                         {{ __('Télécharger tout') }}
                     </button>
 
-                    {{-- Vider toutes les archives --}}
+                    {{-- Vider tout --}}
                     <form wire:submit.prevent="showDeleteAllInvoicesForm">
                         @csrf
 
@@ -53,11 +49,10 @@
                 </div>
             @endif
         </div>
-    </div>
 
     <!-- État vide -->
     @if($archivedInvoices->isEmpty())
-        <div class="px-4">
+        <div class="md:px-4">
             <div class="flex flex-col items-center justify-center bg-gray-50/60 border border-slate-200/80 rounded-xl p-8">
                 <div class="mb-6 p-2 bg-gray-50 rounded-full border border-slate-200">
                     <x-svg.archive class="w-5 h-5 text-slate-400"/>
@@ -84,7 +79,7 @@
         </div>
     @else
         <!-- Liste des factures par année -->
-        <div class="relative space-y-4 px-4" x-data="{ openYear: {{ $currentYear }} }" x-transition>
+        <div class="relative space-y-4 md:px-4" x-data="{ openYear: {{ $currentYear }} }" x-transition>
             @foreach($invoicesByYear as $year => $invoices)
                 <div class="border border-slate-200 rounded-lg overflow-hidden">
                     <!-- En-tête de l'année -->
@@ -94,8 +89,8 @@
                     >
                         <div class="flex items-center gap-2">
                             <x-svg.calendar class="w-5 h-5 text-gray-500" />
-                            <h3 class="text-lg font-semibold text-gray-800">{{ $year }}</h3>
-                            <span class="bg-gray-200 text-gray-700 text-xs font-medium px-2.5 py-0.5 rounded-full ml-2">
+                            <h3 class="text-md-semibold text-gray-800">{{ $year }}</h3>
+                            <span class="bg-gray-200 text-gray-700 text-xs-medium px-2.5 py-0.5 rounded-full ml-2">
                                 {{ $invoices->count() }} facture{{ $invoices->count() > 1 ? 's' : '' }}
                             </span>
                         </div>
@@ -194,11 +189,7 @@
                 </div>
             @endforeach
 
-            {{-- Arcive loading spinners... --}}
-            <div wire:loading wire:target="deleteDefinitelyInvoice, deleteDefinitelyAllInvoice" class="absolute inset-0 bg-white opacity-50"></div>
-            <div wire:loading.flex wire:target="deleteDefinitelyInvoice, deleteDefinitelyAllInvoice" class="flex-center absolute inset-0">
-                <x-svg.spinner class="text-gray-500 size-7"/>
-            </div>
+            <x-loader.spinner target="deleteDefinitelyInvoice, deleteDefinitelyAllInvoice" />
         </div>
 
         <!-- Message si aucune facture archivée trouvée -->
@@ -373,16 +364,7 @@
                         </x-modal.footer>
                     </form>
 
-                    <!-- Loading spinner pour le téléchargement -->
-                    <div wire:loading.flex wire:target="downloadSelectedArchives" class="fixed inset-0 bg-black/40 z-60 flex-center">
-                        <div class="bg-white rounded-lg p-8 max-w-md w-full flex flex-col items-center">
-                            <x-svg.spinner class="text-blue-500 w-12 h-12 mb-4"/>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">Préparation du téléchargement</h3>
-                            <p class="text-sm text-gray-500 text-center">
-                                Nous préparons vos fichiers pour le téléchargement. Cela peut prendre quelques instants selon le nombre de factures.
-                            </p>
-                        </div>
-                    </div>
+                    <x-loader.spinner target="downloadSelectedArchives" />
                 </x-modal.panel>
             </x-modal>
         @endif

@@ -5,15 +5,15 @@
 
 <div class="w-full bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
-        <x-invoices.create.summary-item label="Nom de la facture" :alternateBackground="true">
+        <x-invoices.form.summary-item label="Nom de la facture" :alternateBackground="true">
             {{ $form->name ?? 'Non spécifié' }}
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Type et catégorie">
+        <x-invoices.form.summary-item label="Type et catégorie">
             {{ $form->type ?? 'Non spécifié' }} - {{ $form->category ?? 'Non spécifié' }}
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Fournisseur" :alternateBackground="true">
+        <x-invoices.form.summary-item label="Fournisseur" :alternateBackground="true">
             {{ $form->issuer_name ?? 'Non spécifié' }}
             @if($form->issuer_website)
                 <a href="{{ $form->issuer_website }}" target="_blank"
@@ -23,9 +23,9 @@
                     ({{ $form->issuer_website }})
                 </a>
             @endif
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Montant">
+        <x-invoices.form.summary-item label="Montant">
             @if($form->amount !== null && $form->amount !== '')
                 @php
                     try {
@@ -53,9 +53,9 @@
             @else
                 <span class="text-sm-medium">Non spécifié</span>
             @endif
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Montant et répartition" :alternateBackground="true">
+        <x-invoices.form.summary-item label="Montant et répartition" :alternateBackground="true">
             @php
                 $shareSummary = $this->getShareDetailSummary($this->family_members);
                 $currencySymbol = $this->getCurrencySymbol();
@@ -152,9 +152,9 @@
                     Non spécifié - Non définie
                 </p>
             @endif
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Dates">
+        <x-invoices.form.summary-item label="Dates">
             <div class="flex flex-col gap-1.5">
                 @php
                     // Fonction de formatage des dates réutilisable
@@ -200,9 +200,9 @@
                     </p>
                 @endif
             </div>
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Statut de paiement">
+        <x-invoices.form.summary-item label="Statut de paiement">
             @php
                 $paymentStatusInstance = ($form->payment_status instanceof \App\Enums\PaymentStatusEnum)
                     ? $form->payment_status
@@ -251,17 +251,17 @@
                     </span>
                 </p>
             </div>
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Notes" :alternateBackground="true">
+        <x-invoices.form.summary-item label="Notes" :alternateBackground="true">
             @if(!empty($form->notes))
                 <span class="text-sm-regular">{{ $form->notes }}</span>
             @else
                 <span class="text-sm-medium">{{ __('Aucune') }}</span>
             @endif
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
 
-        <x-invoices.create.summary-item label="Tags">
+        <x-invoices.form.summary-item label="Tags">
             @if(empty($form->tags))
                 <span class="text-sm-medium">Aucun</span>
             @else
@@ -275,6 +275,6 @@
                     @endforeach
                 </ul>
             @endif
-        </x-invoices.create.summary-item>
+        </x-invoices.form.summary-item>
     </dl>
 </div>

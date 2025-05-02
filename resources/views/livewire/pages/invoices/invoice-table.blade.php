@@ -1,5 +1,5 @@
 <div>
-    <section class="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
+    <section class="relative w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
 
         {{-- En-tête --}}
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 pl-6 border-b border-gray-200 dark:border-gray-700 dark:bg-gray-800">
@@ -11,7 +11,7 @@
            </span>
             </h3>
 
-            <div class="flex flex-wrap items-center justify-end gap-2">
+            <div class="flex flex-wrap items-center md:justify-end gap-2">
                 <x-dashboard.search />
 
                 {{-- Filtres --}}
@@ -157,7 +157,7 @@
                     <tr>
                         {{-- Checkboxes... --}}
                         <td class="p-0 pl-2">
-                            <x-dashboard.check-all/>
+                            <x-dashboard.check-all />
                         </td>
 
                         @if($visibleColumns['name'] ?? false)
@@ -438,11 +438,7 @@
             </div>
         @endif
 
-        {{-- Table loading spinners... --}}
-        <div wire:loading wire:target="sortBy, search, previousPage, nextPage" class="absolute inset-0 bg-white opacity-50"></div>
-        <div wire:loading.flex wire:target="sortBy, search, previousPage, nextPage" class="flex-center absolute inset-0">
-            <x-svg.spinner class="text-gray-500 size-7"/>
-        </div>
+        <x-loader.spinner target="sortBy, search, previousPage, nextPage" />
     </section>
 
     {{-- Modals --}}
@@ -455,7 +451,7 @@
 
                 <div class="p-1 border-b border-gray-200 bg-gray-50 dark:bg-gray-900 relative overflow-auto">
                     <div wire:loading.remove>
-                        <x-file-viewer
+                        <x-invoices.file-viewer
                             :filePath="$filePath"
                             :fileExtension="$fileExtension"
                             :fileName="$fileName"

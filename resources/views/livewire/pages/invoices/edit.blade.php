@@ -23,12 +23,11 @@
     }" class="mx-auto md:max-w-[45rem] lg:max-w-[70rem]">
 
         {{-- Barre de progression avec les étapes --}}
-        <x-invoices.create.nav-step />
+        <x-invoices.form.nav-step />
 
         <form wire:submit.prevent="updateInvoice">
             @csrf
 
-            {{-- Invoice form --}}
             <div class="lg:px-4 max-lg:mt-4 mx-auto grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-x-10 lg:gap-y-0">
 
                 {{-- Image : colonne 1 --}}
@@ -44,7 +43,7 @@
                             </button>
 
                             <div class="rounded-xl border border-slate-200 h-full flex flex-col items-start justify-center p-2 overflow-y-auto">
-                                <x-file-viewer
+                                <x-invoices.file-viewer
                                     :filePath="$filePath"
                                     :fileExtension="$fileExtension"
                                     :fileName="$fileName"
@@ -142,7 +141,7 @@
                 <div class="relative bg-slate-100 lg:max-w-[60vw] flex flex-col justify-between py-4 px-6 rounded-xl border border-slate-200">
 
                     {{-- Étape 1: Informations générales --}}
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="1" title="Étape 1 : Informations générales"
                         description="Ajoutez les informations de base concernant cette facture."
                         class="grid grid-cols-1 gap-4 "
@@ -170,10 +169,10 @@
                             <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name" model="form.issuer_name" placeholder="Nom du fournisseur"/>
                             <x-form.field label="Site internet du fournisseur" name="form.issuer_website" model="form.issuer_website" placeholder="https://monfournisseur.com"/>
                         </div>
-                    </x-invoices.create.form-step>
+                    </x-invoices.form.step>
 
                     {{-- Étape 2: Détails financiers --}}
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="2" title="Étape 2 : Détails financiers"
                         description="Choisissez le montant et qui paie cette facture."
                         class="grid grid-cols-1 gap-4"
@@ -316,10 +315,10 @@
                                 Veuillez saisir un montant pour pouvoir le répartir entre les membres.
                             </div>
                         @endif
-                    </x-invoices.create.form-step>
+                    </x-invoices.form.step>
 
                     {{-- Étape 3: Dates importantes --}}
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="3" title="Étape 3 : Dates importantes"
                         description="Indiquez les dates importantes concernant cette facture."
                     >
@@ -365,10 +364,10 @@
                                 </div>
                             </div>
                         </div>
-                    </x-invoices.create.form-step>
+                    </x-invoices.form.step>
 
                     {{-- Étape 4: Statut de paiement --}}
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="4" title="Étape 4 : Statut de paiement"
                         description="Indiquez le statut actuel de paiement de cette facture."
                         class="grid grid-cols-1 lg:grid-cols-2 gap-4"
@@ -393,10 +392,10 @@
                                 <option value="{{ $value }}">{!! $label !!}</option>
                             @endforeach
                         </x-form.select>
-                    </x-invoices.create.form-step>
+                    </x-invoices.form.step>
 
                     {{-- Étape 5: Notes et tags personnalisés --}}
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="5" title="Étape 5 : Notes et tags personnalisés"
                         description="Ajoutez des notes et des tags pour mieux organiser vos factures."
                     >
@@ -406,21 +405,21 @@
                             Montant de caractère maximum <span class="text-sm">{{ strlen($form->notes) }}</span>/500
                         </div>
 
-                        <x-invoices.tag-manager
+                        <x-invoices.form.tag-manager
                             :tags="$form->tags"
                             :tag-input="$form->tagInput"
                             :show-suggestions="$showTagSuggestions"
                             :suggestions="$tagSuggestions"
                         />
-                    </x-invoices.create.form-step>
+                    </x-invoices.form.step>
 
-                    <x-invoices.create.form-step
+                    <x-invoices.form.step
                         step="6" title="Étape 6 : Résumé"
                         description="Vérifiez les informations avant d'enregistrer la facture."
                     >
                         <!-- Résumé du formulaire -->
-                        <x-invoices.create.summary :form="$form" :family_members="$family_members" />
-                    </x-invoices.create.form-step>
+                        <x-invoices.form.summary :form="$form" :family_members="$family_members" />
+                    </x-invoices.form.step>
 
                     {{-- Boutons de Navigation --}}
                     <div class="mt-6 border-t-[0.1rem] w-full border-dashed border-gray-200 dark:border-gray-700">
@@ -435,7 +434,7 @@
                             <button
                                 type="submit"
                                 x-show="currentStep < steps.length"
-                                class="max-sm:hidden relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
+                                class="relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                                 aria-label="Terminer et valider toutes les étapes"
                             >
                                 Terminer et valider
@@ -459,7 +458,9 @@
             </div>
 
             {{-- Gestions des messages d'erreurs --}}
-            <x-invoices.create.alert-errors :form="$form" />
+            <x-invoices.form.alert-errors :form="$form" />
+
+            <x-loader.spinner target="updateInvoice" />
         </form>
     </div>
 </div>

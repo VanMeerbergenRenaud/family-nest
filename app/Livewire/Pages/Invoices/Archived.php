@@ -7,9 +7,9 @@ use App\Models\Invoice;
 use App\Models\User;
 use App\Traits\InvoiceStateCheckTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -165,6 +165,7 @@ class Archived extends Component
     {
         if ($this->isFilterEmpty()) {
             Toaster::info('Aucune facture archivée à télécharger.');
+
             return;
         }
 
@@ -195,11 +196,11 @@ class Archived extends Component
             if ($this->selectedMemberId !== 'all') {
                 $query->where('user_id', $this->selectedMemberId);
                 $memberName = User::find($this->selectedMemberId)->name ?? 'Utilisateur';
-                $zipName = 'FamilyNest_Archives_' . str_replace(' ', '_', $memberName);
+                $zipName = 'FamilyNest_Archives_'.str_replace(' ', '_', $memberName);
             } else {
                 $zipName = $this->filterType === 'personal'
-                    ? 'FamilyNest_Archives_' . $userName
-                    : 'FamilyNest_Archives_' . $familyName;
+                    ? 'FamilyNest_Archives_'.$userName
+                    : 'FamilyNest_Archives_'.$familyName;
             }
 
             // Charger les factures avec leurs fichiers
@@ -207,20 +208,21 @@ class Archived extends Component
 
             if ($invoices->isEmpty()) {
                 Toaster::warning('Aucune facture disponible à télécharger.');
+
                 return;
             }
 
             // 2. Préparation du ZIP
-            $tempDir = storage_path('app/temp/' . uniqid());
-            if (!File::isDirectory($tempDir)) {
+            $tempDir = storage_path('app/temp/'.uniqid());
+            if (! File::isDirectory($tempDir)) {
                 File::makeDirectory($tempDir, 0755, true);
             }
 
             $zipPath = "$tempDir/$zipName";
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
 
             if ($zip->open($zipPath, ZipArchive::CREATE) !== true) {
-                throw new \Exception("Impossible de créer le fichier ZIP");
+                throw new \Exception('Impossible de créer le fichier ZIP');
             }
 
             // 3. Organisation par année et ajout des fichiers
@@ -228,7 +230,7 @@ class Archived extends Component
             $errors = 0;
 
             // Grouper par année
-            $invoicesByYear = $invoices->groupBy(function($invoice) {
+            $invoicesByYear = $invoices->groupBy(function ($invoice) {
                 return $invoice->issued_date
                     ? date('Y', strtotime($invoice->issued_date))
                     : 'Archives_non_datées';
@@ -240,8 +242,9 @@ class Archived extends Component
 
                 foreach ($yearInvoices as $invoice) {
                     // Vérifier si le fichier existe
-                    if (!$invoice->file || !Storage::disk('s3')->exists($invoice->file->file_path)) {
+                    if (! $invoice->file || ! Storage::disk('s3')->exists($invoice->file->file_path)) {
                         $errors++;
+
                         continue;
                     }
 
@@ -264,7 +267,7 @@ class Archived extends Component
                         $successes++;
 
                     } catch (\Exception $e) {
-                        Log::error("Erreur avec le fichier: " . $e->getMessage());
+                        Log::error('Erreur avec le fichier: '.$e->getMessage());
                         $errors++;
                     }
                 }
@@ -280,6 +283,7 @@ class Archived extends Component
             if ($successes === 0) {
                 File::delete($zipPath);
                 Toaster::error("Aucun fichier n'a pu être téléchargé.");
+
                 return;
             }
 
@@ -295,8 +299,9 @@ class Archived extends Component
             ])->deleteFileAfterSend();
 
         } catch (\Exception $e) {
-            Toaster::error("Erreur lors de la création du ZIP.");
-            Log::error("Erreur ZIP: " . $e->getMessage());
+            Toaster::error('Erreur lors de la création du ZIP.');
+            Log::error('Erreur ZIP: '.$e->getMessage());
+
             return null;
         }
     }

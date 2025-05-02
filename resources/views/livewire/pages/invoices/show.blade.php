@@ -5,7 +5,7 @@
     </h2>
 
     <div class="relative flex-center w-full h-full max-h-[75vh] overflow-hidden border border-slate-200 bg-gray-100 rounded-xl">
-        <x-file-viewer
+        <x-invoices.file-viewer
             :$filePath
             :$fileExtension
             :$fileName
@@ -13,5 +13,5 @@
         />
     </div>
 
-    <x-invoices.create.summary :$form :$family_members />
+    <x-invoices.form.summary :$form :$family_members />
 </div>

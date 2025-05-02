@@ -88,6 +88,10 @@ class UserProfileForm extends Form
         } catch (\Exception $e) {
             DB::rollBack();
             Toaster::error('Erreur lors de la mise à jour du profil');
+            \Log::error('Erreur lors de la mise à jour du profil', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
 
             return false;
         }

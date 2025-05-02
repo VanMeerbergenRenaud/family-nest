@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Livewire\Pages\Invoices\Index;
 
 use App\Models\Invoice;
 use App\Services\InvoiceFolderService;

@@ -38,7 +38,7 @@
                                    x-init="$wire.spotlightOpen && setTimeout(() => $refs.searchInput.focus(), 200)"
                                    class="block w-full py-3 pl-13 pr-3 lg:pr-18 text-md-regular text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-gray-300 dark:focus:border-gray-600 dark:bg-gray-800 dark:border-gray-800"/>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 max-sm:hidden">
-                                <x-shortcut key="⌘ K" class="text-gray-500 dark:text-gray-400"/>
+                                <x-app.shortcut key="⌘ K" class="text-gray-500 dark:text-gray-400"/>
                             </div>
                         </div>
 

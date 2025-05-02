@@ -27,7 +27,7 @@
             <!-- Logo -->
             <div class="my-6 p-4 bg-blue-100 rounded-full z-2">
                 <a href="{{ route('welcome') }}" title="Retour à l'accueil" wire:navigate>
-                    <x-app-logo class="w-8 h-8"/>
+                    <x-app.logo class="w-8 h-8"/>
                 </a>
             </div>
 

@@ -44,9 +44,9 @@
 @endphp
 
 <div
+    x-cloak
     x-dialog
     x-model="open"
-    style="display: none"
     class="fixed inset-0 overflow-y-auto z-55"
     @click="document.querySelectorAll('video').forEach(v => v.pause())"
 >

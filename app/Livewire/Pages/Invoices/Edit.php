@@ -78,7 +78,7 @@ class Edit extends Component
 
         if ($invoice) {
             Toaster::success('Facture mise à jour avec succès !');
-            $this->redirectRoute('dashboard', $invoice);
+            $this->redirectRoute('invoices.index', $invoice);
         } else {
             Toaster::error('Une erreur s\'est produite lors de la mise à jour de la facture.');
         }

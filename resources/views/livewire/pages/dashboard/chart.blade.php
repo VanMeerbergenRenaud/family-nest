@@ -1,10 +1,10 @@
 <div>
     <div
-            x-data="chart"
-            x-init="init($wire.dataset)"
-            wire:ignore
-            wire:loading.class="opacity-50"
-            class="relative h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
+        x-data="chart"
+        x-init="init($wire.dataset)"
+        wire:ignore
+        wire:loading.class="opacity-50"
+        class="relative min-h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
         <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">
             Montant des factures par type
@@ -87,8 +87,21 @@
 
                 const {labels, values} = cleanData;
 
-                const colors = ['#1E40AF', '#4F46E5', '#7C3AED', '#9333EA', '#C026D3', '#D946EF', '#EC4899', '#DC2626', '#EF4444', '#F97316', '#F59E0B', '#FBBF24'];
-                const hoverColors = ['#1C3879', '#4338CA', '#6D28D9', '#7E22CE', '#A21CAF', '#C026D3', '#DB2777', '#B91C1C', '#DC2626', '#EA580C', '#F99E0B', '#FBBF24'];
+                const colors = [
+                    '#193fc4', '#6444d7', '#B52FDB', '#d347dc',
+                    '#eb519d', '#ee2849', '#e32a4c', '#e74747',
+                    '#F97316', '#F59E0B', '#FBBF24', '#84CC16',
+                    '#22C55E', '#10B981', '#059669', '#047857',
+                    '#065F46', '#434b49',
+                ];
+
+                const hoverColors = [
+                    '#0D2D9A', '#532ABB', '#9B18BD', '#B830BD',
+                    '#D23888', '#D01233', '#C91737', '#CC3333',
+                    '#E35A0A', '#e6940a', '#dea920', '#73b114',
+                    '#16A34A', '#0D9488', '#047857', '#036645',
+                    '#054E3B', '#2E3432',
+                ];
 
                 return new Chart(el, {
                     type: 'bar',

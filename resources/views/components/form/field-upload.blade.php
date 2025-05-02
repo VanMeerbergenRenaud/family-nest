@@ -50,17 +50,16 @@
         >
 
         <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-80 rounded-xl overflow-hidden border border-transparent">
-            <div wire:loading
+            <div x-cloak
+                 wire:loading
                  wire:target="{{ $model }}"
-                 style="display: none;"
                  class="w-full"
             >
                 <div class="relative z-20 bg-white rounded-xl border border-slate-200 w-full h-full">
                     <div class="flex items-center px-5 py-3 gap-5 w-full">
 
-                        {{-- Spinner --}}
                         <div class="relative flex-shrink-0">
-                            <x-svg.spinner class="h-5 w-5 text-blue-500" />
+                            <x-svg.spinner class="text-blue-500 size-5" />
                         </div>
 
                         {{-- Title and description --}}
@@ -91,7 +90,7 @@
                         class="absolute top-0 right-0.5 p-3 z-10 cursor-pointer"
                         aria-label="Fermer le dialogue de chargement"
                     >
-                        <x-svg.cross class="w-4 h-4"/>
+                        <x-svg.cross />
                     </button>
                 </div>
             </div>

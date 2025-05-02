@@ -140,7 +140,7 @@
         <!-- Contenu central hero -->
         <div class="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pt-16 sm:px-6 lg:px-8">
             <a href="/" class="relative -top-10 p-4 rounded-full shadow-xs bg-white/80 backdrop-blur-sm transition-all duration-700 ease-out hover:scale-105">
-                <x-app-logo class="h-9 w-9 text-white cursor-pointer" />
+                <x-app.logo class="h-9 w-9 text-white cursor-pointer" />
             </a>
 
             <div class="max-w-3xl text-center">

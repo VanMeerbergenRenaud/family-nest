@@ -74,26 +74,26 @@
                 <div class="grid grid-cols-1 gap-6">
                     <x-form.field
                         label="Nom"
-                        name="form.name"
+                        name="name"
                         model="form.name"
-                        placeholder="Renseigner votre nom"
+                        placeholder="Votre nom"
                         class="capitalize"
                     />
 
                     <x-form.field
                         label="Adresse email"
-                        name="form.email"
+                        name="email"
                         model="form.email"
                         type="email"
-                        placeholder="Renseignez votre adresse email"
+                        placeholder="votre-email@gmail.com"
                         class="lowercase"
                     />
                 </div>
 
                 {{-- Upload progress indicator --}}
-                <x-alert-loading
+                <x-loader.animation
                     target="form.avatar"
-                    title="Téléchargement en cours..."
+                    title="Importation en cours..."
                     description="Préparation de l'image pour votre profil"
                 />
 

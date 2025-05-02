@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Livewire\Components\StyleCustomizer;
+use App\Livewire\Pages\Settings\StyleCustomizer;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 

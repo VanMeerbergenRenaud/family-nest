@@ -61,7 +61,7 @@ class Create extends Component
 
         if ($invoice) {
             Toaster::success('Facture créée avec succès !');
-            $this->redirectRoute('dashboard', $invoice);
+            $this->redirectRoute('invoices.index', $invoice);
         } else {
             Toaster::error('Une erreur s\'est produite lors de la création de la facture.');
         }

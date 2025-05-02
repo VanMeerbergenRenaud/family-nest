@@ -14,7 +14,7 @@
                title="Retour à l'accueil"
                class="flex items-center justify-start"
                wire:navigate>
-                <x-app-logo class="w-6 h-6"/>
+                <x-app.logo class="w-6 h-6"/>
                 <span class="ml-4 text-xl font-bold text-gray-900 dark:text-white">
                     FamilyNest
                 </span>
@@ -28,7 +28,8 @@
         <x-divider/>
 
         <!-- Sidebar -->
-        <div x-show="mobileMenuOpen"
+        <div x-cloak
+             x-show="mobileMenuOpen"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 translate-x-full"
              x-transition:enter-end="opacity-100 translate-x-0"
@@ -36,7 +37,6 @@
              x-transition:leave-start="opacity-100 translate-x-0"
              x-transition:leave-end="opacity-0 translate-x-full"
              class="fixed top-15 right-0 h-screen w-screen bg-white dark:bg-gray-800 z-40 overflow-y-auto"
-             style="display: none;"
         >
             <x-divider/>
 
@@ -79,7 +79,7 @@
                    title="Retour à l'accueil"
                    wire:navigate
                 >
-                    <x-app-logo class="w-6 h-6"/>
+                    <x-app.logo class="w-6 h-6"/>
                     @if($expanded)
                         <span class="ml-4 text-xl font-bold text-gray-900 dark:text-white">FamilyNest</span>
                     @endif
