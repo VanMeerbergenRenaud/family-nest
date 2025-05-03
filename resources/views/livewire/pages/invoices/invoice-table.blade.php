@@ -33,28 +33,15 @@
                             $iconInactiveClass = 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-200';
                         @endphp
 
-                            <!-- Filtres de date -->
-                        <x-menu.item wire:click="applyFilter('issued_date_asc')" class="{{ $activeFilter === 'issued_date_asc' ? $activeState : $inactiveState }} group">
-                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Date (ancien → récent)
+                        <!-- Filtres alphabétiques -->
+                        <x-menu.item wire:click="applyFilter('name_asc')" class="{{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.atoz class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'name_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            A → Z
                         </x-menu.item>
 
-                        <x-menu.item wire:click="applyFilter('issued_date_desc')" class="{{ $activeFilter === 'issued_date_desc' ? $activeState : $inactiveState }} group">
-                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Date (récent → ancien)
-                        </x-menu.item>
-
-                        <x-menu.divider/>
-
-                        <!-- Filtres d'échéance -->
-                        <x-menu.item wire:click="applyFilter('payment_due_date_asc')" class="{{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }} group">
-                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Échéance (proche → loin)
-                        </x-menu.item>
-
-                        <x-menu.item wire:click="applyFilter('payment_due_date_desc')" class="{{ $activeFilter === 'payment_due_date_desc' ? $activeState : $inactiveState }} group">
-                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Échéance (loin → proche)
+                        <x-menu.item wire:click="applyFilter('name_desc')" class="{{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.atoz class="w-4 h-4 rotate-180 transition-colors duration-200 {{ $activeFilter === 'name_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Z → A
                         </x-menu.item>
 
                         <x-menu.divider/>
@@ -72,15 +59,28 @@
 
                         <x-menu.divider/>
 
-                        <!-- Filtres alphabétiques -->
-                        <x-menu.item wire:click="applyFilter('name_asc')" class="{{ $activeFilter === 'name_asc' ? $activeState : $inactiveState }} group">
-                            <x-svg.atoz class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'name_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            A → Z
+                        <!-- Filtres d'échéance -->
+                        <x-menu.item wire:click="applyFilter('payment_due_date_asc')" class="{{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Échéance (plus récente)
                         </x-menu.item>
 
-                        <x-menu.item wire:click="applyFilter('name_desc')" class="{{ $activeFilter === 'name_desc' ? $activeState : $inactiveState }} group">
-                            <x-svg.atoz class="w-4 h-4 rotate-180 transition-colors duration-200 {{ $activeFilter === 'name_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Z → A
+                        <x-menu.item wire:click="applyFilter('payment_due_date_desc')" class="{{ $activeFilter === 'payment_due_date_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Échéance (plus ancienne)
+                        </x-menu.item>
+
+                        <x-menu.divider/>
+
+                        <!-- Filtres de date -->
+                        <x-menu.item wire:click="applyFilter('issued_date_asc')" class="{{ $activeFilter === 'issued_date_asc' ? $activeState : $inactiveState }} group">
+                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Émission (plus récente)
+                        </x-menu.item>
+
+                        <x-menu.item wire:click="applyFilter('issued_date_desc')" class="{{ $activeFilter === 'issued_date_desc' ? $activeState : $inactiveState }} group">
+                            <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
+                            Émission (plus ancienne)
                         </x-menu.item>
 
                         @if($activeFilter)

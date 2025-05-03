@@ -30,8 +30,6 @@ class Index extends Component
             $this->filters->init($user);
             $this->filters->family_member = 'all';
         }
-
-        $this->mountInvoiceTableTrait();
     }
 
     public function getInvoicesQuery(): Invoice

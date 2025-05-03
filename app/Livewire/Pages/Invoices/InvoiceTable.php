@@ -33,9 +33,6 @@ class InvoiceTable extends Component
 
     public function mount()
     {
-        $this->mountSortableTrait();
-        $this->mountInvoiceTableTrait();
-
         if (! isset($this->filters)) {
             $this->filters->init(auth()->user());
         }
