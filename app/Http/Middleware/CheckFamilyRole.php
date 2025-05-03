@@ -32,6 +32,17 @@ class CheckFamilyRole
             return redirect()->route('family');
         }
 
+        // If the route contains an invoice, check if the user has access to it
+        if ($request->route('invoice')) {
+            $invoice = $request->route('invoice');
+            $invoiceFamily = $invoice->family;
+
+            // If invoice has a family, check that user belongs to that family
+            if ($invoiceFamily && ! $user->families()->where('family_id', $invoiceFamily->id)->exists()) {
+                return redirect()->route('invoices.index');
+            }
+        }
+
         if (! $this->userHasRequiredRole($user, $family, $roles)) {
             return redirect()->route('family');
         }

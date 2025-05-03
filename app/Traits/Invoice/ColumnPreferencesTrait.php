@@ -20,7 +20,7 @@ trait ColumnPreferencesTrait
     public function toggleColumn($column): void
     {
         if (isset($this->visibleColumns[$column])) {
-            $this->visibleColumns[$column] = !$this->visibleColumns[$column];
+            $this->visibleColumns[$column] = ! $this->visibleColumns[$column];
         }
     }
 

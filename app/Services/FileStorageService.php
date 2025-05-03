@@ -7,7 +7,6 @@ use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Traits\FormatFileSizeTrait;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class FileStorageService
@@ -74,28 +73,6 @@ class FileStorageService
     }
 
     /**
-     * Delete invoice file
-     */
-    public function deleteInvoiceFile(InvoiceFile $file): bool
-    {
-        try {
-            // Delete from S3
-            if ($file->getRawOriginal('file_path') && Storage::disk('s3')->exists($file->getRawOriginal('file_path'))) {
-                Storage::disk('s3')->delete($file->getRawOriginal('file_path'));
-            }
-
-            // Delete database record
-            $file->delete();
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Error deleting file: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    /**
      * Get file information
      */
     public function getFileInfo(?UploadedFile $file, ?string $fileName = null, ?string $fileExtension = null, ?int $fileSize = null): ?array
@@ -119,4 +96,6 @@ class FileStorageService
             'isCsv' => $extension === 'csv',
         ];
     }
+
+    // TODO : Delete the invoice file from s3
 }

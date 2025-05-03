@@ -113,9 +113,22 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
-    public function isAdmin(): bool
+    /**
+     * Get all invoices accessible to this user (personal + family invoices)
+     */
+    public function accessibleInvoices()
     {
-        return $this->getFamilyPermissionAttribute() === FamilyPermissionEnum::Admin;
+        // If no family, only return personal invoices
+        if (! $this->hasFamily()) {
+            return $this->invoices();
+        }
+
+        $familyIds = $this->families()->pluck('families.id')->toArray();
+
+        return Invoice::where(function ($query) use ($familyIds) {
+            $query->where('user_id', $this->id)
+                ->orWhereIn('family_id', $familyIds);
+        });
     }
 
     /**

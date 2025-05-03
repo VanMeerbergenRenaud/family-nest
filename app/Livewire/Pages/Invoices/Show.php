@@ -37,11 +37,11 @@ class Show extends Component
     public function mount($id)
     {
         // Récupérer la facture avec ses relations
-        $this->invoice = auth()->user()->invoices()
+        $this->invoice = auth()->user()->accessibleInvoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
-        // Charger les membres de la famille et préparer les données du formulaire
+        // Reste du code inchangé...
         $this->loadFamilyMembers();
         $this->prepareFormData();
 

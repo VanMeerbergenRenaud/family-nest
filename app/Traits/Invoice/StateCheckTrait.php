@@ -71,12 +71,34 @@ trait StateCheckTrait
     // Les méthodes suivantes utilisent les données du getInvoiceStats
     public function hasFamilyActiveInvoices(): bool
     {
-        return $this->getInvoiceStats()['has_active'];
+        $user = auth()->user();
+
+        if (! $user->hasFamily()) {
+            return $user->invoices()->where('is_archived', false)->exists();
+        }
+
+        $familyIds = $user->families()->pluck('families.id')->toArray();
+
+        return Invoice::where(function ($query) use ($user, $familyIds) {
+            $query->where('user_id', $user->id)
+                ->orWhereIn('family_id', $familyIds);
+        })->where('is_archived', false)->exists();
     }
 
     public function hasFamilyArchivedInvoices(): bool
     {
-        return $this->getInvoiceStats()['has_archived'];
+        $user = auth()->user();
+
+        if (! $user->hasFamily()) {
+            return $user->invoices()->where('is_archived', true)->exists();
+        }
+
+        $familyIds = $user->families()->pluck('families.id')->toArray();
+
+        return Invoice::where(function ($query) use ($user, $familyIds) {
+            $query->where('user_id', $user->id)
+                ->orWhereIn('family_id', $familyIds);
+        })->where('is_archived', true)->exists();
     }
 
     public function hasOnlyArchivedInvoices(): bool

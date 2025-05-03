@@ -17,10 +17,11 @@ trait SearchableTrait
     protected function applySearch($query)
     {
         return $this->search === ''
-            ? $query
-            : $query->where(function ($query) {
-                $query->where('name', 'like', "%{$this->search}%")
-                    ->orWhere('reference', 'like', "%{$this->search}%");
-            });
+                 ? $query
+                 : $query->where(function ($query) {
+                     $searchTerm = strtolower($this->search);
+                     $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
+                         ->orWhereRaw('LOWER(reference) LIKE ?', ["%{$searchTerm}%"]);
+                 });
     }
 }

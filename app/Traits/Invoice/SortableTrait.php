@@ -17,10 +17,10 @@ trait SortableTrait
     public array $availableFilters = [
         'name_asc' => 'Nom (A → Z)',
         'name_desc' => 'Nom (Z → A)',
-        'issued_date_asc' => 'Date d\'émission (plus récente)',
-        'issued_date_desc' => 'Date d\'émission (plus ancienne)',
-        'payment_due_date_asc' => 'Date d\'échéance (plus récente)',
-        'payment_due_date_desc' => 'Date d\'échéance (plus ancienne)',
+        'issued_date_asc' => 'Date d\'émission (ancienne)',
+        'issued_date_desc' => 'Date d\'émission (récente)',
+        'payment_due_date_asc' => 'Date d\'échéance (ancienne)',
+        'payment_due_date_desc' => 'Date d\'échéance (récente)',
         'amount_asc' => 'Montant (croissant)',
         'amount_desc' => 'Montant (décroissant)',
     ];
@@ -30,7 +30,7 @@ trait SortableTrait
         $this->activeFilter = null;
 
         if ($this->sortCol === $column) {
-            $this->sortAsc = !$this->sortAsc;
+            $this->sortAsc = ! $this->sortAsc;
         } else {
             $this->sortCol = $column;
             $this->sortAsc = true;
@@ -43,6 +43,7 @@ trait SortableTrait
     {
         if (empty($filter)) {
             $this->resetSort();
+
             return;
         }
 
@@ -69,7 +70,7 @@ trait SortableTrait
 
     protected function applySorting($query)
     {
-        if (!$this->sortCol) {
+        if (! $this->sortCol) {
             return $query;
         }
 

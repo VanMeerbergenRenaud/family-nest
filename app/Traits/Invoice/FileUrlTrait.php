@@ -65,6 +65,7 @@ trait FileUrlTrait
                 'url' => $fileUrl,
                 'extension' => $fileExtension,
                 'exists' => true,
+                'name' => $invoice->file->file_name,
             ];
 
         } catch (\Exception $e) {

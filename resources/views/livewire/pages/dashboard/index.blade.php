@@ -94,7 +94,7 @@
             <livewire:pages.dashboard.chart :$filters />
 
             {{-- Table de factures --}}
-            <livewire:pages.invoices.invoice-table :$filters />
+            <livewire:pages.invoices.invoice-table :$filters :withFilters="true" />
         </div>
     @endif
 

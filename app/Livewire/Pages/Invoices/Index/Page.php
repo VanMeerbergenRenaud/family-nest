@@ -29,9 +29,7 @@ class Page extends Component
     #[On('invoice-deleted')]
     #[On('invoices-bulk-archived')]
     #[On('invoices-bulk-updated')]
-    public function refreshPage(): void
-    {
-    }
+    public function refreshPage(): void {}
 
     public function render()
     {

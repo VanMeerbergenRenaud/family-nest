@@ -19,8 +19,11 @@ class Folders extends Component
     use ActionsTrait, FileUrlTrait, ShareCalculationTrait;
 
     public $showFolderModal = false;
+
     public $currentFolder = '';
+
     public $folderTitle = '';
+
     public $folderInvoices = [];
 
     // Méthode principale pour ouvrir un dossier

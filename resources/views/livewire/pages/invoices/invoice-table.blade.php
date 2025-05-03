@@ -6,9 +6,9 @@
             <h3 role="heading" aria-level="3" class="flex flex-wrap gap-3 text-md-semibold mb-3 sm:mb-0 dark:text-white">
                 Tous les fichiers
                 <span aria-hidden="true" class="relative -top-0.5 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs-medium dark:bg-gray-700 dark:text-gray-200">
-               {{ \Illuminate\Support\Number::format($invoices->total()) }}
+                    {{ \Illuminate\Support\Number::format($invoices->total()) }}
                     {{ $invoices->total() <= 1 ? 'facture' : 'factures' }}
-           </span>
+               </span>
             </h3>
 
             <div class="flex flex-wrap items-center md:justify-end gap-2">
@@ -21,7 +21,7 @@
                         {{ $activeFilter ? $availableFilters[$activeFilter] : 'Filtres' }}
                     </x-menu.button>
 
-                    <x-menu.items class="mt-2 w-64">
+                    <x-menu.items class="mt-2 w-68">
                         <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
 
                         <x-menu.divider/>
@@ -49,12 +49,12 @@
                         <!-- Filtres de montant -->
                         <x-menu.item wire:click="applyFilter('amount_asc')" class="{{ $activeFilter === 'amount_asc' ? $activeState : $inactiveState }} group">
                             <x-svg.dollar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'amount_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Prix (- → +)
+                            Prix croissant (- → +)
                         </x-menu.item>
 
                         <x-menu.item wire:click="applyFilter('amount_desc')" class="{{ $activeFilter === 'amount_desc' ? $activeState : $inactiveState }} group">
                             <x-svg.dollar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'amount_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Prix (+ → -)
+                            Prix décroissant (+ → -)
                         </x-menu.item>
 
                         <x-menu.divider/>
@@ -62,25 +62,25 @@
                         <!-- Filtres d'échéance -->
                         <x-menu.item wire:click="applyFilter('payment_due_date_asc')" class="{{ $activeFilter === 'payment_due_date_asc' ? $activeState : $inactiveState }} group">
                             <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Échéance (plus récente)
+                            Échéance (ancienne → récente)
                         </x-menu.item>
 
                         <x-menu.item wire:click="applyFilter('payment_due_date_desc')" class="{{ $activeFilter === 'payment_due_date_desc' ? $activeState : $inactiveState }} group">
                             <x-svg.clock class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'payment_due_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Échéance (plus ancienne)
+                            Échéance (récente → ancienne)
                         </x-menu.item>
 
                         <x-menu.divider/>
 
-                        <!-- Filtres de date -->
+                        <!-- Filtres de date d'émission -->
                         <x-menu.item wire:click="applyFilter('issued_date_asc')" class="{{ $activeFilter === 'issued_date_asc' ? $activeState : $inactiveState }} group">
                             <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_asc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Émission (plus récente)
+                            Émission (ancienne → récente)
                         </x-menu.item>
 
                         <x-menu.item wire:click="applyFilter('issued_date_desc')" class="{{ $activeFilter === 'issued_date_desc' ? $activeState : $inactiveState }} group">
                             <x-svg.calendar class="w-4 h-4 transition-colors duration-200 {{ $activeFilter === 'issued_date_desc' ? $iconActiveClass : $iconInactiveClass }}"/>
-                            Émission (plus ancienne)
+                            Émission (récente → ancienne)
                         </x-menu.item>
 
                         @if($activeFilter)

@@ -25,7 +25,7 @@ trait ActionsTrait
 
     public function showInvoiceModal($id): void
     {
-        $invoice = auth()->user()->invoices()
+        $invoice = auth()->user()->accessibleInvoices()
             ->with('file')
             ->findOrFail($id);
 
@@ -35,8 +35,8 @@ trait ActionsTrait
 
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
-        $this->fileExists = $fileInfo['exists'];
-        $this->fileName = $invoice->file->file_name ?? null;
+        $this->fileExists = $fileInfo['exists'] ?? false;
+        $this->fileName = $fileInfo['name'] ?? $invoice->file->file_name ?? $invoice->name;
 
         // Fermer tout autre modal si ouvert
         if (property_exists($this, 'showFolderModal')) {

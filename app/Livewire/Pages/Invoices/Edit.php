@@ -47,11 +47,18 @@ class Edit extends Component
     public function mount($id)
     {
         // Récupérer la facture avec ses relations
-        $this->invoice = auth()->user()->invoices()
+        $this->invoice = auth()->user()->accessibleInvoices()
             ->with(['file', 'sharedUsers'])
             ->findOrFail($id);
 
-        // Initialiser le formulaire à partir de la facture
+        // Vérifier les droits de modification
+        if (! auth()->user()->can('update', $this->invoice)) {
+            Toaster::warning('Vous n\'avez pas les droits pour modifier cette facture.');
+
+            return redirect()->route('invoices.show', $this->invoice);
+        }
+
+        // Reste du code inchangé...
         $this->form->setFromInvoice($this->invoice);
 
         // Récupérer les informations du fichier

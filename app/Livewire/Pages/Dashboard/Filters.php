@@ -152,26 +152,19 @@ class Filters extends Form
         $family = $user->family();
 
         // Query de base pour les factures non archivées
-        $query = Invoice::query()->where('is_archived', false);
+        $query = auth()->user()->accessibleInvoices()
+            ->where('is_archived', false)
+            ->with(['file', 'sharedUsers']);
 
         // Si on filtre par membre spécifique
         if ($this->family_member !== 'all') {
             return $query->where('user_id', $this->family_member);
         }
 
-        // Sinon, si c'est "tous les membres"
+        // Sinon, si c'est "tous les membres" et qu'on a une famille
         if ($family) {
-            if ($user->isAdmin()) {
-                return $query->where('family_id', $family->id);
-            }
-
-            // Sinon, on montre seulement ses propres factures et celles partagées avec lui
-            return $query->where(function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                    ->orWhereHas('sharedUsers', function ($q) use ($user) {
-                        $q->where('user_id', $user->id);
-                    });
-            })->where('family_id', $family->id);
+            // Pour tous les utilisateurs, on affiche toutes les factures de la famille
+            return $query->where('family_id', $family->id);
         }
 
         // Si pas de famille, on montre seulement ses propres factures
