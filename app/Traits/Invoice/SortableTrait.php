@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Traits\Invoice;
 
 use Livewire\Attributes\Url;
 
@@ -18,7 +18,7 @@ trait SortableTrait
 
     public $activeFilter = null;
 
-    public $availableFilters = [
+    public array $availableFilters = [
         'name_asc' => 'Par ordre alphabétique (A-Z)',
         'name_desc' => 'Par ordre alphabétique (Z-A)',
         'issued_date_asc' => 'Date d\'ajout (plus ancien)',

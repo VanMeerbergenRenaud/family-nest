@@ -4,16 +4,16 @@ namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Family;
 use App\Models\Invoice;
-use App\Traits\InvoiceStateCheckTrait;
-use App\Traits\InvoiceTableTrait;
+use App\Traits\Invoice\StateCheckTrait;
+use App\Traits\Invoice\TableTrait;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Tableau de bord')]
 class Index extends Component
 {
-    use InvoiceStateCheckTrait;
-    use InvoiceTableTrait;
+    use StateCheckTrait;
+    use TableTrait;
 
     public ?Family $family = null;
 

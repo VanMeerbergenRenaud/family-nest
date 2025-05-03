@@ -10,10 +10,10 @@ use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Services\FileStorageService;
-use App\Traits\InvoiceComponentTrait;
-use App\Traits\InvoiceFileUrlTrait;
-use App\Traits\InvoiceShareCalculationTrait;
-use App\Traits\InvoiceTagManagement;
+use App\Traits\Invoice\ComponentTrait;
+use App\Traits\Invoice\FileUrlTrait;
+use App\Traits\Invoice\ShareCalculationTrait;
+use App\Traits\Invoice\TagManagement;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -22,10 +22,10 @@ use Masmerise\Toaster\Toaster;
 #[Title('Modifier la facture')]
 class Edit extends Component
 {
-    use InvoiceComponentTrait;
-    use InvoiceFileUrlTrait;
-    use InvoiceShareCalculationTrait;
-    use InvoiceTagManagement;
+    use ComponentTrait;
+    use FileUrlTrait;
+    use ShareCalculationTrait;
+    use TagManagement;
     use WithFileUploads;
 
     public InvoiceForm $form;

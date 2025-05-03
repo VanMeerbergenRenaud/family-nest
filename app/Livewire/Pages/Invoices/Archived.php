@@ -5,7 +5,7 @@ namespace App\Livewire\Pages\Invoices;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Models\User;
-use App\Traits\InvoiceStateCheckTrait;
+use App\Traits\Invoice\StateCheckTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +19,7 @@ use ZipArchive;
 #[Title('Archives')]
 class Archived extends Component
 {
-    use InvoiceStateCheckTrait, WithPagination;
+    use StateCheckTrait, WithPagination;
 
     public InvoiceForm $form;
 
@@ -80,7 +80,6 @@ class Archived extends Component
 
     public function showDeleteAllInvoicesForm(): void
     {
-        // Vérifier s'il y a des factures à supprimer avant d'afficher la modal
         if ($this->isFilterEmpty()) {
             Toaster::info('Il n\'y a aucune facture à supprimer.');
 
@@ -123,7 +122,11 @@ class Archived extends Component
         if ($this->filterType === 'personal') {
             $query->where('user_id', auth()->id());
         } elseif ($this->hasFamily()) {
-            $familyMemberIds = auth()->user()->family()->users()->pluck('user_id')->toArray();
+            $familyMemberIds = auth()->user()->family()
+                ->users()
+                ->pluck('user_id')
+                ->toArray();
+
             $query->whereIn('user_id', $familyMemberIds);
         }
 
@@ -306,37 +309,19 @@ class Archived extends Component
         }
     }
 
-    protected function getContentType($extension): string
-    {
-        $contentTypes = [
-            'pdf' => 'application/pdf',
-            'doc' => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'xls' => 'application/vnd.ms-excel',
-            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'jpg' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'gif' => 'image/gif',
-            'txt' => 'text/plain',
-        ];
-
-        return $contentTypes[strtolower($extension)] ?? 'application/octet-stream';
-    }
-
     public function render()
     {
         $archivedInvoices = $this->getFilteredInvoicesQuery()
-            ->with(['file', 'user'])
+            ->with(['file'])
             ->get();
 
         $invoicesByYear = $archivedInvoices->groupBy(function ($invoice) {
-            return $invoice->issued_date ? date('Y', strtotime($invoice->issued_date)) : 'Non daté';
+            return $invoice->issued_date
+                ? date('Y', strtotime($invoice->issued_date))
+                : 'Non daté';
         })->sortKeysDesc();
 
-        $familyMembers = $this->hasFamily()
-            ? auth()->user()->family()->users()->get()
-            : collect();
+        $familyMembers = auth()->user()->family()->users()->get();
 
         return view('livewire.pages.invoices.archived', [
             'archivedInvoices' => $archivedInvoices,

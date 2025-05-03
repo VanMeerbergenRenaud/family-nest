@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Traits;
+namespace App\Traits\Invoice;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-trait InvoiceTagManagement
+trait TagManagement
 {
     public array $tagSuggestions = [];
 

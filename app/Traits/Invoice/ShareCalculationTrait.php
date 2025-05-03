@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Traits;
+namespace App\Traits\Invoice;
 
 use App\Enums\CurrencyEnum;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 
-trait InvoiceShareCalculationTrait
+trait ShareCalculationTrait
 {
     public string $shareMode = 'amount';
 

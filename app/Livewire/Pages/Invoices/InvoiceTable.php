@@ -3,11 +3,11 @@
 namespace App\Livewire\Pages\Invoices;
 
 use App\Livewire\Pages\Dashboard\Filters;
-use App\Traits\ColumnPreferencesTrait;
 use App\Traits\HumanDateTrait;
-use App\Traits\InvoiceTableTrait;
-use App\Traits\SearchableTrait;
-use App\Traits\SortableTrait;
+use App\Traits\Invoice\ColumnPreferencesTrait;
+use App\Traits\Invoice\SearchableTrait;
+use App\Traits\Invoice\SortableTrait;
+use App\Traits\Invoice\TableTrait;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
@@ -20,9 +20,9 @@ class InvoiceTable extends Component
 {
     use ColumnPreferencesTrait,
         HumanDateTrait,
-        InvoiceTableTrait,
         SearchableTrait,
-        SortableTrait;
+        SortableTrait,
+        TableTrait;
 
     #[Reactive]
     public Filters $filters;
@@ -37,8 +37,7 @@ class InvoiceTable extends Component
         $this->mountInvoiceTableTrait();
 
         if (! isset($this->filters)) {
-            $user = auth()->user();
-            $this->filters->init($user);
+            $this->filters->init(auth()->user());
         }
     }
 

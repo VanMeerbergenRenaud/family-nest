@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Traits;
+namespace App\Traits\Invoice;
 
 /**
  * Trait commun pour les composants liés aux factures (Create, Edit, Show)
  * Contient les méthodes partagées par ces composants
  */
-trait InvoiceComponentTrait
+trait ComponentTrait
 {
     /**
      * Charge les membres de la famille de l'utilisateur
@@ -71,7 +71,6 @@ trait InvoiceComponentTrait
 
     /**
      * Valide les parts avant la sauvegarde finale
-     * Ne force pas à avoir 100% ou le montant total réparti
      */
     protected function validateShares(): void
     {

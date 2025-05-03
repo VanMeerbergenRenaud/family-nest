@@ -5,7 +5,7 @@
 <div x-cloak
      x-transition
      x-show="$wire.selectedInvoiceIds.length > 0"
-     class="fixed bottom-4 left-6 right-6 lg:left-24 mx-auto w-auto lg:w-fit z-70 rounded-md lg:rounded-xl bg-gray-100 border border-gray-200"
+     class="fixed bottom-4 left-4 right-4 lg:left-24 mx-auto w-auto lg:w-fit z-70 rounded-xl bg-gray-100 border border-gray-200"
 >
     <div class="flex max-lg:flex-wrap items-center justify-between gap-y-4 p-2.5 lg:pl-5 lg:pr-2.5">
         <!-- Selected count indicator -->

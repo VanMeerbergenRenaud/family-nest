@@ -10,9 +10,9 @@ use App\Enums\TypeEnum;
 use App\Livewire\Forms\InvoiceForm;
 use App\Services\FileStorageService;
 use App\Services\TextractService;
-use App\Traits\InvoiceComponentTrait;
-use App\Traits\InvoiceShareCalculationTrait;
-use App\Traits\InvoiceTagManagement;
+use App\Traits\Invoice\ComponentTrait;
+use App\Traits\Invoice\ShareCalculationTrait;
+use App\Traits\Invoice\TagManagement;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -22,9 +22,9 @@ use Masmerise\Toaster\Toaster;
 #[Title('Ajouter la facture')]
 class Create extends Component
 {
-    use InvoiceComponentTrait;
-    use InvoiceShareCalculationTrait;
-    use InvoiceTagManagement;
+    use ComponentTrait;
+    use ShareCalculationTrait;
+    use TagManagement;
     use WithFileUploads;
 
     public InvoiceForm $form;

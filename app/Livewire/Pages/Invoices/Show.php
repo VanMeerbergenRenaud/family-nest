@@ -7,18 +7,18 @@ use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Models\Invoice;
-use App\Traits\InvoiceComponentTrait;
-use App\Traits\InvoiceFileUrlTrait;
-use App\Traits\InvoiceShareCalculationTrait;
+use App\Traits\Invoice\ComponentTrait;
+use App\Traits\Invoice\FileUrlTrait;
+use App\Traits\Invoice\ShareCalculationTrait;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Détails de facture')]
 class Show extends Component
 {
-    use InvoiceComponentTrait;
-    use InvoiceFileUrlTrait;
-    use InvoiceShareCalculationTrait;
+    use ComponentTrait;
+    use FileUrlTrait;
+    use ShareCalculationTrait;
 
     public Invoice $invoice;
 

@@ -38,14 +38,16 @@
                     </button>
 
                     {{-- Vider tout --}}
-                    <form wire:submit.prevent="showDeleteAllInvoicesForm">
-                        @csrf
+                    @can('delete', $archivedInvoices->first())
+                        <form wire:submit.prevent="showDeleteAllInvoicesForm">
+                            @csrf
 
-                        <button type="submit" class="button-danger">
-                            <x-svg.trash class="mr-0.5 text-white"/>
-                            {{ __('Supprimer les archives') }}
-                        </button>
-                    </form>
+                            <button type="submit" class="button-danger">
+                                <x-svg.trash class="mr-0.5 text-white"/>
+                                {{ __('Supprimer les archives') }}
+                            </button>
+                        </form>
+                    @endcan
                 </div>
             @endif
         </div>
@@ -79,13 +81,12 @@
         </div>
     @else
         <!-- Liste des factures par année -->
-        <div class="relative space-y-4 md:px-4" x-data="{ openYear: {{ $currentYear }} }" x-transition>
+        <div x-cloak class="relative space-y-4 md:px-4" x-data="{ openYear: {{ $currentYear }} }" x-transition>
             @foreach($invoicesByYear as $year => $invoices)
                 <div class="border border-slate-200 rounded-lg overflow-hidden">
                     <!-- En-tête de l'année -->
-                    <div
-                        @click="openYear = openYear === '{{ $year }}' ? null : '{{ $year }}'"
-                        class="bg-gray-50 p-4 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                    <div @click="openYear = openYear === '{{ $year }}' ? null : '{{ $year }}'"
+                         class="bg-gray-50 p-4 flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
                     >
                         <div class="flex items-center gap-2">
                             <x-svg.calendar class="w-5 h-5 text-gray-500" />

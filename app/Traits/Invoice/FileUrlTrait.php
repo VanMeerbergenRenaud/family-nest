@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Traits\Invoice;
 
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Masmerise\Toaster\Toaster;
 
-trait InvoiceFileUrlTrait
+trait FileUrlTrait
 {
     /**
      * Génère une URL temporaire pour le fichier principal d'une facture

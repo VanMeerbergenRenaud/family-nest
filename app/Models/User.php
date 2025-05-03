@@ -24,6 +24,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
     ];
 
+    protected $familyRelationCache = null;
+
+    protected $hasFamilyCache = null;
+
     protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
@@ -73,16 +77,28 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
-    // Get the first family the user belongs to
+    // Get the first family of the user
     public function family()
     {
-        return $this->families()->first();
+        if ($this->familyRelationCache === null) {
+            $this->familyRelationCache = $this->families()->first();
+        }
+
+        return $this->familyRelationCache;
     }
 
     // Check if the user has a family
     public function hasFamily(): bool
     {
-        return $this->families()->exists();
+        if ($this->hasFamilyCache === null) {
+            if ($this->relationLoaded('families')) {
+                $this->hasFamilyCache = $this->families->isNotEmpty();
+            } else {
+                $this->hasFamilyCache = $this->families()->exists();
+            }
+        }
+
+        return $this->hasFamilyCache;
     }
 
     // Return the value of the label corresponding to the permission of the user in his family
