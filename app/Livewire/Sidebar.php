@@ -12,10 +12,13 @@ class Sidebar extends Component
 
     public bool $expanded = true;
 
+    protected $listeners = [
+        'user-profile-updated' => 'refreshUserData'
+    ];
+
     public function mount()
     {
         $this->user = auth()->user();
-
         $this->expanded = session('sidebar_expanded', true);
     }
 
@@ -23,9 +26,14 @@ class Sidebar extends Component
     {
         $this->expanded = ! $this->expanded;
 
-        session(['sidebar_expanded' => $this->expanded]);
-
         $this->dispatch('sidebar-toggled', expanded: $this->expanded);
+
+        session()->put('sidebar_expanded', $this->expanded);
+    }
+
+    public function refreshUserData(): void
+    {
+        $this->user = auth()->user()->fresh();
     }
 
     public function seeProfile(): void

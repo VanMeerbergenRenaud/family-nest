@@ -14,8 +14,11 @@
 
         <x-toaster-hub />
 
-        <main class="flex-1 transition-all duration-300 max-lg:!ml-0"
-              style="margin-left: {{ session('sidebar_expanded', true) ? '16rem' : '5rem' }};"
+        <main
+            x-data
+            class="flex-1 max-lg:!ml-0 transition-all duration-300"
+            @sidebar-toggled.window="$el.style.marginLeft = $event.detail.expanded ? '16rem' : '5rem'"
+            style="margin-left: {{ session('sidebar_expanded', true) ? '16rem' : '5rem' }};"
         >
             <livewire:spotlight />
 
@@ -31,18 +34,5 @@
         </main>
 
         @livewireScripts
-
-        <script>
-            document.addEventListener('livewire:init', () => {
-                Livewire.on('sidebar-toggled', (event) => {
-                    const mainContent = document.querySelector('main');
-                    if (event.expanded) {
-                        mainContent.style.marginLeft = '16rem'; // 16rem = 64px (w-64)
-                    } else {
-                        mainContent.style.marginLeft = '5rem';  // 5rem = 20px (w-20)
-                    }
-                });
-            });
-        </script>
     </body>
 </html>

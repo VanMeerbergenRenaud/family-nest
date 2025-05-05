@@ -38,26 +38,26 @@
             {{ __('Télécharger') }}
         </x-menu.item>
 
-        <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})" wire:loading.attr="disabled">
-            @if($invoice->is_favorite)
-                <x-svg.star class="group-hover:text-gray-900 fill-current"/>
-                {{ __('Retirer des favoris') }}
-            @else
-                <x-svg.star class="group-hover:text-gray-900"/>
-                {{ __('Ajouter aux favoris') }}
-            @endif
-        </x-menu.item>
+        @can('addToFavorite', $invoice)
+            <x-menu.item wire:click="toggleFavorite({{ $invoice->id }})" wire:loading.attr="disabled">
+                @if($invoice->is_favorite)
+                    <x-svg.star class="group-hover:text-gray-900 fill-current"/>
+                    {{ __('Retirer des favoris') }}
+                @else
+                    <x-svg.star class="group-hover:text-gray-900"/>
+                    {{ __('Ajouter aux favoris') }}
+                @endif
+            </x-menu.item>
+        @endif
 
-        @can('archive', $invoice)
+        @can('delete', $invoice)
             <x-menu.divider/>
 
             <x-menu.item wire:click="archiveInvoice({{ $invoice->id }})" class="group hover:text-red-500" wire:loading.attr="disabled">
                 <x-svg.archive class="group-hover:text-red-500 stroke-2" />
                 {{ __('Archiver') }}
             </x-menu.item>
-        @endcan
 
-        @can('delete', $invoice)
             <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500" wire:loading.attr="disabled">
                 <x-svg.trash class="group-hover:text-red-500"/>
                 {{ __('Supprimer') }}

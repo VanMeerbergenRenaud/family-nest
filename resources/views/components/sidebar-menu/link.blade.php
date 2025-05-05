@@ -15,9 +15,9 @@
 <li class="rounded-lg cursor-pointer {{ $basicColor }}" x-data="{ showTooltip: false }" role="listitem">
     <a href="{{ $href }}"
        wire:navigate
-       class="group flex items-center px-3 py-2 h-10 rounded-lg relative {{ $isActive ? $activeColor : '' }}"
        @mouseenter="showTooltip = true"
        @mouseleave="showTooltip = false"
+       class="group flex items-center px-3 py-2 h-10 rounded-lg relative {{ $isActive ? $activeColor : '' }}"
         {{ $attributes }}
     >
         <span :class="{{ $isActive ? 'true' : 'false' }} ? 'text-indigo-600 dark:text-indigo-200' : '{{ $groupColor }}'">

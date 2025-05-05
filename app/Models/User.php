@@ -24,9 +24,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar',
     ];
 
-    protected $familyRelationCache = null;
+    protected $familyRelation = null;
 
-    protected $hasFamilyCache = null;
+    protected $hasFamily = null;
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -57,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 );
             }
         } catch (\Exception $e) {
-            Toaster::error('Le fichier n\'a pas pu être trouvé::Erreur de connexion au serveur.');
+            Toaster::error('Votre photo de profil n\'a pas pu être trouvée::Erreur de connexion internet au serveur.');
         }
 
         return null;
@@ -80,25 +80,25 @@ class User extends Authenticatable implements MustVerifyEmail
     // Get the first family of the user
     public function family()
     {
-        if ($this->familyRelationCache === null) {
-            $this->familyRelationCache = $this->families()->first();
+        if ($this->familyRelation === null) {
+            $this->familyRelation = $this->families()->first();
         }
 
-        return $this->familyRelationCache;
+        return $this->familyRelation;
     }
 
     // Check if the user has a family
     public function hasFamily(): bool
     {
-        if ($this->hasFamilyCache === null) {
+        if ($this->hasFamily === null) {
             if ($this->relationLoaded('families')) {
-                $this->hasFamilyCache = $this->families->isNotEmpty();
+                $this->hasFamily = $this->families->isNotEmpty();
             } else {
-                $this->hasFamilyCache = $this->families()->exists();
+                $this->hasFamily = $this->families()->exists();
             }
         }
 
-        return $this->hasFamilyCache;
+        return $this->hasFamily;
     }
 
     // Return the value of the label corresponding to the permission of the user in his family

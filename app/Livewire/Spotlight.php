@@ -173,7 +173,7 @@ class Spotlight extends Component
         $this->navigableItems = [];
 
         // Add results to navigable items
-        foreach ($this->results as $section => $items) {
+        foreach ($this->results as $items) {
             foreach ($items as $item) {
                 $type = $item instanceof User ? 'user' : 'invoice';
                 $this->navigableItems[] = [

@@ -60,7 +60,7 @@
                 <x-divider/>
 
                 <!-- User profile dropdown -->
-                <x-sidebar-menu.user-dropdown />
+                <x-sidebar-menu.user-dropdown :$user />
             </div>
         </div>
     </aside>
@@ -73,15 +73,27 @@
         <div class="h-full px-4.5 pt-6 pb-4 flex flex-col justify-between gap-4 overflow-y-visible rounded-tr-[16px] rounded-br-[16px] bg-white dark:bg-gray-800">
 
         <!-- Navigation header -->
-            <div class="flex items-center justify-between pl-2">
+            <div x-data="{ showTooltip: false }" class="relative flex items-center justify-between pl-2.5">
                 <a href="{{ route('dashboard') }}"
                    class="flex items-center"
                    title="Retour à l'accueil"
+                   @mouseenter="showTooltip = true"
+                   @mouseleave="showTooltip = false"
                    wire:navigate
                 >
                     <x-app.logo class="w-6 h-6"/>
                     @if($expanded)
                         <span class="ml-4 text-xl font-bold text-gray-900 dark:text-white">FamilyNest</span>
+                    @else
+                        <div x-cloak x-show="showTooltip">
+                            <x-tooltip
+                                text="Accueil"
+                                position="right"
+                                :active="request()->routeIs('dashboard')"
+                                show="true"
+                                colorStyle="gray"
+                            />
+                        </div>
                     @endif
                 </a>
                 @if($expanded)
@@ -136,7 +148,7 @@
             <x-divider/>
 
             <!-- User profile dropdown -->
-            <x-sidebar-menu.user-dropdown :expanded="$expanded"/>
+            <x-sidebar-menu.user-dropdown :$user :expanded="$expanded" />
         </div>
     </aside>
 </div>

@@ -53,11 +53,13 @@ class Profile extends Component
     public function updateProfileInformation(): void
     {
         $this->form->update();
+        $this->dispatch('user-profile-updated');
     }
 
     public function deleteAvatar(): void
     {
         $this->form->deleteAvatar();
+        $this->dispatch('user-profile-updated');
     }
 
     public function sendVerification(): void

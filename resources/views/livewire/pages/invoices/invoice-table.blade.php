@@ -277,8 +277,8 @@
                                         @endif
                                     </div>
 
-                                    <div class="flex flex-col">
-                                        <span class="text-sm-medium text-gray-900 dark:text-gray-400">{{ $invoice->name }}</span>
+                                    <div class="flex flex-col max-w-[12.5rem]">
+                                       <span class="text-sm-medium text-gray-900 truncate block">{{ $invoice->name }}</span>
                                     </div>
                                 </div>
                             </td>

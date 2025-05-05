@@ -41,7 +41,7 @@ trait BulkActionsTrait
         // Vérifier les permissions pour chaque facture
         $archivableInvoiceIds = [];
         foreach ($invoices as $invoice) {
-            if ($user->can('archive', $invoice)) {
+            if ($user->can('delete', $invoice)) {
                 $archivableInvoiceIds[] = $invoice->id;
             }
         }
