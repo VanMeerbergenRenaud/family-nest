@@ -28,6 +28,10 @@ class VerifyEmailController extends Controller
             event(new Verified($user));
         }
 
+        if (! $request->user()->family()) {
+            return redirect()->route('onboarding.family');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
     }
 }

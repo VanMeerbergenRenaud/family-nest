@@ -37,7 +37,6 @@ return [
 
     'mailers' => [
 
-        // mailgun
         'mailgun' => [
             'transport' => 'mailgun',
         ],
@@ -46,7 +45,13 @@ return [
             'transport' => 'mailersend',
         ],
 
-        // mailpit
+        'mailtrap' => [
+            'transport' => 'mailtrap',
+            'api_key' => env('MAILTRAP_API_KEY'),
+            'host' => env('MAILTRAP_HOST'),
+        ],
+
+        // mailpit (local)
         'mailpit' => [
             'transport' => 'smtp',
             'host' => env('MAILPIT_HOST', '127.0.0.1'),

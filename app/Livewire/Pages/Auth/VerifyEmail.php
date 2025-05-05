@@ -41,15 +41,12 @@ class VerifyEmail extends Component
                 str_contains($e->getMessage(), '#MS42222') ||
                 str_contains($e->getMessage(), 'email quota limit')) {
 
-                // Log the error for administrators (me)
                 Log::warning('MailerSend limit reached. Auto-verifying user: '.Auth::user()->email);
 
                 // Automatically verify the user as a temporary solution
                 DB::table('users')
                     ->where('id', Auth::user()->id)
                     ->update(['email_verified_at' => now()]);
-
-                Session::flash('status', 'Votre email a été automatiquement vérifié en raison de limitations techniques temporaires.');
 
                 if (! Auth::user()->family()) {
                     $this->redirectRoute('onboarding.family');
@@ -58,7 +55,6 @@ class VerifyEmail extends Component
                 }
             } else {
                 Log::error('Email verification error: '.$e->getMessage());
-                Session::flash('status', 'Une erreur s\'est produite. Veuillez réessayer plus tard.');
             }
         }
     }

@@ -113,6 +113,17 @@ class User extends Authenticatable implements MustVerifyEmail
         );
     }
 
+    // EMAIL Verification
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new \App\Mail\CustomVerifyEmail);
+    }
+
     /**
      * Get all invoices accessible to this user (personal + family invoices)
      */

@@ -33,7 +33,8 @@ class GoogleAuthController extends Controller
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'password' => bcrypt(Str::random(20)),
+                    'password' => bcrypt(Str::random(24)),
+                    'email_verified_at' => now(),
                 ]);
 
                 if ($avatarUrl) {

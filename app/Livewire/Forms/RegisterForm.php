@@ -46,13 +46,6 @@ class RegisterForm extends Form
 
         $user = User::create($validated);
 
-        try {
-            event(new Registered($user));
-        } catch (\Exception $e) {
-            Toaster::error('Une erreur est survenue lors de l\'inscription::Veuillez réessayer');
-            \Log::error('Error during registration: '.$e->getMessage());
-        }
-
         Auth::login($user);
 
         Session::regenerate();

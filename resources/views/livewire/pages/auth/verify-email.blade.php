@@ -16,7 +16,7 @@
         <div class="mt-5 flex flex-wrap gap-2">
             <!-- Verification link -->
             <button type="button" wire:click="sendVerification" class="button-primary">
-                {{ __('Renvoyer le code de vérification') }}
+                {{ __('Envoyer un code de vérification') }}
             </button>
 
             <!-- Logout link -->
