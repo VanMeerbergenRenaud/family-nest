@@ -174,7 +174,7 @@
                                         color: '#6B7280'
                                     },
                                     callback: function (value, index) {
-                                        if (window.innerWidth < 640) {
+                                        if (window.innerWidth < 1280) {
                                             return '';
                                         }
 

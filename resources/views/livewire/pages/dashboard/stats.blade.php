@@ -3,7 +3,7 @@
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col h-full justify-between">
             <div>
-                <h3 class="text-sm-medium text-gray-600">Montant Total</h3>
+                <h3 class="text-sm-medium text-gray-600">Montant total</h3>
                 <div class="flex items-center gap-2 mt-3">
                     <span class="text-2xl font-bold text-gray-900">
                         {{ number_format($this->statistics['totalAmount'], 2, ',', ' ') }} €
@@ -26,7 +26,7 @@
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col h-full justify-between">
             <div>
-                <h3 class="text-sm-medium text-gray-600">Montant en Retard</h3>
+                <h3 class="text-sm-medium text-gray-600">Montant en retard</h3>
                 <div class="flex items-center gap-2 mt-3">
                     <span class="text-2xl font-bold {{ $this->statistics['overdueAmount'] > 0 ? 'text-rose-600' : 'text-gray-900' }}">
                         {{ number_format($this->statistics['overdueAmount'], 2, ',', ' ') }} €
@@ -52,7 +52,7 @@
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col h-full justify-between">
             <div>
-                <h3 class="text-sm-medium text-gray-600">Échéances ce Mois</h3>
+                <h3 class="text-sm-medium text-gray-600">Échéances du mois</h3>
                 <div class="flex items-center gap-2 mt-3">
                     <span class="text-2xl font-bold text-gray-900">
                         {{ number_format($this->statistics['thisMonthAmount'], 2, ',', ' ') }} €
@@ -76,12 +76,14 @@
     <div class="relative bg-white border border-slate-200 rounded-xl p-5 overflow-hidden">
         <div class="flex flex-col h-full justify-between">
             <div>
-                <h3 class="text-sm-medium text-gray-600">À Payer Prochainement</h3>
-                <div class="flex items-center gap-2 mt-3">
+                <h3 class="text-sm-medium text-gray-600">À payer prochainement</h3>
+                <div class="flex items-baseline gap-2 mt-3">
                     <span class="text-2xl font-bold text-gray-900">
                         {{ $this->statistics['upcomingDueCount'] }}
                     </span>
-                    <span class="text-sm text-gray-600 font-medium">Facture(s)</span>
+                    <span class="text-sm text-gray-600 font-medium">
+                        {{ $this->statistics['upcomingDueCount'] <= 1 ? 'Facture' : 'Factures' }}
+                    </span>
                 </div>
             </div>
             <div>

@@ -43,9 +43,10 @@ class Filters extends Form
     public function statuses(): Collection
     {
         return collect(FilterStatus::cases())->map(function ($status) {
-            $count = $this->getBaseQuery()
-                ->when($status !== FilterStatus::All, fn ($q) => $q->where('payment_status', $status->value))
-                ->count();
+            $baseQuery = $this->getBaseQuery();
+            $count = $this->applyRange(
+                $this->applyStatus($baseQuery, $status)
+            )->count();
 
             return [
                 'value' => $status->value,
@@ -72,27 +73,28 @@ class Filters extends Form
             [
                 'id' => 'all',
                 'name' => 'Tous les membres',
-                'invoice_count' => $this->applyStatus($baseQuery)->count(),
+                'invoice_count' => $this->applyRange($this->applyStatus($baseQuery))->count(),
             ],
             [
                 'id' => $this->user->id,
                 'name' => $this->user->name.' (Vous)',
-                'invoice_count' => $this->applyStatus($baseQuery)
-                    ->where('user_id', $this->user->id)
-                    ->count(),
+                'invoice_count' => $this->applyRange($this->applyStatus(
+                    clone $baseQuery->where('user_id', $this->user->id)
+                ))->count(),
             ],
         ]);
 
         $otherMembers = $family->users()
             ->where('user_id', '!=', $this->user->id)
             ->get()
-            ->map(fn ($member) => [
-                'id' => $member->id,
-                'name' => $member->name,
-                'invoice_count' => $this->applyStatus($member->invoices()
-                    ->where('is_archived', false))
-                    ->count(),
-            ]);
+            ->map(function ($member) {
+                $memberQuery = $member->invoices()->where('is_archived', false);
+                return [
+                    'id' => $member->id,
+                    'name' => $member->name,
+                    'invoice_count' => $this->applyRange($this->applyStatus($memberQuery))->count(),
+                ];
+            });
 
         return $primaryMember->concat($otherMembers);
     }
