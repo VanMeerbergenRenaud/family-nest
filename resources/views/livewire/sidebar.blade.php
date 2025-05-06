@@ -89,9 +89,8 @@
                             <x-tooltip
                                 text="Accueil"
                                 position="right"
-                                :active="request()->routeIs('dashboard')"
                                 show="true"
-                                colorStyle="gray"
+                                colorStyle="white"
                             />
                         </div>
                     @endif

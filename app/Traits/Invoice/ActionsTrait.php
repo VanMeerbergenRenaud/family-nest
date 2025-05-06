@@ -51,19 +51,20 @@ trait ActionsTrait
         try {
             $user = auth()->user();
 
-            $originalInvoice =  $user->accessibleInvoices()
+            $originalInvoice = $user->accessibleInvoices()
                 ->with(['sharedUsers'])
                 ->findOrFail($invoiceId);
 
             if (! $user->can('update', $originalInvoice)) {
                 Toaster::error('Vous n\'avez pas la permission de copier cette facture.');
+
                 return;
             }
 
             $newInvoice = $originalInvoice->replicate();
 
             $newInvoice->name = $originalInvoice->name.' (version copiée)';
-            $newInvoice->user_id = $user->id;// making sure the new invoice is owned by the current user
+            $newInvoice->user_id = $user->id; // making sure the new invoice is owned by the current user
 
             if ($originalInvoice->tags) {
                 $newInvoice->tags = $originalInvoice->tags;
@@ -152,6 +153,7 @@ trait ActionsTrait
 
             if (! auth()->user()->can('delete', $invoice)) {
                 Toaster::error('Vous n\'avez pas la permission d\'archiver cette facture.');
+
                 return;
             }
 

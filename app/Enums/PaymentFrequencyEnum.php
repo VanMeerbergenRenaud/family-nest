@@ -35,8 +35,8 @@ enum PaymentFrequencyEnum: string
     {
         return match ($this) {
             self::Daily => '📅',
-            self::Weekly => '🗓️',
-            self::Monthly => '📆',
+            self::Weekly => '🗓️️',
+            self::Monthly => '🗒️️',
             self::Quarterly => '🗂️',
             self::SemiAnnually => '📖',
             self::Annually => '🎈',

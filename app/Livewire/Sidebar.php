@@ -13,7 +13,7 @@ class Sidebar extends Component
     public bool $expanded = true;
 
     protected $listeners = [
-        'user-profile-updated' => 'refreshUserData'
+        'user-profile-updated' => 'refreshUserData',
     ];
 
     public function mount()

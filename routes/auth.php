@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use App\Http\Controllers\GoogleAuthController;
 use App\Http\Middleware\GoogleAuthLogMiddleware;
 use App\Livewire\Actions\Logout;
 use App\Livewire\FamilyInvitationHandler;

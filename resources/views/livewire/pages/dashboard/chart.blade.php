@@ -4,7 +4,7 @@
         x-init="init($wire.dataset)"
         wire:ignore
         wire:loading.class="opacity-50"
-        class="relative min-h-[10rem] sm:h-[22rem] w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
+        class="relative min-h-[10rem] sm:h-[22rem] max-sm:pb-2 w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
         <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg font-medium text-gray-800">
             Montant des factures par type
@@ -114,7 +114,7 @@
                             hoverBackgroundColor: hoverColors,
                             borderWidth: 0,
                             borderRadius: 8,
-                            minBarLength: 15,
+                            minBarLength: 35,
                         }]
                     },
                     options: {
@@ -166,7 +166,7 @@
                                 border: {display: false},
                                 ticks: {
                                     autoSkip: true,
-                                    maxRotation: 35,
+                                    maxRotation: 0,
                                     minRotation: 0,
                                     padding: 0,
                                     font: {
@@ -174,6 +174,10 @@
                                         color: '#6B7280'
                                     },
                                     callback: function (value, index) {
+                                        if (window.innerWidth < 640) {
+                                            return '';
+                                        }
+
                                         const label = this.getLabelForValue(index);
                                         if (label && label.length > 12) {
                                             return label.substring(0, 10) + '...';
