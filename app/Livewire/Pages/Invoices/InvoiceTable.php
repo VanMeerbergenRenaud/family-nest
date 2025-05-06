@@ -27,7 +27,9 @@ class InvoiceTable extends Component
     #[Reactive]
     public Filters $filters;
 
-    public int $perPage = 9;
+    public int $perPage = 8;
+
+    public $perPageOptions = [8, 15, 25, 50, 100];
 
     public bool $withFilters = true;
 
@@ -36,6 +38,11 @@ class InvoiceTable extends Component
         if (! isset($this->filters)) {
             $this->filters->init(auth()->user());
         }
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
     }
 
     public function updated($property): void
