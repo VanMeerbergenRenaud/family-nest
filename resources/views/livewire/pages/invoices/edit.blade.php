@@ -35,104 +35,42 @@
                     @if ($form->existingFilePath && !$form->uploadedFile)
                         {{-- Affichage du fichier existant --}}
                         <div class="relative w-full h-full">
-                            <!-- Button de suppression de l'image -->
-                            <button type="button"
-                                    wire:click="removeUploadedFile"
-                                    class="absolute top-2.5 right-2.5 z-10">
-                                <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
-                            </button>
+                            <div class="absolute top-2.5 right-2.5 z-2">
+                                <button type="button" wire:click="removeUploadedFile" class="p-1">
+                                    <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
+                                </button>
+                            </div>
 
-                            <div class="rounded-xl border border-slate-200 h-full flex flex-col items-start justify-center p-2 overflow-y-auto">
+                            <div class="rounded-lg border border-slate-200 h-full flex flex-col items-start justify-center p-2.5 overflow-y-auto">
                                 <x-invoices.file-viewer
                                     :filePath="$filePath"
                                     :fileExtension="$fileExtension"
                                     :fileName="$fileName"
-                                    class="w-full h-full"
                                 />
-
-                                <!-- Informations sur le fichier -->
-                                @if($fileExtension === 'pdf')
-                                    <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                        <h3 role="heading" aria-level="3" class="text-md-medium text-gray-800 truncate">
-                                            <span class="sr-only">Fichier :</span>{{ $form->fileName }}
-                                        </h3>
-                                        <p class="flex-center text-sm-regular text-gray-600">
-                                            {{ strtoupper($form->fileExtension) }}
-                                        </p>
-
-                                        <p class="mt-2 px-3 py-1 text-xs rounded-full bg-green-100 text-green-800 w-fit">
-                                            Fichier existant
-                                        </p>
-                                    </div>
-                                @endif
                             </div>
                         </div>
+                    {{-- Affichage du nouveau fichier uploadé --}}
                     @elseif ($form->uploadedFile)
-                        {{-- Affichage du nouveau fichier uploadé --}}
-                        <div class="relative w-full h-full">
-                            <!-- Button de suppression de l'image -->
-                            <button type="button"
-                                    wire:click="removeUploadedFile"
-                                    class="absolute top-2.5 right-2.5 z-10">
-                                <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
-                            </button>
+                        @php
+                            $fileInfo = app(App\Services\FileStorageService::class)->getFileInfo($form->uploadedFile);
+                            $fileInfo['status'] = !$errors->has('form.uploadedFile') ? 'success' : 'error';
+                            $fileInfo['statusMessage'] = !$errors->has('form.uploadedFile') ? 'Nouveau fichier importé' : 'Erreur lors de l\'import du fichier';
+                        @endphp
 
-                            @php
-                                $fileInfo = app(App\Services\FileStorageService::class)->getFileInfo($form->uploadedFile);
-                                $fileInfo['status'] = !$errors->has('form.uploadedFile') ? 'success' : 'error';
-                                $fileInfo['statusMessage'] = !$errors->has('form.uploadedFile') ? 'Nouveau fichier importé' : 'Erreur lors de l\'import du fichier';
-                            @endphp
-
-                            <div class="rounded-xl border border-slate-200 min-h-[30rem] flex-center flex-col p-2 overflow-y-auto">
-                                <!-- Aperçu pour les images -->
-                                @if ($fileInfo['isImage'] ?? false)
-                                    <img src="{{ $form->uploadedFile->temporaryUrl() }}"
-                                         alt="Aperçu de la facture"
-                                         class="bg-gray-100 rounded-xl max-h-[40vh] mb-4"
-                                    />
-                                @elseif ($fileInfo['isPdf'] ?? false)
-                                    <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100 mb-4">
-                                        <p class="mb-2.5 text-center font-medium text-slate-700">Aperçu disponible après enregistrement</p>
-                                        <p class="text-sm text-center text-slate-500">Le fichier PDF sera affiché après enregistrement.</p>
-                                    </div>
-                                @elseif ($fileInfo['isDocx'] ?? false)
-                                    <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100 mb-4">
-                                        <p class="mb-2.5 text-center font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
-                                        <p class="text-sm text-center text-slate-500">Le fichier sera disponible après enregistrement.</p>
-                                    </div>
-                                @elseif($fileInfo['isCsv'] ?? false)
-                                    <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
-                                        <x-svg.csv class="w-12 h-12 text-gray-600" />
-                                    </div>
-                                @else
-                                    <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
-                                        <x-svg.img class="w-12 h-12 text-gray-600" />
-                                    </div>
-                                @endif
-
-                                <!-- Informations sur le fichier différent des images -->
-                                @if(!$fileInfo['isImage'] ?? false)
-                                    <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                                        <h2 class="text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] ?? '' }}</h2>
-                                        <p class="flex-center space-x-1.5 text-gray-600">
-                                            <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
-                                            <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>
-                                        </p>
-                                        <p class="mt-2 px-3 py-1 text-xs rounded-full {{ ($fileInfo['status'] ?? '') === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} w-fit">
-                                            {{ $fileInfo['statusMessage'] ?? 'Nouveau fichier' }}
-                                        </p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
+                        <x-invoices.file-preview
+                            :fileInfo="$fileInfo"
+                            :temporaryUrl="$form->uploadedFile->temporaryUrl()"
+                            :onRemove="'removeUploadedFile'"
+                            class="w-full h-full"
+                        />
+                    {{-- Champ d'upload vide --}}
                     @else
-                        {{-- Champ d'upload vide --}}
                         <x-form.field-upload
                             label="Importer une facture"
                             model="form.uploadedFile"
                             name="form.uploadedFile"
-                            :asterix="true"
                             title="Importation en cours..."
+                            :asterix="true"
                         />
                     @endif
                 </div>
@@ -434,8 +372,8 @@
                             <button
                                 type="submit"
                                 x-show="currentStep < steps.length"
-                                class="relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                                 aria-label="Terminer et valider toutes les étapes"
+                                class="relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                             >
                                 Terminer et valider
                                 <span class="absolute left-1/2 -translate-x-1/2 bottom-full z-10 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 flex gap-2 bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
@@ -460,7 +398,7 @@
             {{-- Gestions des messages d'erreurs --}}
             <x-invoices.form.alert-errors :form="$form" />
 
-            <x-loader.spinner target="updateInvoice" />
+            <x-loader.spinner target="updateInvoice" position="fixed"  />
         </form>
     </div>
 </div>

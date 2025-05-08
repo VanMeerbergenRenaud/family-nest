@@ -9,12 +9,9 @@
         JS
         : '';
 
-    // Limit pagination
     $windowSize = 2; // Number of pages to show on each side of the current page
     $showDotsLimit = 8; // Maximum number of pages to show before using dots
-
-    // Options de pagination par page
-    $perPageOptions = [8, 15, 25, 50, 100];
+    $perPageOptions = [8, 15, 25, 50, 100]; // Number of rows display options
 @endphp
 
 @if ($paginator->hasPages())
@@ -47,7 +44,7 @@
         </div>
 
         {{-- Pagination (droite) --}}
-        <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto">
+        <div class="flex items-center max-sm:justify-between justify-end w-full sm:w-auto">
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <span class="flex items-center gap-1.5 px-3 py-2 text-gray-400 rounded-lg cursor-not-allowed select-none">

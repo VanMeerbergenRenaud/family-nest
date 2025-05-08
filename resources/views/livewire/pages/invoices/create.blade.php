@@ -27,7 +27,6 @@
         <form wire:submit.prevent="createInvoice">
             @csrf
 
-            {{-- Invoice form --}}
             <div class="lg:px-4 max-lg:mt-4 mx-auto grid lg:grid-cols-[1fr_2fr] gap-4 lg:gap-x-10 lg:gap-y-0">
 
                 {{-- Image : colonne 1 --}}
@@ -37,8 +36,8 @@
                             label="Importer une facture"
                             model="form.uploadedFile"
                             name="form.uploadedFile"
-                            :asterix="true"
                             title="Importation en cours..."
+                            :asterix="true"
                         />
                     @else
                         @php
@@ -51,21 +50,10 @@
                             :fileInfo="$fileInfo"
                             :temporaryUrl="$form->uploadedFile->temporaryUrl()"
                             :onRemove="'removeUploadedFile'"
+                            :$showOcrButton
+                            :$isOcrProcessing
+                            :onOcrProcess="'processOcr'"
                         />
-
-                        {{-- Bouton OCR --}}
-                        @if($showOcrButton && !$isOcrProcessing)
-                            <button
-                                type="button"
-                                wire:click="processOcr"
-                                wire:loading.attr="disabled"
-                                x-show="currentStep < steps.length"
-                                class="absolute left-4 right-4 bottom-4 z-10 button-primary justify-center group hover:text-gray-900"
-                            >
-                                <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
-                                Autocompléter automatiquement
-                            </button>
-                        @endif
                     @endif
                 </div>
 
@@ -348,8 +336,8 @@
                             <button
                                 type="submit"
                                 x-show="currentStep < steps.length"
-                                class="relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                                 aria-label="Terminer et valider toutes les étapes"
+                                class="relative button-classic group px-3 text-gray-600 hover:text-gray-700 bg-gray-200 hover:bg-gray-300"
                             >
                                 Terminer et valider
                                 <span class="absolute left-1/2 -translate-x-1/2 bottom-full z-10 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 flex gap-2 bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
@@ -374,7 +362,7 @@
             {{-- Gestions des messages d'erreurs --}}
             <x-invoices.form.alert-errors :form="$form" />
 
-            <x-loader.spinner target="createInvoice" />
+            <x-loader.spinner target="createInvoice" position="fixed" />
         </form>
     </div>
 </div>

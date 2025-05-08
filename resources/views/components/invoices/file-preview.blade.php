@@ -2,49 +2,64 @@
     'fileInfo' => [],
     'temporaryUrl' => null,
     'storagePath' => null,
-    'onRemove' => null
+    'onRemove' => null,
+    'showOcrButton' => false,
+    'isOcrProcessing' => false,
+    'onOcrProcess' => null
 ])
 
-<div class="relative w-full h-full">
+<div class="relative w-full h-full flex flex-col">
     @if(isset($onRemove) && $onRemove)
-        <button type="button"
-                wire:click="{{ $onRemove }}"
-                class="absolute top-2.5 right-2.5 z-2"
-        >
-            <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
-        </button>
+        <div class="absolute top-2.5 right-2.5 z-2">
+            <button type="button" wire:click="{{ $onRemove }}" class="p-1">
+                <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
+            </button>
+        </div>
     @endif
 
-    <div class="pb-16 rounded-xl border border-slate-200 min-h-[30rem] flex flex-col items-center justify-center p-2 overflow-y-scroll">
+    <div class="rounded-xl border border-slate-200 min-h-[30rem] flex-center flex-col p-2.5 overflow-y-scroll mb-2">
         {{-- Aperçu pour les images --}}
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
                  alt="Aperçu de la facture"
-                 class="bg-gray-100 rounded-xl max-h-[50vh]"
+                 class="bg-gray-100 rounded-lg min-h-[60vh]"
             />
-            {{-- Preview pour les fichiers PDF --}}
+        {{-- Les autres types de fichiers inchangés... --}}
         @elseif ($fileInfo['isPdf'] ?? false)
-            @if($storagePath)
-                <div class="w-full h-[40vh] overflow-hidden rounded-xl">
-                    <iframe src="{{ $storagePath }}"
-                            width="100%"
-                            height="100%"
-                            class="rounded-xl"
-                            style="border: none;"
-                    ></iframe>
+            {{-- Code existant inchangé --}}
+            @if($temporaryUrl || $storagePath)
+                <div class="w-full h-full overflow-hidden rounded-lg">
+                    <object
+                        id="pdf-viewer"
+                        width="100%"
+                        height="100%"
+                        class="inline-block w-full h-full min-h-[60vh]"
+                        type="application/pdf"
+                        data="{{ $temporaryUrl ?? $storagePath }}"
+                        sandbox="allow-same-origin"
+                    ></object>
                 </div>
             @else
-                <div class="px-4 mb-4 text-center">
-                    <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
-                        <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers PDF</p>
-                        <p class="text-sm text-slate-500">Le fichier sera traité après l'enregistrement de la facture.</p>
-                    </div>
+                <div class="w-full min-h-[60vh] flex-center flex-col gap-4">
+                    <x-svg.pdf class="w-16 h-16 text-gray-400" />
+                    <p class="text-center text-sm text-gray-500 px-8 lg:px-12">
+                        Le fichier PDF n'est pas disponible pour l'aperçu.
+                    </p>
+                    <a href="{{ $temporaryUrl ?? $storagePath }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="button-secondary mt-2"
+                    >
+                        <x-svg.show class="text-white" />
+                        Ouvrir le PDF
+                    </a>
                 </div>
             @endif
-            {{-- Pour les fichiers Word --}}
+        {{-- Aperçu pour les fichiers DOCX --}}
         @elseif ($fileInfo['isDocx'] ?? false)
+            {{-- Code existant inchangé --}}
             <div class="px-4 mb-4 text-center">
-                <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-xl bg-slate-100">
+                <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-lg bg-slate-100">
                     <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
                     <p class="text-sm text-slate-500">
                         @if($storagePath)
@@ -55,33 +70,29 @@
                     </p>
                 </div>
             </div>
-            {{-- Pour les fichiers CSV --}}
+        {{-- Pour les fichiers CSV --}}
         @elseif($fileInfo['isCsv'] ?? false)
             <div class="w-24 h-24 mb-5 flex-center bg-green-100 rounded-full">
                 <x-svg.csv class="w-12 h-12 text-gray-600" />
             </div>
-            {{-- Icône générique pour les autres types de fichiers --}}
+        {{-- Pour les autres types de fichiers --}}
         @else
             <div class="w-24 h-24 mb-5 flex-center bg-gray-100 rounded-full">
                 <x-svg.img class="w-12 h-12 text-gray-600" />
             </div>
         @endif
 
-        {{-- Informations sur le fichier --}}
-        @if(isset($fileInfo['name']) && !$fileInfo['isImage'])
-            <div class="w-full max-w-md bg-gray-50 p-4 rounded-lg flex-center flex-col gap-2">
-                <h4 role="heading" aria-level="4" class="w-full text-center text-md-medium text-gray-800 truncate">{{ $fileInfo['name'] }}</h4>
-                <p class="flex-center space-x-1.5 text-gray-600">
-                    <span class="text-sm-regular">{{ strtoupper($fileInfo['extension'] ?? '') }}</span>
-                    <span class="text-sm-regular">{{ $fileInfo['sizeFormatted'] ?? '' }}</span>
-                </p>
-
-                @if(isset($fileInfo['status']))
-                    <p class="mt-2 px-3 py-1 text-xs rounded-full {{ $fileInfo['status'] === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} w-fit">
-                        {{ $fileInfo['statusMessage'] ?? ($fileInfo['status'] === 'success' ? 'Fichier valide' : 'Erreur lors de l\'import du fichier') }}
-                    </p>
-                @endif
-            </div>
+        {{-- Bouton OCR intégré --}}
+        @if($showOcrButton && !$isOcrProcessing && isset($onOcrProcess) && $onOcrProcess)
+            <button
+                type="button"
+                wire:click="{{ $onOcrProcess }}"
+                wire:loading.attr="disabled"
+                class="mt-3 w-full button-primary justify-center group hover:text-gray-900"
+            >
+                <x-svg.ocr class="group-hover:stroke-gray-900 group-hover:text-gray-900" />
+                Autocompléter automatiquement
+            </button>
         @endif
     </div>
 </div>

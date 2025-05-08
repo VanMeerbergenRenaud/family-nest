@@ -8,9 +8,21 @@
 <div class="{{ $class }} relative flex-center bg-gray-100 rounded-xl overflow-y-scroll overflow-x-hidden">
     @if ($filePath)
         @if(in_array($fileExtension, ['jpg', 'jpeg', 'png']))
-            <img src="{{ $filePath }}" alt="{{ $fileName ?? 'Aperçu du document' }}" class="max-w-full max-h-full object-cover" />
+            <img
+                src="{{ $filePath }}"
+                alt="{{ $fileName ?? 'Aperçu du document' }}"
+                class="max-w-full max-h-full object-cover"
+            >
         @elseif($fileExtension === 'pdf')
-            <iframe src="{{ $filePath }}" class="absolute top-O bottom-O left-0 right-0 w-full h-full" style="border: none;"></iframe>
+            <object
+                id="pdf-viewer"
+                width="100%"
+                height="100%"
+                class="inline-block w-full h-full min-h-[60vh]"
+                type="application/pdf"
+                data="{{ $filePath }}"
+                sandbox="allow-same-origin"
+            ></object>
         @elseif($fileExtension === 'docx')
             <div class="p-5 text-gray-700 text-md-medium">
                 <div class="w-16 h-16 mx-auto mb-6 flex-center bg-blue-100 rounded-full">

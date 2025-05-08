@@ -38,6 +38,8 @@ class InvoiceTable extends Component
         if (! isset($this->filters)) {
             $this->filters->init(auth()->user());
         }
+
+        $this->detectDevice();
     }
 
     public function updatedPerPage(): void

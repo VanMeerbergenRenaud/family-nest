@@ -89,6 +89,7 @@ class Filters extends Form
             ->get()
             ->map(function ($member) {
                 $memberQuery = $member->invoices()->where('is_archived', false);
+
                 return [
                     'id' => $member->id,
                     'name' => $member->name,
