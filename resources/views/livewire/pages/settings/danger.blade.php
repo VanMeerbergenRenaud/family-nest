@@ -1,10 +1,8 @@
 <div>
-    <x-header
-        title="Supprimer le compte"
+    <x-empty-state
+        title="Zone de suppression de compte"
         description="Dès que votre compte est supprimé, toutes ses ressources et données seront définitivement supprimées. Avant de supprimer votre compte, veuillez télécharger."
-    />
-
-    <div class="md:px-4 my-4">
+    >
         <x-modal wire:model="showModal">
             <x-modal.open>
                 <button type="button" wire:click="openModal" class="button-danger">
@@ -52,5 +50,5 @@
         </x-modal>
 
         <x-loader.spinner target="deleteUser" />
-    </div>
+    </x-empty-state>
 </div>

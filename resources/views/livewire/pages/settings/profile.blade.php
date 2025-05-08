@@ -73,10 +73,10 @@
 
                 <div class="grid grid-cols-1 gap-6">
                     <x-form.field
-                        label="Nom"
+                        label="Nom d'utilisateur"
                         name="name"
                         model="form.name"
-                        placeholder="Votre nom"
+                        placeholder="Nom"
                         class="capitalize"
                     />
 

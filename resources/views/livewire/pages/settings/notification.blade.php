@@ -1,3 +1,3 @@
 <div>
-    Notifications
+    <x-coming-soon title="Notifications" />
 </div>

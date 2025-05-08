@@ -1,4 +1,4 @@
-<x-auth-template title="Inscription" description="Entrez vos informations pour vous créer un compte." showSocialLogin>
+<x-auth-template title="Inscription" description="Entrez vos informations pour créer un compte." showSocialLogin>
 
     <form wire:submit="register">
         @csrf
@@ -6,10 +6,10 @@
         <div class="flex flex-col gap-4">
             <!-- Name -->
             <x-form.field
-                label="Nom"
+                label="Nom d'utilisateur"
                 name="name"
                 model="form.name"
-                placeholder="Votre nom"
+                placeholder="Nom"
                 autocomplete="name"
                 autofocus
                 required

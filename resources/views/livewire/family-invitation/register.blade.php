@@ -25,6 +25,16 @@
                 @csrf
 
                 <x-form.field
+                    label="Nom d'utilisateur"
+                    name="name"
+                    model="form.name"
+                    placeholder="Nom"
+                    :asterix="true"
+                    autofocus
+                    class="capitalize"
+                />
+
+                <x-form.field
                     label="Adresse e-mail"
                     name="email"
                     type="email"
@@ -32,16 +42,6 @@
                     value="{{ $email }}"
                     placeholder="votre-email@gmail.com"
                     class="lowercase"
-                />
-
-                <x-form.field
-                    label="Ajouter votre nom"
-                    name="name"
-                    model="form.name"
-                    placeholder="Votre nom"
-                    :asterix="true"
-                    autofocus
-                    class="capitalize"
                 />
 
                 <x-form.field-password
