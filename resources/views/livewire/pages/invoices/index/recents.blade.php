@@ -11,7 +11,8 @@
         <ul class="flex overflow-x-scroll gap-4 scrollbar-hidden">
             @foreach($recentInvoices as $invoice)
                 <li wire:key="invoice-{{ $invoice->id }}"
-                    class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    class="pl-4 py-4 pr-3 min-w-fit h-fit rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 overflow-hidden"
+                >
                     @php
                         $extension = $invoice->file->file_extension ?? null;
                     @endphp
@@ -24,9 +25,9 @@
                             @endif
                         </div>
                         <div>
-                            <h4 role="heading" aria-level="4" class="text-sm-medium text-gray-900 dark:text-white">
+                            <p class="text-sm-medium text-gray-900 dark:text-white">
                                 {{ Str::limit($invoice->name, 16) }}
-                            </h4>
+                            </p>
                             <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
                                 {{ $invoice->dateForHumans($invoice->created_at) }}
                                 • {{ $invoice->amount ?? 'Montant vide' }} {{ $this->getInvoiceCurrencySymbol($invoice) }}
@@ -43,4 +44,6 @@
     {{-- Modales --}}
     <x-invoices.modal.prewiew :$showInvoicePreviewModal :$filePath :$fileExtension :$fileName />
     <x-invoices.modal.delete :$showDeleteFormModal :$filePath :$fileExtension :$fileName/>
+
+    <x-loader.spinner target="" position="fixed" />
 </section>

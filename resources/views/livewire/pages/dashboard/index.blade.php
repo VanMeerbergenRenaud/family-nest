@@ -52,24 +52,24 @@
         <div class="w-full flex flex-col gap-4">
             <div class="w-full flex flex-wrap items-center md:justify-between gap-8">
                 <div class="lg:pl-4">
-                    <p class="text-sm text-gray-500 mb-1">{{ __('Famille ') . $family->name }}</p>
-                    <h2 role="heading" aria-level="2" class="font-semibold text-xl text-gray-800">Bonjour, {{ auth()->user()->name }}! 👋🏻</h2>
+                    <h2 role="heading" aria-level="2"  class="text-sm text-gray-500 mb-1">{{ __('Famille ') . $family->name }}</h2>
+                    <p class="font-semibold text-xl text-gray-800">Bonjour, {{ auth()->user()->name }}! 👋🏻</p>
                 </div>
 
                 {{-- Zone de filtres --}}
                 <div class="w-full md:w-auto flex flex-col sm:flex-row gap-3 items-start sm:items-end">
                     <div>
-                        <h3 class="text-xs font-medium text-gray-500 mb-1 pl-2">Membres</h3>
+                        <h3 role="heading" aria-level="3" class="text-xs font-medium text-gray-500 mb-1 pl-2">Membres</h3>
                         <x-dashboard.filter-member :$filters />
                     </div>
 
                     <div>
-                        <h3 class="text-xs font-medium text-gray-500 mb-1 pl-2">Échéances</h3>
+                        <h3 role="heading" aria-level="3" class="text-xs font-medium text-gray-500 mb-1 pl-2">Échéances</h3>
                         <x-dashboard.filter-date :$filters />
                     </div>
 
                     <div>
-                        <h3 class="text-xs font-medium text-gray-500 mb-1 pl-2">Statut de paiement</h3>
+                        <h3 role="heading" aria-level="3" class="text-xs font-medium text-gray-500 mb-1 pl-2">Statut de paiement</h3>
                         <x-dashboard.filter-status :$filters />
                     </div>
 

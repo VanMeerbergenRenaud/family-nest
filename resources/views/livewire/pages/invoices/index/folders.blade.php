@@ -4,9 +4,9 @@
     <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
         @foreach([
             ['id' => 'favorites', 'title' => 'Favoris', 'icon' => 'folder', 'bgClass' => 'bg-gray-100', 'iconBg' => 'bg-gray-200','iconColor' => 'text-green-500'],
-            ['id' => 'paid', 'title' => 'Factures payées', 'icon' => 'validate', 'bgClass' => 'bg-green-100', 'iconBg' => 'bg-green-200','iconColor' => 'text-green-500'],
-            ['id' => 'unpaid', 'title' => 'Factures non payées', 'icon' => 'clock', 'bgClass' => 'bg-red-50', 'iconBg' => 'bg-red-100','iconColor' => 'text-red-500'],
-            ['id' => 'late', 'title' => 'Retards de paiement', 'icon' => 'document', 'bgClass' => 'bg-yellow-50', 'iconBg' => 'bg-yellow-100','iconColor' => 'text-yellow-500'],
+            ['id' => 'paid', 'title' => 'Payées', 'icon' => 'validate', 'bgClass' => 'bg-green-100', 'iconBg' => 'bg-green-200','iconColor' => 'text-green-500'],
+            ['id' => 'unpaid', 'title' => 'Non payées', 'icon' => 'clock', 'bgClass' => 'bg-red-50', 'iconBg' => 'bg-red-100','iconColor' => 'text-red-500'],
+            ['id' => 'late', 'title' => 'En retard', 'icon' => 'document', 'bgClass' => 'bg-yellow-50', 'iconBg' => 'bg-yellow-100','iconColor' => 'text-yellow-500'],
             ['id' => 'high_priority', 'title' => 'Priorités élevées', 'icon' => 'shield-exclamation', 'bgClass' => 'bg-orange-50', 'iconBg' => 'bg-orange-100','iconColor' => 'text-orange-500'],
             ['id' => 'last_week', 'title' => 'Semaine dernière', 'icon' => 'clock', 'bgClass' => 'bg-blue-50', 'iconBg' => 'bg-blue-100','iconColor' => 'text-blue-500'],
         ] as $folder)
@@ -21,7 +21,7 @@
                             <x-svg.document class="w-6 h-6 {{ $folder['iconColor'] }}"/>
                         @endif
                     </div>
-                    <span class="text-md-medium text-gray-900 dark:text-white">{{ $folder['title'] }}</span>
+                    <h4 role="heading" aria-level="4" class="inline text-md-medium text-gray-900 dark:text-white">{{ $folder['title'] }}</h4>
                     <span class="text-sm-medium text-gray-500 dark:text-gray-400 mt-1">
                         {{ $folderStats[$folder['id']]['count'] }} Fichiers
                         @if($folderStats[$folder['id']]['count'] > 0)

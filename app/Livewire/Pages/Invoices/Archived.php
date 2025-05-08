@@ -5,6 +5,7 @@ namespace App\Livewire\Pages\Invoices;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Invoice;
 use App\Models\User;
+use App\Traits\Invoice\ActionsTrait;
 use App\Traits\Invoice\StateCheckTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -19,7 +20,7 @@ use ZipArchive;
 #[Title('Archives')]
 class Archived extends Component
 {
-    use StateCheckTrait, WithPagination;
+    use StateCheckTrait, ActionsTrait, WithPagination;
 
     public InvoiceForm $form;
 
@@ -41,25 +42,11 @@ class Archived extends Component
         $this->resetPage();
     }
 
-    public function restoreInvoice($invoiceId): void
-    {
-        $invoice = Invoice::findOrFail($invoiceId);
-
-        if (! $this->authorizeAction('update', $invoice, 'restaurer')) {
-            return;
-        }
-
-        $this->form->setFromInvoice($invoice);
-        $this->form->restore()
-            ? Toaster::success('Facture restaurée avec succès !')
-            : Toaster::error('Erreur lors de la restauration de la facture.');
-    }
-
     public function showDeleteInvoiceForm($id): void
     {
         $invoice = Invoice::findOrFail($id);
 
-        if (! $this->authorizeAction('delete', $invoice, 'supprimer')) {
+        if (! auth()->user()->can('delete', $invoice)) {
             return;
         }
 
@@ -148,17 +135,6 @@ class Archived extends Component
         return $count;
     }
 
-    protected function authorizeAction(string $action, Invoice $invoice, string $actionName): bool
-    {
-        if (! auth()->user()->can($action, $invoice)) {
-            Toaster::error("Vous n'avez pas la permission de $actionName cette facture.");
-
-            return false;
-        }
-
-        return true;
-    }
-
     public function isFilterEmpty(): bool
     {
         return $this->getFilteredInvoicesQuery()->count() === 0;
@@ -174,12 +150,6 @@ class Archived extends Component
 
         $this->selectedMemberId = 'all';
         $this->showDownloadSelectionModal = true;
-    }
-
-    public function updateSelectedMemberId($memberId): void
-    {
-        $this->selectedMemberId = $memberId;
-        Log::info('Membre sélectionné pour téléchargement', ['member_id' => $memberId]);
     }
 
     public function downloadSelectedArchives()

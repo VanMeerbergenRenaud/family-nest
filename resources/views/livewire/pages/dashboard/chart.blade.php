@@ -17,10 +17,12 @@
 
         <canvas class="pt-10 w-full"></canvas>
 
-        <div x-show="!hasData" class="absolute inset-0 flex items-center justify-center text-gray-400 text-sm">
+        <div x-show="!hasData" class="absolute inset-0 flex-center text-gray-400 text-sm">
             <span>Aucune donnée disponible pour ce filtre</span>
         </div>
     </div>
+
+
 </div>
 
 @assets

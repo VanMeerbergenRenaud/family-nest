@@ -8,6 +8,9 @@
         <x-svg.dots class="w-5 h-5 text-gray-500 {{ $dotsRotation ? 'rotate-90' : '' }}" />
     </x-menu.button>
 
+    <x-loader.spinner target="toggleFavorite({{ $invoice->id }})" position="fixed" />
+    <x-loader.spinner target="archiveInvoice({{ $invoice->id }})" position="fixed" />
+
     <x-menu.items>
         <x-menu.item wire:click="showInvoiceModal({{ $invoice->id }})" wire:loading.attr="disabled">
             <x-svg.show class="group-hover:text-gray-900"/>

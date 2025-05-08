@@ -46,6 +46,22 @@ trait ActionsTrait
         $this->showInvoicePreviewModal = true;
     }
 
+    public function restoreInvoice($invoiceId): void
+    {
+        $invoice = Invoice::findOrFail($invoiceId);
+
+        $this->invoice = $invoice;
+
+        if (! auth()->user()->can('update', $invoice)) {
+            return;
+        }
+
+        $this->invoice->update([
+            'is_archived' => false,
+            'is_favorite' => false,
+        ]);
+    }
+
     public function copyInvoice($invoiceId): void
     {
         try {
@@ -205,7 +221,7 @@ trait ActionsTrait
             }
 
             $this->dispatch('invoice-deleted', $this->invoice->id);
-            Toaster::success('Facture supprimée avec succès !');
+            Toaster::success('Facture supprimée définitivement !');
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de la suppression: '.$e->getMessage());
         }
