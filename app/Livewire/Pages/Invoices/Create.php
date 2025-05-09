@@ -54,7 +54,6 @@ class Create extends Component
 
     public function createInvoice(FileStorageService $fileStorageService): void
     {
-        // Validation finale des parts avant sauvegarde
         $this->validateShares();
 
         $invoice = $this->form->store($fileStorageService);

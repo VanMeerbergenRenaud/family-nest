@@ -10,7 +10,9 @@ use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Notifications\InvoicePaymentReminder;
 use App\Services\FileStorageService;
+use App\Services\InvoiceReminderService;
 use App\Traits\FormatFileSizeTrait;
 use App\Traits\HumanDateTrait;
 use Illuminate\Support\Facades\DB;
@@ -323,9 +325,22 @@ class InvoiceForm extends Form
         }
     }
 
+    public function handlePaymentReminder(Invoice $invoice): void
+    {
+        if ($this->payment_reminder) {
+            app(InvoiceReminderService::class)->scheduleReminder($invoice);
+        }
+    }
+
     public function store(FileStorageService $fileStorageService)
     {
-        return $this->saveInvoice($fileStorageService);
+        $invoice = $this->saveInvoice($fileStorageService);
+
+        if ($invoice) {
+            $this->handlePaymentReminder($invoice);
+        }
+
+        return $invoice;
     }
 
     public function update(FileStorageService $fileStorageService)
@@ -334,7 +349,15 @@ class InvoiceForm extends Form
             Toaster::error('Impossible de mettre à jour cette facture::Il y a un conflit de données.');
         }
 
-        return $this->saveInvoice($fileStorageService);
+        $invoice = $this->saveInvoice($fileStorageService);
+
+        auth()->user()->notify(new InvoicePaymentReminder($invoice));
+
+        if ($invoice) {
+            $this->handlePaymentReminder($invoice);
+        }
+
+        return $invoice;
     }
 
     public function archive(): bool

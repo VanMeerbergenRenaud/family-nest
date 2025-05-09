@@ -20,7 +20,7 @@ use ZipArchive;
 #[Title('Archives')]
 class Archived extends Component
 {
-    use StateCheckTrait, ActionsTrait, WithPagination;
+    use ActionsTrait, StateCheckTrait, WithPagination;
 
     public InvoiceForm $form;
 

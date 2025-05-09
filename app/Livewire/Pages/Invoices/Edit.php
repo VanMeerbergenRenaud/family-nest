@@ -78,14 +78,13 @@ class Edit extends Component
 
     public function updateInvoice(FileStorageService $fileStorageService): void
     {
-        // Valider les parts avant la sauvegarde
         $this->validateShares();
 
         $invoice = $this->form->update($fileStorageService);
 
         if ($invoice) {
             Toaster::success('Facture mise à jour avec succès !');
-            $this->redirectRoute('invoices.index', $invoice);
+            $this->redirectRoute('dashboard', $invoice);
         } else {
             Toaster::error('Une erreur s\'est produite lors de la mise à jour de la facture.');
         }

@@ -2,6 +2,8 @@
 
 namespace App\Traits\Invoice;
 
+use Masmerise\Toaster\Toaster;
+
 /**
  * Trait commun pour les composants liés aux factures (Create, Edit, Show)
  * Contient les méthodes partagées par ces composants
@@ -58,6 +60,16 @@ trait ComponentTrait
     {
         $this->form->updateAvailableCategories();
         $this->form->category = null;
+    }
+
+    /**
+     * Toast pour le rappel de paiement
+     */
+    public function updatedFormPaymentReminder($value): void
+    {
+        if ($value) {
+            Toaster::info('Un rappel de paiement sera programmé pour le '.date('d/m/Y', strtotime($value)));
+        }
     }
 
     /**
