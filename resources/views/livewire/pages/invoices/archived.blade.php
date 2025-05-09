@@ -60,7 +60,7 @@
                     <x-svg.archive class="w-5 h-5 text-slate-400"/>
                 </div>
 
-                <h3 class="text-lg font-medium text-slate-800 mb-2.5">
+                <h3 role="heading" aria-level="3" class="text-lg font-medium text-slate-800 mb-2.5">
                     @if($filterType === 'personal')
                         Aucune facture personnelle archivée
                     @else
@@ -90,7 +90,7 @@
                     >
                         <div class="flex items-center gap-2">
                             <x-svg.calendar class="w-5 h-5 text-gray-500" />
-                            <h3 class="text-md-semibold text-gray-800">{{ $year }}</h3>
+                            <h3 role="heading" aria-level="3" class="text-md-semibold text-gray-800">{{ $year }}</h3>
                             <span class="bg-gray-200 text-gray-700 text-xs-medium px-2.5 py-0.5 rounded-full ml-2">
                                 {{ $invoices->count() }} facture{{ $invoices->count() > 1 ? 's' : '' }}
                             </span>
@@ -189,15 +189,13 @@
                     </div>
                 </div>
             @endforeach
-
-            <x-loader.spinner target="deleteDefinitelyInvoice, deleteDefinitelyAllInvoice" />
         </div>
 
         <!-- Message si aucune facture archivée trouvée -->
         @if($invoicesByYear->isEmpty())
             <div class="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
                 <x-svg.archive class="w-12 h-12 text-gray-400 mx-auto"/>
-                <h3 class="mt-4 text-lg font-medium text-gray-900">Aucune facture archivée trouvée</h3>
+                <h3 role="heading" aria-level="3" class="mt-4 text-lg font-medium text-gray-900">Aucune facture archivée trouvée</h3>
                 <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
                     @if($filterType === 'personal')
                         Vous n'avez pas encore archivé de factures personnelles.
@@ -221,50 +219,8 @@
             </div>
         @endif
 
-        <!-- Modales de confirmation -->
-        @if($showDeleteFormModal)
-            <x-modal wire:model="showDeleteFormModal">
-                <x-modal.panel>
-                    <form wire:submit.prevent="deleteDefinitelyInvoice">
-                        @csrf
-                        <div x-data="{ confirmation: '' }">
-                            <div class="flex gap-x-6 p-8">
-                                <x-svg.advertising/>
-                                <div>
-                                    <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
-                                        {{ __('Supprimer la facture') }}
-                                    </h3>
-                                    <p class="mt-2 text-md-regular text-gray-500">
-                                        {{ __('Êtes-vous sûr de vouloir supprimer la facture') }}
-                                        <strong class="font-semibold"> {{ $form->name }}&nbsp;?</strong>
-                                        {{ __('Toutes les données seront supprimées. Cette action est irréversible.') }}
-                                    </p>
-                                    <div class="mt-6 mb-2 flex flex-col gap-3">
-                                        <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
-                                            {{ __('Veuillez taper "CONFIRMER" pour confirmer la suppression.') }}
-                                        </label>
-                                        <input x-model="confirmation" placeholder="CONFIRMER" type="text" id="delete-definitely-invoice"
-                                               class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
-                                               autofocus>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <x-modal.footer>
-                                <x-modal.close>
-                                    <button type="button" class="button-secondary">{{ __('Annuler') }}</button>
-                                </x-modal.close>
-                                <x-modal.close>
-                                    <button type="submit" class="button-danger" :disabled="confirmation !== 'CONFIRMER'">
-                                        {{ __('Supprimer') }}
-                                    </button>
-                                </x-modal.close>
-                            </x-modal.footer>
-                        </div>
-                    </form>
-                </x-modal.panel>
-            </x-modal>
-        @endif
+        <!-- Modale de suppression de la facture -->
+        <x-invoices.modal.delete :$showDeleteFormModal :$filePath :$fileExtension :$fileName />
 
         <!-- Modal de suppression de toutes les archives -->
         @if($showDeleteAllFormModal)
@@ -272,6 +228,9 @@
                 <x-modal.panel>
                     <form wire:submit.prevent="deleteDefinitelyAllInvoice">
                         @csrf
+
+                        <x-loader.spinner target="deleteDefinitelyAllInvoice" />
+
                         <div x-data="{ confirmation: '' }">
                             <div class="flex gap-x-6 p-8">
                                 <x-svg.advertising/>
@@ -321,6 +280,8 @@
                     <form wire:submit.prevent="downloadSelectedArchives">
                         @csrf
 
+                        <x-loader.spinner target="downloadSelectedArchives" />
+
                         <div class="p-5">
                             <h2 role="heading" aria-level="2" class="text-xl-semibold mb-4">
                                 {{ __('Télécharger les factures archivées') }}
@@ -364,8 +325,6 @@
                             </button>
                         </x-modal.footer>
                     </form>
-
-                    <x-loader.spinner target="downloadSelectedArchives" />
                 </x-modal.panel>
             </x-modal>
         @endif

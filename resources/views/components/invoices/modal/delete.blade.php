@@ -12,6 +12,8 @@
                 <form wire:submit.prevent="deleteDefinitelyInvoice">
                     @csrf
 
+                    <x-loader.spinner target="deleteDefinitelyInvoice" />
+
                     <div x-data="{ confirmation: '' }">
                         <div class="flex gap-x-6 p-8">
                             <x-svg.advertising/>

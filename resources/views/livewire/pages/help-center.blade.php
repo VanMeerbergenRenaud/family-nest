@@ -1,3 +1,3 @@
 <div>
-    Centre d'aide
+    <x-coming-soon title="Centre d’aide" />
 </div>

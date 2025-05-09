@@ -43,7 +43,7 @@
 
     {{-- Modales --}}
     <x-invoices.modal.prewiew :$showInvoicePreviewModal :$filePath :$fileExtension :$fileName />
-    <x-invoices.modal.delete :$showDeleteFormModal :$filePath :$fileExtension :$fileName/>
+    <x-invoices.modal.delete :$showDeleteFormModal :$filePath :$fileExtension :$fileName />
 
     <x-loader.spinner target="" position="fixed" />
 </section>

@@ -6,33 +6,30 @@ use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
-use App\Models\Invoice;
+use App\Traits\Invoice\ActionsTrait;
 use App\Traits\Invoice\ComponentTrait;
 use App\Traits\Invoice\FileUrlTrait;
 use App\Traits\Invoice\ShareCalculationTrait;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Title('Détails de facture')]
 class Show extends Component
 {
+    use ActionsTrait;
     use ComponentTrait;
     use FileUrlTrait;
     use ShareCalculationTrait;
 
-    public Invoice $invoice;
-
-    public $filePath = null;
-
-    public $fileExtension = null;
-
-    public $fileName = null;
-
-    public $fileExists = false;
-
     public $family_members = [];
 
     public $form;
+
+    // Ajout des propriétés nécessaires pour les modales
+    public bool $showInvoicePreviewModal = false;
+
+    public bool $showDeleteFormModal = false;
 
     public function mount($id)
     {
@@ -97,6 +94,14 @@ class Show extends Component
         $this->prepareShares();
         $this->initializeShares();
     }
+
+    #[On('invoice-favorite')]
+    #[On('invoice-restore')]
+    #[On('invoice-archived')]
+    #[On('invoice-deleted')]
+    #[On('invoices-bulk-archived')]
+    #[On('invoices-bulk-updated')]
+    public function refreshShow(): void {}
 
     private function prepareShares(): void
     {

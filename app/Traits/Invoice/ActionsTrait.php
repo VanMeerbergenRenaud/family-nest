@@ -60,6 +60,9 @@ trait ActionsTrait
             'is_archived' => false,
             'is_favorite' => false,
         ]);
+
+        $this->dispatch('invoice-restore', $invoiceId);
+        Toaster::success('Facture restaurée avec succès !');
     }
 
     public function copyInvoice($invoiceId): void

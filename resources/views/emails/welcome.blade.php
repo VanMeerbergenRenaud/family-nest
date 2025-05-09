@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome to Our Platform</title>
+    <title>Bienvenue sur notre plateforme</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,26 +38,24 @@
             text-align: center;
         }
     </style>
-
 </head>
 <body>
-<div class="email-container">
-    <h1>Saluttt !</h1>
-    <p>
-        Thank you for signing up on our platform. We're excited to have
-        you on board.
-    </p>
-    <p>
-        Feel free to explore our features, and let us know if you need
-        any assistance.
-    </p>
-    <p>Best regards,<br />{{ config('app.name') }} Team</p>
-
-    <div class="footer">
+    <div class="email-container">
+        <h1>Bonjour 👋🏻!</h1>
         <p>
-            &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
+            Merci de vous être inscrit sur notre plateforme. Nous sommes ravis de vous avoir parmi nous.
         </p>
+        <p>
+            N'hésitez pas à explorer nos fonctionnalités et faites-nous savoir si vous avez besoin d'aide.
+        </p>
+        <p>
+            Cordialement,<br />L'équipe {{ config('app.name') }}
+        </p>
+        <div class="footer">
+            <p>
+                &copy; {{ date('Y') }} {{ config('app.name') }}. Tous droits réservés.
+            </p>
+        </div>
     </div>
-</div>
 </body>
 </html>

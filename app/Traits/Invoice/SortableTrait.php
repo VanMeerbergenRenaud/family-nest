@@ -10,7 +10,7 @@ trait SortableTrait
     public string $sortCol = 'name';
 
     #[Url]
-    public bool $sortAsc = false;
+    public bool $sortAsc = true;
 
     public $activeFilter = null;
 

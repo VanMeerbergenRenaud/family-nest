@@ -1,6 +1,6 @@
 @props(['search'])
 
-<div class="flex items-center justify-start flex-wrap gap-3 py-3 px-4.5 border-slate-200">
+<div class="flex items-center justify-start flex-wrap gap-2 py-3 px-4.5 border-slate-200">
     <p class="w-full overflow-clip text-sm-medium text-gray-500 dark:text-gray-400">
         Aucun résultat pour : "{{ $search }}"
     </p>

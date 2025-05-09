@@ -1,7 +1,7 @@
 <div>
     <x-empty-state
-        title="Zone de suppression de compte"
-        description="Dès que votre compte est supprimé, toutes ses ressources et données seront définitivement supprimées. Avant de supprimer votre compte, veuillez télécharger."
+        title="Zone de suppression du compte"
+        description="Dès que votre compte est supprimé, toutes ses ressources et données seront définitivement supprimées. Avant de supprimer votre compte, veuillez télécharger toutes les données que vous souhaitez conserver."
     >
         <x-modal wire:model="showModal">
             <x-modal.open>

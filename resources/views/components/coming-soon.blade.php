@@ -2,7 +2,7 @@
     'title' => 'Fonctionnalité à venir',
 ])
 
-<div class="flex-center flex-col min-h-[90vh] px-4">
+<div class="flex-center flex-col min-h-[80vh] px-4">
     <!-- Badge avec animation subtile -->
     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200">
         {{ __('En développement') }}
