@@ -13,8 +13,7 @@ use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
 /**
- * Composant réutilisable pour les tables des factures
- * Peut être utilisé à la fois par le dashboard et la page des factures
+ * Composant dynamique utilisé à la fois pour le dashboard et la page des factures
  */
 class InvoiceTable extends Component
 {

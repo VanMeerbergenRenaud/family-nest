@@ -11,11 +11,11 @@ trait ActionsTrait
 {
     public ?Invoice $invoice = null;
 
-    public $filePath;
+    public $filePath = '';
 
-    public $fileExtension;
+    public $fileExtension = '';
 
-    public $fileName;
+    public $fileName = '';
 
     public $fileExists = false;
 
@@ -223,8 +223,12 @@ trait ActionsTrait
                 $this->showFolderModal = false;
             }
 
-            $this->dispatch('invoice-deleted', $this->invoice->id);
-            Toaster::success('Facture supprimée définitivement !');
+            if ($this instanceof \App\Livewire\Pages\Invoices\Show) {
+                $this->redirectRoute('dashboard');
+            } else {
+                $this->dispatch('invoice-deleted', $this->invoice->id);
+                Toaster::success('Facture supprimée définitivement !');
+            }
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de la suppression: '.$e->getMessage());
         }

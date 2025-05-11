@@ -31,9 +31,14 @@
                                     <label for="delete-definitely-invoice" class="text-sm-medium text-gray-800">
                                         {{ __('Veuillez tapper "CONFIRMER" pour confirmer la suppression.') }}
                                     </label>
-                                    <input x-model="confirmation" placeholder="CONFIRMER" type="text" id="delete-definitely-invoice"
-                                           class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
-                                           autofocus>
+                                    <input
+                                        id="delete-definitely-invoice"
+                                        type="text"
+                                        x-model="confirmation"
+                                        placeholder="CONFIRMER"
+                                        class="py-2 px-3 text-sm-regular border border-gray-300 rounded-md w-[87.5%]"
+                                        autofocus
+                                    >
                                 </div>
                             </div>
                         </div>

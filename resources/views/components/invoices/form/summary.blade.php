@@ -6,15 +6,15 @@
 <div class="w-full bg-white dark:bg-gray-800 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
     <dl>
         <x-invoices.form.summary-item label="Nom de la facture" :alternateBackground="true">
-            {{ $form->name ?? 'Non spécifié' }}
+            {{ $form->name ?? __('Non spécifié') }}
         </x-invoices.form.summary-item>
 
         <x-invoices.form.summary-item label="Type et catégorie">
-            {{ $form->type ?? 'Non spécifié' }} - {{ $form->category ?? 'Non spécifié' }}
+            {{ $form->type ?? __('Non spécifié') }} - {{ $form->category ?? __('Non spécifié') }}
         </x-invoices.form.summary-item>
 
         <x-invoices.form.summary-item label="Fournisseur" :alternateBackground="true">
-            {{ $form->issuer_name ?? 'Non spécifié' }}
+            {{ $form->issuer_name ?? __('Non spécifié') }}
             @if($form->issuer_website)
                 <a href="{{ $form->issuer_website }}" target="_blank"
                    title="Visiter le site de l'émetteur"
@@ -45,13 +45,12 @@
                 <div class="flex items-center">
                     <span class="text-sm-medium">{{ $formattedAmount }}</span>
                     <span class="ml-1 text-sm-medium">{{ $symbol }}</span>
-                    <span
-                        class="ml-2 text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-teal-100 text-gray-800">
+                    <span class="ml-2 text-xs inline-flex items-center px-2 py-0.5 rounded-full bg-teal-100 text-gray-800">
                         {{ $flag }} {{ $currencyName }}
                     </span>
                 </div>
             @else
-                <span class="text-sm-medium">Non spécifié</span>
+                <span class="text-sm-medium">{{ __('Non spécifié') }}</span>
             @endif
         </x-invoices.form.summary-item>
 
@@ -95,8 +94,7 @@
                                     <div class="text-sm-medium w-max">{{ $shareSummary['formattedShared'] }}
                                         &nbsp;{{ $currencySymbol }}</div>
                                     <div class="relative top-0.5 h-1 min-w-20 bg-gray-200 rounded-full">
-                                        <div class="h-1 rounded-full bg-amber-500"
-                                             style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
+                                        <div class="h-1 rounded-full bg-amber-500" style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
                                     </div>
                                     <div class="text-sm-medium">
                                         ({{ number_format($shareSummary['totalPercentage'], 0) }}%)
@@ -106,9 +104,9 @@
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      class="h-4 w-4 transition-transform"
                                      :class="showRepartition ? 'transform rotate-180' : ''"
-                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M19 9l-7 7-7-7"/>
+                                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                >
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                 </svg>
                             </button>
 
@@ -121,8 +119,7 @@
                                     <li class="flex justify-between items-center gap-2 py-1"
                                         wire:key="share-{{ $member['id'] }}">
                                         <div class="flex items-center gap-2 sm:w-44 mr-2">
-                                            <img src="{{ $member['avatar'] }}"
-                                                 alt="" class="w-6 h-6 rounded-full inline-block">
+                                            <img src="{{ $member['avatar'] }}" alt="" class="w-6 h-6 rounded-full inline-block">
                                             <span class="text-sm text-gray-700">{{ $member['name'] }}</span>
                                         </div>
                                         <p class="text-sm-medium text-gray-800">
@@ -130,8 +127,7 @@
                                         </p>
                                         <div class="flex items-center gap-2">
                                             <div class="w-12 h-1 bg-gray-100 rounded-full">
-                                                <div class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}"
-                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
+                                                <div class="h-1 rounded-full {{ $member['isPayer'] ? 'bg-indigo-400' : 'bg-gray-400' }}" style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
                                             </div>
                                             <span class="text-xs text-gray-500 ml-1">{{ $member['formattedPercentage'] }}%</span>
                                         </div>
@@ -140,16 +136,15 @@
                             </ul>
                         </div>
                     @else
-                        <!-- Aucune répartition -->
                         <p class="text-sm-regular">
-                            Répartition : <span class="text-sm-medium">Non définie</span>
+                            Répartition : <span class="text-sm-medium">{{ __('Non définie') }}</span>
                         </p>
                     @endif
                 </div>
             @else
                 <!-- Montant non défini -->
                 <p class="text-sm-medium">
-                    Non spécifié - Non définie
+                    {{ __('Non spécifié') }} - {{ __('Non définie') }}
                 </p>
             @endif
         </x-invoices.form.summary-item>
@@ -157,10 +152,10 @@
         <x-invoices.form.summary-item label="Dates">
             <div class="flex flex-col gap-1.5">
                 @php
-                    // Fonction de formatage des dates réutilisable
+                    // Fonction de formatage des dates
                     function formatDate($date) {
                         if (empty($date)) {
-                            return 'Non spécifiée';
+                            return __('Non spécifiée');
                         }
 
                         if (is_string($date)) {
@@ -177,7 +172,7 @@
                     </span>
                 </p>
                 <p class="text-sm-regular">
-                    Paiement: <span class="text-sm-medium">
+                    Échéance: <span class="text-sm-medium">
                         {{ formatDate($form->payment_due_date) }}
                     </span>
                 </p>
@@ -188,15 +183,13 @@
                 </p>
 
                 @php
-                    $frequencyInstance = ($form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum)
+                    $frequencyEnum = $form->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum
                         ? $form->payment_frequency
-                        : ((!empty($form->payment_frequency)) ? \App\Enums\PaymentFrequencyEnum::tryFrom($form->payment_frequency) : null);
+                        : \App\Enums\PaymentFrequencyEnum::tryFrom($form->payment_frequency ?? '');
                 @endphp
-                @if($frequencyInstance)
+                @if($frequencyEnum)
                     <p class="text-sm-regular">
-                        Fréquence: <span class="text-sm-medium">
-                            {{ $frequencyInstance->label() }}
-                        </span>
+                        Fréquence: <span class="text-sm-medium">{{ $frequencyEnum->label() }}</span>
                     </p>
                 @endif
             </div>
@@ -204,9 +197,9 @@
 
         <x-invoices.form.summary-item label="Statut de paiement">
             @php
-                $paymentStatusInstance = ($form->payment_status instanceof \App\Enums\PaymentStatusEnum)
+                $paymentStatusInstance = $form->payment_status instanceof \App\Enums\PaymentStatusEnum
                     ? $form->payment_status
-                    : ((!empty($form->payment_status)) ? \App\Enums\PaymentStatusEnum::tryFrom($form->payment_status) : null);
+                    : \App\Enums\PaymentStatusEnum::tryFrom($form->payment_status ?? '');
             @endphp
 
             @if($paymentStatusInstance)
@@ -215,7 +208,7 @@
                 </span>
             @else
                 <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    Non spécifié
+                    {{ __('Non spécifié') }}
                 </span>
             @endif
 
@@ -223,31 +216,23 @@
                 <p class="text-sm-regular">
                     Méthode: <span class="text-sm-medium">
                         @php
-                            $paymentMethodInstance = ($form->payment_method instanceof \App\Enums\PaymentMethodEnum)
+                            $paymentMethodInstance = $form->payment_method instanceof \App\Enums\PaymentMethodEnum
                                 ? $form->payment_method
-                                : ((!empty($form->payment_method)) ? \App\Enums\PaymentMethodEnum::tryFrom($form->payment_method) : null);
+                                : \App\Enums\PaymentMethodEnum::tryFrom($form->payment_method ?? '');
                         @endphp
 
-                        @if($paymentMethodInstance)
-                            {{ $paymentMethodInstance->label() }}
-                        @else
-                            Non spécifiée
-                        @endif
+                        {{ $paymentMethodInstance?->label() ?? 'Non spécifiée' }}
                     </span>
                 </p>
                 <p class="text-sm-regular">
                     Priorité: <span class="text-sm-medium">
                         @php
-                            $priorityInstance = ($form->priority instanceof \App\Enums\PriorityEnum)
+                            $priorityInstance = $form->priority instanceof \App\Enums\PriorityEnum
                                 ? $form->priority
-                                : ((!empty($form->priority)) ? \App\Enums\PriorityEnum::tryFrom($form->priority) : null);
+                                : \App\Enums\PriorityEnum::tryFrom($form->priority ?? '');
                         @endphp
 
-                        @if($priorityInstance)
-                            {{ $priorityInstance->label() }}
-                        @else
-                            Non spécifiée
-                        @endif
+                        {{ $priorityInstance?->label() ?? 'Non spécifiée' }}
                     </span>
                 </p>
             </div>
@@ -263,7 +248,7 @@
 
         <x-invoices.form.summary-item label="Tags">
             @if(empty($form->tags))
-                <span class="text-sm-medium">Aucun</span>
+                <span class="text-sm-medium">{{ __('Aucun') }}</span>
             @else
                 <ul class="flex flex-wrap gap-2">
                     @foreach($form->tags as $tag)

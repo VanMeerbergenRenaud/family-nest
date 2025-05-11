@@ -331,7 +331,7 @@
 
                             {{-- Émetteur --}}
                             @if($visibleColumns['issuer_name'] ?? false)
-                                <td>
+                                <td class="max-sm:max-w-[9rem] max-w-[12.5rem] truncate">
                                     {{ $invoice->issuer_name ?? 'Non spécifié' }}
                                 </td>
                             @endif

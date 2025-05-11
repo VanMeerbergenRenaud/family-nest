@@ -1,71 +1,483 @@
-<div class="flex flex-col gap-6 p-4">
+<div class="flex flex-col gap-5 lg:p-4">
+    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-6">
 
-    <div class="max-sm:grid flex justify-between items-center gap-3">
-        <h2 role="heading" aria-level="2" class="px-4 text-2xl font-bold text-gray-900">
-            Détails de la facture
+        <h2 role="heading" aria-level="2" class="text-2xl font-medium max-w-xs">
+            Facture&nbsp;:&nbsp;{{ $invoice->name }}
         </h2>
 
-        <div class="flex-center flex-wrap gap-3">
+        <!-- Actions -->
+        <div class="flex flex-wrap md:justify-end gap-2">
+
+            <button
+                type="button"
+                class="button-primary"
+                wire:click="downloadInvoice({{ $invoice->id }})"
+                wire:loading.attr="disabled"
+            >
+                <x-svg.download />
+                {{ __('Télécharger') }}
+            </button>
+
             @can('addToFavorite', $invoice)
-                <button type="button" wire:click="toggleFavorite({{ $invoice->id }})" class="button-primary" wire:loading.attr="disabled">
+                <button
+                    type="button"
+                    class="button-primary group"
+                    wire:click="toggleFavorite({{ $invoice->id }})"
+                    wire:loading.attr="disabled"
+                >
                     @if($invoice->is_favorite)
-                        <x-svg.star class="group-hover:text-gray-900 fill-current"/>
+                        <x-svg.star class="text-gray-700 fill-current mr-0.5"/>
                         {{ __('Retirer des favoris') }}
                     @else
-                        <x-svg.star class="group-hover:text-gray-900"/>
+                        <x-svg.star class="text-gray-500 mr-0.5" />
                         {{ __('Ajouter aux favoris') }}
                     @endif
                 </button>
             @endif
 
             @can('update', $invoice)
-                <a href="{{ route('invoices.edit', $invoice->id) }}" class="button-primary" wire:navigate>
-                    <x-svg.edit class="group-hover:text-gray-900"/>
-                    {{ __('Modifier') }}
-                </a>
+                <div class="inline-flex">
+                    <a href="{{ route('invoices.edit', $invoice->id) }}"
+                       class="button-primary rounded-r-none border-r-0"
+                       wire:navigate
+                    >
+                        <x-svg.edit />
+                        {{ __('Modifier') }}
+                    </a>
 
-                <button type="button" wire:click="copyInvoice({{ $invoice->id }})" class="button-primary" wire:loading.attr="disabled">
-                    <x-svg.copy class="group-hover:text-gray-900"/>
-                    {{ __('Dupliquer') }}
-                </button>
+
+                    <button type="button"
+                            class="button-primary rounded-l-none"
+                            wire:click="copyInvoice({{ $invoice->id }})"
+                            wire:loading.attr="disabled"
+                    >
+                        <x-svg.copy />
+                        {{ __('Dupliquer') }}
+                    </button>
+                </div>
             @endcan
-
-            <button type="button" wire:click="downloadInvoice({{ $invoice->id }})" class="button-primary" wire:loading.attr="disabled">
-                <x-svg.download class="group-hover:text-gray-900"/>
-                {{ __('Télécharger') }}
-            </button>
 
             @can('delete', $invoice)
-                @if($invoice->is_archived)
-                    <button type="button" wire:click="restoreInvoice({{ $invoice->id }})" class="button-primary" wire:loading.attr="disabled">
-                        <x-svg.restore />
-                        {{ __('Restaurer') }}
-                    </button>
-                @else
-                    <button type="button" wire:click="archiveInvoice({{ $invoice->id }})" class="button-danger" wire:loading.attr="disabled">
-                        <x-svg.archive class="text-white stroke-2" />
-                        {{ __('Archiver') }}
-                    </button>
-                @endif
+                <div class="flex items-center">
+                    @if($invoice->is_archived)
+                        <button
+                            type="button"
+                            class="button-primary rounded-r-none border-r-0"
+                            wire:click="restoreInvoice({{ $invoice->id }})"
+                            wire:loading.attr="disabled"
+                        >
+                            <x-svg.restore />
+                            {{ __('Restaurer') }}
+                        </button>
+                    @else
+                        <button
+                            type="button"
+                            class="button-danger border-white rounded-r-none border-r-0"
+                            wire:click="archiveInvoice({{ $invoice->id }})"
+                            wire:loading.attr="disabled"
+                        >
+                            <x-svg.archive class="text-white" />
+                            {{ __('Archiver') }}
+                        </button>
+                    @endif
 
-                <button type="button" wire:click="showDeleteForm({{ $invoice->id }})" class="button-danger" wire:loading.attr="disabled">
-                    <x-svg.trash class="text-white"/>
-                    {{ __('Supprimer') }}
-                </button>
+                    <x-divider :vertical="true" class="bg-red-600/80 max-h-[2.5rem]"/>
+
+                    <button
+                        type="button"
+                        class="button-danger border-white rounded-l-none border-l-0"
+                        wire:click="showDeleteForm({{ $invoice->id }})"
+                        wire:loading.attr="disabled"
+                    >
+                        <x-svg.trash class="text-white"/>
+                        {{ __('Supprimer') }}
+                    </button>
+                </div>
             @endcan
-
         </div>
     </div>
 
-    <div class="lg:grid lg:grid-cols-2 lg:gap-4">
-        <div class="relative flex-center w-full h-full max-h-[90vh] overflow-hidden border border-slate-200 bg-gray-100 rounded-xl">
-            <x-invoices.file-viewer
-                :$filePath
-                :$fileExtension
-                :$fileName
-                class="w-full h-full min-h-[50vh]"
-            />
+    <!-- Contenu principal -->
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <!-- Aperçu du fichier -->
+        <div class="lg:col-span-2">
+            <div class="border border-slate-200 rounded-2xl overflow-hidden h-fit">
+                <div class="relative h-[80vh] overflow-y-auto bg-gray-100">
+                    <x-invoices.file-viewer
+                        :filePath="$filePath"
+                        :fileExtension="$fileExtension"
+                        :fileName="$fileName"
+                        class="min-h-full"
+                    />
+                </div>
+            </div>
         </div>
-        <x-invoices.form.summary :$form :$family_members />
+
+        <!-- Détails de facturation -->
+        <div class="lg:col-span-3">
+            <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
+                <div class="h-full overflow-y-auto">
+                    @php
+                        $paymentStatusInstance = $invoice->payment_status instanceof \App\Enums\PaymentStatusEnum
+                            ? $invoice->payment_status
+                            : \App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status ?? '');
+
+                        $currencySymbol = $this->getCurrencySymbol();
+                    @endphp
+
+                    <!-- En-tête avec statut et montant -->
+                    <div class="p-5 pl-6.5">
+                        <div class="flex items-start max-sm:items-center justify-between mb-4 gap-4">
+
+                            <div class="flex flex-col gap-2">
+                                <p class="text-xl-semibold text-gray-900">
+                                    {{ $invoice->name }}
+                                </p>
+
+                                @if($invoice->reference)
+                                    <p class="flex items-center text-sm text-gray-500">
+                                        <span class="bg-gray-100 w-5 h-5 rounded-md flex-center mr-2">
+                                            #
+                                        </span>
+                                        {{ $invoice->reference }}
+                                    </p>
+                                @endif
+                            </div>
+
+                            @if($paymentStatusInstance)
+                                <span class="flex-center gap-1.5 px-4.5 py-2 bg-gray-100 rounded-md">
+                                    <span class="text-xs">{{ $paymentStatusInstance->emoji() }}</span>
+                                    <span class="text-sm-medium text-gray-700">{{ $paymentStatusInstance->label() }}</span>
+                                </span>
+                            @endif
+                        </div>
+
+                        @if($invoice->amount)
+                            <div class="mt-5 flex items-baseline">
+                                <p class="text-3xl font-bold text-gray-900">
+                                    {{ number_format($invoice->amount, 2, ',', ' ') }}
+                                </p>
+                                <span class="text-xl ml-1 text-gray-600">{{ $currencySymbol }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Séparateur -->
+                    <x-divider class="my-2 border-slate-200"/>
+
+                    <!-- Contenu principal -->
+                    <div class="px-5 py-4 space-y-6">
+
+                        @php
+                            $iconClass = 'p-1.5 rounded-md mr-2.5';
+                        @endphp
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+
+                            <!-- Type et catégorie -->
+                            <div class="flex-1">
+                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Type et catégorie</h3>
+                                <div class="px-4 py-3 flex items-center bg-teal-50 rounded-lg border border-slate-200">
+                                    <span class="{{ $iconClass }} bg-teal-100 text-teal-700">
+                                        <x-rectangle-stack />
+                                    </span>
+                                    <p class="text-sm-medium text-gray-800">
+                                        {{ $invoice->type->value ?? 'Non spécifié' }} - {{ $invoice->category->value ?? 'Non spécifiée' }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Fournisseur -->
+                            <div class="flex-1">
+                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Fournisseur</h3>
+
+                                @if($invoice->issuer_website)
+                                    <a href="{{ $invoice->issuer_website }}"
+                                       target="_blank"
+                                       title="Visiter le site de {{ $invoice->issuer_name }}"
+                                       class="px-4 py-3 flex gap-0.5 rounded-lg group bg-cyan-50 border border-slate-200 hover:bg-cyan-100 transition"
+                                    >
+                                        <span class="{{ $iconClass }} h-fit bg-cyan-100 text-cyan-700 group-hover:bg-cyan-200 transition">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/>
+                                            </svg>
+                                        </span>
+                                        <p class="flex flex-col gap-1 font-medium text-gray-800">
+                                            {{ $invoice->issuer_name ?? 'Non spécifié' }}
+                                            <span class="flex items-center text-sm text-gray-500 group-hover:text-indigo-600 transition">
+                                                {{ $invoice->issuer_website }}
+                                            </span>
+                                        </p>
+                                    </a>
+                                @else
+                                    <div class="p-3 bg-cyan-50 rounded-lg border border-slate-200 flex items-start gap-3">
+                                        <span class="bg-cyan-100 p-1.5 rounded-lg text-cyan-700">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/>
+                                            </svg>
+                                        </span>
+                                        <p class="font-medium text-gray-800">{{ $invoice->issuer_name ?? 'Non spécifié' }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Dates -->
+                        <div>
+                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Dates importantes</h3>
+                            @php
+                                function formatDate($date) {
+                                    if (empty($date)) return 'Non spécifiée';
+                                    if (is_string($date)) $date = \Carbon\Carbon::parse($date);
+                                    return $date->format('d/m/Y');
+                                }
+                            @endphp
+
+                            <div class="bg-white rounded-lg border border-slate-200">
+                                <div class="grid grid-cols-2 md:grid-cols-4">
+                                    <div class="px-4 py-3 flex flex-col gap-2.5 md:border-r border-slate-200">
+                                        <span class="text-xs text-gray-500">Émission</span>
+                                        <span class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="bg-blue-50 {{ $iconClass }} text-blue-600">
+                                                <x-svg.calendar />
+                                            </span>
+                                            {{ formatDate($invoice->issued_date) }}
+                                        </span>
+                                    </div>
+
+                                    <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200">
+                                        <span class="text-xs text-gray-500">Échéance</span>
+                                        <span class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="bg-amber-50 {{ $iconClass }} text-amber-600">
+                                                <x-svg.clock />
+                                            </span>
+                                            {{ formatDate($invoice->payment_due_date) }}
+                                        </span>
+                                    </div>
+
+                                    @if($invoice->payment_reminder)
+                                        <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200 border-t md:border-t-0">
+                                            <span class="text-xs text-gray-500">Rappel</span>
+                                            <span class="text-sm-medium text-gray-900 flex items-center">
+                                                <span class="bg-rose-50 {{ $iconClass }} text-rose-600">
+                                                    <x-svg.bell />
+                                                </span>
+                                                {{ formatDate($invoice->payment_reminder) }}
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    @php
+                                        $frequencyEnum = $invoice->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum
+                                            ? $invoice->payment_frequency
+                                            : \App\Enums\PaymentFrequencyEnum::tryFrom($invoice->payment_frequency ?? '');
+                                    @endphp
+
+                                    @if($frequencyEnum)
+                                        <div class="px-4 py-3 flex flex-col gap-2 border-t border-slate-200 md:border-t-0">
+                                            <span class="text-xs text-gray-500">Fréquence</span>
+                                            <span class="text-sm-medium text-gray-900 flex items-center">
+                                                <span class="bg-indigo-50 {{ $iconClass }} text-indigo-600">
+                                                    <x-svg.reset />
+                                                </span>
+                                                {{ $frequencyEnum->label() }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informations de paiement -->
+                        <div>
+                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Informations de paiement</h3>
+                            <div class="bg-white rounded-lg border border-slate-200">
+                                @php
+                                    $paymentMethodInstance = $invoice->payment_method instanceof \App\Enums\PaymentMethodEnum
+                                        ? $invoice->payment_method
+                                        : \App\Enums\PaymentMethodEnum::tryFrom($invoice->payment_method ?? '');
+
+                                    $priorityEnum = $invoice->priority instanceof \App\Enums\PriorityEnum
+                                        ? $invoice->priority
+                                        : \App\Enums\PriorityEnum::tryFrom($invoice->priority ?? '');
+                                @endphp
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2">
+                                    <div class="px-4 py-3 border-b sm:border-b-0 sm:border-r border-slate-200">
+                                        <p class="text-xs text-gray-500 mb-2">Méthode</p>
+                                        <p class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="bg-purple-50 {{ $iconClass }} text-purple-700">
+                                                <x-svg.credit-card />
+                                            </span>
+                                            {{ $paymentMethodInstance?->label() ?? 'Non spécifiée' }}
+                                        </p>
+                                    </div>
+                                    <div class="px-4 py-3">
+                                        <p class="text-xs text-gray-500 mb-2">Priorité</p>
+                                        <p class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="bg-blue-50 {{ $iconClass }} text-blue-700">
+                                                <x-svg.shield-exclamation />
+                                            </span>
+                                            {{ $priorityEnum?->label() ?? 'Non spécifiée' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Montant et répartition --}}
+                        @php
+                            $shareSummary = $this->getShareDetailSummary($this->family_members);
+                            $currencySymbol = $this->getCurrencySymbol();
+                        @endphp
+
+                        <div class="mb-6">
+                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Répartition des paiements</h3>
+
+                            @if($shareSummary['hasAmount'])
+                                <div class="px-4 py-3 space-y-4 rounded-lg bg-white border border-slate-200">
+                                    <!-- Nom du payeur -->
+                                    @if(isset($shareSummary['memberDetails'][0]))
+                                        @php
+                                            $payer = collect($shareSummary['memberDetails'])->firstWhere('isPayer', true) ?? $shareSummary['memberDetails'][0];
+                                        @endphp
+
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-500">Payeur :</span>
+                                            <div class="flex items-center ml-2">
+                                                <img src="{{ $payer['avatar'] }}"
+                                                     alt="{{ $payer['name'] }}"
+                                                     class="w-6 h-6 object-cover rounded-full border-2 border-white"
+                                                >
+                                                <span class="ml-2 text-sm-medium text-gray-800">{{ $payer['name'] }}</span>
+                                            </div>
+                                        </div>
+                                    @endif
+
+                                    <!-- Détail des parts -->
+                                    @if($shareSummary['hasDetails'])
+                                        <div x-data="{ showRepartition: false }">
+                                            <!-- En-tête avec bouton toggle -->
+                                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 py-1">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-sm text-gray-500">Répartition :</span>
+                                                    <span class="text-sm-medium text-teal-800">
+                                                        {{ $shareSummary['formattedShared'] }}&nbsp;{{ $currencySymbol }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="flex items-center gap-2 flex-1">
+                                                    <div class="relative h-1.5 bg-zinc-200 rounded-full flex-1 max-w-56">
+                                                        <div class="h-1.5 rounded-full bg-teal-500"
+                                                             style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
+                                                    </div>
+                                                    <span class="text-xs-medium text-teal-800 bg-zinc-100 px-1.5 py-0.5 rounded">
+                                                        {{ number_format($shareSummary['totalPercentage'], 0) }}%
+                                                    </span>
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    @click="showRepartition = !showRepartition"
+                                                    class="flex items-center gap-1.5"
+                                                >
+                                                    <span
+                                                        x-text="showRepartition ? 'Masquer détails' : 'Voir détails'"
+                                                        class="text-sm-medium text-teal-700 hover:text-teal-900 transition-colors"
+                                                    ></span>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.667"
+                                                         class="h-4 w-4 transition-transform"
+                                                         :class="showRepartition ? 'transform rotate-180' : ''"
+                                                    >
+                                                        <path d="M19 9l-7 7-7-7"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+
+                                            <!-- Détail des répartitions - collapsible -->
+                                            <ul x-show="showRepartition"
+                                                x-collapse
+                                                x-transition
+                                                class="mt-3 pt-3 space-y-3 border-t border-teal-200"
+                                            >
+                                                @foreach($shareSummary['memberDetails'] as $member)
+                                                    <li class="pl-1 pr-2 flex flex-col sm:flex-row sm:items-center gap-2"
+                                                        wire:key="share-{{ $member['id'] }}">
+                                                        <div class="flex items-center gap-2 sm:w-44">
+                                                            <img src="{{ $member['avatar'] }}" alt="{{ $member['name'] }}" class="w-6 h-6 rounded-full object-cover border-2 border-white">
+                                                            <span class="text-sm-medium text-gray-800">{{ $member['name'] }}</span>
+                                                        </div>
+
+                                                        <div class="flex items-center justify-between flex-1 gap-3">
+                                                            <div class="flex-grow bg-zinc-200 h-1.5 rounded-full relative overflow-hidden">
+                                                                <div class="absolute top-0 left-0 h-1.5 rounded-full {{ $member['isPayer'] ? 'bg-amber-400' : 'bg-amber-500' }}"
+                                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
+                                                            </div>
+
+                                                            <div class="flex items-center gap-3">
+                                                                <span class="text-xs-medium text-teal-800 bg-zinc-100 px-1.5 py-0.5 rounded">
+                                                                    {{ $member['formattedPercentage'] }}%
+                                                                </span>
+                                                                <span class="text-sm-medium text-zinc-700 min-w-16 text-right">
+                                                                    {{ $member['formattedAmount'] }}&nbsp;{{ $currencySymbol }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-teal-700">Répartition :</span>
+                                            <span class="ml-2 text-sm-medium text-gray-700">{{ __('Non définie') }}</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            @else
+                                <!-- Montant non défini -->
+                                <div class="bg-teal-50 rounded-xl border border-teal-100 p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-teal-700 font-medium">Répartition</span>
+                                        <span class="text-sm-medium text-gray-700">{{ __('Non spécifié') }}</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Note (si disponibles) -->
+                        @if(!empty($invoice->notes))
+                            <div>
+                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Notes</h3>
+                                <div class="px-4 py-3 bg-white rounded-lg border border-slate-200">
+                                    <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ $invoice->notes }}</p>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Tags (si disponibles) -->
+                        @if(!empty($invoice->tags))
+                            <div>
+                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Tags</h3>
+                                <ul class="pl-1 flex flex-wrap gap-2">
+                                    @foreach($invoice->tags as $tag)
+                                        <li wire:key="tag-{{ $tag }}">
+                                            <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center hover:bg-indigo-100 transition">
+                                                <x-svg.tag2 class="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
+                                                {{ $tag }}
+                                            </span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Modale de suppression -->
+    <x-invoices.modal.delete :$showDeleteFormModal :$filePath :$fileExtension :$fileName/>
 </div>

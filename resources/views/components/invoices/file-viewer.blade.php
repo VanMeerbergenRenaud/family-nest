@@ -1,11 +1,10 @@
 @props([
-    'filePath' => '',
-    'fileExtension' => '',
-    'fileName' => '',
-    'class' => 'w-full h-full'
+    'filePath',
+    'fileExtension',
+    'fileName',
 ])
 
-<div class="{{ $class }} relative flex-center bg-gray-100 rounded-xl overflow-y-scroll overflow-x-hidden">
+<div {{ $attributes->merge(['class' => 'w-full h-full relative flex-center bg-gray-100 rounded-xl overflow-y-scroll overflow-x-hidden']) }}">
     @if ($filePath)
         @if(in_array($fileExtension, ['jpg', 'jpeg', 'png']))
             <img
