@@ -160,7 +160,7 @@
                                         @endphp
 
                                         @if($shareSummary['totalShares'] > 0)
-                                            <span class="mr-3 px-2 py-0.5 text-xs font-medium rounded-full {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                            <span class="mr-3 px-2 py-0.5 text-xs-medium rounded-full {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                 {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
                                                 {{ $shareSummary['formattedTotalPercent'] }}%
                                             </span>
@@ -216,7 +216,7 @@
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
                                                 </div>
-                                                <span class="text-xs font-medium ml-2 mr-auto truncate max-w-[80px]">{{ $member->name }}</span>
+                                                <span class="text-xs-medium ml-2 mr-auto truncate max-w-[80px]">{{ $member->name }}</span>
 
                                                 @if($memberShare['hasShare'])
                                                     <div class="flex items-center">

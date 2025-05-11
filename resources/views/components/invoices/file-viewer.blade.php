@@ -45,7 +45,7 @@
         @else
             <div class="flex-center flex-col p-8">
                 <x-svg.file-size class="w-24 h-24 text-gray-400 mb-6"/>
-                <p class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <p class="text-xl-medium text-gray-700 dark:text-gray-300 mb-2">
                     Prévisualisation non disponible
                 </p>
                 <p class="text-sm text-gray-500 dark:text-gray-400 text-center max-w-md mb-8">

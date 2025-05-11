@@ -16,7 +16,7 @@
             </h2>
 
             <div class="flex items-center">
-                <span class="text-sm font-medium text-gray-500 mr-4 md:ml-6">
+                <span class="text-sm-medium text-gray-500 mr-4 md:ml-6">
                     Étape {{ $step }} sur 4
                 </span>
 
@@ -24,7 +24,7 @@
                     @for ($i = 1; $i <= 4; $i++)
                         <div class="flex items-center">
                             <div class="relative flex-center w-7 h-7 rounded-full {{ $step === $i ? 'bg-slate-700' : ($step > $i ? 'bg-slate-600' : 'bg-gray-100 border border-gray-200') }}">
-                                <span class="text-xs font-medium {{ $step >= $i ? 'text-white' : 'text-gray-500' }}">{{ $i }}</span>
+                                <span class="text-xs-medium {{ $step >= $i ? 'text-white' : 'text-gray-500' }}">{{ $i }}</span>
                             </div>
 
                             @if($i < 4)
@@ -43,7 +43,7 @@
         @if($step === 1)
             <div class="space-y-6">
                 <div class="text-center mb-8">
-                    <h2 role="heading" aria-level="2" class="text-2xl font-bold text-gray-800 mb-3">Bienvenue sur notre plateforme !</h2>
+                    <h2 role="heading" aria-level="2" class="display-xs-bold text-gray-800 mb-3">Bienvenue sur notre plateforme !</h2>
                     <p class="text-gray-600 max-w-md mx-auto">
                         Commençons par créer votre espace famille. C'est là que vous pourrez gérer vos dépenses communes.
                     </p>
@@ -78,7 +78,7 @@
         @if($step === 2)
             <div class="space-y-8">
                 <div class="text-center mb-8">
-                    <h2 role="heading" aria-level="2" class="text-2xl font-bold text-gray-800 mb-3">
+                    <h2 role="heading" aria-level="2" class="display-xs-bold text-gray-800 mb-3">
                         Invitez des membres à rejoindre votre famille
                     </h2>
                     <p class="text-gray-600 max-w-md mx-auto">
@@ -176,7 +176,7 @@
             <div class="space-y-4 max-w-2xl mx-auto px-2">
                 <!-- En-tête avec titre et sous-titre -->
                 <div class="text-center mb-8">
-                    <h2 role="heading" aria-level="2" class="text-2xl font-bold text-slate-800 mb-3">
+                    <h2 role="heading" aria-level="2" class="display-xs-bold text-slate-800 mb-3">
                         Récapitulatif de votre famille
                     </h2>
                     <p class="text-gray-500 max-w-md mx-auto">
@@ -212,7 +212,7 @@
                 <!-- Membres invités - Avec design de carte légère -->
                 @if(count(array_filter($members, fn($m) => !empty($m['email']))) > 0)
                     <div class="pt-5 pb-2 px-6 rounded-lg bg-white border border-slate-200">
-                        <h2 role="heading" aria-level="2" class="text-lg font-medium text-slate-800 mb-5">Membres invités</h2>
+                        <h2 role="heading" aria-level="2" class="text-lg-medium text-slate-800 mb-5">Membres invités</h2>
                         <div class="space-y-3">
                             @foreach($members as $member)
                                 @if(!empty($member['email']) && $member['valid'])
@@ -231,7 +231,7 @@
                                                 $permissionClass = $permission ? $permission->cssClasses() : '';
                                                 $permissionLabel = $permission ? $permission->label() : '';
                                             @endphp
-                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium {{ $permissionClass }}">
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs-medium {{ $permissionClass }}">
                                                     {{ $permissionLabel }}
                                                 </span>
                                         </div>
@@ -335,7 +335,7 @@
 
                 <x-svg.success class="h-12 w-12 text-green-500" />
 
-                <h2 role="heading" aria-level="2" class="text-2xl font-semibold text-slate-800 text-center">
+                <h2 role="heading" aria-level="2" class="display-xs-semibold text-slate-800 text-center">
                     Félicitations !
                 </h2>
 

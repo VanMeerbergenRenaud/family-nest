@@ -4,12 +4,12 @@
 
 <div class="flex-center flex-col min-h-[80vh] px-4">
     <!-- Badge avec animation subtile -->
-    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200">
+    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm-medium bg-gray-50 text-gray-600 border border-gray-200">
         {{ __('En développement') }}
     </span>
 
     <!-- Titre avec espacement optimisé -->
-    <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+    <h2 class="mt-6 text-center display-sm-bold tracking-tight text-gray-900 dark:text-white">
         {{ $title }}
     </h2>
 

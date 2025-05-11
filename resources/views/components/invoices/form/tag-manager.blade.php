@@ -6,7 +6,7 @@
 ])
 
 <div class="mt-2">
-    <label for="tags" class="relative mb-1.5 pl-2 block text-sm font-medium text-gray-800 dark:text-gray-200">
+    <label for="tags" class="relative mb-1.5 pl-2 block text-sm-medium text-gray-800 dark:text-gray-200">
         Tags personnalisés
     </label>
 

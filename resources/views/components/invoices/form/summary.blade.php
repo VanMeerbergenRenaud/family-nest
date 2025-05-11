@@ -88,7 +88,7 @@
                             <!-- En-tête avec bouton toggle -->
                             <button @click="showRepartition = !showRepartition"
                                     type="button"
-                                    class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm font-medium rounded-lg text-gray-700 transition-colors">
+                                    class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm-medium rounded-lg text-gray-700 transition-colors">
                                 <div class="flex items-center gap-2">
                                     <div class="text-sm-regular">Répartition&nbsp;:</div>
                                     <div class="text-sm-medium w-max">{{ $shareSummary['formattedShared'] }}
@@ -203,11 +203,11 @@
             @endphp
 
             @if($paymentStatusInstance)
-                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 rounded-full bg-gray-100 text-gray-800">
                     {{ $paymentStatusInstance->emoji() }}&nbsp;&nbsp;{{ $paymentStatusInstance->label() }}
                 </span>
             @else
-                <span class="mb-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                <span class="mb-2 px-2 inline-flex text-xs leading-5 rounded-full bg-gray-100 text-gray-800">
                     {{ __('Non spécifié') }}
                 </span>
             @endif

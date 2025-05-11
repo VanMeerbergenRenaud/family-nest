@@ -16,7 +16,7 @@
             <div class="relative px-8 pb-8 flex-center flex-col text-center overflow-hidden">
                 <div class="absolute -top-10 w-full h-100 pointer-events-none" style="background-image: url('{{ asset('img/empty-invoice.png') }}'); background-size: contain; background-position: center; background-repeat: no-repeat;"></div>
                 <!-- Textes -->
-                <h3 role="heading" aria-level="3" class="text-2xl font-semibold text-gray-900 mt-46 mb-4">
+                <h3 role="heading" aria-level="3" class="display-xs-semibold text-gray-900 mt-46 mb-4">
                     {{ __('Aucune facture créée jusqu\'à présent') }}
                 </h3>
 

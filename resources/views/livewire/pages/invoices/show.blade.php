@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-5 lg:p-4">
-    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-6">
+    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-4 lg:gap-6">
 
-        <h2 role="heading" aria-level="2" class="text-2xl font-medium max-w-xs">
+        <h2 role="heading" aria-level="2" class="display-xs-medium max-w-xs">
             Facture&nbsp;:&nbsp;{{ $invoice->name }}
         </h2>
 
@@ -98,12 +98,12 @@
     </div>
 
     <!-- Contenu principal -->
-    <div class="grid lg:grid-cols-5 gap-8">
+    <div class="grid lg:grid-cols-5 gap-4">
 
         <!-- Aperçu du fichier -->
         <div class="lg:col-span-2">
             <div class="border border-slate-200 rounded-2xl overflow-hidden h-fit">
-                <div class="relative h-[80vh] overflow-y-auto bg-gray-100">
+                <div class="relative h-[85vh] overflow-y-auto bg-gray-100">
                     <x-invoices.file-viewer
                         :filePath="$filePath"
                         :fileExtension="$fileExtension"
@@ -127,7 +127,7 @@
                     @endphp
 
                     <!-- En-tête avec statut et montant -->
-                    <div class="p-5 pl-6.5">
+                    <div class="p-5 lg:pl-6.5">
                         <div class="flex items-start max-sm:items-center justify-between mb-4 gap-4">
 
                             <div class="flex flex-col gap-2">
@@ -146,7 +146,7 @@
                             </div>
 
                             @if($paymentStatusInstance)
-                                <span class="flex-center gap-1.5 px-4.5 py-2 bg-gray-100 rounded-md">
+                                <span class="relative -top-4 lg:-top-1 -right-1 flex-center gap-1.5 px-4.5 py-2 bg-gray-100 rounded-lg">
                                     <span class="text-xs">{{ $paymentStatusInstance->emoji() }}</span>
                                     <span class="text-sm-medium text-gray-700">{{ $paymentStatusInstance->label() }}</span>
                                 </span>
@@ -155,10 +155,10 @@
 
                         @if($invoice->amount)
                             <div class="mt-5 flex items-baseline">
-                                <p class="text-3xl font-bold text-gray-900">
+                                <p class="display-sm-bold text-gray-900">
                                     {{ number_format($invoice->amount, 2, ',', ' ') }}
                                 </p>
-                                <span class="text-xl ml-1 text-gray-600">{{ $currencySymbol }}</span>
+                                <span class="text-xl-regular ml-1 text-gray-600">{{ $currencySymbol }}</span>
                             </div>
                         @endif
                     </div>
@@ -200,10 +200,10 @@
                                     >
                                         <span class="{{ $iconClass }} h-fit bg-cyan-100 text-cyan-700 group-hover:bg-cyan-200 transition">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
                                             </svg>
                                         </span>
-                                        <p class="flex flex-col gap-1 font-medium text-gray-800">
+                                        <p class="flex flex-col gap-1 text-sm-medium text-gray-800">
                                             {{ $invoice->issuer_name ?? 'Non spécifié' }}
                                             <span class="flex items-center text-sm text-gray-500 group-hover:text-indigo-600 transition">
                                                 {{ $invoice->issuer_website }}
@@ -211,13 +211,18 @@
                                         </p>
                                     </a>
                                 @else
-                                    <div class="p-3 bg-cyan-50 rounded-lg border border-slate-200 flex items-start gap-3">
+                                    <div class="p-3 flex items-start gap-3 bg-cyan-50 rounded-lg border border-slate-200">
                                         <span class="bg-cyan-100 p-1.5 rounded-lg text-cyan-700">
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z"/>
                                             </svg>
                                         </span>
-                                        <p class="font-medium text-gray-800">{{ $invoice->issuer_name ?? 'Non spécifié' }}</p>
+                                        <p class="flex flex-col text-sm-medium text-gray-800">
+                                            {{ $invoice->issuer_name ?? 'Non spécifié' }}
+                                            <span class="text-sm text-gray-500">
+                                                Site non spécifié
+                                            </span>
+                                        </p>
                                     </div>
                                 @endif
                             </div>
@@ -463,7 +468,7 @@
                                 <ul class="pl-1 flex flex-wrap gap-2">
                                     @foreach($invoice->tags as $tag)
                                         <li wire:key="tag-{{ $tag }}">
-                                            <span class="px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center hover:bg-indigo-100 transition">
+                                            <span class="px-3 py-1.5 rounded-lg text-xs-medium bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center hover:bg-indigo-100 transition">
                                                 <x-svg.tag2 class="w-3.5 h-3.5 mr-1.5 text-indigo-600" />
                                                 {{ $tag }}
                                             </span>

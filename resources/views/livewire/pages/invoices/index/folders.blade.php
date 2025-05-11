@@ -1,5 +1,5 @@
 <section class="mb-8">
-    <h3 role="heading" aria-level="3" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">Catégories</h3>
+    <h3 role="heading" aria-level="3" class="mb-3 pl-4 text-md-semibold text-gray-800 dark:text-white">Catégories</h3>
 
     <div class="flex overflow-x-scroll gap-4 scrollbar-hidden">
         @foreach([
@@ -52,8 +52,8 @@
                 <!-- En-tête avec titre et compteur -->
                 <div class="sticky top-0 px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
                     <div class="flex flex-wrap items-center gap-3 pr-8">
-                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">{{ $folderTitle }}</h2>
-                        <span class="inline-flex px-2.5 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-full">
+                        <h2 class="text-xl-semibold text-gray-900 dark:text-white">{{ $folderTitle }}</h2>
+                        <span class="inline-flex px-2.5 py-1 text-xs-medium rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                             {{ count($folderInvoices) }} {{ __('factures') }}
                         </span>
                     </div>
@@ -101,25 +101,25 @@
                                         <div class="grid grid-cols-2 gap-4">
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d\'émission') }}</p>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p class="text-sm-medium text-gray-900 dark:text-white">
                                                     {{ $invoice->dateForHumans($invoice->issued_date) }}
                                                 </p>
                                             </div>
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Montant') }}</p>
-                                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                <p class="text-sm-semibold text-gray-900 dark:text-white">
                                                     {{ $this->formatAmount($invoice->amount, $invoice->currency) }}
                                                 </p>
                                             </div>
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Date d’échéance') }}</p>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white">
+                                                <p class="text-sm-medium text-gray-900 dark:text-white">
                                                     {{ $invoice->dateForHumans($invoice->payment_due_date) }}
                                                 </p>
                                             </div>
                                             <div class="space-y-1">
                                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('Émetteur') }}</p>
-                                                <p class="text-sm font-medium text-gray-900 dark:text-white truncate"
+                                                <p class="text-sm-medium text-gray-900 dark:text-white truncate"
                                                    title="{{ $invoice->issuer_name ?? __('Non spécifié') }}">
                                                     {{ $invoice->issuer_name ?? __('Non spécifié') }}
                                                 </p>
@@ -173,7 +173,7 @@
                         </div>
                         <x-modal.close>
                             <button type="button"
-                                    class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm font-medium transition-colors">
+                                    class="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm-medium transition-colors">
                                 {{ __('Fermer') }}
                             </button>
                         </x-modal.close>

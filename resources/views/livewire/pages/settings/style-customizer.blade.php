@@ -31,7 +31,7 @@
         {{-- Dropdown list --}}
         <x-menu.items>
             <div class="bg-white dark:bg-gray-800 rounded-lg py-1.5 w-full">
-                <h3 class="text-sm font-medium text-gray-800 dark:text-white mb-3 pl-2 pr-4">
+                <h3 class="text-sm-medium text-gray-800 dark:text-white mb-3 pl-2 pr-4">
                     Personnaliser votre interface cher {{ auth()->user()->name ?? 'membre' }}&nbsp;!
                 </h3>
 
@@ -71,7 +71,7 @@
                                 class-not-checked="hover:bg-gray-100 dark:hover:bg-gray-650"
                                 x-transition:enter="transition ease-out"
                             >
-                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">90%</span>
+                                <span class="text-xs-medium text-gray-700 dark:text-gray-300">90%</span>
                             </x-radio-group.option>
 
                             <x-radio-group.option
@@ -81,7 +81,7 @@
                                 class-not-checked="hover:bg-gray-100 dark:hover:bg-gray-650"
                                 x-transition:enter="transition ease-out"
                             >
-                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">100%</span>
+                                <span class="text-xs-medium text-gray-700 dark:text-gray-300">100%</span>
                             </x-radio-group.option>
 
                             <x-radio-group.option
@@ -91,7 +91,7 @@
                                 class-not-checked="hover:bg-gray-100 dark:hover:bg-gray-650"
                                 x-transition:enter="transition ease-out"
                             >
-                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">110%</span>
+                                <span class="text-xs-medium text-gray-700 dark:text-gray-300">110%</span>
                             </x-radio-group.option>
 
                             <x-radio-group.option
@@ -101,7 +101,7 @@
                                 class-not-checked="hover:bg-gray-100 dark:hover:bg-gray-650"
                                 x-transition:enter="transition ease-out"
                             >
-                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300">125%</span>
+                                <span class="text-xs-medium text-gray-700 dark:text-gray-300">125%</span>
                             </x-radio-group.option>
                         </x-radio-group>
                         <p class="mt-2 mx-2 text-xs text-gray-500 dark:text-gray-500 mb-2">Ajustez la taille du contenu selon vos préférences</p>

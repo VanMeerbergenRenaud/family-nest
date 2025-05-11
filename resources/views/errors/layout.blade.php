@@ -14,7 +14,7 @@
 <div class="flex-center flex-col min-h-screen px-8 py-16 bg-gray-200">
     @yield('icon')
 
-    <h1 class="my-8 text-[#CD475E] font-semibold text-8xl tracking-[-0.0625rem]">
+    <h1 class="my-8 text-[#CD475E] display-3xl-semibold tracking-[-0.0625rem]">
         @yield('code')
     </h1>
 
@@ -28,12 +28,12 @@
 
     <div class="mt-12 flex-center flex-col gap-4 md:flex-row">
         <a href="{{ url()->previous() }}"
-           class="flex-center py-3 px-8 gap-2 font-medium rounded-lg bg-gray-100 text-dark hover:bg-gray-50">
+           class="flex-center py-3 px-8 gap-2 text-md-medium rounded-lg bg-gray-100 text-dark hover:bg-gray-50">
             <x-svg.arrow-left/>
             Retour en arrière
         </a>
         <a href="{{ route('dashboard') }}"
-           class="flex-center py-3 px-8 gap-2 font-medium rounded-lg bg-gray-800 text-white hover:bg-gray-900">
+           class="flex-center py-3 px-8 gap-2 text-md-medium rounded-lg bg-gray-800 text-white hover:bg-gray-900">
             Aller à l'accueil
         </a>
     </div>

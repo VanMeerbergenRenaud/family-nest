@@ -60,7 +60,7 @@
                     <x-svg.archive class="w-5 h-5 text-slate-400"/>
                 </div>
 
-                <h3 role="heading" aria-level="3" class="text-lg font-medium text-slate-800 mb-2.5">
+                <h3 role="heading" aria-level="3" class="text-lg-medium text-slate-800 mb-2.5">
                     @if($filterType === 'personal')
                         Aucune facture personnelle archivée
                     @else
@@ -142,7 +142,7 @@
                                         @if($this->hasFamily() && $filterType === 'all')
                                             <td>
                                                 @if($invoice->user_id === auth()->id())
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Vous</span>
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs-medium bg-blue-100 text-blue-800">Vous</span>
                                                 @else
                                                     <span class="text-sm text-gray-600">{{ $invoice->user->name ?? 'Membre' }}</span>
                                                 @endif
@@ -195,7 +195,7 @@
         @if($invoicesByYear->isEmpty())
             <div class="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
                 <x-svg.archive class="w-12 h-12 text-gray-400 mx-auto"/>
-                <h3 role="heading" aria-level="3" class="mt-4 text-lg font-medium text-gray-900">Aucune facture archivée trouvée</h3>
+                <h3 role="heading" aria-level="3" class="mt-4 text-lg-medium text-gray-900">Aucune facture archivée trouvée</h3>
                 <p class="mt-2 text-sm text-gray-500 max-w-md mx-auto">
                     @if($filterType === 'personal')
                         Vous n'avez pas encore archivé de factures personnelles.

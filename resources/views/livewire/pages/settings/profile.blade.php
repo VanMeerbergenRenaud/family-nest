@@ -3,7 +3,7 @@
         {{-- Section Profil --}}
         <section>
             <header class="mb-6">
-                <h2 class="text-xl font-medium text-gray-800 dark:text-gray-100">
+                <h2 class="text-xl-medium text-gray-800 dark:text-gray-100">
                     {{ __('Informations du profil') }}
                 </h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -21,7 +21,7 @@
                             @if($form->avatarUrl)
                                 <img src="{{ $form->avatarUrl }}" alt="Avatar" class="h-full w-full object-cover">
                             @else
-                                <span class="text-zinc-400 text-3xl">{{ substr($form->name, 0, 1) }}</span>
+                                <span class="text-zinc-400 display-sm-regular">{{ substr($form->name, 0, 1) }}</span>
                             @endif
                         </div>
 
@@ -130,7 +130,7 @@
         {{-- Section Mot de passe --}}
         <section class="space-y-4 border-t lg:border-l lg:border-t-0 border-gray-100 dark:border-gray-800 lg:pl-8 pt-8 lg:pt-0">
             <header>
-                <h2 class="text-xl font-medium text-gray-800 dark:text-gray-100">
+                <h2 class="text-xl-medium text-gray-800 dark:text-gray-100">
                     {{ __('Sécurité') }}
                 </h2>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">

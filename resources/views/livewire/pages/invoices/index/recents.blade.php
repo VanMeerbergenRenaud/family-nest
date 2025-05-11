@@ -1,5 +1,5 @@
 <section class="mb-10">
-    <h3 role="heading" aria-level="3" class="pl-4 font-semibold text-gray-800 dark:text-white mb-3">
+    <h3 role="heading" aria-level="3" class="mb-3 pl-4 text-md-semibold text-gray-800 dark:text-white">
         {{ __('Factures récentes') }}
     </h3>
 

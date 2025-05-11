@@ -95,7 +95,7 @@
                                 </td>
                                 <td>
                                     @if($invitation->isExpired())
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs-medium bg-red-100 text-red-800">
                                             Expirée
                                         </span>
                                     @else
@@ -104,11 +104,11 @@
                                 </td>
                                 <td>
                                     @if($invitation->send_failed)
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs-medium bg-red-100 text-red-800">
                                             Échec d'envoi
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs-medium bg-green-100 text-green-800">
                                             Envoyée
                                         </span>
                                     @endif
@@ -493,13 +493,13 @@
                         <div class="grid grid-cols-4 gap-3 mt-4">
                             <!-- Badge Total -->
                             <div class="flex flex-col items-center justify-center py-2.5 px-1 bg-gray-50 rounded-lg border border-gray-100">
-                                <span class="text-lg font-semibold text-gray-800">{{ $selectedUserInvoiceCounts['total'] }}</span>
+                                <span class="text-lg-semibold text-gray-800">{{ $selectedUserInvoiceCounts['total'] }}</span>
                                 <span class="text-xs text-gray-500 mt-0.5">Total</span>
                             </div>
 
                             <!-- Badge Urgent -->
                             <div class="flex flex-col items-center justify-center py-2.5 px-1 bg-amber-50 rounded-lg border border-amber-100 {{ $selectedUserInvoiceCounts['late'] > 0 ? 'opacity-100' : 'opacity-40' }}">
-                                <span class="text-lg font-semibold {{ $selectedUserInvoiceCounts['late'] > 0 ? 'text-amber-700' : 'text-gray-400' }}">
+                                <span class="text-lg-semibold {{ $selectedUserInvoiceCounts['late'] > 0 ? 'text-amber-700' : 'text-gray-400' }}">
                                     {{ $selectedUserInvoiceCounts['late'] }}
                                 </span>
                                 <span class="text-xs {{ $selectedUserInvoiceCounts['late'] > 0 ? 'text-amber-600' : 'text-gray-400' }} mt-0.5">Urgent</span>
@@ -507,7 +507,7 @@
 
                             <!-- Badge À venir -->
                             <div class="flex flex-col items-center justify-center py-2.5 px-1 bg-blue-50 rounded-lg border border-blue-100 {{ $selectedUserInvoiceCounts['unpaid'] > 0 ? 'opacity-100' : 'opacity-40' }}">
-                                <span class="text-lg font-semibold {{ $selectedUserInvoiceCounts['unpaid'] > 0 ? 'text-blue-700' : 'text-gray-400' }}">
+                                <span class="text-lg-semibold {{ $selectedUserInvoiceCounts['unpaid'] > 0 ? 'text-blue-700' : 'text-gray-400' }}">
                                     {{ $selectedUserInvoiceCounts['unpaid'] }}
                                 </span>
                                 <span class="text-xs {{ $selectedUserInvoiceCounts['unpaid'] > 0 ? 'text-blue-600' : 'text-gray-400' }} mt-0.5">À venir</span>
@@ -515,7 +515,7 @@
 
                             <!-- Badge En cours -->
                             <div class="flex flex-col items-center justify-center py-2.5 px-1 bg-green-50 rounded-lg border border-green-100 {{ $selectedUserInvoiceCounts['pending'] > 0 ? 'opacity-100' : 'opacity-40' }}">
-                                <span class="text-lg font-semibold {{ $selectedUserInvoiceCounts['pending'] > 0 ? 'text-green-700' : 'text-gray-400' }}">
+                                <span class="text-lg-semibold {{ $selectedUserInvoiceCounts['pending'] > 0 ? 'text-green-700' : 'text-gray-400' }}">
                                     {{ $selectedUserInvoiceCounts['pending'] }}
                                 </span>
                                 <span class="text-xs {{ $selectedUserInvoiceCounts['pending'] > 0 ? 'text-green-600' : 'text-gray-400' }} mt-0.5">En cours</span>
@@ -644,7 +644,7 @@
 
                     <div class="p-6">
                         <!-- Titre et Description -->
-                        <h2 role="heading" aria-level="2" class="text-xl font-semibold">Créer une famille</h2>
+                        <h2 role="heading" aria-level="2" class="text-xl-semibold">Créer une famille</h2>
                         <p class="text-gray-500 text-sm mt-1 mb-2">
                             Pour commencer à gérer vos dépenses ensemble
                         </p>
@@ -701,7 +701,7 @@
                                          alt="Exemple de 3 avatars"
                                          class="h-16 w-auto rounded-full object-cover bg-transparent">
                                 </div>
-                                <h2 role="heading" aria-level="2" class="text-2xl font-semibold">Inviter un membre</h2>
+                                <h2 role="heading" aria-level="2" class="display-xs-semibold">Inviter un membre</h2>
                                 <p class="text-gray-600 dark:text-gray-400 px-4 lg:px-12">
                                     Invitez un membre de votre famille ou un proche pour mieux gérer vos dépenses
                                     ensemble.

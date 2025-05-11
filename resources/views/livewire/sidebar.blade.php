@@ -15,7 +15,7 @@
                class="flex items-center justify-start"
                wire:navigate>
                 <x-app.logo class="w-6 h-6"/>
-                <span class="ml-4 text-xl font-bold text-gray-900 dark:text-white">
+                <span class="ml-4 text-xl-bold text-gray-900 dark:text-white">
                     FamilyNest
                 </span>
             </a>
@@ -83,7 +83,7 @@
                 >
                     <x-app.logo class="w-6 h-6"/>
                     @if($expanded)
-                        <span class="ml-4 text-xl font-bold text-gray-900 dark:text-white">FamilyNest</span>
+                        <span class="ml-4 text-xl-bold text-gray-900 dark:text-white">FamilyNest</span>
                     @else
                         <div x-cloak x-show="showTooltip">
                             <x-tooltip

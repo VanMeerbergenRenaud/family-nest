@@ -89,7 +89,7 @@
         </div>
 
         @error($model)
-        <ul class="my-2 flex flex-col gap-2 font-medium text-red-500 dark:text-red-400">
+        <ul class="my-2 flex flex-col gap-2">
             @foreach ($errors->get($model) as $error)
                 <li class="pl-2 pr-1 text-sm-medium text-red-500 dark:text-red-400">{{ $error }}</li>
             @endforeach

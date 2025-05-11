@@ -75,14 +75,14 @@
                     @foreach (range(1, $lastPage) as $page)
                         <span wire:key="paginator-{{ $paginator->getPageName() }}-page{{ $page }}">
                             @if ($page == $currentPage)
-                                <span aria-current="page" class="flex items-center justify-center w-8 h-8 text-sm-medium text-white bg-gray-800 dark:bg-gray-600 rounded-lg">
+                                <span aria-current="page" class="flex-center w-8 h-8 text-sm-medium text-white bg-gray-800 dark:bg-gray-600 rounded-lg">
                                     {{ $page }}
                                 </span>
                             @else
                                 <button
                                     wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')"
                                     x-on:click="{{ $scrollIntoViewJsSnippet }}"
-                                    class="flex items-center justify-center w-8 h-8 text-sm-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150"
+                                    class="flex-center w-8 h-8 text-sm-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150"
                                     aria-label="{{ __('Aller à la page :page', ['page' => $page]) }}"
                                 >
                                     {{ $page }}
@@ -96,7 +96,7 @@
                         <button
                             wire:click="gotoPage(1, '{{ $paginator->getPageName() }}')"
                             x-on:click="{{ $scrollIntoViewJsSnippet }}"
-                            class="flex items-center justify-center w-8 h-8 text-sm-medium {{ $currentPage == 1 ? 'text-white bg-gray-800 dark:bg-gray-600 rounded-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150' }}"
+                            class="flex-center w-8 h-8 text-sm-medium {{ $currentPage == 1 ? 'text-white bg-gray-800 dark:bg-gray-600 rounded-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150' }}"
                             aria-label="{{ __('Aller à la page 1') }}"
                         >
                             1
@@ -105,7 +105,7 @@
 
                     {{-- Dots --}}
                     @if ($currentPage > $windowSize + 2)
-                        <span aria-disabled="true" class="flex items-center justify-center w-8 h-8 text-sm-medium text-gray-400">
+                        <span aria-disabled="true" class="flex-center w-8 h-8 text-sm-medium text-gray-400">
                             ...
                         </span>
                     @endif
@@ -115,14 +115,14 @@
                         <span wire:key="paginator-{{ $paginator->getPageName() }}-page{{ $page }}">
                             @if ($page == $currentPage)
                                 <span aria-current="page"
-                                      class="flex items-center justify-center w-8 h-8 text-sm-medium text-white bg-gray-800 dark:bg-gray-600 rounded-lg">
+                                      class="flex-center w-8 h-8 text-sm-medium text-white bg-gray-800 dark:bg-gray-600 rounded-lg">
                                     {{ $page }}
                                 </span>
                             @else
                                 <button
                                     wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')"
                                     x-on:click="{{ $scrollIntoViewJsSnippet }}"
-                                    class="flex items-center justify-center w-8 h-8 text-sm-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150"
+                                    class="flex-center w-8 h-8 text-sm-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150"
                                     aria-label="{{ __('Aller à la page :page', ['page' => $page]) }}"
                                 >
                                     {{ $page }}
@@ -133,7 +133,7 @@
 
                     {{-- Dots --}}
                     @if ($currentPage < $lastPage - $windowSize - 1)
-                        <span aria-disabled="true" class="flex items-center justify-center w-8 h-8 text-sm-medium text-gray-400">
+                        <span aria-disabled="true" class="flex-center w-8 h-8 text-sm-medium text-gray-400">
                             ...
                         </span>
                     @endif
@@ -144,7 +144,7 @@
                             <button
                                 wire:click="gotoPage({{ $lastPage }}, '{{ $paginator->getPageName() }}')"
                                 x-on:click="{{ $scrollIntoViewJsSnippet }}"
-                                class="flex items-center justify-center w-8 h-8 text-sm-medium {{ $currentPage == $lastPage ? 'text-white bg-gray-800 dark:bg-gray-600 rounded-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150' }}"
+                                class="flex-center w-8 h-8 text-sm-medium {{ $currentPage == $lastPage ? 'text-white bg-gray-800 dark:bg-gray-600 rounded-lg' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-gray-200 rounded-lg transition-colors duration-150' }}"
                                 aria-label="{{ __('Aller à la page :page', ['page' => $lastPage]) }}"
                             >
                                 {{ $lastPage }}

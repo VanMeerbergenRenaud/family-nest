@@ -5,7 +5,7 @@
             <div>
                 <h3 class="text-sm-medium text-gray-600">Montant total</h3>
                 <div class="flex items-center gap-2 mt-3">
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span class="display-xs-bold text-gray-900">
                         {{ number_format($this->statistics['totalAmount'], 2, ',', ' ') }} €
                     </span>
                 </div>
@@ -28,7 +28,7 @@
             <div>
                 <h3 class="text-sm-medium text-gray-600">Montant en retard</h3>
                 <div class="flex items-center gap-2 mt-3">
-                    <span class="text-2xl font-bold {{ $this->statistics['overdueAmount'] > 0 ? 'text-rose-600' : 'text-gray-900' }}">
+                    <span class="display-xs-bold {{ $this->statistics['overdueAmount'] > 0 ? 'text-rose-600' : 'text-gray-900' }}">
                         {{ number_format($this->statistics['overdueAmount'], 2, ',', ' ') }} €
                     </span>
                 </div>
@@ -54,7 +54,7 @@
             <div>
                 <h3 class="text-sm-medium text-gray-600">Échéances du mois</h3>
                 <div class="flex items-center gap-2 mt-3">
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span class="display-xs-bold text-gray-900">
                         {{ number_format($this->statistics['thisMonthAmount'], 2, ',', ' ') }} €
                     </span>
                 </div>
@@ -78,7 +78,7 @@
             <div>
                 <h3 class="text-sm-medium text-gray-600">À payer prochainement</h3>
                 <div class="flex items-baseline gap-2 mt-3">
-                    <span class="text-2xl font-bold text-gray-900">
+                    <span class="display-xs-bold text-gray-900">
                         {{ $this->statistics['upcomingDueCount'] }}
                     </span>
                     <span class="text-sm text-gray-600 font-medium">

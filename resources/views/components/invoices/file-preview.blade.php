@@ -57,10 +57,9 @@
             @endif
         {{-- Aperçu pour les fichiers DOCX --}}
         @elseif ($fileInfo['isDocx'] ?? false)
-            {{-- Code existant inchangé --}}
             <div class="px-4 mb-4 text-center">
-                <div class="p-5 text-gray-700 text-md-medium border border-slate-200 rounded-lg bg-slate-100">
-                    <p class="mb-2.5 font-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
+                <div class="p-5 text-gray-700 border border-slate-200 rounded-lg bg-slate-100">
+                    <p class="mb-2.5 text-md-medium text-slate-700">Aperçu non disponible pour les fichiers Word</p>
                     <p class="text-sm text-slate-500">
                         @if($storagePath)
                             Le fichier a été traité et sauvegardé

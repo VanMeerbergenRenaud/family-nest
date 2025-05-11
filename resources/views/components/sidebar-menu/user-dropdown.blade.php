@@ -23,7 +23,7 @@
             @if($expanded)
                 {{-- Name and email --}}
                 <div class="grid flex-1 text-left text-sm leading-tight">
-                    <span class="truncate text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                    <span class="truncate text-sm-semibold text-gray-900 dark:text-white capitalize">
                         {{ $user->name ?? 'Nom inconnu' }}
                     </span>
                     <span class="truncate text-xs text-gray-500 dark:text-gray-400 lowercase">
