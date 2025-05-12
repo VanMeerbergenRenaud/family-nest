@@ -61,7 +61,7 @@
             <div class="text-sm-regular text-center text-dark-gray">
                 {{ __("Pas encore membre ?") }}
                 <a href="{{ route('register') }}"
-                   class="text-sm-medium text-black custom-underline-link"
+                   class="text-sm-medium text-black link-underline"
                    title="Vers la page de connexion"
                    wire:navigate
                 >

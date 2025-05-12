@@ -3,7 +3,7 @@
         title="Aucun objectif n'a été crée jusqu'à présent"
         description="Vous êtes déterminé à mieux gérer vos finances et vos factures ? N’hésitez pas à vous fixer des objectifs, que ce soit pour vos types de dépenses, vos dépenses globales ou pour mieux gérer votre budget mensuel."
     >
-        <a href="{{ route('goals') }}" class="button-tertiary isDisabled" title="Vers la page des objectifs">
+        <a href="{{ route('goals') }}" class="button-tertiary link-disabled" title="Vers la page des objectifs">
             <x-svg.target class="text-white" />
             Se fixer un objectif
         </a>

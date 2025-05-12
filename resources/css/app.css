@@ -11,27 +11,16 @@
     /*--font-clashgrotesk: "Clash Grotesk", sans-serif;
     --font-instrumentsans: "Instrument Sans", sans-serif;*/
 
-    --color-light-white: #fafafa;
-    --color-blue-dark: #364153;
     --color-dark: #334054;
-
-    /* Tables */
-    --color-headerTable: #465467;
-
-    --color-border-gray: #E2E2E2;
-    --color-border-link: #d0d5dd;
-    --color-border-focus: #33b0e0;
-
-    --color-bg-dark: #1E2030;
 }
 
 @layer base {
     body {
-        @apply mx-auto p-0 relative flex flex-col h-screen min-h-screen max-w-[160rem] text-base font-normal scroll-smooth antialiased bg-gray-50 dark:bg-bg-dark text-black dark:text-white;
+        @apply mx-auto p-0 relative flex flex-col h-screen min-h-screen max-w-[160rem] text-base font-normal scroll-smooth antialiased bg-gray-50 dark:bg-gray-800 text-black dark:text-white;
     }
 
     main {
-        @apply m-0 p-0 bg-gray-50 dark:bg-bg-dark;
+        @apply m-0 p-0 bg-gray-50 dark:bg-gray-800;
     }
 
     h1, h2, h3, h4, h5, h6 {/*font-clashgrotesk*/
@@ -121,8 +110,55 @@
         }
     }
 
+    /* Invalid state */
+    .input-invalid {
+        @apply outline-2 outline-red-600 dark:outline-red-400 outline-offset-2 rounded-md;
+    }
+
+    /* Links
+        1. Custom underline link
+        2. Disabled state
+    */
+
+    .link-underline {
+        @apply relative transition-all ease-in-out rounded-md;
+
+        /* Styles 'before' (1ère partie du soulignement) */
+        @apply before:transition-[width]
+        before:ease-in-out
+        before:duration-400
+        before:absolute
+        before:bg-gray-600
+        before:origin-center
+        before:h-[0.1rem]
+        before:w-0
+        before:bottom-[-2px]
+        before:left-[50%]
+        before:rounded-r-lg;
+
+        /* Styles 'after' (2ème partie du soulignement) */
+        @apply after:rounded-l-lg
+        after:transition-[width]
+        after:ease-in-out
+        after:duration-400
+        after:absolute
+        after:bg-gray-600
+        after:origin-center
+        after:h-[0.1rem]
+        after:w-0
+        after:bottom-[-2px]
+        after:right-[50%];
+
+        /* Styles hover */
+        @apply hover:before:w-[50%] hover:after:w-[50%];
+    }
+
+    .link-disabled {
+        @apply opacity-50 cursor-not-allowed;
+    }
+
     /* Buttons
-        0. Classic => hover:bg-gray-200
+        0. Classic => transparent/gray
         1. Primary => white
         2. Secondary => gray
         3. Tertiary => indigo
@@ -159,64 +195,12 @@
         @apply flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full text-gray-700 transition-colors;
     }
 
-    /* Basic border */
-    .border-gray {
-        @apply border-[#E2E2E2] dark:border-b-gray-500;
-    }
+    /* Fonts
+        1. Display (3xl, 2xl, xl, lg, md, sm, xs)
+        2. Text (xl, lg, md, sm, xs)
+    */
 
-    .isDisabled {
-        @apply opacity-50 cursor-not-allowed;
-    }
-
-    /* Input invalid */
-    .input-invalid {
-        @apply outline-2 outline-red-600 dark:outline-red-400 outline-offset-2 rounded-md;
-    }
-
-    /* Hide scrollbar for Chrome, Safari and Opera */
-    .scrollbar-hidden::-webkit-scrollbar {
-        display: none;
-    }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .scrollbar-hidden {
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
-    }
-
-    /* Effet de surlignement custom */
-    .custom-underline-link {
-        @apply relative transition-all ease-in-out rounded-md;
-
-        /* Styles 'before' (1ère partie du soulignement) */
-        @apply before:transition-[width]
-        before:ease-in-out
-        before:duration-400
-        before:absolute
-        before:bg-gray-600
-        before:origin-center
-        before:h-[0.1rem]
-        before:w-0
-        before:bottom-[-2px]
-        before:left-[50%]
-        before:rounded-r-lg;
-
-        /* Styles 'after' (2ème partie du soulignement) */
-        @apply after:rounded-l-lg
-        after:transition-[width]
-        after:ease-in-out
-        after:duration-400
-        after:absolute
-        after:bg-gray-600
-        after:origin-center
-        after:h-[0.1rem]
-        after:w-0
-        after:bottom-[-2px]
-        after:right-[50%];
-
-        /* Styles hover */
-        @apply hover:before:w-[50%] hover:after:w-[50%];
-    }
-
+    /*---------- 1. Display ----------*/
     .display-3xl-semibold {
         @apply text-8xl leading-[5.75rem] tracking-[-0.02em] font-semibold;
         /* 80px / 92px / -2% / Semibold */
@@ -342,6 +326,7 @@
         /* 24px / 32px / Bold */
     }
 
+    /*---------- 2. Text ----------*/
     .text-xl-regular {
         @apply text-xl leading-normal font-normal;
         /* 20px / 30px / Regular */
@@ -448,6 +433,9 @@
 }
 
 @utility scrollbar-hidden {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+
     &::-webkit-scrollbar {
         display: none;
     }
