@@ -76,6 +76,12 @@ class Edit extends Component
         $this->initializeTagManagement();
     }
 
+    public function hydrate()
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
     public function updateInvoice(FileStorageService $fileStorageService): void
     {
         $this->validateShares();

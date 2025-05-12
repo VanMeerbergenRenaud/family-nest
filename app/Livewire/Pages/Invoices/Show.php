@@ -51,13 +51,11 @@ class Show extends Component
     #[On('invoice-deleted')]
     #[On('invoices-bulk-archived')]
     #[On('invoices-bulk-updated')]
-    public function refreshShow(): void
-    {
-    }
+    public function refreshShow(): void {}
 
     private function prepareSharesData(): void
     {
-        $this->form = (object)[
+        $this->form = (object) [
             'amount' => $this->invoice->amount ?? 0,
             'currency' => $this->invoice->currency ?? 'EUR',
             'family_id' => $this->invoice->family_id,
@@ -67,7 +65,7 @@ class Show extends Component
 
     private function prepareShares(): void
     {
-        if (!$this->invoice->sharedUsers->isEmpty()) {
+        if (! $this->invoice->sharedUsers->isEmpty()) {
             foreach ($this->invoice->sharedUsers as $user) {
                 $this->form->user_shares[] = [
                     'id' => $user->id,

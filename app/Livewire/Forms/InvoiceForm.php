@@ -152,8 +152,9 @@ class InvoiceForm extends Form
 
             // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',
-            'tags' => 'nullable|array',
-            'tagInput' => 'nullable|string',
+            'tags' => 'nullable|array|max:10',
+            'tags.*' => 'alpha', // chaque tag ne contient que des lettres
+            'tagInput' => 'nullable|string|alpha|max:15', // tag en cours ne contient que des lettres
 
             // États
             'is_archived' => 'boolean',
@@ -188,6 +189,11 @@ class InvoiceForm extends Form
             'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
             'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
             'tags.array' => 'Les tags doivent être un tableau.',
+            'tags.max' => 'Vous ne pouvez pas ajouter plus de 10 tags.',
+            'tags.*.alpha' => 'Les tags ne peuvent contenir que des lettres.',
+            'tags.*.max' => 'Chaque tag ne peut pas dépasser 15 caractères.',
+            'tagInput.alpha' => 'Les tags ne peuvent contenir que des lettres.',
+            'tagInput.max' => 'Un tag ne peut pas dépasser 15 caractères.',
         ];
     }
 

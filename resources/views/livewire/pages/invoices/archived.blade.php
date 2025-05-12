@@ -235,9 +235,9 @@
                             <div class="flex gap-x-6 p-8">
                                 <x-svg.advertising/>
                                 <div>
-                                    <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                    <h2 role="heading" aria-level="2" class="mb-4 text-xl-semibold">
                                         {{ __('Supprimer les archives') }}
-                                    </h3>
+                                    </h2>
                                     <p class="mt-2 text-md-regular text-gray-500">
                                         @php
                                             $message = 'Êtes-vous sûr de vouloir supprimer définitivement toutes les factures archivées';

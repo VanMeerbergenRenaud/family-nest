@@ -2,9 +2,9 @@
 
 namespace App\Traits\Invoice;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Masmerise\Toaster\Toaster;
 
 trait TagManagement
 {
@@ -23,13 +23,37 @@ trait TagManagement
     {
         $tag = trim($this->form->tagInput ?? '');
 
-        if (! empty($tag)) {
-            $this->addTagToForm($tag);
+        if (empty($tag)) {
+            return;
         }
-    }
 
-    private function resetTagInput(): void
-    {
+        // Vérifier que le tag contient uniquement des lettres
+        if (! preg_match('/^[a-zA-Z]+$/', $tag)) {
+            Toaster::error('Le tag ne peut contenir que des lettres.');
+
+            return;
+        }
+
+        // Vérifier la longueur maximale (15 caractères)
+        if (strlen($tag) > 15) {
+            Toaster::error('Le tag ne peut pas dépasser 15 caractères.');
+
+            return;
+        }
+
+        // Vérifier le nombre maximum de tags (10)
+        if (count($this->form->tags) >= 10) {
+            Toaster::error('Vous ne pouvez pas ajouter plus de 10 tags.');
+
+            return;
+        }
+
+        // Vérifier si le tag existe déjà (insensible à la casse)
+        if (! in_array(strtolower($tag), array_map('strtolower', $this->form->tags))) {
+            $this->form->tags[] = $tag;
+        }
+
+        // Réinitialiser l'input
         $this->form->tagInput = '';
         $this->tagSuggestions = [];
         $this->showTagSuggestions = false;
@@ -45,12 +69,11 @@ trait TagManagement
 
     public function updatedFormTagInput(): void
     {
-        $this->tagSuggestions = [];
         $input = trim($this->form->tagInput ?? '');
 
-        // Ne pas chercher si la saisie est trop courte
         if (strlen($input) < 1) {
             $this->showTagSuggestions = false;
+            $this->tagSuggestions = [];
 
             return;
         }
@@ -59,13 +82,16 @@ trait TagManagement
         $this->showTagSuggestions = count($this->tagSuggestions) > 0;
     }
 
+    public function selectTag($tag): void
+    {
+        $this->form->tagInput = $tag;
+        $this->addTag();
+    }
+
     private function searchTagsInDatabase(string $query): array
     {
         try {
-            if (empty($query)) {
-                return [];
-            }
-
+            // Rechercher les tags qui correspondent à la requête
             $invoices = DB::table('invoices')
                 ->where('user_id', auth()->id())
                 ->whereJsonLength('tags', '>', 0)
@@ -76,85 +102,38 @@ trait TagManagement
                 return [];
             }
 
-            $allTags = $this->extractUniqueMatchingTags($invoices, $query);
+            // Extraire tous les tags correspondants
+            $allTags = [];
+            $userTags = array_map('strtolower', $this->form->tags ?? []);
 
-            $selectedTags = array_map('strtolower', $this->form->tags ?? []);
+            foreach ($invoices as $invoice) {
+                try {
+                    $tags = json_decode($invoice->tags, true);
 
-            return array_values(array_filter($allTags, function ($tag) use ($selectedTags) {
-                return ! in_array(strtolower($tag), $selectedTags);
-            }));
+                    if (! is_array($tags)) {
+                        continue;
+                    }
+
+                    foreach ($tags as $tag) {
+                        // Filtrer les tags valides qui contiennent la requête et qui ne sont pas déjà sélectionnés
+                        if (is_string($tag) &&
+                            stripos($tag, $query) !== false &&
+                            preg_match('/^[a-zA-Z]+$/', $tag) &&
+                            strlen($tag) <= 15 &&  // S'assurer que le tag ne dépasse pas 15 caractères
+                            ! in_array(strtolower($tag), $userTags)) {
+                            $allTags[] = $tag;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    continue;
+                }
+            }
+
+            return array_values(array_unique($allTags));
         } catch (\Exception $e) {
             Log::error('Erreur lors de la recherche de tags : '.$e->getMessage());
 
             return [];
         }
-    }
-
-    private function extractUniqueMatchingTags(Collection $invoices, string $query): array
-    {
-        $allTags = [];
-
-        foreach ($invoices as $invoice) {
-            try {
-                $tags = $this->parseJsonTags($invoice->tags);
-
-                foreach ($tags as $tag) {
-                    if (is_string($tag) && stripos($tag, $query) !== false) {
-                        $allTags[] = $tag;
-                    }
-                }
-            } catch (\Exception $e) {
-                Log::warning('Erreur de décodage JSON pour les tags: '.$e->getMessage());
-
-                continue;
-            }
-        }
-
-        return array_unique($allTags);
-    }
-
-    private function parseJsonTags(?string $tagsJson): array
-    {
-        if (empty($tagsJson)) {
-            return [];
-        }
-
-        if (str_starts_with($tagsJson, '"') && str_ends_with($tagsJson, '"')) {
-            $tagsJson = substr($tagsJson, 1, -1);
-        }
-
-        $tagsJson = str_replace('\\', '', $tagsJson);
-
-        $tagsArray = json_decode($tagsJson, true);
-
-        if (! is_array($tagsArray)) {
-            $tagsArray = json_decode($tagsJson, true);
-        }
-
-        return is_array($tagsArray) ? $tagsArray : [];
-    }
-
-    public function selectTag($tag): void
-    {
-        $this->addTagToForm($tag);
-    }
-
-    private function addTagToForm(string $tag): void
-    {
-        $lowerTag = strtolower($tag);
-        $exists = false;
-
-        foreach ($this->form->tags as $existingTag) {
-            if (strtolower($existingTag) === $lowerTag) {
-                $exists = true;
-                break;
-            }
-        }
-
-        if (! $exists) {
-            $this->form->tags[] = $tag;
-        }
-
-        $this->resetTagInput();
     }
 }

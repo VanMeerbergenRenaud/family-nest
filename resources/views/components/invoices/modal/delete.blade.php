@@ -19,9 +19,9 @@
                             <x-svg.advertising/>
 
                             <div>
-                                <h3 role="heading" aria-level="3" class="mb-4 text-xl-semibold">
+                                <h4 role="heading" aria-level="4" class="mb-4 text-xl-semibold">
                                     {{ __('Supprimer la facture') }}
-                                </h3>
+                                </h4>
                                 <p class="mt-2 text-md-regular text-gray-500">
                                     {{ __('Êtes-vous sûre de vouloir supprimer la facture') }}
                                     <strong class="font-semibold"> {{ $invoice->name ?? '' }}&nbsp;?</strong>

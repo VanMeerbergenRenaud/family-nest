@@ -41,21 +41,55 @@
                     {{-- Avatar upload --}}
                     <div class="flex flex-col gap-3 w-full">
                         @error('form.avatar')
-                        <p class="py-3 px-4 max-md:mb-4 rounded-lg border-red-100 bg-red-100 text-sm-medium text-red-500">
-                            {{ $message }}
-                        </p>
+                            <p class="py-3 px-4 max-md:mb-4 rounded-lg border-red-100 bg-red-100 text-sm-medium text-red-500">
+                                {{ $message }}
+                            </p>
                         @else
                             <p class="px-2 text-sm text-gray-500 dark:text-gray-400">
                                 {{ __('Sélectionnez une image pour votre photo de profil.') }}
                             </p>
-                            @enderror
+                        @enderror
 
                             <div class="flex flex-wrap gap-4">
-                                <label for="avatar" class="button-primary cursor-pointer">
-                                    <x-svg.file.img class="mr-1" />
-                                    {{ __('Choisir une photo de profil') }}
-                                </label>
-                                <input id="avatar" type="file" wire:model="form.avatar" class="sr-only" accept="image/jpg,image/jpeg,image/png" />
+
+                                <div x-data="{
+                                    fileError: null,
+                                    maxSizeBytes: 5 * 1024 * 1024,
+
+                                    validateFile(event) {
+                                        const file = event.target.files[0];
+                                        if (!file) return true;
+
+                                        if (file.size > this.maxSizeBytes) {
+                                            this.fileError = `Le fichier est trop volumineux (${(file.size / (1024 * 1024)).toFixed(2)} Mo). Maximum 5 Mo.`;
+                                            this.resetFile(event.target);
+                                            return false;
+                                        }
+
+                                        this.fileError = null;
+                                        return true;
+                                    },
+
+                                    resetFile(input) {
+                                        input.value = '';
+                                        $wire.set('form.avatar', null);
+                                    }
+                                }">
+                                    <label for="avatar" class="button-primary cursor-pointer">
+                                        <x-svg.file.img class="mr-1" />
+                                        {{ __('Choisir une photo de profil') }}
+                                    </label>
+                                    <input
+                                        id="avatar"
+                                        type="file"
+                                        wire:model="form.avatar"
+                                        @change="validateFile($event)"
+                                        class="sr-only"
+                                        accept="image/jpg,image/jpeg,image/png"
+                                    />
+
+                                    <div x-show="fileError" x-cloak class="mt-2 px-3 py-2 bg-red-100 text-red-800 text-xs rounded-md" x-text="fileError"></div>
+                                </div>
 
                                 @if($form->avatarUrl)
                                     <button type="button" wire:click="deleteAvatar" class="button-classic group">
@@ -66,7 +100,7 @@
                             </div>
 
                             <p class="pl-2 text-xs text-gray-500">
-                                {{ __('JPG, JPEG, PNG · Max: 1MB') }}
+                                {{ __('JPG, JPEG, PNG · Max: 5MB') }}
                             </p>
                     </div>
                 </div>

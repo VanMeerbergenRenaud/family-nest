@@ -22,13 +22,14 @@
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
                  alt="Aperçu de la facture"
+                 wire:ignore
                  class="bg-gray-100 rounded-lg min-h-[60vh]"
             />
         {{-- Les autres types de fichiers inchangés... --}}
         @elseif ($fileInfo['isPdf'] ?? false)
             {{-- Code existant inchangé --}}
             @if($temporaryUrl || $storagePath)
-                <div class="w-full h-full overflow-hidden rounded-lg">
+                <div wire:ignore class="w-full h-full overflow-hidden rounded-lg">
                     <object
                         id="pdf-viewer"
                         width="100%"

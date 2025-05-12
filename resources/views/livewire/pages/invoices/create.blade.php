@@ -343,7 +343,7 @@
                                 <span class="absolute left-1/2 -translate-x-1/2 bottom-full z-10 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 px-3 py-1.5 flex gap-2 bg-gray-700 text-white rounded-md whitespace-nowrap pointer-events-none">
                                      <x-svg.info class="mt-0.5 text-white w-3 h-3" />
                                     <span class="text-xs text-left max-w-xs">Cette action valide toutes les étapes et<br>enregistre la facture si il n'y a pas d'erreur.</span>
-                              </span>
+                                </span>
                             </button>
                             <button type="button" x-show="currentStep < steps.length" @click="nextStep" class="button-secondary">
                                 Suivant
