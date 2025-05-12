@@ -140,9 +140,31 @@ class InvoiceForm extends Form
             'user_shares.*.percentage' => 'nullable|numeric|min:0|max:100',
 
             // Étape 3 - Dates
-            'issued_date' => 'nullable|date',
-            'payment_due_date' => 'nullable|date',
-            'payment_reminder' => 'nullable|date',
+            'issued_date' => 'nullable|date|after_or_equal:2020-01-01',
+            'payment_due_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:2020-01-01',
+                function ($attribute, $value, $fail) {
+                    if (!empty($value) && !empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
+                        $fail("La date d'échéance ne peut pas être antérieure à la date d'émission.");
+                    }
+                },
+            ],
+            'payment_reminder' => [
+                'nullable',
+                'date',
+                'after_or_equal:2020-01-01',
+                function ($attribute, $value, $fail) {
+                    if (!empty($value) && !empty($this->payment_due_date) && strtotime($value) > strtotime($this->payment_due_date)) {
+                        $fail("La date de rappel ne peut pas être postérieure à la date d'échéance.");
+                    } elseif (!empty($value) && !empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
+                        $fail("La date de rappel ne peut pas être antérieure à la date d'émission.");
+                    } elseif (!empty($value) && strtotime($value) < strtotime(now())) {
+                        $fail("La date de rappel ne peut pas être dans le passé.");
+                    }
+                },
+            ],
             'payment_frequency' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, PaymentFrequencyEnum::cases())),
 
             // Étape 4 - Statut de paiement
@@ -183,8 +205,9 @@ class InvoiceForm extends Form
             'family_id.exists' => 'La famille sélectionnée n\'existe pas.',
             'user_shares.*.amount' => 'Le montant de la part doit être un nombre valide.',
             'user_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
-            'issued_date.date' => "La date d'émission doit être une date valide.",
-            'payment_due_date.date' => "La date d'échéance doit être une date valide.",
+            'issued_date.after_or_equal' => "La date d'émission ne peut pas être antérieure à 2020.",
+            'payment_due_date.after_or_equal' => "La date d'échéance ne peut pas être antérieure à 2020.",
+            'payment_reminder.after_or_equal' => "La date de rappel ne peut pas être antérieure à 2020.",
             'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
             'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
             'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',

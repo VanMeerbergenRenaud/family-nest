@@ -245,7 +245,10 @@
                             </x-form.select>
 
                             {{-- Toggle pour le rappel de paiement --}}
-                            <div x-data="{ showReminder: false }" class="relative mb-24 lg:mt-6  h-fit p-3 bg-white border border-slate-200 rounded-lg">
+                            <div
+                                x-data="{ showReminder: false }"
+                                class="relative lg:mt-6  h-fit p-3 bg-white border border-slate-200 rounded-lg"
+                            >
                                 <div class="flex items-center">
                                     <x-form.checkbox-input
                                         label="Ajouter un rappel de paiement"
@@ -256,7 +259,7 @@
                                 </div>
 
                                 {{-- Utilisation de x-menu pour afficher l'input en position absolue --}}
-                                <div x-show="showReminder" x-cloak class="p-2 absolute left-0 mt-6 bg-white border border-slate-200 rounded-lg w-full z-10">
+                                <div x-show="showReminder" x-cloak x-transition class="p-2 mt-4 bg-gray-50 border border-slate-200 rounded-lg w-full">
                                     <x-form.field-date
                                         label="Rappel de paiement"
                                         name="form.payment_reminder"
