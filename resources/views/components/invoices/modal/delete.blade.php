@@ -6,17 +6,17 @@
 ])
 
 <div>
+    <x-loader.spinner target="deleteDefinitelyInvoice" />
+
     @if($showDeleteFormModal)
         <x-modal wire:model="showDeleteFormModal">
             <x-modal.panel>
                 <form wire:submit.prevent="deleteDefinitelyInvoice">
                     @csrf
 
-                    <x-loader.spinner target="deleteDefinitelyInvoice" />
-
                     <div x-data="{ confirmation: '' }">
                         <div class="flex gap-x-6 p-8">
-                            <x-svg.advertising/>
+                            <x-svg.advertising />
 
                             <div>
                                 <h4 role="heading" aria-level="4" class="mb-4 text-xl-semibold">
