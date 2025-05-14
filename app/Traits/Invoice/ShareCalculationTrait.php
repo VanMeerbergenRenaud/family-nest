@@ -56,6 +56,8 @@ trait ShareCalculationTrait
                 // Calculer le montant à partir du pourcentage
                 if ($invoiceAmount > 0) {
                     $this->form->user_shares[$userIndex]['amount'] = $this->calculateAmountFromPercentage($value);
+                } else {
+                    $this->form->user_shares[$userIndex]['amount'] = 0;
                 }
             } else {
                 // Limiter le montant au montant total de la facture maximum
@@ -65,22 +67,25 @@ trait ShareCalculationTrait
                 // Calculer le pourcentage à partir du montant
                 if ($invoiceAmount > 0) {
                     $this->form->user_shares[$userIndex]['percentage'] = $this->calculatePercentageFromAmount($value);
+                } else {
+                    $this->form->user_shares[$userIndex]['percentage'] = 0;
                 }
             }
         } else {
-            // Ajouter une nouvelle part
+            // Ajouter une nouvelle part initialisée à 0
             $newShare = [
                 'id' => $userId,
-                'amount' => 0,
-                'percentage' => 0,
+                'amount',
+                'percentage',
             ];
 
+            // Mettre à jour avec la valeur fournie
             if ($type === 'percentage') {
-                $value = min(100, max(0, $value)); // Limiter entre 0 et 100
+                $value = min(100, max(0, $value));
                 $newShare['percentage'] = $value;
                 $newShare['amount'] = $invoiceAmount > 0 ? $this->calculateAmountFromPercentage($value) : 0;
             } else {
-                $value = min($invoiceAmount, max(0, $value)); // Limiter entre 0 et montant max
+                $value = min($invoiceAmount, max(0, $value));
                 $newShare['amount'] = $value;
                 $newShare['percentage'] = $invoiceAmount > 0 ? $this->calculatePercentageFromAmount($value) : 0;
             }
@@ -96,10 +101,14 @@ trait ShareCalculationTrait
      */
     public function removeShare(int $userId): void
     {
-        $this->form->user_shares = array_values(array_filter(
-            $this->form->user_shares ?? [],
-            fn ($share) => $share['id'] != $userId
-        ));
+        // Trouver l'index de la part à supprimer
+        $shareIndex = $this->findShareIndex($userId);
+
+        // Supprimer la part
+        if ($shareIndex !== false) {
+            unset($this->form->user_shares[$shareIndex]);
+            $this->form->user_shares = array_values($this->form->user_shares); // Réindexer le tableau
+        }
 
         $this->calculateRemainingShares();
     }
@@ -118,9 +127,16 @@ trait ShareCalculationTrait
             return;
         }
 
-        // Réinitialiser les parts pour une distribution équitable
+        // Réinitialiser complètement les parts avant une nouvelle distribution
         $this->form->user_shares = [];
         $invoiceAmount = floatval($this->form->amount ?? 0);
+
+        // Ne rien faire si le montant est nul
+        if ($invoiceAmount <= 0) {
+            $this->calculateRemainingShares();
+
+            return;
+        }
 
         if ($this->shareMode === 'percentage') {
             // Distribuer en pourcentage
@@ -164,6 +180,18 @@ trait ShareCalculationTrait
             }
         }
 
+        $this->calculateRemainingShares();
+    }
+
+    /**
+     * Réinitialise complètement toutes les parts
+     */
+    public function resetShares(): void
+    {
+        // Réinitialiser toutes les parts sans assigner au payeur
+        $this->form->user_shares = [];
+
+        // Recalculer les valeurs restantes
         $this->calculateRemainingShares();
     }
 

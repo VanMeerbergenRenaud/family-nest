@@ -146,7 +146,7 @@ class InvoiceForm extends Form
                 'date',
                 'after_or_equal:2020-01-01',
                 function ($attribute, $value, $fail) {
-                    if (!empty($value) && !empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
+                    if (! empty($value) && ! empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
                         $fail("La date d'échéance ne peut pas être antérieure à la date d'émission.");
                     }
                 },
@@ -156,12 +156,12 @@ class InvoiceForm extends Form
                 'date',
                 'after_or_equal:2020-01-01',
                 function ($attribute, $value, $fail) {
-                    if (!empty($value) && !empty($this->payment_due_date) && strtotime($value) > strtotime($this->payment_due_date)) {
+                    if (! empty($value) && ! empty($this->payment_due_date) && strtotime($value) > strtotime($this->payment_due_date)) {
                         $fail("La date de rappel ne peut pas être postérieure à la date d'échéance.");
-                    } elseif (!empty($value) && !empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
+                    } elseif (! empty($value) && ! empty($this->issued_date) && strtotime($value) < strtotime($this->issued_date)) {
                         $fail("La date de rappel ne peut pas être antérieure à la date d'émission.");
-                    } elseif (!empty($value) && strtotime($value) < strtotime(now())) {
-                        $fail("La date de rappel ne peut pas être dans le passé.");
+                    } elseif (! empty($value) && strtotime($value) < strtotime(now())) {
+                        $fail('La date de rappel ne peut pas être dans le passé.');
                     }
                 },
             ],
@@ -207,7 +207,7 @@ class InvoiceForm extends Form
             'user_shares.*.percentage' => 'Le pourcentage doit être entre 0 et 100.',
             'issued_date.after_or_equal' => "La date d'émission ne peut pas être antérieure à 2020.",
             'payment_due_date.after_or_equal' => "La date d'échéance ne peut pas être antérieure à 2020.",
-            'payment_reminder.after_or_equal' => "La date de rappel ne peut pas être antérieure à 2020.",
+            'payment_reminder.after_or_equal' => 'La date de rappel ne peut pas être antérieure à 2020.',
             'payment_status.in' => 'Le statut de paiement doit être parmi : non-payée, payée, en retard, ou partiellement payée.',
             'payment_method.in' => 'La méthode de paiement doit être parmi : carte, espèces ou virement.',
             'priority.in' => 'La priorité doit être parmi : haute, moyenne, basse.',
@@ -497,31 +497,13 @@ class InvoiceForm extends Form
         // Charger les parts d'utilisateurs
         $this->user_shares = [];
 
-        if (auth()->user()->families->isEmpty()) {
-            // Si l'utilisateur n'a pas de famille, répartition à 100% pour lui-même
-            $this->user_shares[] = [
-                'id' => auth()->user()->id,
-                'amount' => $invoice->amount,
-                'percentage' => 100,
-            ];
-        } else {
-            // Si l'utilisateur a une famille
-            if ($invoice->sharedUsers->isEmpty()) {
-                // Aucune répartition incluse, répartition à 100% pour l'utilisateur authentifié
+        if (!$invoice->sharedUsers->isEmpty()) {
+            foreach ($invoice->sharedUsers as $user) {
                 $this->user_shares[] = [
-                    'id' => auth()->user()->id,
-                    'amount' => $invoice->amount,
-                    'percentage' => 100,
+                    'id' => $user->id,
+                    'amount' => $user->pivot->share_amount,
+                    'percentage' => $user->pivot->share_percentage,
                 ];
-            } else {
-                // Charger les parts des utilisateurs associés
-                foreach ($invoice->sharedUsers as $user) {
-                    $this->user_shares[] = [
-                        'id' => $user->id,
-                        'amount' => $user->pivot->share_amount,
-                        'percentage' => $user->pivot->share_percentage,
-                    ];
-                }
             }
         }
 

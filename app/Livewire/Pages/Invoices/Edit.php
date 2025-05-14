@@ -44,6 +44,8 @@ class Edit extends Component
 
     public $fileExists = false;
 
+    public bool $hasExistingShares;
+
     public function mount($id)
     {
         // Récupérer la facture avec ses relations
@@ -71,9 +73,12 @@ class Edit extends Component
         // Préparer les données de partage de la facture
         $this->loadFamilyMembers();
         $this->initializeShares();
+        $this->calculateRemainingShares();
 
         // Initialiser les tags de la facture
         $this->initializeTagManagement();
+
+        $this->hasExistingShares = !empty($this->form->user_shares) && count($this->form->user_shares) > 0;
     }
 
     public function hydrate()

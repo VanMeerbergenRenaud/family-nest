@@ -42,12 +42,36 @@ class Create extends Component
     {
         $this->loadFamilyMembers();
         $this->form->paid_by_user_id = auth()->id();
+
         $this->form->user_shares = [];
-        $this->initializeShares();
+
         $this->initializeTagManagement();
+
+        // Calculer les valeurs restantes sans assigner de part par défaut
+        $this->calculateRemainingShares();
     }
 
-    public function hydrate()
+    // Ajoutons ces méthodes pour réagir aux changements de montant et du payeur
+    public function updatedFormAmount(): void
+    {
+        if (isset($this->form->amount)) {
+            $this->form->amount = $this->form->normalizeAmount($this->form->amount);
+        }
+
+        // Si des parts ont déjà été définies, les recalculer pour refléter le nouveau montant
+        if (! empty($this->form->user_shares)) {
+            foreach ($this->form->user_shares as &$share) {
+                if (isset($share['percentage']) && $share['percentage'] > 0) {
+                    $share['amount'] = $this->calculateAmountFromPercentage($share['percentage']);
+                }
+            }
+        }
+
+        // Recalculer les valeurs restantes
+        $this->calculateRemainingShares();
+    }
+
+    public function hydrate(): void
     {
         $this->resetErrorBag();
         $this->resetValidation();

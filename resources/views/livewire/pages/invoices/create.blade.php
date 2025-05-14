@@ -121,44 +121,44 @@
 
                         {{-- Section de répartition --}}
                         @if($form->amount > 0 && $form->paid_by_user_id)
-                            <div x-data="{ showShareInterface: false }">
-                                <button
-                                    type="button"
-                                    @click="showShareInterface = !showShareInterface"
-                                    class="button-primary w-full justify-between px-3.5 py-2.5"
-                                >
-                                    <div class="flex items-center space-x-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                                        </svg>
-                                        <span class="text-sm-medium">Répartir entre les membres</span>
-                                    </div>
+                            <div x-data="{ enableSharing: false }">
 
-                                    <div class="flex items-center">
-                                        @php $shareSummary = $this->getShareSummary(); @endphp
-                                        @if($shareSummary['totalShares'] > 0)
-                                            <span class="mr-3 px-2 py-0.5 text-xs-medium rounded-full {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                {{-- Case à cocher pour activer/désactiver la répartition --}}
+                                <div class="button-primary w-full max-sm:flex-wrap justify-between px-3.5 py-2.5">
+                                    <x-form.checkbox-input
+                                        label="Répartir ce montant entre plusieurs membres"
+                                        name="enable_sharing"
+                                        x-model="enableSharing"
+                                        x-on:change="if (!enableSharing) $wire.resetShares()"
+                                    />
+
+                                    @php $shareSummary = $this->getShareSummary(); @endphp
+                                    @if($shareSummary['totalShares'] > 0)
+                                        <div class="flex items-center">
+                                            <span class="px-2 py-0.5 text-xs-medium rounded-full w-max {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                 {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
                                                 {{ $shareSummary['formattedTotalPercent'] }}%
                                             </span>
-                                        @endif
+                                        </div>
+                                    @endif
+                                </div>
 
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 transition-transform" :class="{'rotate-180': showShareInterface}" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </button>
-
-                                <div x-show="showShareInterface" x-cloak class="mt-3 p-3 border border-gray-200 rounded-md">
-                                    <div class="flex justify-between items-center mb-3">
-                                        <div class="flex items-center space-x-3">
+                                {{-- Interface de répartition (visible uniquement si la case est cochée) --}}
+                                <div x-cloak
+                                     x-show="enableSharing"
+                                     class="mt-2 p-3 bg-white border border-gray-200 rounded-lg"
+                                >
+                                    <div class="flex justify-between items-center flex-wrap gap-3 mb-3">
+                                        <div class="flex items-center gap-3">
                                             <button type="button"
                                                     wire:click="distributeEvenly()"
-                                                    class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition text-xs">
+                                                    wire:loading.class="opacity-75"
+                                                    wire:loading.attr="disabled"
+                                                    class="px-3 py-1.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-md transition text-xs flex items-center gap-1">
                                                 Partager équitablement
                                             </button>
 
-                                            <div class="flex items-center space-x-1">
+                                            <div class="flex items-center gap-1">
                                                 <button type="button"
                                                         wire:click="$set('shareMode', 'percentage')"
                                                         class="w-7 h-7 flex-center text-xs rounded-md {{ $shareMode === 'percentage' ? 'bg-indigo-500 text-white' : 'bg-gray-200 text-gray-700' }}">
@@ -172,7 +172,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="ml-2 text-xs text-right px-2 py-1 rounded-md {{ $remainingPercentage <= 0.1 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                        <div class="text-xs text-right px-2 py-1 rounded-md {{ $remainingPercentage <= 0.1 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                             @if($shareMode === 'percentage')
                                                 {{ \Illuminate\Support\Number::format($remainingPercentage, 1, locale: 'fr_FR') }}% non attribués
                                             @else
@@ -183,23 +183,31 @@
 
                                     <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3">
                                         @foreach($family_members as $member)
-                                            @php $memberShare = $this->getMemberShareInfo($member->id); @endphp
+                                            @php
+                                                $memberShare = $this->getMemberShareInfo($member->id);
+                                            @endphp
                                             <li class="flex items-center p-2 border {{ $memberShare['hasShare'] ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-white' }} rounded-md">
+
                                                 <div class="w-6 h-6 bg-indigo-100 text-indigo-700 rounded-full flex-center text-xs">
                                                     <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt="{{ $member->name }}" class="w-6 h-6 rounded-full">
                                                 </div>
-                                                <span class="text-xs-medium ml-2 mr-auto truncate max-w-[80px]">{{ $member->name }}</span>
+
+                                                <span class="text-xs-medium ml-2 mr-auto truncate max-w-[6.25rem] lg:max-w-[8rem]">{{ $member->name }}</span>
 
                                                 @if($memberShare['hasShare'])
                                                     <div class="flex items-center">
+                                                        <label for="share-{{ $member->id }}" class="sr-only">
+                                                            Montant de répartition de {{ $member->name }}
+                                                        </label>
                                                         <input
+                                                            id="share-{{ $member->id }}"
                                                             type="number"
                                                             step="0.01"
                                                             min="0"
                                                             max="{{ $shareMode === 'percentage' ? 100 : $form->amount }}"
                                                             wire:model="form.user_shares.{{ $memberShare['shareIndex'] }}.{{ $shareMode === 'percentage' ? 'percentage' : 'amount' }}"
                                                             wire:change="updateShare({{ $member->id }}, $event.target.value, '{{ $shareMode }}')"
-                                                            class="min-w-16 p-1 text-xs border border-gray-300 rounded-l-md text-right"
+                                                            class="min-w-20 p-1 text-xs border border-gray-300 rounded-l-md text-right focus:outline-none"
                                                         />
                                                         <span class="bg-gray-100 p-1 text-xs border border-l-0 border-gray-300 rounded-r-md w-6 text-center">
                                                             {{ $shareMode === 'percentage' ? '%' : $this->getCurrencySymbol() }}
@@ -209,9 +217,11 @@
                                                         </button>
                                                     </div>
                                                 @else
-                                                    <button type="button"
-                                                            wire:click="updateShare({{ $member->id }}, {{ $shareMode === 'percentage' ? ($remainingPercentage > 0 ? $remainingPercentage : 0) : ($remainingAmount > 0 ? $remainingAmount : 0) }}, '{{ $shareMode }}')"
-                                                            class="text-xs bg-indigo-100 hover:bg-indigo-200 px-1.5 py-1 rounded">
+                                                    <button
+                                                        type="button"
+                                                        wire:click="updateShare({{ $member->id }}, {{ $shareMode === 'percentage' ? ($remainingPercentage > 0 ? $remainingPercentage : 0) : ($remainingAmount > 0 ? $remainingAmount : 0) }}, '{{ $shareMode }}')"
+                                                        class="text-xs bg-indigo-100 hover:bg-indigo-200 px-1.5 py-1 rounded"
+                                                    >
                                                         <x-svg.add2 class="text-indigo-700 w-3.5 h-3.5" />
                                                     </button>
                                                 @endif

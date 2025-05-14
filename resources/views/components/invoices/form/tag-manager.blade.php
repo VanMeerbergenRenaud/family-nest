@@ -5,7 +5,7 @@
     'suggestions' => []
 ])
 
-<div class="mt-2" x-data="{
+<div class="mt-6 lg:mt-2" x-data="{
     handleKeyDown(event) {
         if (event.key === 'Enter') {
             event.preventDefault();
@@ -80,7 +80,7 @@
 
     {{-- Tags ajoutés --}}
     @if(count($tags) > 0)
-        <ul class="flex flex-wrap gap-2.5 mt-7 ml-2">
+        <ul class="flex flex-wrap gap-2.5 mt-4 ml-2">
             @foreach($tags as $index => $tag)
                 <li wire:key="tag-{{ $index }}"
                     class="inline-flex items-center pl-3.5 pr-2.5 pt-1 pb-1.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">

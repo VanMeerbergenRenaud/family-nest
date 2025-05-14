@@ -4,10 +4,10 @@
     'checked' => false,
 ])
 
-<label for="{{ $name }}" class="relative w-full flex items-center cursor-pointer">
+<label for="{{ $name }}" class="relative w-full flex items-center gap-2 cursor-pointer">
     <input id="{{ $name }}"
            type="checkbox"
-           class="h-4 w-4 cursor-pointer transition-all pointer-events-none appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"
+           class="min-w-4 h-4 cursor-pointer transition-all pointer-events-none appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"
         {{ $checked ? 'checked' : '' }}
         {{ $attributes }}
     />
@@ -16,5 +16,5 @@
             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
         </svg>
     </span>
-    <span class="ml-2 text-sm-medium">{{ $label }}</span>
+    <span class="text-sm-medium">{{ $label }}</span>
 </label>

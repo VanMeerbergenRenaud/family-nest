@@ -86,18 +86,6 @@ trait ComponentTrait
      */
     protected function validateShares(): void
     {
-        // Si le montant est défini mais qu'aucune part n'est spécifiée,
-        // créer automatiquement une part à 100% pour le payeur
-        if (floatval($this->form->amount) > 0 && empty($this->form->user_shares)) {
-            $this->form->user_shares = [[
-                'id' => $this->form->paid_by_user_id,
-                'amount' => floatval($this->form->amount),
-                'percentage' => 100,
-            ]];
-        }
-
-        // Assurer que les valeurs numériques sont correctement formatées
-        // sans forcer le total à 100% ou au montant complet
         if (! empty($this->form->user_shares)) {
             foreach ($this->form->user_shares as &$share) {
                 $share['amount'] = $this->normalizeNumber($share['amount'] ?? 0);
