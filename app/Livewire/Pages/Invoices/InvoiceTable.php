@@ -4,24 +4,31 @@ namespace App\Livewire\Pages\Invoices;
 
 use App\Livewire\Pages\Dashboard\Filters;
 use App\Traits\HumanDateTrait;
+use App\Traits\Invoice\ActionsTrait;
+use App\Traits\Invoice\BulkActionsTrait;
 use App\Traits\Invoice\ColumnPreferencesTrait;
+use App\Traits\Invoice\FileUrlTrait;
 use App\Traits\Invoice\SearchableTrait;
 use App\Traits\Invoice\SortableTrait;
-use App\Traits\Invoice\TableTrait;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 /**
  * Composant dynamique utilisé à la fois pour le dashboard et la page des factures
  */
 class InvoiceTable extends Component
 {
-    use ColumnPreferencesTrait,
+    use ActionsTrait,
+        BulkActionsTrait,
+        ColumnPreferencesTrait,
+        ColumnPreferencesTrait,
+        FileUrlTrait,
         HumanDateTrait,
         SearchableTrait,
         SortableTrait,
-        TableTrait;
+        WithPagination;
 
     #[Reactive]
     public Filters $filters;

@@ -91,15 +91,15 @@ class InvoiceCreateTest extends TestCase
         $this->fileStorageService->shouldReceive('store')->andReturn(
             new Invoice([
                 'id' => 1,
-                'name' => 'Facture Internet - Avril 2025',
+                'name' => 'Luminus Électricité - Avril 2025',
                 'user_id' => $this->user->id,
             ])
         );
 
         $component = Livewire::test(Create::class)
             ->set('form.uploadedFile', $file)
-            ->set('form.name', 'Facture Internet - Avril 2025')
-            ->set('form.reference', 'INV-12345')
+            ->set('form.name', 'Luminus Électricité - Avril 2025')
+            ->set('form.reference', '123456')
             ->set('form.type', TypeEnum::ABONNEMENTS->value)
             ->set('form.availableCategories', [
                 CategoryEnum::ABO_INTERNET_TELECOM->value => CategoryEnum::ABO_INTERNET_TELECOM->labelWithEmoji(),
@@ -132,12 +132,12 @@ class InvoiceCreateTest extends TestCase
         $component->assertHasNoErrors();
 
         $invoice = Invoice::where('name', 'Facture Internet - Avril 2025')
-            ->where('reference', 'INV-12345')
+            ->where('reference', '123456')
             ->first();
 
         $this->assertNotNull($invoice);
-        $this->assertEquals('Facture Internet - Avril 2025', $invoice->name);
-        $this->assertEquals('INV-12345', $invoice->reference);
+        $this->assertEquals('Luminus Électricité - Avril 2025', $invoice->name);
+        $this->assertEquals('123456', $invoice->reference);
         $this->assertEquals(TypeEnum::ABONNEMENTS->value, $invoice->type->value);
         $this->assertEquals(CategoryEnum::ABO_INTERNET_TELECOM->value, $invoice->category->value);
         $this->assertEquals('Fournisseur Internet', $invoice->issuer_name);

@@ -67,8 +67,8 @@
                         class="grid grid-cols-1 gap-4 "
                     >
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
-                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="exemple : Facture Internet - Octobre 2024" :asterix="true" />
-                            <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="INV-12345" />
+                            <x-form.field label="Nom" name="form.name" model="form.name" placeholder="exemple : Luminus Électricité - Octobre 2024" :asterix="true" />
+                            <x-form.field label="Référence / Numéro" name="form.reference" model="form.reference" placeholder="123456" />
                         </div>
                         <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
                             <x-form.select label="Type*" name="form.type" model="form.type" label="Type">
@@ -121,19 +121,23 @@
 
                         {{-- Section de répartition --}}
                         @if($form->amount > 0 && $form->paid_by_user_id)
+                            @php $shareSummary = $this->getShareSummary(); @endphp
+
                             <div x-data="{ enableSharing: false }">
 
-                                {{-- Case à cocher pour activer/désactiver la répartition --}}
+                                {{-- Case à cocher pour activer/désactiver la répartition avec indicateur de répartition existante --}}
                                 <div class="button-primary w-full max-sm:flex-wrap justify-between px-3.5 py-2.5">
-                                    <x-form.checkbox-input
-                                        label="Répartir ce montant entre plusieurs membres"
-                                        name="enable_sharing"
-                                        x-model="enableSharing"
-                                        x-on:change="if (!enableSharing) $wire.resetShares()"
-                                    />
+                                    <div class="flex items-center">
+                                        <x-form.checkbox-input
+                                            label="Répartir ce montant entre plusieurs membres"
+                                            name="enable_sharing"
+                                            wire:model="enableSharing"
+                                            x-model="enableSharing"
+                                            x-on:change="if (!enableSharing) $wire.resetShares()"
+                                        />
+                                    </div>
 
-                                    @php $shareSummary = $this->getShareSummary(); @endphp
-                                    @if($shareSummary['totalShares'] > 0)
+                                    @if($shareSummary['totalShares'] > 1)
                                         <div class="flex items-center">
                                             <span class="px-2 py-0.5 text-xs-medium rounded-full w-max {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                                 {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
@@ -146,8 +150,10 @@
                                 {{-- Interface de répartition (visible uniquement si la case est cochée) --}}
                                 <div x-cloak
                                      x-show="enableSharing"
-                                     class="mt-2 p-3 bg-white border border-gray-200 rounded-lg"
+                                     class="relative mt-2 p-3 bg-white border border-gray-200 rounded-lg"
                                 >
+                                    <x-loader.spinner target="distributeEvenly, shareMode, removeShare, updateShare" />
+
                                     <div class="flex justify-between items-center flex-wrap gap-3 mb-3">
                                         <div class="flex items-center gap-3">
                                             <button type="button"
@@ -220,14 +226,22 @@
                                                     <button
                                                         type="button"
                                                         wire:click="updateShare({{ $member->id }}, {{ $shareMode === 'percentage' ? ($remainingPercentage > 0 ? $remainingPercentage : 0) : ($remainingAmount > 0 ? $remainingAmount : 0) }}, '{{ $shareMode }}')"
-                                                        class="text-xs bg-indigo-100 hover:bg-indigo-200 px-1.5 py-1 rounded"
+                                                        class="text-xs text-indigo-800 bg-indigo-100 hover:bg-indigo-200 px-2 py-1 rounded"
                                                     >
-                                                        <x-svg.add2 class="text-indigo-700 w-3.5 h-3.5" />
+                                                        Ajouter
                                                     </button>
                                                 @endif
                                             </li>
                                         @endforeach
                                     </ul>
+
+                                    @error('form.user_shares')
+                                    <ul class="my-2 flex flex-col gap-2">
+                                        @foreach ($errors->get('form.user_shares') as $error)
+                                            <li class="pl-2 pr-1 text-sm-medium text-red-500 dark:text-red-400">{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                    @enderror
                                 </div>
                             </div>
                         @else

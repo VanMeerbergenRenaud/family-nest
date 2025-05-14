@@ -20,15 +20,23 @@ trait ShareCalculationTrait
      */
     public function calculateRemainingShares(): void
     {
-        $totalAmount = $totalPercentage = 0;
-        $invoiceAmount = floatval($this->form->amount ?? 0);
+        $invoiceAmount = floatval($this->form->amount);
 
-        foreach ($this->form->user_shares ?? [] as $share) {
+        $this->remainingAmount = $invoiceAmount;
+        $this->remainingPercentage = 100;
+
+        if (empty($this->form->user_shares)) {
+            return;
+        }
+
+        $totalAmount = $totalPercentage = 0;
+
+        foreach ($this->form->user_shares as $share) {
             $totalAmount += floatval($share['amount'] ?? 0);
             $totalPercentage += floatval($share['percentage'] ?? 0);
         }
 
-        // Calculer les valeurs restantes sans ajuster les parts existantes
+        // Calculer les valeurs restantes
         $this->remainingAmount = max(0, $invoiceAmount - $totalAmount);
         $this->remainingPercentage = max(0, 100 - $totalPercentage);
     }
@@ -48,52 +56,57 @@ trait ShareCalculationTrait
 
         if ($userIndex !== false) {
             // Mettre à jour une part existante
-            if ($type === 'percentage') {
-                // Limiter le pourcentage à 100% maximum
-                $value = min(100, max(0, $value));
-                $this->form->user_shares[$userIndex]['percentage'] = $value;
-
-                // Calculer le montant à partir du pourcentage
-                if ($invoiceAmount > 0) {
-                    $this->form->user_shares[$userIndex]['amount'] = $this->calculateAmountFromPercentage($value);
-                } else {
-                    $this->form->user_shares[$userIndex]['amount'] = 0;
-                }
-            } else {
-                // Limiter le montant au montant total de la facture maximum
-                $value = min($invoiceAmount, max(0, $value));
-                $this->form->user_shares[$userIndex]['amount'] = $value;
-
-                // Calculer le pourcentage à partir du montant
-                if ($invoiceAmount > 0) {
-                    $this->form->user_shares[$userIndex]['percentage'] = $this->calculatePercentageFromAmount($value);
-                } else {
-                    $this->form->user_shares[$userIndex]['percentage'] = 0;
-                }
-            }
+            $this->updateExistingShare($userIndex, $value, $type, $invoiceAmount);
         } else {
-            // Ajouter une nouvelle part initialisée à 0
-            $newShare = [
-                'id' => $userId,
-                'amount',
-                'percentage',
-            ];
-
-            // Mettre à jour avec la valeur fournie
-            if ($type === 'percentage') {
-                $value = min(100, max(0, $value));
-                $newShare['percentage'] = $value;
-                $newShare['amount'] = $invoiceAmount > 0 ? $this->calculateAmountFromPercentage($value) : 0;
-            } else {
-                $value = min($invoiceAmount, max(0, $value));
-                $newShare['amount'] = $value;
-                $newShare['percentage'] = $invoiceAmount > 0 ? $this->calculatePercentageFromAmount($value) : 0;
-            }
-
-            $this->form->user_shares[] = $newShare;
+            // Ajouter une nouvelle part
+            $this->addNewShare($userId, $value, $type, $invoiceAmount);
         }
 
         $this->calculateRemainingShares();
+    }
+
+    /**
+     * Met à jour une part existante
+     */
+    private function updateExistingShare(int $index, float $value, string $type, float $invoiceAmount): void
+    {
+        if ($type === 'percentage') {
+            $value = min(100, max(0, $value));
+            $this->form->user_shares[$index]['percentage'] = $value;
+            $this->form->user_shares[$index]['amount'] = $invoiceAmount > 0
+                ? $this->calculateAmountFromPercentage($value)
+                : 0;
+        } else {
+            $value = min($invoiceAmount, max(0, $value));
+            $this->form->user_shares[$index]['amount'] = $value;
+            $this->form->user_shares[$index]['percentage'] = $invoiceAmount > 0
+                ? $this->calculatePercentageFromAmount($value)
+                : 0;
+        }
+    }
+
+    /**
+     * Ajoute une nouvelle part
+     */
+    private function addNewShare(int $userId, float $value, string $type, float $invoiceAmount): void
+    {
+        $newShare = [
+            'id' => $userId,
+            'amount',
+            'percentage',
+        ];
+
+        if ($type === 'percentage') {
+            $value = min(100, max(0, $value));
+            $newShare['percentage'] = $value;
+            $newShare['amount'] = $invoiceAmount > 0 ? $this->calculateAmountFromPercentage($value) : 0;
+        } else {
+            $value = min($invoiceAmount, max(0, $value));
+            $newShare['amount'] = $value;
+            $newShare['percentage'] = $invoiceAmount > 0 ? $this->calculatePercentageFromAmount($value) : 0;
+        }
+
+        $this->form->user_shares[] = $newShare;
     }
 
     /**
@@ -101,104 +114,99 @@ trait ShareCalculationTrait
      */
     public function removeShare(int $userId): void
     {
-        // Trouver l'index de la part à supprimer
         $shareIndex = $this->findShareIndex($userId);
 
-        // Supprimer la part
         if ($shareIndex !== false) {
             unset($this->form->user_shares[$shareIndex]);
-            $this->form->user_shares = array_values($this->form->user_shares); // Réindexer le tableau
+            $this->form->user_shares = array_values($this->form->user_shares);
         }
 
         $this->calculateRemainingShares();
     }
 
     /**
-     * Distribue équitablement les parts entre les utilisateurs spécifiés
-     * Cette méthode est appelée uniquement quand l'utilisateur clique sur "Partager équitablement"
+     * Distribue équitablement les parts entre les utilisateurs
      */
     public function distributeEvenly(array $userIds = []): void
     {
-        // Si aucun ID n'est fourni, utiliser tous les membres de la famille
         $userIds = $userIds ?: $this->family_members->pluck('id')->toArray();
         $count = count($userIds);
 
-        if (! $count) {
+        if ($count < 2) {
             return;
         }
 
-        // Réinitialiser complètement les parts avant une nouvelle distribution
         $this->form->user_shares = [];
         $invoiceAmount = floatval($this->form->amount ?? 0);
 
-        // Ne rien faire si le montant est nul
         if ($invoiceAmount <= 0) {
             $this->calculateRemainingShares();
 
             return;
         }
 
-        if ($this->shareMode === 'percentage') {
-            // Distribuer en pourcentage
-            $sharePercentage = $this->normalizeNumber(100 / $count);
-            $remainingPercentage = 100;
-
-            foreach ($userIds as $index => $userId) {
-                // Pour le dernier utilisateur, attribuer le reste pour éviter les erreurs d'arrondi
-                if ($index === $count - 1) {
-                    $percentage = $remainingPercentage;
-                } else {
-                    $percentage = $sharePercentage;
-                    $remainingPercentage -= $sharePercentage;
-                }
-
-                $this->form->user_shares[] = [
-                    'id' => $userId,
-                    'percentage' => $percentage,
-                    'amount' => $invoiceAmount > 0 ? $this->calculateAmountFromPercentage($percentage) : 0,
-                ];
-            }
-        } else {
-            // Distribuer en montant
-            $shareAmount = $invoiceAmount > 0 ? $this->normalizeNumber($invoiceAmount / $count) : 0;
-            $remainingAmount = $invoiceAmount;
-
-            foreach ($userIds as $index => $userId) {
-                // Pour le dernier utilisateur, attribuer le reste pour éviter les erreurs d'arrondi
-                if ($index === $count - 1) {
-                    $amount = $remainingAmount;
-                } else {
-                    $amount = $shareAmount;
-                    $remainingAmount -= $shareAmount;
-                }
-
-                $this->form->user_shares[] = [
-                    'id' => $userId,
-                    'amount' => $amount,
-                    'percentage' => $invoiceAmount > 0 ? $this->calculatePercentageFromAmount($amount) : 0,
-                ];
-            }
-        }
+        $this->shareMode === 'percentage'
+            ? $this->distributeByPercentage($userIds, $invoiceAmount, $count)
+            : $this->distributeByAmount($userIds, $invoiceAmount, $count);
 
         $this->calculateRemainingShares();
     }
 
     /**
-     * Réinitialise complètement toutes les parts
+     * Distribue par pourcentage
+     */
+    private function distributeByPercentage(array $userIds, float $invoiceAmount, int $count): void
+    {
+        $sharePercentage = $this->normalizeNumber(100 / $count);
+        $remainingPercentage = 100;
+
+        foreach ($userIds as $index => $userId) {
+            // Le dernier utilisateur prend le reste pour éviter les erreurs d'arrondi
+            $percentage = ($index === $count - 1) ? $remainingPercentage : $sharePercentage;
+            $remainingPercentage -= $sharePercentage;
+
+            $this->form->user_shares[] = [
+                'id' => $userId,
+                'percentage' => $percentage,
+                'amount' => $invoiceAmount > 0 ? $this->calculateAmountFromPercentage($percentage) : 0,
+            ];
+        }
+    }
+
+    /**
+     * Distribue par montant
+     */
+    private function distributeByAmount(array $userIds, float $invoiceAmount, int $count): void
+    {
+        $shareAmount = $invoiceAmount > 0 ? $this->normalizeNumber($invoiceAmount / $count) : 0;
+        $remainingAmount = $invoiceAmount;
+
+        foreach ($userIds as $index => $userId) {
+            // Le dernier utilisateur prend le reste pour éviter les erreurs d'arrondi
+            $amount = ($index === $count - 1) ? $remainingAmount : $shareAmount;
+            $remainingAmount -= $shareAmount;
+
+            $this->form->user_shares[] = [
+                'id' => $userId,
+                'amount' => $amount,
+                'percentage' => $invoiceAmount > 0 ? $this->calculatePercentageFromAmount($amount) : 0,
+            ];
+        }
+    }
+
+    /**
+     * Réinitialise toutes les parts
      */
     public function resetShares(): void
     {
-        // Réinitialiser toutes les parts sans assigner au payeur
         $this->form->user_shares = [];
-
-        // Recalculer les valeurs restantes
         $this->calculateRemainingShares();
     }
 
     /**
      * Calcule le montant à partir d'un pourcentage
      */
-    private function calculateAmountFromPercentage(float $percentage): float
+    protected function calculateAmountFromPercentage(float $percentage): float
     {
         $invoiceAmount = floatval($this->form->amount ?? 0);
 
@@ -212,7 +220,7 @@ trait ShareCalculationTrait
     /**
      * Calcule le pourcentage à partir d'un montant
      */
-    private function calculatePercentageFromAmount(float $amount): float
+    protected function calculatePercentageFromAmount(float $amount): float
     {
         $invoiceAmount = floatval($this->form->amount ?? 0);
 
@@ -226,9 +234,13 @@ trait ShareCalculationTrait
     /**
      * Trouve l'index d'un utilisateur dans le tableau des parts
      */
-    private function findShareIndex(int $userId): int|false
+    protected function findShareIndex(int $userId): int|false
     {
-        foreach ($this->form->user_shares ?? [] as $index => $share) {
+        if (empty($this->form->user_shares)) {
+            return false;
+        }
+
+        foreach ($this->form->user_shares as $index => $share) {
             if ((int) $share['id'] === $userId) {
                 return $index;
             }
@@ -240,29 +252,13 @@ trait ShareCalculationTrait
     /**
      * Normalise un nombre à 2 décimales
      */
-    private function normalizeNumber($value): float
+    protected function normalizeNumber($value): float
     {
         if (! is_numeric($value)) {
             return 0;
         }
 
         return round((float) $value, 2);
-    }
-
-    /**
-     * Formate un montant pour l'affichage
-     */
-    public function formatMontant($value): string
-    {
-        return Number::format($value, 2, locale: 'fr_FR');
-    }
-
-    /**
-     * Formate un pourcentage pour l'affichage
-     */
-    public function formatPourcentage($value): string
-    {
-        return Number::format($value, 2, locale: 'fr_FR').'%';
     }
 
     /**
@@ -280,8 +276,6 @@ trait ShareCalculationTrait
             $totalAmount += floatval($share['amount'] ?? 0);
         }
 
-        // Considérer comme complet si le pourcentage est proche de 100% ou
-        // si le montant est proche du montant total de la facture
         $isComplete = ($totalPercent >= 99.9) ||
             ($invoiceAmount > 0 && abs($invoiceAmount - $totalAmount) < 0.01);
 
@@ -300,10 +294,6 @@ trait ShareCalculationTrait
      */
     public function getMemberShareInfo($memberId): array
     {
-        if (empty($this->form->user_shares)) {
-            return ['hasShare' => false, 'shareIndex' => null, 'shareData' => null];
-        }
-
         $index = $this->findShareIndex($memberId);
 
         if ($index !== false) {
@@ -318,52 +308,6 @@ trait ShareCalculationTrait
     }
 
     /**
-     * Prépare la liste de sélection du payeur
-     */
-    public function preparePayerSelectionList(): Collection
-    {
-        // Si l'utilisateur n'a pas de famille, retourner uniquement l'utilisateur authentifié
-        if (! isset($this->family_members) || $this->family_members->isEmpty()) {
-            return collect([auth()->user()]);
-        }
-
-        // S'assurer que l'utilisateur authentifié est dans la liste
-        $members = clone $this->family_members;
-        if (! $members->contains('id', auth()->id())) {
-            $members->prepend(auth()->user());
-        }
-
-        return $members;
-    }
-
-    /**
-     * Initialise les parts utilisateur
-     */
-    public function initializeUserShares(): void
-    {
-        if (! isset($this->form->user_shares)) {
-            $this->form->user_shares = [];
-
-            return;
-        }
-
-        // Dédupliquer les parts par ID d'utilisateur
-        $sharesById = [];
-        foreach ($this->form->user_shares as $share) {
-            if (isset($share['id'])) {
-                $sharesById[$share['id']] = [
-                    'id' => (int) $share['id'],
-                    'amount' => $this->normalizeNumber($share['amount'] ?? 0),
-                    'percentage' => $this->normalizeNumber($share['percentage'] ?? 0),
-                ];
-            }
-        }
-
-        $this->form->user_shares = array_values($sharesById);
-        $this->calculateRemainingShares();
-    }
-
-    /**
      * Obtient un résumé détaillé des parts pour l'affichage
      */
     public function getShareDetailSummary(Collection $familyMembers): array
@@ -371,27 +315,45 @@ trait ShareCalculationTrait
         $invoiceAmount = floatval($this->form->amount ?? 0);
 
         if ($invoiceAmount <= 0) {
-            return [
-                'hasAmount' => false,
-                'hasDetails' => false,
-                'formattedShared' => 0,
-                'totalPercentage' => 0,
-                'memberDetails' => [],
-            ];
+            return $this->getEmptyShareSummary(false);
         }
 
         $userShares = $this->form->user_shares ?? [];
 
-        // Si aucune part n'est définie, montrer le payeur comme seul bénéficiaire à 100%
-        if (empty($userShares)) {
-            $payerId = $this->form->paid_by_user_id ?? auth()->id();
-            $payer = $this->findMember($familyMembers, $payerId);
-
-            return $this->getDefaultShareSummary($payer, $invoiceAmount);
+        if (empty($userShares) || ! $this->hasActiveShares($userShares)) {
+            return $this->getEmptyShareSummary(true, $invoiceAmount);
         }
 
-        // Construire le résumé des parts existantes
         return $this->buildShareDetailSummary($userShares, $familyMembers, $invoiceAmount);
+    }
+
+    /**
+     * Retourne un résumé vide des parts
+     */
+    private function getEmptyShareSummary(bool $hasAmount, float $amount = 0): array
+    {
+        return [
+            'hasAmount' => $hasAmount,
+            'hasDetails' => false,
+            'formattedShared' => $hasAmount ? number_format($amount, 2, ',', ' ') : 0,
+            'totalPercentage' => 0,
+            'memberDetails' => [],
+        ];
+    }
+
+    /**
+     * Vérifie si au moins une part est active (montant ou pourcentage > 0)
+     */
+    private function hasActiveShares(array $shares): bool
+    {
+        foreach ($shares as $share) {
+            if ((isset($share['amount']) && floatval($share['amount']) > 0) ||
+                (isset($share['percentage']) && floatval($share['percentage']) > 0)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -401,19 +363,12 @@ trait ShareCalculationTrait
     {
         $memberDetails = [];
         $totalPercentage = 0;
-        $membersById = $familyMembers->keyBy('id');
-
-        // Ajouter l'utilisateur authentifié au mapping s'il n'y est pas
-        if (! isset($membersById[auth()->id()])) {
-            $membersById[auth()->id()] = auth()->user();
-        }
 
         foreach ($userShares as $share) {
             if (! isset($share['id'])) {
                 continue;
             }
 
-            // Récupérer le membre
             $member = $this->findMember($familyMembers, $share['id']);
 
             if (! $member) {
@@ -445,51 +400,12 @@ trait ShareCalculationTrait
     }
 
     /**
-     * Trouve un membre dans la collection de membres ou recherche dans la base de données
+     * Trouve un membre dans la collection de membres
      */
     private function findMember(Collection $familyMembers, int $userId): ?User
     {
-        // Chercher d'abord dans la collection
-        $member = $familyMembers->firstWhere('id', $userId);
-
-        if ($member) {
-            return $member;
-        }
-
-        // Si l'utilisateur cherché est l'utilisateur authentifié
-        if ($userId === auth()->id()) {
-            return auth()->user();
-        }
-
-        // En dernier recours, chercher dans la base de données
-        return User::find($userId);
-    }
-
-    /**
-     * Génère un résumé de partage par défaut pour un seul utilisateur (100%)
-     */
-    private function getDefaultShareSummary(?User $user, float $invoiceAmount): array
-    {
-        // Si aucun utilisateur n'est trouvé, utiliser l'utilisateur authentifié
-        $user = $user ?? auth()->user();
-
-        return [
-            'hasAmount' => true,
-            'hasDetails' => true,
-            'formattedShared' => number_format($invoiceAmount, 2, ',', ' '),
-            'totalPercentage' => 100,
-            'memberDetails' => [
-                [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'avatar' => $user->avatar_url ?? asset('img/img_placeholder.jpg'),
-                    'formattedAmount' => number_format($invoiceAmount, 2, ',', ' '),
-                    'sharePercentage' => 100,
-                    'formattedPercentage' => '100',
-                    'isPayer' => true,
-                ],
-            ],
-        ];
+        return $familyMembers->firstWhere('id', $userId)
+            ?? ($userId === auth()->id() ? auth()->user() : User::find($userId));
     }
 
     /**
@@ -502,11 +418,21 @@ trait ShareCalculationTrait
         }
 
         try {
-            $currencyEnum = CurrencyEnum::tryFrom($this->form->currency);
-
-            return $currencyEnum?->symbol() ?? '€';
+            return CurrencyEnum::tryFrom($this->form->currency)?->symbol() ?? '€';
         } catch (\Exception) {
             return '€';
         }
+    }
+
+    /**
+     * Initialise les parts pour la facture
+     */
+    protected function initializeShares(): void
+    {
+        if (! isset($this->form->paid_by_user_id)) {
+            $this->form->paid_by_user_id = auth()->user()->id;
+        }
+
+        $this->calculateRemainingShares();
     }
 }

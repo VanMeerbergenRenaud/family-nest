@@ -2,12 +2,8 @@
 
 namespace App\Traits\Invoice;
 
-use Masmerise\Toaster\Toaster;
+use Illuminate\Support\Collection;
 
-/**
- * Trait commun pour les composants liés aux factures (Create, Edit, Show)
- * Contient les méthodes partagées par ces composants
- */
 trait ComponentTrait
 {
     /**
@@ -15,42 +11,51 @@ trait ComponentTrait
      */
     protected function loadFamilyMembers(): void
     {
-        $family = auth()->user()->family();
+        $user = auth()->user();
+        $family = $user->family();
 
-        if ($family) {
-            // Récupérer les membres de la famille
-            $this->family_members = $family->users()->get();
-        } else {
-            // Si pas de famille, uniquement l'utilisateur authentifié
-            $this->family_members = collect([auth()->user()]);
-        }
+        // Si l'utilisateur a une famille, on récupère tous les membres
+        // Sinon, on crée une collection avec juste l'utilisateur actuel
+        $this->family_members = $family
+            ? $family->users()->get()
+            : collect([$user]);
 
         // S'assurer que l'utilisateur authentifié est dans la liste
-        if (! $this->family_members->contains('id', auth()->id())) {
-            $this->family_members->prepend(auth()->user());
+        if (! $this->family_members->contains('id', $user->id)) {
+            $this->family_members->prepend($user);
         }
     }
 
     /**
-     * Recalcule les parts restantes quand le montant change
+     * Met à jour les parts quand le montant change
      */
     public function updatedFormAmount(): void
     {
-        // Normalisation du montant pour éviter les erreurs de format
+        // Normaliser le montant
         if (isset($this->form->amount)) {
-            $this->form->amount = $this->form->normalizeAmount($this->form->amount);
+            $this->form->amount = is_object($this->form) && method_exists($this->form, 'normalizeAmount')
+                ? $this->form->normalizeAmount($this->form->amount)
+                : $this->normalizeNumber($this->form->amount);
         }
 
-        // Recalculer uniquement les valeurs restantes
+        // Recalculer les montants des parts si elles existent
+        if (! empty($this->form->user_shares)) {
+            $this->recalculateShareAmounts();
+        }
+
         $this->calculateRemainingShares();
     }
 
     /**
-     * Quand le mode de partage change, recalculer les parts
+     * Recalcule les montants des parts en fonction des pourcentages
      */
-    public function updatedShareMode(): void
+    private function recalculateShareAmounts(): void
     {
-        $this->calculateRemainingShares();
+        foreach ($this->form->user_shares as &$share) {
+            if (isset($share['percentage']) && $share['percentage'] > 0) {
+                $share['amount'] = $this->calculateAmountFromPercentage($share['percentage']);
+            }
+        }
     }
 
     /**
@@ -58,17 +63,9 @@ trait ComponentTrait
      */
     public function updatedFormType(): void
     {
-        $this->form->updateAvailableCategories();
-        $this->form->category = null;
-    }
-
-    /**
-     * Toast pour le rappel de paiement
-     */
-    public function updatedFormPaymentReminder($value): void
-    {
-        if ($value) {
-            Toaster::info('Un rappel de paiement sera programmé pour le '.date('d/m/Y', strtotime($value)));
+        if (is_object($this->form) && method_exists($this->form, 'updateAvailableCategories')) {
+            $this->form->updateAvailableCategories();
+            $this->form->category = null;
         }
     }
 
@@ -77,50 +74,27 @@ trait ComponentTrait
      */
     public function removeUploadedFile(): void
     {
-        $this->form->removeFile();
-        $this->form->resetErrorBag('uploadedFile');
+        if (is_object($this->form) && method_exists($this->form, 'removeFile')) {
+            $this->form->removeFile();
+            $this->form->resetErrorBag('uploadedFile');
+        }
     }
 
     /**
-     * Valide les parts avant la sauvegarde finale
+     * Prépare la liste de sélection du payeur
      */
-    protected function validateShares(): void
+    public function preparePayerSelectionList(): Collection
     {
-        if (! empty($this->form->user_shares)) {
-            foreach ($this->form->user_shares as &$share) {
-                $share['amount'] = $this->normalizeNumber($share['amount'] ?? 0);
-                $share['percentage'] = $this->normalizeNumber($share['percentage'] ?? 0);
-            }
+        if (! isset($this->family_members) || $this->family_members->isEmpty()) {
+            return collect([auth()->user()]);
         }
 
-        // Recalculer les valeurs restantes sans ajustement
-        $this->calculateRemainingShares();
-    }
+        $members = clone $this->family_members;
 
-    /**
-     * Initialise les parts utilisateur à partir de la facture
-     */
-    protected function initializeShares(): void
-    {
-        // Si aucune part n'est définie mais que le montant est supérieur à 0,
-        // créer une part à 100% pour le payeur
-        if (empty($this->form->user_shares)) {
-            if (floatval($this->form->amount ?? 0) > 0) {
-                $this->form->user_shares = [[
-                    'id' => $this->form->paid_by_user_id ?? auth()->id(),
-                    'amount' => floatval($this->form->amount),
-                    'percentage' => 100,
-                ]];
-            }
+        if (! $members->contains('id', auth()->id())) {
+            $members->prepend(auth()->user());
         }
 
-        // S'assurer que le payeur est défini
-        if (! isset($this->form->paid_by_user_id)) {
-            $this->form->paid_by_user_id = auth()->id();
-        }
-
-        // Initialiser les parts et calculer les valeurs restantes
-        $this->initializeUserShares();
-        $this->calculateRemainingShares();
+        return $members;
     }
 }

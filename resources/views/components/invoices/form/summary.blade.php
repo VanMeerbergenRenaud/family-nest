@@ -62,33 +62,34 @@
 
             @if($shareSummary['hasAmount'])
                 <div class="space-y-2">
-                    <!-- Nom du payeur -->
+                    <!-- Nom du payeur - toujours l'afficher si un payeur est défini -->
                     <div class="flex justify-between items-center">
-                        @if(isset($shareSummary['memberDetails'][0]))
+                        @if($form->paid_by_user_id)
                             @php
-                                $payer = collect($shareSummary['memberDetails'])->firstWhere('isPayer', true) ?? $shareSummary['memberDetails'][0];
+                                $payer = $family_members->firstWhere('id', $form->paid_by_user_id);
                             @endphp
                             <p class="max-sm:mt-1.5 text-sm-regular">
                                 Payeur :
                                 <span class="text-sm-medium">
-                            <img src="{{ $payer['avatar'] }}" alt=""
+                            <img src="{{ $payer->avatar_url ?? asset('img/img_placeholder.jpg') }}" alt=""
                                  class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1">
-                            {{ $payer['name'] }}
+                            {{ $payer->name }}
                         </span>
                             </p>
                         @endif
                     </div>
 
-                    <!-- Détail des parts -->
-                    @if($shareSummary['hasDetails'])
+                    <!-- Détail des parts - seulement si shareSummary a des détails -->
+                    @if($shareSummary['hasDetails'] && !empty($shareSummary['memberDetails']))
                         <!-- Détail des parts avec toggle -->
-                        <div class="mt-2 pr-4 max-sm:max-w-[70vw] overflow-x-scroll"
-                             x-data="{ showRepartition: false }">
-
-                            <!-- En-tête avec bouton toggle -->
-                            <button @click="showRepartition = !showRepartition"
-                                    type="button"
-                                    class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm-medium rounded-lg text-gray-700 transition-colors">
+                        <div x-data="{ showRepartition: false }"
+                             class="mt-2 pr-4 max-sm:max-w-[70vw] overflow-x-scroll"
+                        >
+                            <button
+                                type="button"
+                                @click="showRepartition = !showRepartition"
+                                class="flex justify-between items-center w-full gap-3 pl-0 py-2 text-sm-medium rounded-lg text-gray-700 transition-colors"
+                            >
                                 <div class="flex items-center gap-2">
                                     <div class="text-sm-regular">Répartition&nbsp;:</div>
                                     <div class="text-sm-medium w-max">{{ $shareSummary['formattedShared'] }}

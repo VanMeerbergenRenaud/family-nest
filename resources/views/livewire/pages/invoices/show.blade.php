@@ -8,6 +8,8 @@
         <!-- Actions -->
         <div class="flex flex-wrap md:justify-end gap-2">
 
+            <x-loader.spinner target="downloadInvoice, toggleFavorite, copyInvoice, restoreInvoice" />
+
             <button
                 type="button"
                 class="button-primary"
@@ -118,13 +120,6 @@
         <div class="lg:col-span-3">
             <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white">
                 <div class="h-full overflow-y-auto">
-                    @php
-                        $paymentStatusInstance = $invoice->payment_status instanceof \App\Enums\PaymentStatusEnum
-                            ? $invoice->payment_status
-                            : \App\Enums\PaymentStatusEnum::tryFrom($invoice->payment_status ?? '');
-
-                        $currencySymbol = $this->getCurrencySymbol();
-                    @endphp
 
                     <!-- En-tête avec statut et montant -->
                     <div class="p-5 lg:pl-6.5">
@@ -145,10 +140,10 @@
                                 @endif
                             </div>
 
-                            @if($paymentStatusInstance)
+                            @if($paymentStatusEnum)
                                 <span class="relative -top-4 lg:-top-1 -right-1 flex-center gap-1.5 px-4.5 py-2 bg-gray-100 rounded-lg">
-                                    <span class="text-xs">{{ $paymentStatusInstance->emoji() }}</span>
-                                    <span class="text-sm-medium text-gray-700">{{ $paymentStatusInstance->label() }}</span>
+                                    <span class="text-xs">{{ $paymentStatusEnum->emoji() }}</span>
+                                    <span class="text-sm-medium text-gray-700">{{ $paymentStatusEnum->label() }}</span>
                                 </span>
                             @endif
                         </div>
@@ -177,7 +172,7 @@
 
                             <!-- Type et catégorie -->
                             <div class="flex-1">
-                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Type et catégorie</h3>
+                                <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Type et catégorie</h3>
                                 <div class="px-4 py-3 flex items-center bg-teal-50 rounded-lg border border-slate-200">
                                     <span class="{{ $iconClass }} bg-teal-100 text-teal-700">
                                         <x-rectangle-stack />
@@ -190,7 +185,7 @@
 
                             <!-- Fournisseur -->
                             <div class="flex-1">
-                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Fournisseur</h3>
+                                <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Fournisseur</h3>
 
                                 @if($invoice->issuer_website)
                                     <a href="{{ $invoice->issuer_website }}"
@@ -230,14 +225,7 @@
 
                         <!-- Dates -->
                         <div>
-                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Dates importantes</h3>
-                            @php
-                                function formatDate($date) {
-                                    if (empty($date)) return 'Non spécifiée';
-                                    if (is_string($date)) $date = \Carbon\Carbon::parse($date);
-                                    return $date->format('d/m/Y');
-                                }
-                            @endphp
+                            <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Dates importantes</h3>
 
                             <div class="bg-white rounded-lg border border-slate-200">
                                 <div class="grid grid-cols-2 md:grid-cols-4">
@@ -247,7 +235,7 @@
                                             <span class="bg-blue-50 {{ $iconClass }} text-blue-600">
                                                 <x-svg.calendar />
                                             </span>
-                                            {{ formatDate($invoice->issued_date) }}
+                                            {{ $this->formatDate($invoice->issued_date) }}
                                         </span>
                                     </div>
 
@@ -257,7 +245,7 @@
                                             <span class="bg-amber-50 {{ $iconClass }} text-amber-600">
                                                 <x-svg.clock />
                                             </span>
-                                            {{ formatDate($invoice->payment_due_date) }}
+                                            {{ $this->formatDate($invoice->payment_due_date) }}
                                         </span>
                                     </div>
 
@@ -268,16 +256,10 @@
                                                 <span class="bg-rose-50 {{ $iconClass }} text-rose-600">
                                                     <x-svg.bell />
                                                 </span>
-                                                {{ formatDate($invoice->payment_reminder) }}
+                                                {{ $this->formatDate($invoice->payment_reminder) }}
                                             </span>
                                         </div>
                                     @endif
-
-                                    @php
-                                        $frequencyEnum = $invoice->payment_frequency instanceof \App\Enums\PaymentFrequencyEnum
-                                            ? $invoice->payment_frequency
-                                            : \App\Enums\PaymentFrequencyEnum::tryFrom($invoice->payment_frequency ?? '');
-                                    @endphp
 
                                     @if($frequencyEnum)
                                         <div class="px-4 py-3 flex flex-col gap-2 border-t border-slate-200 md:border-t-0">
@@ -296,18 +278,8 @@
 
                         <!-- Informations de paiement -->
                         <div>
-                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Informations de paiement</h3>
+                            <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Informations de paiement</h3>
                             <div class="bg-white rounded-lg border border-slate-200">
-                                @php
-                                    $paymentMethodInstance = $invoice->payment_method instanceof \App\Enums\PaymentMethodEnum
-                                        ? $invoice->payment_method
-                                        : \App\Enums\PaymentMethodEnum::tryFrom($invoice->payment_method ?? '');
-
-                                    $priorityEnum = $invoice->priority instanceof \App\Enums\PriorityEnum
-                                        ? $invoice->priority
-                                        : \App\Enums\PriorityEnum::tryFrom($invoice->priority ?? '');
-                                @endphp
-
                                 <div class="grid grid-cols-1 sm:grid-cols-2">
                                     <div class="px-4 py-3 border-b sm:border-b-0 sm:border-r border-slate-200">
                                         <p class="text-xs text-gray-500 mb-2">Méthode</p>
@@ -315,7 +287,7 @@
                                             <span class="bg-purple-50 {{ $iconClass }} text-purple-700">
                                                 <x-svg.credit-card />
                                             </span>
-                                            {{ $paymentMethodInstance?->label() ?? 'Non spécifiée' }}
+                                            {{ $paymentMethodEnum?->label() ?? 'Non spécifiée' }}
                                         </p>
                                     </div>
                                     <div class="px-4 py-3">
@@ -332,36 +304,25 @@
                         </div>
 
                         {{-- Montant et répartition --}}
-                        @php
-                            $shareSummary = $this->getShareDetailSummary($this->family_members);
-                            $currencySymbol = $this->getCurrencySymbol();
-                        @endphp
-
-                        <div class="mb-6">
-                            <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Répartition des paiements</h3>
+                        <div>
+                            <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Répartition des paiements</h3>
 
                             @if($shareSummary['hasAmount'])
                                 <div class="px-4 py-3 space-y-4 rounded-lg bg-white border border-slate-200">
-                                    <!-- Nom du payeur -->
-                                    @if(isset($shareSummary['memberDetails'][0]))
-                                        @php
-                                            $payer = collect($shareSummary['memberDetails'])->firstWhere('isPayer', true) ?? $shareSummary['memberDetails'][0];
-                                        @endphp
-
-                                        <div class="flex items-center">
-                                            <span class="text-sm text-gray-500">Payeur :</span>
-                                            <div class="flex items-center ml-2">
-                                                <img src="{{ $payer['avatar'] }}"
-                                                     alt="{{ $payer['name'] }}"
-                                                     class="w-6 h-6 object-cover rounded-full border-2 border-white"
-                                                >
-                                                <span class="ml-2 text-sm-medium text-gray-800">{{ $payer['name'] }}</span>
-                                            </div>
+                                    <!-- Nom du payeur - toujours l'afficher -->
+                                    <div class="flex items-center">
+                                        <span class="text-sm text-gray-500">Payeur :</span>
+                                        <div class="flex items-center ml-2">
+                                            <img src="{{ $payer->avatar_url ?? asset('img/img_placeholder.jpg') }}"
+                                                 alt="{{ $payer->name ?? 'Non spécifié' }}"
+                                                 class="w-6 h-6 object-cover rounded-full border-2 border-white"
+                                            >
+                                            <span class="ml-2 text-sm-medium text-gray-800">{{ $payer->name ?? 'Non spécifié' }}</span>
                                         </div>
-                                    @endif
+                                    </div>
 
-                                    <!-- Détail des parts -->
-                                    @if($shareSummary['hasDetails'])
+                                    <!-- Détail des parts - uniquement si réellement des parts en DB -->
+                                    @if($shareSummary['hasDetails'] && !empty($shareSummary['memberDetails']))
                                         <div x-data="{ showRepartition: false }">
                                             <!-- En-tête avec bouton toggle -->
                                             <div class="flex flex-col sm:flex-row sm:items-center gap-3 py-1">
@@ -378,7 +339,7 @@
                                                              style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
                                                     </div>
                                                     <span class="text-xs-medium text-teal-800 bg-zinc-100 px-1.5 py-0.5 rounded">
-                                                        {{ number_format($shareSummary['totalPercentage'], 0) }}%
+                                                        {{ number_format($shareSummary['totalPercentage']) }}%
                                                     </span>
                                                 </div>
 
@@ -404,8 +365,7 @@
                                             <ul x-show="showRepartition"
                                                 x-collapse
                                                 x-transition
-                                                class="mt-3 pt-3 space-y-3 border-t border-teal-200"
-                                            >
+                                                class="mt-3 pt-3 space-y-3 border-t border-teal-200">
                                                 @foreach($shareSummary['memberDetails'] as $member)
                                                     <li class="pl-1 pr-2 flex flex-col sm:flex-row sm:items-center gap-2"
                                                         wire:key="share-{{ $member['id'] }}">
@@ -454,7 +414,7 @@
                         <!-- Note (si disponibles) -->
                         @if(!empty($invoice->notes))
                             <div>
-                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Notes</h3>
+                                <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Notes</h3>
                                 <div class="px-4 py-3 bg-white rounded-lg border border-slate-200">
                                     <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">{{ $invoice->notes }}</p>
                                 </div>
@@ -464,7 +424,7 @@
                         <!-- Tags (si disponibles) -->
                         @if(!empty($invoice->tags))
                             <div>
-                                <h3 class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Tags</h3>
+                                <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Tags</h3>
                                 <ul class="pl-1 flex flex-wrap gap-2">
                                     @foreach($invoice->tags as $tag)
                                         <li wire:key="tag-{{ $tag }}">

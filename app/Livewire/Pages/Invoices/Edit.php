@@ -44,7 +44,7 @@ class Edit extends Component
 
     public $fileExists = false;
 
-    public bool $hasExistingShares;
+    public bool $enableSharing = false;
 
     public function mount($id)
     {
@@ -60,28 +60,35 @@ class Edit extends Component
             return redirect()->route('invoices.show', $this->invoice);
         }
 
-        // Reste du code inchangé...
         $this->form->setFromInvoice($this->invoice);
+        $this->setupFileInformation();
+        $this->setupSharingData();
+        $this->initializeTagManagement();
+    }
 
-        // Récupérer les informations du fichier
+    /**
+     * Configure les informations du fichier attaché à la facture
+     */
+    private function setupFileInformation(): void
+    {
         $fileInfo = $this->generateInvoiceFileUrl($this->invoice);
         $this->filePath = $fileInfo['url'];
         $this->fileExtension = $fileInfo['extension'];
         $this->fileExists = $fileInfo['exists'];
         $this->fileName = $this->invoice->file->file_name ?? null;
-
-        // Préparer les données de partage de la facture
-        $this->loadFamilyMembers();
-        $this->initializeShares();
-        $this->calculateRemainingShares();
-
-        // Initialiser les tags de la facture
-        $this->initializeTagManagement();
-
-        $this->hasExistingShares = !empty($this->form->user_shares) && count($this->form->user_shares) > 0;
     }
 
-    public function hydrate()
+    /**
+     * Configure les données de partage de la facture
+     */
+    private function setupSharingData(): void
+    {
+        $this->loadFamilyMembers();
+        $this->initializeShares();
+        $this->enableSharing = $this->invoice->sharedUsers()->count() > 1;
+    }
+
+    public function hydrate(): void
     {
         $this->resetErrorBag();
         $this->resetValidation();
@@ -89,9 +96,13 @@ class Edit extends Component
 
     public function updateInvoice(FileStorageService $fileStorageService): void
     {
-        $this->validateShares();
+        if (! $this->form->invoice) {
+            Toaster::error('Impossible de mettre à jour cette facture: Il y a un conflit de données.');
 
-        $invoice = $this->form->update($fileStorageService);
+            return;
+        }
+
+        $invoice = $this->form->save($fileStorageService, $this->enableSharing);
 
         if ($invoice) {
             Toaster::success('Facture mise à jour avec succès !');

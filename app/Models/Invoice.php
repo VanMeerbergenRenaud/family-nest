@@ -69,6 +69,11 @@ class Invoice extends Model
         return $this->belongsTo(Family::class);
     }
 
+    public function paidByUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'paid_by_user_id');
+    }
+
     /**
      * Configuration Algolia
      */

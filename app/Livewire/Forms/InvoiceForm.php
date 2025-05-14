@@ -260,68 +260,73 @@ class InvoiceForm extends Form
         }
     }
 
+    // Calculer le montant restant à répartir
+    public function validateAndAdjustShares(): bool
+    {
+        // Si le montant total est nul, pas besoin de vérifier les répartitions
+        if (floatval($this->amount ?? 0) <= 0) {
+            $this->user_shares = [];
+
+            return true;
+        }
+
+        // Filtrer pour ne garder que les parts actives (avec montant ou pourcentage > 0)
+        $activeShares = array_filter($this->user_shares ?? [], function ($share) {
+            return (isset($share['amount']) && floatval($share['amount']) > 0) ||
+                (isset($share['percentage']) && floatval($share['percentage']) > 0);
+        });
+
+        // Si le mode de répartition est activé, mais qu'il y a moins de 2 membres actifs, la validation échoue
+        if (! empty($this->user_shares) && count($activeShares) < 2) {
+            return false;
+        }
+
+        // Si pas de répartition active, réinitialiser complètement les parts
+        if (empty($activeShares)) {
+            $this->user_shares = [];
+        }
+
+        return true;
+    }
+
     // Create or update invoice
-    public function saveInvoice(FileStorageService $fileStorageService)
+    public function processAmount(): void
+    {
+        if (isset($this->amount)) {
+            $this->amount = $this->normalizeAmount($this->amount);
+        }
+    }
+
+    // Méthode générique pour la sauvegarde de la facture
+    public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
         $this->family_id = auth()->user()->family()->id;
+
+        // Ne vérifier les parts que si la répartition est activée
+        if ($enableSharing && ! $this->validateAndAdjustShares()) {
+            $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
+
+            return false;
+        }
+
+        // Si la répartition n'est pas activée, réinitialiser les parts
+        if (! $enableSharing) {
+            $this->user_shares = [];
+        }
 
         $this->validate();
 
         try {
             DB::beginTransaction();
 
-            // Normaliser le montant avant stockage
-            $amount = $this->normalizeAmount($this->amount);
+            // Préparer les données communes
+            $invoiceData = $this->prepareInvoiceData();
 
-            // Si le payeur n'est pas dans la bonne famille, on le force à être l'utilisateur authentifié
-            // Vérifier que le payeur est valide, sans forcer l'utilisateur authentifié
-            $validPayerIds = auth()->user()->families->flatMap(function ($family) {
-                return $family->users->pluck('id');
-            })->push(auth()->id())->unique()->toArray();
-
-            $payerId = $this->paid_by_user_id;
-            if (! in_array($payerId, $validPayerIds)) {
-                $payerId = auth()->id();
-            }
-
-            // Préparation des données communes
-            $invoiceData = [
-                // Informations générales
-                'name' => $this->name,
-                'reference' => $this->reference,
-                'type' => $this->type,
-                'category' => $this->category,
-                'issuer_name' => $this->issuer_name,
-                'issuer_website' => $this->issuer_website,
-                // Détails financiers
-                'amount' => $amount,
-                'currency' => $this->currency,
-                'paid_by_user_id' => $payerId,
-                'family_id' => $this->family_id,
-                // Dates
-                'issued_date' => $this->issued_date,
-                'payment_due_date' => $this->payment_due_date,
-                'payment_reminder' => $this->payment_reminder,
-                'payment_frequency' => $this->payment_frequency,
-                // Statut de paiement
-                'payment_status' => $this->payment_status,
-                'payment_method' => $this->payment_method,
-                'priority' => $this->priority,
-                // Notes et tags
-                'notes' => $this->notes,
-                'tags' => $this->tags ?? [],
-                // Archives et favoris
-                'is_archived' => $this->is_archived,
-                'is_favorite' => $this->is_favorite,
-            ];
-
-            // Si c'est une mise à jour ou une création
+            // Création ou mise à jour
             if ($this->invoice) {
-                // Mise à jour
                 $this->invoice->update($invoiceData);
                 $invoice = $this->invoice;
             } else {
-                // Création
                 $invoiceData['user_id'] = auth()->id();
                 $invoice = auth()->user()->invoices()->create($invoiceData);
             }
@@ -331,18 +336,22 @@ class InvoiceForm extends Form
 
             // Traitement du fichier si présent
             if ($this->uploadedFile) {
-                // Récupérer l'ancien fichier si édition
                 $oldFile = $this->invoice
                     ? InvoiceFile::where('invoice_id', $invoice->id)
                         ->where('is_primary', true)
                         ->first()
                     : null;
 
-                // Stocker le fichier
                 $this->invoiceFile = $fileStorageService->processInvoiceFile($invoice, $this->uploadedFile, $oldFile);
             }
 
             DB::commit();
+
+            // Gérer le rappel de paiement
+            if ($invoice && $this->payment_reminder) {
+                app(InvoiceReminderService::class)->scheduleReminder($invoice);
+                // auth()->user()->notify(new InvoicePaymentReminder($invoice));
+            }
 
             return $invoice;
         } catch (\Exception $e) {
@@ -354,39 +363,51 @@ class InvoiceForm extends Form
         }
     }
 
-    public function handlePaymentReminder(Invoice $invoice): void
+    // Préparer les données de la facture
+    private function prepareInvoiceData(): array
     {
-        if ($this->payment_reminder) {
-            app(InvoiceReminderService::class)->scheduleReminder($invoice);
-        }
-    }
+        // Normaliser le montant avant stockage
+        $amount = $this->normalizeAmount($this->amount);
 
-    public function store(FileStorageService $fileStorageService)
-    {
-        $invoice = $this->saveInvoice($fileStorageService);
+        // Vérifier que le payeur est valide
+        $validPayerIds = auth()->user()->families->flatMap(function ($family) {
+            return $family->users->pluck('id');
+        })->push(auth()->id())->unique()->toArray();
 
-        if ($invoice) {
-            $this->handlePaymentReminder($invoice);
-        }
-
-        return $invoice;
-    }
-
-    public function update(FileStorageService $fileStorageService)
-    {
-        if (! $this->invoice) {
-            Toaster::error('Impossible de mettre à jour cette facture::Il y a un conflit de données.');
+        $payerId = $this->paid_by_user_id;
+        if (! in_array($payerId, $validPayerIds)) {
+            $payerId = auth()->id();
         }
 
-        $invoice = $this->saveInvoice($fileStorageService);
-
-        auth()->user()->notify(new InvoicePaymentReminder($invoice));
-
-        if ($invoice) {
-            $this->handlePaymentReminder($invoice);
-        }
-
-        return $invoice;
+        return [
+            // Informations générales
+            'name' => $this->name,
+            'reference' => $this->reference,
+            'type' => $this->type,
+            'category' => $this->category,
+            'issuer_name' => $this->issuer_name,
+            'issuer_website' => $this->issuer_website,
+            // Détails financiers
+            'amount' => $amount,
+            'currency' => $this->currency,
+            'paid_by_user_id' => $payerId,
+            'family_id' => $this->family_id,
+            // Dates
+            'issued_date' => $this->issued_date,
+            'payment_due_date' => $this->payment_due_date,
+            'payment_reminder' => $this->payment_reminder,
+            'payment_frequency' => $this->payment_frequency,
+            // Statut de paiement
+            'payment_status' => $this->payment_status,
+            'payment_method' => $this->payment_method,
+            'priority' => $this->priority,
+            // Notes et tags
+            'notes' => $this->notes,
+            'tags' => $this->tags ?? [],
+            // Archives et favoris
+            'is_archived' => $this->is_archived,
+            'is_favorite' => $this->is_favorite,
+        ];
     }
 
     public function archive(): bool
@@ -497,7 +518,7 @@ class InvoiceForm extends Form
         // Charger les parts d'utilisateurs
         $this->user_shares = [];
 
-        if (!$invoice->sharedUsers->isEmpty()) {
+        if (! $invoice->sharedUsers->isEmpty()) {
             foreach ($invoice->sharedUsers as $user) {
                 $this->user_shares[] = [
                     'id' => $user->id,
@@ -577,43 +598,28 @@ class InvoiceForm extends Form
     }
 
     /**
-     * Normalise les montants des parts avant la sauvegarde
-     * Sans forcer automatiquement une répartition à 100% ou au montant total
-     */
-    private function normalizeShares(): void
-    {
-        if (empty($this->user_shares)) {
-            return;
-        }
-
-        // Simplement normaliser les valeurs numériques sans ajuster les totaux
-        foreach ($this->user_shares as &$share) {
-            // Normaliser le pourcentage et le montant à 2 décimales
-            $share['percentage'] = round(floatval($share['percentage'] ?? 0), 2);
-            $share['amount'] = round(floatval($share['amount'] ?? 0), 2);
-        }
-    }
-
-    /**
      * Traite les parts d'utilisateurs avant de les sauvegarder
      */
     private function processInvoiceShares(Invoice $invoice): void
     {
-        // Normaliser les parts sans forcer le total à 100% ou au montant complet
-        $this->normalizeShares();
-
         // Détacher toutes les parts existantes
         $invoice->sharedUsers()->detach();
 
         // Si des parts sont définies, les attacher
         if (! empty($this->user_shares)) {
+            $sharesToAttach = [];
+
             foreach ($this->user_shares as $share) {
                 if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
-                    $invoice->sharedUsers()->attach($share['id'], [
+                    $sharesToAttach[$share['id']] = [
                         'share_amount' => $share['amount'],
                         'share_percentage' => $share['percentage'],
-                    ]);
+                    ];
                 }
+            }
+
+            if (! empty($sharesToAttach)) {
+                $invoice->sharedUsers()->attach($sharesToAttach);
             }
         }
     }

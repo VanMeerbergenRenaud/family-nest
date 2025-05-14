@@ -4,16 +4,24 @@ namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Family;
 use App\Models\Invoice;
+use App\Traits\Invoice\ActionsTrait;
+use App\Traits\Invoice\BulkActionsTrait;
+use App\Traits\Invoice\ColumnPreferencesTrait;
+use App\Traits\Invoice\FileUrlTrait;
 use App\Traits\Invoice\StateCheckTrait;
-use App\Traits\Invoice\TableTrait;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Title('Tableau de bord')]
 class Index extends Component
 {
+    use ActionsTrait;
+    use BulkActionsTrait;
+    use ColumnPreferencesTrait;
+    use FileUrlTrait;
     use StateCheckTrait;
-    use TableTrait;
+    use WithPagination;
 
     public ?Family $family = null;
 
