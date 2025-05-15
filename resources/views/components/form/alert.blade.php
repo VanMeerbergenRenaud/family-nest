@@ -36,11 +36,18 @@
             'icon' => 'text-blue-400'
         ],
         'inProgress' => [
-            'bg' => 'bg-orange-50 dark:bg-orange-900/20',
-            'border' => 'border-orange-300 dark:border-orange-800',
-            'title' => 'text-orange-600 dark:text-orange-300',
-            'text' => 'text-orange-800 dark:text-orange-300',
-            'icon' => 'text-orange-400'
+            'bg' => 'bg-amber-50 dark:bg-amber-900/20',
+            'border' => 'border-amber-300 dark:border-amber-800',
+            'title' => 'text-amber-600 dark:text-amber-300',
+            'text' => 'text-amber-800 dark:text-amber-300',
+            'icon' => 'text-amber-400'
+        ],
+        'almostComplete' => [
+            'bg' => 'bg-emerald-50 dark:bg-emerald-900/20',
+            'border' => 'border-emerald-300 dark:border-emerald-800',
+            'title' => 'text-emerald-600 dark:text-emerald-300',
+            'text' => 'text-emerald-800 dark:text-emerald-300',
+            'icon' => 'text-emerald-400'
         ],
     ];
 

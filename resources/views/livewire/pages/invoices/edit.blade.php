@@ -148,14 +148,14 @@
 
                             <div x-data="{ enableSharing: @js($enableSharing) }">
 
-                                {{-- Case à cocher pour activer/désactiver la répartition avec indicateur de répartition existante --}}
+                                {{-- Case à cocher pour activer/désactiver la répartition entre les membres --}}
                                 <div class="button-primary w-full max-sm:flex-wrap justify-between px-3.5 py-2.5">
                                     <div class="flex items-center">
                                         <x-form.checkbox-input
                                             label="Répartir ce montant entre plusieurs membres"
                                             name="enable_sharing"
-                                            wire:model="enableSharing"
                                             x-model="enableSharing"
+                                            wire:model="enableSharing"
                                             x-on:change="if (!enableSharing) $wire.resetShares()"
                                         />
                                     </div>
@@ -163,7 +163,8 @@
                                     @if($shareSummary['totalShares'] > 1)
                                         <div class="flex items-center">
                                             <span class="px-2 py-0.5 text-xs-medium rounded-full w-max {{ $shareSummary['isComplete'] ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                                {{ $shareSummary['totalShares'] }} {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
+                                                {{ $shareSummary['totalShares'] }}
+                                                {{ $shareSummary['totalShares'] === 1 ? 'membre' : 'membres' }} •
                                                 {{ $shareSummary['formattedTotalPercent'] }}%
                                             </span>
                                         </div>

@@ -6,11 +6,13 @@
     @php
         // Utiliser une variable pour stocker la fonction
         $calculateProgressFn = function($form, $errors) {
-            // Champs requis et optionnels
+
             $requiredFields = ['uploadedFile', 'name', 'amount'];
-            $optionalFields = ['type', 'category', 'issuer_name', 'issuer_website', 'issued_date', 'payment_due_date',
-                              'payment_reminder', 'payment_frequency', 'payment_status', 'payment_method',
-                              'priority', 'notes', 'tags'];
+            $optionalFields = [
+                'type', 'category', 'issuer_name', 'issuer_website', 'issued_date',
+                'payment_due_date', 'payment_reminder', 'payment_frequency', 'payment_status',
+                'payment_method', 'priority', 'notes', 'tags'
+            ];
 
             $filledRequired = 0;
             $filledOptional = 0;
@@ -72,19 +74,19 @@
             $alertTitle = 'Aucune information';
         } elseif ($progressPercentage < 33) {
             $alertType = 'warning';
-            $barColor = 'bg-orange-400';
+            $barColor = 'bg-yellow-400';
             $alertTitle = 'Début de saisie';
         } elseif ($progressPercentage < 70) {
             $alertType = $errors->any() ? 'warning' : 'inProgress';
-            $barColor = 'bg-orange-500';
+            $barColor = $errors->any() ? 'bg-yellow-400' : 'bg-orange-400';
             $alertTitle = 'En cours de complétion';
         } elseif ($progressPercentage < 100) {
-            $alertType = $errors->any() ? 'warning' : 'inProgress';
-            $barColor = 'bg-orange-600';
+            $alertType = $errors->any() ? 'warning' : 'almostComplete';
+            $barColor = $errors->any() ? 'bg-yellow-400' : 'bg-emerald-400';
             $alertTitle = 'Presque terminé';
         } else {
             $alertType = $errors->any() ? 'warning' : 'success';
-            $barColor = $errors->any() ? 'bg-orange-500' : 'bg-green-600';
+            $barColor = $errors->any() ? 'bg-yellow-400' : 'bg-green-500';
             $alertTitle = $errors->any() ? 'Corrections requises' : 'Prêt à soumettre';
         }
 
@@ -132,8 +134,8 @@
                         'devise' => 2,
                         'payée par' => 2,
                         'date d\'émission' => 3,
-                        'date de paiement' => 3,
-                        'rappel de paiement' => 3,
+                        'date d\'échéance' => 3,
+                        'date de rappel' => 3,
                         'fréquence' => 3,
                         'statut' => 4,
                         'méthode de paiement' => 4,

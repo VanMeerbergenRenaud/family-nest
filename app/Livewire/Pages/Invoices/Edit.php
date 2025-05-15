@@ -85,7 +85,7 @@ class Edit extends Component
     {
         $this->loadFamilyMembers();
         $this->initializeShares();
-        $this->enableSharing = $this->invoice->sharings()->count() > 1;
+        $this->enableSharing = $this->invoice->sharings()->exists();
     }
 
     public function hydrate(): void

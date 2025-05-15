@@ -268,7 +268,6 @@ class InvoiceForm extends Form
         // Si le montant total est nul, pas besoin de vérifier les répartitions
         if (floatval($this->amount ?? 0) <= 0) {
             $this->user_shares = [];
-
             return true;
         }
 
@@ -280,6 +279,18 @@ class InvoiceForm extends Form
 
         // Si le mode de répartition est activé, mais qu'il y a moins de 2 membres actifs, la validation échoue
         if (! empty($this->user_shares) && count($activeShares) < 2) {
+            return false;
+        }
+
+        // Vérifier si le total des pourcentages ne dépasse pas 100%
+        $totalPercentage = 0;
+        foreach ($activeShares as $share) {
+            if (isset($share['percentage']) && floatval($share['percentage']) > 0) {
+                $totalPercentage += floatval($share['percentage']);
+            }
+        }
+
+        if ($totalPercentage > 100) {
             return false;
         }
 
@@ -307,7 +318,6 @@ class InvoiceForm extends Form
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
             $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
-
             return false;
         }
 
