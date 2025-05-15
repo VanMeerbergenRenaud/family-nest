@@ -72,7 +72,7 @@ class Folders extends Component
     public function activeInvoices()
     {
         return auth()->user()->invoices()
-            ->with(['file', 'family', 'sharedUsers'])
+            ->with(['file', 'family'])
             ->where('is_archived', false)
             ->get();
     }

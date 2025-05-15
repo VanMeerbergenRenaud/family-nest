@@ -15,8 +15,9 @@
             {{-- Avatar --}}
             <span class="relative flex shrink-0 overflow-hidden h-8 w-8 rounded-lg">
                 <img class="object-cover w-full h-full"
-                     alt="{{ $user->name ?? 'Nom inconnu' }}"
                      src="{{ $user->avatar_url ?? asset('img/avatar_placeholder.png') }}"
+                     alt="{{ $user->name ?? 'Nom inconnu' }}"
+                     loading="lazy"
                 >
             </span>
 

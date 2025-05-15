@@ -40,8 +40,7 @@ trait StateCheckTrait
             } else {
                 $family = $this->getUserFamily();
                 $this->familyMemberIds = $family->users()
-                    ->select('users.id')
-                    ->pluck('id')
+                    ->pluck('users.id')
                     ->toArray();
             }
         }

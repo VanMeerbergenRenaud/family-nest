@@ -27,7 +27,7 @@
             id="archived-invoices"
             type="suggestion"
             :href="route('invoices.archived')"
-            text="Voir mes factures archivées"
+            text="Voir les factures archivées"
         >
             <x-svg.archive class="h-4 w-4 text-gray-400 dark:text-gray-500 group-hover:text-gray-800"/>
         </x-spotlight.result-item>

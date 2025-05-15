@@ -22,8 +22,9 @@
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
                  alt="Aperçu de la facture"
-                 wire:ignore
                  class="bg-gray-100 rounded-lg min-h-[60vh]"
+                 wire:ignore
+                 loading="lazy"
             />
         {{-- Les autres types de fichiers inchangés... --}}
         @elseif ($fileInfo['isPdf'] ?? false)
@@ -38,6 +39,7 @@
                         type="application/pdf"
                         data="{{ $temporaryUrl ?? $storagePath }}"
                         sandbox="allow-same-origin"
+                        loading="lazy"
                     ></object>
                 </div>
             @else

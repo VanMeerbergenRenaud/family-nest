@@ -17,7 +17,7 @@
             {{ __('Voir l\'aperçu') }}
         </x-menu.item>
 
-        <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}">
+        <x-menu.item type="link" href="{{ route('invoices.show', $invoice->id) }}" wire:navigate>
             <x-svg.binocular class="group-hover:text-gray-900"/>
             {{ __('Voir les détails') }}
         </x-menu.item>

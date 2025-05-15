@@ -19,7 +19,7 @@
                     <div class="relative lg:pl-4">
                         <div class="flex-center h-20 w-20 rounded-full overflow-hidden bg-zinc-100 border border-slate-200">
                             @if($form->avatarUrl)
-                                <img src="{{ $form->avatarUrl }}" alt="Avatar" class="h-full w-full object-cover">
+                                <img src="{{ $form->avatarUrl }}" alt="Avatar" class="h-full w-full object-cover" loading="lazy">
                             @else
                                 <span class="text-zinc-400 display-sm-regular">{{ substr($form->name, 0, 1) }}</span>
                             @endif
@@ -29,7 +29,7 @@
                         @if($form->avatar && !$errors->has('form.avatar'))
                             <div wire:loading.remove wire:target="form.avatar" class="lg:pl-4 absolute inset-0">
                                 <div class="h-20 w-20 rounded-full overflow-hidden ring-1 ring-indigo-200">
-                                    <img src="{{ $form->avatar->temporaryUrl() }}" alt="Aperçu" class="h-full w-full object-cover">
+                                    <img src="{{ $form->avatar->temporaryUrl() }}" alt="Aperçu" class="h-full w-full object-cover" loading="lazy">
                                 </div>
                                 <div class="absolute -bottom-0.5 -right-0.5 bg-white rounded-full">
                                     <x-svg.success class="w-5 h-5 text-teal-500"/>

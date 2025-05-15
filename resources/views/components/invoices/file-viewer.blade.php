@@ -11,6 +11,7 @@
                 src="{{ $filePath }}"
                 alt="{{ $fileName ?? 'Aperçu du document' }}"
                 class="max-w-full max-h-full object-cover"
+                loading="lazy"
             >
         @elseif($fileExtension === 'pdf')
             <object
@@ -21,6 +22,7 @@
                 type="application/pdf"
                 data="{{ $filePath }}"
                 sandbox="allow-same-origin"
+                loading="lazy"
             ></object>
         @elseif($fileExtension === 'docx')
             <div class="p-5 text-gray-700 text-md-medium">

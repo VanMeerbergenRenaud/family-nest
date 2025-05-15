@@ -66,7 +66,7 @@ class Filters extends Form
         }
 
         $baseQuery = Invoice::where('family_id', $family->id)
-            ->with(['file', 'sharedUsers'])
+            ->with(['file'])
             ->where('is_archived', false);
 
         $primaryMember = collect([
@@ -157,7 +157,7 @@ class Filters extends Form
         // Query de base pour les factures non archivées
         $query = auth()->user()->accessibleInvoices()
             ->where('is_archived', false)
-            ->with(['file', 'sharedUsers']);
+            ->with(['file']);
 
         // Si on filtre par membre spécifique
         if ($this->family_member !== 'all') {

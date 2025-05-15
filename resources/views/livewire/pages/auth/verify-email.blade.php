@@ -7,7 +7,7 @@
 
         <!-- Session status -->
         @if (session('status') == 'verification-link-sent')
-            <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-3 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-start">
+            <p class="my-4 bg-green-50 border border-green-200 py-2 px-4 gap-3 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-start">
                 <x-svg.success class="w-8 h-6 text-green-600" />
                 {{ __('Un nouveau lien de vérification a été envoyé à l’adresse e-mail que vous avez fournie lors de votre inscription.') }}
             </p>

@@ -114,7 +114,7 @@
     <body>
         <div class="container">
             <div class="header">
-                <img src="{{ asset('img/favicon.svg') }}" alt="Logo" class="logo">
+                <img src="{{ asset('img/favicon.svg') }}" alt="Logo" class="logo" loading="lazy">
             </div>
 
             <div class="content">

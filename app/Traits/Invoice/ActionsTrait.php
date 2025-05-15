@@ -71,7 +71,6 @@ trait ActionsTrait
             $user = auth()->user();
 
             $originalInvoice = $user->accessibleInvoices()
-                ->with(['sharedUsers'])
                 ->findOrFail($invoiceId);
 
             if (! $user->can('update', $originalInvoice)) {

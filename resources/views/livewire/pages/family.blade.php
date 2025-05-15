@@ -226,188 +226,190 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @foreach($members as $member)
-                            <tr wire:key="member-{{ $member->id }}">
-                                <td>
-                                    <div class="flex items-center">
-                                        <div class="mr-3 rounded">
-                                            <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}"
-                                                 alt="{{ $member->name }}"
-                                                 class="h-10 min-w-8 w-10 rounded-full object-cover">
+                            @foreach($members as $member)
+                                <tr wire:key="member-{{ $member->id }}">
+                                    <td>
+                                        <div class="flex items-center">
+                                            <div class="mr-3 rounded">
+                                                <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}"
+                                                     class="h-10 min-w-8 w-10 rounded-full object-cover"
+                                                     alt="{{ $member->name }}"
+                                                     loading="lazy"
+                                                >
+                                            </div>
+                                            <p class="flex flex-col">
+                                               <span
+                                                   class="text-sm-medium text-gray-900 dark:text-gray-400">
+                                                   {{ $member->name ?? 'Nom inconnu' }}
+                                                   @if($member->id === $currentUser)
+                                                       <span class="ml-2 text-xs-medium text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded-full">
+                                                           Vous
+                                                       </span>
+                                                   @endif
+                                               </span>
+                                                <span class="text-sm-regular text-gray-500 dark:text-gray-400">
+                                                   {{ $member->email }}
+                                               </span>
+                                            </p>
                                         </div>
-                                        <p class="flex flex-col">
-                                           <span
-                                               class="text-sm-medium text-gray-900 dark:text-gray-400">
-                                               {{ $member->name ?? 'Nom inconnu' }}
-                                               @if($member->id === $currentUser)
-                                                   <span class="ml-2 text-xs-medium text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded-full">
-                                                       Vous
-                                                   </span>
-                                               @endif
-                                           </span>
-                                            <span class="text-sm-regular text-gray-500 dark:text-gray-400">
-                                               {{ $member->email }}
-                                           </span>
-                                        </p>
-                                    </div>
-                                </td>
-                                <td>
-                                    @php
-                                        $isCurrentUser = $member->id === $currentUser;
-                                        $permission = App\Enums\FamilyPermissionEnum::tryFrom($member->permission);
-                                        $permissionClass = $permission ? $permission->cssClasses() : 'bg-slate-50 text-slate-700 border-slate-100';
-                                        $permissionLabel = $permission ? $permission->label() : 'Membre';
-                                    @endphp
-                                    <span
-                                        class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $permissionClass }}">
-                                       {{ $permissionLabel }}
-                                   </span>
-                                </td>
-                                <td>
-                                    @php
-                                        $relation = App\Enums\FamilyRelationEnum::tryFrom($member->relation);
-                                        $relationLabel = $relation ? $relation->label() : $member->relation;
-                                    @endphp
-                                    {{ $relationLabel }}
-                                </td>
-                                <td>
-                                    @php
-                                        $invoiceData = $invoiceCounts[$member->id] ?? [
-                                            'total' => 0,
-                                            'late' => 0,
-                                            'unpaid' => 0,
-                                            'pending' => 0
-                                        ];
-                                    @endphp
-
-                                    <div class="flex flex-wrap gap-1">
-                                       <span
-                                           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-gray-100 text-gray-800">
-                                           {{ $invoiceData['total'] }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $isCurrentUser = $member->id === $currentUser;
+                                            $permission = App\Enums\FamilyPermissionEnum::tryFrom($member->permission);
+                                            $permissionClass = $permission ? $permission->cssClasses() : 'bg-slate-50 text-slate-700 border-slate-100';
+                                            $permissionLabel = $permission ? $permission->label() : 'Membre';
+                                        @endphp
+                                        <span
+                                            class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $permissionClass }}">
+                                           {{ $permissionLabel }}
                                        </span>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $relation = App\Enums\FamilyRelationEnum::tryFrom($member->relation);
+                                            $relationLabel = $relation ? $relation->label() : $member->relation;
+                                        @endphp
+                                        {{ $relationLabel }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $invoiceData = $invoiceCounts[$member->id] ?? [
+                                                'total' => 0,
+                                                'late' => 0,
+                                                'unpaid' => 0,
+                                                'pending' => 0
+                                            ];
+                                        @endphp
 
-                                        @if($invoiceData['late'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-amber-100 text-amber-800">
-                                               {{ $invoiceData['late'] }} urgent
+                                        <div class="flex flex-wrap gap-1">
+                                           <span
+                                               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-gray-100 text-gray-800">
+                                               {{ $invoiceData['total'] }}
                                            </span>
-                                        @endif
 
-                                        @if($invoiceData['unpaid'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
-                                               {{ $invoiceData['unpaid'] }} à venir
-                                           </span>
-                                        @endif
-
-                                        @if($invoiceData['pending'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-green-100 text-green-800">
-                                               {{ $invoiceData['pending'] }} en cours
-                                           </span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="grid justify-end text-right">
-                                    <x-menu>
-                                        <x-menu.button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                            <x-svg.dots class="w-5 h-5 text-gray-500"/>
-                                        </x-menu.button>
-                                        <x-menu.items>
-                                            @if($member->id === $currentUser)
-                                                <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
-                                                    Mon profil
-                                                </p>
-                                                <x-menu.item wire:click="showUserProfile({{ $member->id }})" class="group">
-                                                    <x-svg.show class="group-hover:text-gray-900"/>
-                                                    {{ __('Voir') }}
-                                                </x-menu.item>
-                                                <x-menu.item type="link" href="{{ route('settings.profile') }}">
-                                                    <x-svg.edit class="group-hover:text-gray-900"/>
-                                                    {{ __('Modifier') }}
-                                                </x-menu.item>
-                                            @else
-                                                <x-menu.item wire:click="showUserProfile({{ $member->id }})" class="group">
-                                                    <x-svg.show class="group-hover:text-gray-900"/>
-                                                    {{ __('Voir le profil') }}
-                                                </x-menu.item>
+                                            @if($invoiceData['late'] > 0)
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-amber-100 text-amber-800">
+                                                   {{ $invoiceData['late'] }} urgent
+                                               </span>
                                             @endif
 
-                                            {{-- Seul un admin peut changer les rôles --}}
-                                            @if($isAdmin && $member->id !== $currentUser)
-                                                <x-menu.divider/>
-
-                                                <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
-                                                    Changement de rôle
-                                                </p>
-
-                                                {{-- Option: Administrateur --}}
-                                                <x-menu.item
-                                                    wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Admin->value }}')"
-                                                    class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Admin->value ? App\Enums\FamilyPermissionEnum::Admin->cssClasses() : '' }}"
-                                                    wire:loading.attr="disabled"
-                                                >
-                                                    <x-svg.admin class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Admin->value ? 'text-' . App\Enums\FamilyPermissionEnum::Admin->color() . '-700 group-hover:text-gray-900' : '' }}"/>
-                                                    {{ App\Enums\FamilyPermissionEnum::Admin->label() }}
-                                                </x-menu.item>
-
-                                                {{-- Option: Éditeur --}}
-                                                <x-menu.item
-                                                    wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Editor->value }}')"
-                                                    class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Editor->value ? App\Enums\FamilyPermissionEnum::Editor->cssClasses() : '' }}"
-                                                    wire:loading.attr="disabled"
-                                                >
-                                                    <x-svg.edit class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Editor->value ? 'text-' . App\Enums\FamilyPermissionEnum::Editor->color() . '-700 group-hover:text-gray-900' : '' }}"/>
-                                                    {{ App\Enums\FamilyPermissionEnum::Editor->label() }}
-                                                </x-menu.item>
-
-                                                {{-- Option: Lecteur --}}
-                                                <x-menu.item
-                                                    wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Viewer->value }}')"
-                                                    class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Viewer->value ? App\Enums\FamilyPermissionEnum::Viewer->cssClasses() : '' }}"
-                                                    wire:loading.attr="disabled"
-                                                >
-                                                    <x-svg.show class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Viewer->value ? 'text-' . App\Enums\FamilyPermissionEnum::Viewer->color() . '-700 group-hover:text-gray-900' : '' }}"/>
-                                                    {{ App\Enums\FamilyPermissionEnum::Viewer->label() }}
-                                                </x-menu.item>
-
-                                                <x-menu.divider/>
-
-                                                <x-menu.item
-                                                    wire:click="deleteMember({{ $member->id }})"
-                                                    class="group hover:text-red-500"
-                                                    wire:loading.attr="disabled"
-                                                >
-                                                    <x-svg.trash class="group-hover:text-red-500"/>
-                                                    {{ __('Supprimer le membre') }}
-                                                </x-menu.item>
+                                            @if($invoiceData['unpaid'] > 0)
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
+                                                   {{ $invoiceData['unpaid'] }} à venir
+                                               </span>
                                             @endif
 
-                                            {{-- Seul un admin peut gérer la famille --}}
-                                            @if($isAdmin && $member->id === $currentUser)
-                                                <x-menu.divider/>
-
-                                                <p class="text-left text-xs-medium uppercase text-gray-500 py-1 px-2">
-                                                    Ma famille
-                                                </p>
-                                                {{-- Modifier le nom de la famille --}}
-                                                <x-menu.item wire:click="showModifyFamilyNameFormModal" class="group">
-                                                    <x-svg.edit class="group-hover:text-gray-900"/>
-                                                    {{ __('Modifier le nom') }}
-                                                </x-menu.item>
-                                                {{-- Supprimer les membres (visible seulement s'il y a plus d'un membre) --}}
-                                                @if($members->count() > 1)
-                                                    <x-menu.item wire:click="showDeleteFamilyMFormModal" class="group hover:text-red-500">
-                                                        <x-svg.trash class="group-hover:text-red-500"/>
-                                                        {{ __('Supprimer les membres') }}
+                                            @if($invoiceData['pending'] > 0)
+                                                <span
+                                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-green-100 text-green-800">
+                                                   {{ $invoiceData['pending'] }} en cours
+                                               </span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="grid justify-end text-right">
+                                        <x-menu>
+                                            <x-menu.button class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <x-svg.dots class="w-5 h-5 text-gray-500"/>
+                                            </x-menu.button>
+                                            <x-menu.items>
+                                                @if($member->id === $currentUser)
+                                                    <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
+                                                        Mon profil
+                                                    </p>
+                                                    <x-menu.item wire:click="showUserProfile({{ $member->id }})" class="group">
+                                                        <x-svg.show class="group-hover:text-gray-900"/>
+                                                        {{ __('Voir') }}
+                                                    </x-menu.item>
+                                                    <x-menu.item type="link" href="{{ route('settings.profile') }}">
+                                                        <x-svg.edit class="group-hover:text-gray-900"/>
+                                                        {{ __('Modifier') }}
+                                                    </x-menu.item>
+                                                @else
+                                                    <x-menu.item wire:click="showUserProfile({{ $member->id }})" class="group">
+                                                        <x-svg.show class="group-hover:text-gray-900"/>
+                                                        {{ __('Voir le profil') }}
                                                     </x-menu.item>
                                                 @endif
-                                            @endif
-                                        </x-menu.items>
-                                    </x-menu>
-                                </td>
-                            </tr>
-                        @endforeach
+
+                                                {{-- Seul un admin peut changer les rôles --}}
+                                                @if($isAdmin && $member->id !== $currentUser)
+                                                    <x-menu.divider/>
+
+                                                    <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
+                                                        Changement de rôle
+                                                    </p>
+
+                                                    {{-- Option: Administrateur --}}
+                                                    <x-menu.item
+                                                        wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Admin->value }}')"
+                                                        class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Admin->value ? App\Enums\FamilyPermissionEnum::Admin->cssClasses() : '' }}"
+                                                        wire:loading.attr="disabled"
+                                                    >
+                                                        <x-svg.admin class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Admin->value ? 'text-' . App\Enums\FamilyPermissionEnum::Admin->color() . '-700 group-hover:text-gray-900' : '' }}"/>
+                                                        {{ App\Enums\FamilyPermissionEnum::Admin->label() }}
+                                                    </x-menu.item>
+
+                                                    {{-- Option: Éditeur --}}
+                                                    <x-menu.item
+                                                        wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Editor->value }}')"
+                                                        class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Editor->value ? App\Enums\FamilyPermissionEnum::Editor->cssClasses() : '' }}"
+                                                        wire:loading.attr="disabled"
+                                                    >
+                                                        <x-svg.edit class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Editor->value ? 'text-' . App\Enums\FamilyPermissionEnum::Editor->color() . '-700 group-hover:text-gray-900' : '' }}"/>
+                                                        {{ App\Enums\FamilyPermissionEnum::Editor->label() }}
+                                                    </x-menu.item>
+
+                                                    {{-- Option: Lecteur --}}
+                                                    <x-menu.item
+                                                        wire:click="changeRole({{ $member->id }}, '{{ App\Enums\FamilyPermissionEnum::Viewer->value }}')"
+                                                        class="group {{ $member->permission === App\Enums\FamilyPermissionEnum::Viewer->value ? App\Enums\FamilyPermissionEnum::Viewer->cssClasses() : '' }}"
+                                                        wire:loading.attr="disabled"
+                                                    >
+                                                        <x-svg.show class="{{ $member->permission === App\Enums\FamilyPermissionEnum::Viewer->value ? 'text-' . App\Enums\FamilyPermissionEnum::Viewer->color() . '-700 group-hover:text-gray-900' : '' }}"/>
+                                                        {{ App\Enums\FamilyPermissionEnum::Viewer->label() }}
+                                                    </x-menu.item>
+
+                                                    <x-menu.divider/>
+
+                                                    <x-menu.item
+                                                        wire:click="deleteMember({{ $member->id }})"
+                                                        class="group hover:text-red-500"
+                                                        wire:loading.attr="disabled"
+                                                    >
+                                                        <x-svg.trash class="group-hover:text-red-500"/>
+                                                        {{ __('Supprimer le membre') }}
+                                                    </x-menu.item>
+                                                @endif
+
+                                                {{-- Seul un admin peut gérer la famille --}}
+                                                @if($isAdmin && $member->id === $currentUser)
+                                                    <x-menu.divider/>
+
+                                                    <p class="text-left text-xs-medium uppercase text-gray-500 py-1 px-2">
+                                                        Ma famille
+                                                    </p>
+                                                    {{-- Modifier le nom de la famille --}}
+                                                    <x-menu.item wire:click="showModifyFamilyNameFormModal" class="group">
+                                                        <x-svg.edit class="group-hover:text-gray-900"/>
+                                                        {{ __('Modifier le nom') }}
+                                                    </x-menu.item>
+                                                    {{-- Supprimer les membres (visible seulement s'il y a plus d'un membre) --}}
+                                                    @if($members->count() > 1)
+                                                        <x-menu.item wire:click="showDeleteFamilyMFormModal" class="group hover:text-red-500">
+                                                            <x-svg.trash class="group-hover:text-red-500"/>
+                                                            {{ __('Supprimer les membres') }}
+                                                        </x-menu.item>
+                                                    @endif
+                                                @endif
+                                            </x-menu.items>
+                                        </x-menu>
+                                    </td>
+                                </tr>
+                            @endforeach
                         </tbody>
                     </table>
 
@@ -428,9 +430,9 @@
                 <!-- En-tête avec avatar et informations de base -->
                 <div class="flex-center flex-col gap-1 mt-10 mb-6">
                     <img src="{{ $selectedUser->avatar_url ?? asset('img/img_placeholder.jpg') }}"
+                         class="mb-4 relative h-24 w-24 rounded-full object-cover"
                          alt="{{ $selectedUser->name }}"
                          loading="lazy"
-                         class="mb-4 relative h-24 w-24 rounded-full object-cover"
                     >
                     <h2 class="text-xl-semibold text-gray-900">{{ $selectedUser->name }}</h2>
                     <p class="text-sm text-gray-500">{{ $selectedUser->email }}</p>
@@ -698,8 +700,10 @@
                                 <!-- Avatar Image -->
                                 <div class="flex-center mt-4 mb-6">
                                     <img src="{{ asset('img/users/three.png') ?? null }}"
+                                         class="h-16 w-auto rounded-full object-cover bg-transparent"
                                          alt="Exemple de 3 avatars"
-                                         class="h-16 w-auto rounded-full object-cover bg-transparent">
+                                         loading="lazy"
+                                    >
                                 </div>
                                 <h2 role="heading" aria-level="2" class="display-xs-semibold">Inviter un membre</h2>
                                 <p class="text-gray-600 dark:text-gray-400 px-4 lg:px-12">

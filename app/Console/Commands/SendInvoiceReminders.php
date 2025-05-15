@@ -22,7 +22,7 @@ class SendInvoiceReminders extends Command
         // Récupérer toutes les factures avec une date de rappel aujourd'hui et qui ne sont pas encore payées
         $invoices = Invoice::whereDate('payment_reminder', $today)
             ->whereNotIn('payment_status', [PaymentStatusEnum::Paid->value])
-            ->with(['user', 'family', 'sharedUsers'])
+            ->with(['user', 'family'])
             ->get();
 
         $count = 0;
