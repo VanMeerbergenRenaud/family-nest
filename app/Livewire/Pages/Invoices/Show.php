@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Invoices;
 
+use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
@@ -9,7 +10,6 @@ use App\Enums\PriorityEnum;
 use App\Traits\Invoice\ActionsTrait;
 use App\Traits\Invoice\ComponentTrait;
 use App\Traits\Invoice\FileUrlTrait;
-use App\Traits\Invoice\ShareCalculationTrait;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
@@ -21,18 +21,16 @@ class Show extends Component
     use ActionsTrait;
     use ComponentTrait;
     use FileUrlTrait;
-    use ShareCalculationTrait;
 
     public bool $showDeleteFormModal = false;
 
     public function mount($id)
     {
         $this->invoice = auth()->user()->accessibleInvoices()
-            ->with(['file', 'sharedUsers'])
+            ->with(['file', 'family', 'sharings'])
             ->findOrFail($id);
 
         $this->initializeFileInfo();
-        $this->prepareShares();
     }
 
     private function initializeFileInfo(): void
@@ -43,33 +41,6 @@ class Show extends Component
         $this->fileExtension = $fileInfo['extension'];
         $this->fileName = $this->invoice->file->file_name ?? $this->invoice->name;
         $this->fileExists = $fileInfo['exists'];
-    }
-
-    private function prepareShares(): void
-    {
-        $this->form = new \stdClass;
-        $this->form->amount = $this->invoice->amount;
-        $this->form->currency = $this->invoice->currency;
-        $this->form->family_id = $this->invoice->family_id;
-        $this->form->user_shares = [];
-
-        $this->loadSharesFromInvoice();
-        $this->initializeShares();
-    }
-
-    private function loadSharesFromInvoice(): void
-    {
-        if ($this->invoice->sharedUsers->isEmpty()) {
-            return;
-        }
-
-        foreach ($this->invoice->sharedUsers as $user) {
-            $this->form->user_shares[] = [
-                'id' => $user->id,
-                'amount' => floatval($user->pivot->share_amount ?? 0),
-                'percentage' => floatval($user->pivot->share_percentage ?? 0),
-            ];
-        }
     }
 
     public function formatDate($date): string
@@ -85,12 +56,28 @@ class Show extends Component
         return $date->format('d/m/Y');
     }
 
+    /**
+     * Obtient le symbole de la devise pour l'affichage
+     */
+    public function getCurrencySymbol(): string
+    {
+        if (! isset($this->invoice->currency)) {
+            return '€';
+        }
+
+        try {
+            return CurrencyEnum::tryFrom($this->invoice->currency)?->symbol() ?? '€';
+        } catch (\Exception) {
+            return '€';
+        }
+    }
+
     #[On('invoice-favorite')]
     #[On('invoice-restore')]
     #[On('invoice-archived')]
     public function refreshShow(): void
     {
-        $this->prepareShares();
+        $this->invoice->refresh();
     }
 
     public function render()
@@ -106,8 +93,10 @@ class Show extends Component
 
         $currencySymbol = $this->getCurrencySymbol();
 
-        $shareSummary = $this->getShareDetailSummary($this->invoice->sharedUsers);
-        $payer = $this->invoice->paidByUser;
+        $totalPercentage = $this->invoice->total_percentage;
+        $totalSharedAmount = $this->invoice->total_shared_amount;
+        $hasShares = $this->invoice->has_shares;
+        $isFullyShared = $this->invoice->is_fully_shared;
 
         return view('livewire.pages.invoices.show', compact(
             'paymentStatusEnum',
@@ -115,8 +104,10 @@ class Show extends Component
             'frequencyEnum',
             'priorityEnum',
             'currencySymbol',
-            'shareSummary',
-            'payer',
+            'totalPercentage',
+            'totalSharedAmount',
+            'hasShares',
+            'isFullyShared',
         ))->layout('layouts.app-sidebar');
     }
 }

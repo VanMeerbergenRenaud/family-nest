@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Scout\Searchable;
 
@@ -44,7 +45,14 @@ class Invoice extends Model
         'is_favorite' => 'boolean',
     ];
 
-    protected $with = ['file', 'family', 'sharedUsers'];
+    protected $with = ['file', 'family'];
+
+    protected $appends = [
+        'has_shares',
+        'total_percentage',
+        'total_shared_amount',
+        'is_fully_shared',
+    ];
 
     public function user(): BelongsTo
     {
@@ -57,9 +65,17 @@ class Invoice extends Model
             ->where('is_primary', true);
     }
 
+    /**
+     * Les partages associés à cette facture
+     */
+    public function sharings(): HasMany
+    {
+        return $this->hasMany(InvoiceSharing::class);
+    }
+
     public function sharedUsers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'invoice_user')
+        return $this->belongsToMany(User::class, 'invoice_sharings')
             ->withPivot('share_amount', 'share_percentage')
             ->withTimestamps();
     }
@@ -74,19 +90,68 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'paid_by_user_id');
     }
 
-    /**
-     * Configuration Algolia
-     */
+    public function getHasSharesAttribute(): bool
+    {
+        if ($this->relationLoaded('sharings')) {
+            return $this->sharings->isNotEmpty();
+        }
+
+        if (isset($this->attributes['sharings_count'])) {
+            return $this->attributes['sharings_count'] > 0;
+        }
+
+        return $this->sharings()->exists();
+    }
+
+    public function getTotalPercentageAttribute(): float
+    {
+        if (isset($this->attributes['sharings_sum_share_percentage'])) {
+            return (float) $this->attributes['sharings_sum_share_percentage'];
+        }
+
+        if ($this->relationLoaded('sharings')) {
+            return $this->sharings->sum('share_percentage');
+        }
+
+        return $this->sharings()->sum('share_percentage');
+    }
+
+    public function getTotalSharedAmountAttribute(): float
+    {
+        if (isset($this->attributes['sharings_sum_share_amount'])) {
+            return (float) $this->attributes['sharings_sum_share_amount'];
+        }
+
+        if ($this->relationLoaded('sharings')) {
+            return $this->sharings->sum('share_amount');
+        }
+
+        return $this->sharings()->sum('share_amount');
+    }
+
+    public function getIsFullySharedAttribute(): bool
+    {
+        return $this->total_percentage >= 99.9 ||
+            (floatval($this->amount) > 0 && abs(floatval($this->amount) - $this->total_shared_amount) < 0.01);
+    }
+
+    /* Algolia */
     public function toSearchableArray(): array
     {
+        if (! $this->relationLoaded('family')) {
+            $this->load('family');
+        }
+
         return [
             'name' => $this->name,
             'reference' => $this->reference,
-            'type' => $this->type,
-            'category' => $this->category,
+            'type' => $this->type?->value,
+            'category' => $this->category?->value,
             'issuer_name' => $this->issuer_name,
             'tags' => $this->tags,
             'amount' => (float) $this->amount,
+            'user_id' => $this->user_id,
+            'family_id' => $this->family_id,
         ];
     }
 

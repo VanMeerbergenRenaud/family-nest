@@ -38,7 +38,7 @@ class CheckFamilyRole
             $invoiceFamily = $invoice->family;
 
             // If invoice has a family, check that user belongs to that family
-            if ($invoiceFamily && ! $user->families()->where('family_id', $invoiceFamily->id)->exists()) {
+            if ($invoiceFamily && ! $user->belongsToFamily($invoiceFamily->id)) {
                 return redirect()->route('invoices.index');
             }
         }

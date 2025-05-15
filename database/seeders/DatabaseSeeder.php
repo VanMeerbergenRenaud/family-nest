@@ -7,6 +7,7 @@ use App\Enums\FamilyRelationEnum;
 use App\Models\Family;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Models\InvoiceSharing;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -82,6 +83,10 @@ class DatabaseSeeder extends Seeder
         // Create invoice files for users
         foreach ($invoiceRenaud as $invoice) {
             InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+            InvoiceSharing::factory()->create([
+                'user_id' => $renaud->id,
                 'invoice_id' => $invoice->id,
             ]);
         }

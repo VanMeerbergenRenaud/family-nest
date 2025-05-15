@@ -50,7 +50,7 @@ class Edit extends Component
     {
         // Récupérer la facture avec ses relations
         $this->invoice = auth()->user()->accessibleInvoices()
-            ->with(['file', 'sharedUsers'])
+            ->with(['file', 'sharings', 'family'])
             ->findOrFail($id);
 
         // Vérifier les droits de modification
@@ -85,7 +85,7 @@ class Edit extends Component
     {
         $this->loadFamilyMembers();
         $this->initializeShares();
-        $this->enableSharing = $this->invoice->sharedUsers()->count() > 1;
+        $this->enableSharing = $this->invoice->sharings()->count() > 1;
     }
 
     public function hydrate(): void

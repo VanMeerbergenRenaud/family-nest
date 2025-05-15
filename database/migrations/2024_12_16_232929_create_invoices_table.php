@@ -41,6 +41,7 @@ return new class extends Migration
             $table->boolean('is_favorite')->default(false);
             // Foreign keys
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('paid_by_user_id')->constrained('users')->cascadeOnDelete();
             // Time stamps
             $table->timestamps();
         });

@@ -29,6 +29,8 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $hasFamily = null;
 
+    protected $familyMembership = [];
+
     protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
@@ -123,7 +125,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get all invoices accessible to this user (personal + family invoices)
+     * Get all invoices accessible to this user (personal and family invoices)
      */
     public function accessibleInvoices()
     {
@@ -138,6 +140,43 @@ class User extends Authenticatable implements MustVerifyEmail
             $query->where('user_id', $this->id)
                 ->orWhereIn('family_id', $familyIds);
         });
+    }
+
+    /**
+     * Relation avec les factures partagées avec cet utilisateur
+     */
+    public function sharedInvoices()
+    {
+        return $this->belongsToMany(Invoice::class, 'invoice_sharings')
+            ->withPivot('share_amount', 'share_percentage')
+            ->withTimestamps();
+    }
+
+    /**
+     * Vérifie si l'utilisateur appartient à la famille spécifiée
+     */
+    public function belongsToFamily(?int $familyId): bool
+    {
+        if (empty($familyId)) {
+            return false;
+        }
+
+        // Vérifier si le résultat est déjà en cache
+        if (! isset($this->familyMembership[$familyId])) {
+            $this->familyMembership[$familyId] = $this->families()
+                ->where('family_id', $familyId)
+                ->exists();
+        }
+
+        return $this->familyMembership[$familyId];
+    }
+
+    /**
+     * Les parts de factures associées à cet utilisateur
+     */
+    public function invoiceShares(): HasMany
+    {
+        return $this->hasMany(InvoiceSharing::class);
     }
 
     /**

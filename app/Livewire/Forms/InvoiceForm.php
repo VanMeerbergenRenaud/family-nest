@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Enums\CategoryEnum;
 use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
@@ -10,6 +11,7 @@ use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use App\Models\InvoiceSharing;
 use App\Notifications\InvoicePaymentReminder;
 use App\Services\FileStorageService;
 use App\Services\InvoiceReminderService;
@@ -123,9 +125,9 @@ class InvoiceForm extends Form
 
             // Étape 1 - Informations générales
             'name' => 'required|string|max:255',
-            'reference' => 'nullable|string|max:255',
-            'type' => 'nullable|string|max:255',
-            'category' => 'nullable|string|max:255',
+            'reference' => 'nullable|string|max:50',
+            'type' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, TypeEnum::cases())),
+            'category' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, CategoryEnum::cases())),
             'issuer_name' => 'nullable|string|max:255',
             'issuer_website' => 'nullable|url|max:255',
 
@@ -474,7 +476,7 @@ class InvoiceForm extends Form
             }
 
             // Supprimer les parts associées
-            $this->invoice->sharedUsers()->detach();
+            $this->invoice->sharings()->delete();
 
             // Supprimer la facture
             $this->invoice->delete();
@@ -518,12 +520,12 @@ class InvoiceForm extends Form
         // Charger les parts d'utilisateurs
         $this->user_shares = [];
 
-        if (! $invoice->sharedUsers->isEmpty()) {
-            foreach ($invoice->sharedUsers as $user) {
+        if (! $invoice->sharings->isEmpty()) {
+            foreach ($invoice->sharings as $sharing) {
                 $this->user_shares[] = [
-                    'id' => $user->id,
-                    'amount' => $user->pivot->share_amount,
-                    'percentage' => $user->pivot->share_percentage,
+                    'id' => $sharing->user_id,
+                    'amount' => $sharing->share_amount,
+                    'percentage' => $sharing->share_percentage,
                 ];
             }
         }
@@ -600,26 +602,23 @@ class InvoiceForm extends Form
     /**
      * Traite les parts d'utilisateurs avant de les sauvegarder
      */
+    // Méthode pour traiter les parts d'utilisateurs
     private function processInvoiceShares(Invoice $invoice): void
     {
-        // Détacher toutes les parts existantes
-        $invoice->sharedUsers()->detach();
+        // Supprimer tous les partages existants
+        $invoice->sharings()->delete();
 
-        // Si des parts sont définies, les attacher
+        // Si des parts sont définies, les créer
         if (! empty($this->user_shares)) {
-            $sharesToAttach = [];
-
             foreach ($this->user_shares as $share) {
                 if (isset($share['id']) && ($share['amount'] > 0 || $share['percentage'] > 0)) {
-                    $sharesToAttach[$share['id']] = [
+                    InvoiceSharing::create([
+                        'invoice_id' => $invoice->id,
+                        'user_id' => $share['id'],
                         'share_amount' => $share['amount'],
                         'share_percentage' => $share['percentage'],
-                    ];
+                    ]);
                 }
-            }
-
-            if (! empty($sharesToAttach)) {
-                $invoice->sharedUsers()->attach($sharesToAttach);
             }
         }
     }

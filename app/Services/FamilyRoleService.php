@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 class FamilyRoleService
 {
-    protected array $permissionsCache = [];
+    protected array $permissions = [];
 
     /**
      * Checks if the user has the administrator role in the given family.
@@ -19,13 +19,13 @@ class FamilyRoleService
     {
         $cacheKey = $user->id.'_'.$family->id;
 
-        if (! isset($this->permissionsCache[$cacheKey])) {
-            $this->permissionsCache[$cacheKey] = $user->families()
+        if (! isset($this->permissions[$cacheKey])) {
+            $this->permissions[$cacheKey] = $user->families()
                 ->where('family_id', $family->id)
                 ->pluck('permission');
         }
 
-        return $this->permissionsCache[$cacheKey];
+        return $this->permissions[$cacheKey];
     }
 
     /**

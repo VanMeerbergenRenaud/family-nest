@@ -5,11 +5,10 @@
             Facture&nbsp;:&nbsp;{{ $invoice->name }}
         </h2>
 
+        <x-loader.spinner target="downloadInvoice, toggleFavorite, copyInvoice, restoreInvoice, archiveInvoice" position="fixed" />
+
         <!-- Actions -->
         <div class="flex flex-wrap md:justify-end gap-2">
-
-            <x-loader.spinner target="downloadInvoice, toggleFavorite, copyInvoice, restoreInvoice" />
-
             <button
                 type="button"
                 class="button-primary"
@@ -165,7 +164,7 @@
                     <div class="px-5 py-4 space-y-6">
 
                         @php
-                            $iconClass = 'p-1.5 rounded-md mr-2.5';
+                            $iconClass = 'p-1.5 rounded-md mr-0.5';
                         @endphp
 
                         <div class="flex flex-col sm:flex-row gap-4">
@@ -231,7 +230,7 @@
                                 <div class="grid grid-cols-2 md:grid-cols-4">
                                     <div class="px-4 py-3 flex flex-col gap-2.5 md:border-r border-slate-200">
                                         <span class="text-xs text-gray-500">Émission</span>
-                                        <span class="text-sm-medium text-gray-900 flex items-center">
+                                        <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                             <span class="bg-blue-50 {{ $iconClass }} text-blue-600">
                                                 <x-svg.calendar />
                                             </span>
@@ -239,20 +238,10 @@
                                         </span>
                                     </div>
 
-                                    <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200">
-                                        <span class="text-xs text-gray-500">Échéance</span>
-                                        <span class="text-sm-medium text-gray-900 flex items-center">
-                                            <span class="bg-amber-50 {{ $iconClass }} text-amber-600">
-                                                <x-svg.clock />
-                                            </span>
-                                            {{ $this->formatDate($invoice->payment_due_date) }}
-                                        </span>
-                                    </div>
-
                                     @if($invoice->payment_reminder)
                                         <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200 border-t md:border-t-0">
                                             <span class="text-xs text-gray-500">Rappel</span>
-                                            <span class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                                 <span class="bg-rose-50 {{ $iconClass }} text-rose-600">
                                                     <x-svg.bell />
                                                 </span>
@@ -261,10 +250,20 @@
                                         </div>
                                     @endif
 
+                                    <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200">
+                                        <span class="text-xs text-gray-500">Échéance</span>
+                                        <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
+                                            <span class="bg-amber-50 {{ $iconClass }} text-amber-600">
+                                                <x-svg.clock />
+                                            </span>
+                                            {{ $this->formatDate($invoice->payment_due_date) }}
+                                        </span>
+                                    </div>
+
                                     @if($frequencyEnum)
                                         <div class="px-4 py-3 flex flex-col gap-2 border-t border-slate-200 md:border-t-0">
                                             <span class="text-xs text-gray-500">Fréquence</span>
-                                            <span class="text-sm-medium text-gray-900 flex items-center">
+                                            <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                                 <span class="bg-indigo-50 {{ $iconClass }} text-indigo-600">
                                                     <x-svg.reset />
                                                 </span>
@@ -283,7 +282,7 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2">
                                     <div class="px-4 py-3 border-b sm:border-b-0 sm:border-r border-slate-200">
                                         <p class="text-xs text-gray-500 mb-2">Méthode</p>
-                                        <p class="text-sm-medium text-gray-900 flex items-center">
+                                        <p class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                             <span class="bg-purple-50 {{ $iconClass }} text-purple-700">
                                                 <x-svg.credit-card />
                                             </span>
@@ -292,7 +291,7 @@
                                     </div>
                                     <div class="px-4 py-3">
                                         <p class="text-xs text-gray-500 mb-2">Priorité</p>
-                                        <p class="text-sm-medium text-gray-900 flex items-center">
+                                        <p class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                             <span class="bg-blue-50 {{ $iconClass }} text-blue-700">
                                                 <x-svg.shield-exclamation />
                                             </span>
@@ -303,11 +302,11 @@
                             </div>
                         </div>
 
-                        {{-- Montant et répartition --}}
+                        <!-- Section de répartition des paiements -->
                         <div>
                             <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Répartition des paiements</h3>
 
-                            @if($shareSummary['hasAmount'])
+                            @if($invoice->amount > 0)
                                 <div class="px-4 py-3 space-y-4 rounded-lg bg-white border border-slate-200">
                                     <!-- Nom du payeur - toujours l'afficher -->
                                     <div class="flex items-center">
@@ -316,30 +315,32 @@
                                             <img src="{{ $payer->avatar_url ?? asset('img/img_placeholder.jpg') }}"
                                                  alt="{{ $payer->name ?? 'Non spécifié' }}"
                                                  class="w-6 h-6 object-cover rounded-full border-2 border-white"
+                                                 loading="lazy"
                                             >
                                             <span class="ml-2 text-sm-medium text-gray-800">{{ $payer->name ?? 'Non spécifié' }}</span>
                                         </div>
                                     </div>
 
-                                    <!-- Détail des parts - uniquement si réellement des parts en DB -->
-                                    @if($shareSummary['hasDetails'] && !empty($shareSummary['memberDetails']))
+                                    <!-- Détail des parts - uniquement si réellement des parts dans la DB -->
+                                    @if($hasShares)
                                         <div x-data="{ showRepartition: false }">
                                             <!-- En-tête avec bouton toggle -->
                                             <div class="flex flex-col sm:flex-row sm:items-center gap-3 py-1">
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-sm text-gray-500">Répartition :</span>
                                                     <span class="text-sm-medium text-teal-800">
-                                                        {{ $shareSummary['formattedShared'] }}&nbsp;{{ $currencySymbol }}
+                                                        {{ number_format($invoice->amount, 2, ',', ' ') }}&nbsp;{{ $currencySymbol }}
                                                     </span>
                                                 </div>
 
+                                                {{-- Pourcentage --}}
                                                 <div class="flex items-center gap-2 flex-1">
                                                     <div class="relative h-1.5 bg-zinc-200 rounded-full flex-1 max-w-56">
                                                         <div class="h-1.5 rounded-full bg-teal-500"
-                                                             style="width: {{ min($shareSummary['totalPercentage'], 100) }}%"></div>
+                                                             style="width: {{ min($invoice->total_percentage, 100) }}%"></div>
                                                     </div>
                                                     <span class="text-xs-medium text-teal-800 bg-zinc-100 px-1.5 py-0.5 rounded">
-                                                        {{ number_format($shareSummary['totalPercentage']) }}%
+                                                        {{ number_format($invoice->total_percentage) }}%
                                                     </span>
                                                 </div>
 
@@ -364,30 +365,32 @@
                                             <!-- Détail des répartitions - collapsible -->
                                             <ul x-show="showRepartition"
                                                 x-collapse
-                                                x-transition
-                                                class="mt-3 pt-3 space-y-3 border-t border-teal-200">
-                                                @foreach($shareSummary['memberDetails'] as $member)
-                                                    <li class="pl-1 pr-2 flex flex-col sm:flex-row sm:items-center gap-2"
-                                                        wire:key="share-{{ $member['id'] }}">
-                                                        <div class="flex items-center gap-2 sm:w-44">
-                                                            <img src="{{ $member['avatar'] }}" alt="{{ $member['name'] }}" class="w-6 h-6 rounded-full object-cover border-2 border-white">
-                                                            <span class="text-sm-medium text-gray-800">{{ $member['name'] }}</span>
+                                                class="mt-3 pt-3 space-y-3 border-t border-teal-200"
+                                            >
+                                                @foreach($invoice->sharings as $sharing)
+                                                    <li class="flex justify-between items-center gap-2 py-1"
+                                                        wire:key="share-{{ $sharing->user_id }}">
+                                                        <div class="flex items-center gap-2 sm:w-44 mr-2">
+                                                            @php
+                                                                $shareUser = $sharing->user;
+                                                                $isPayer = $sharing->user_id === $invoice->paid_by_user_id;
+                                                            @endphp
+
+                                                            <img src="{{ $shareUser->avatar_url ?? asset('img/img_placeholder.jpg') }}"
+                                                                 class="w-6 h-6 rounded-full inline-block"
+                                                                 alt="" loading="lazy"
+                                                            >
+                                                            <span class="text-sm text-gray-700">{{ $shareUser->name }}</span>
                                                         </div>
-
-                                                        <div class="flex items-center justify-between flex-1 gap-3">
-                                                            <div class="flex-grow bg-zinc-200 h-1.5 rounded-full relative overflow-hidden">
-                                                                <div class="absolute top-0 left-0 h-1.5 rounded-full {{ $member['isPayer'] ? 'bg-amber-400' : 'bg-amber-500' }}"
-                                                                     style="width: {{ min($member['sharePercentage'], 100) }}%"></div>
+                                                        <p class="text-sm-medium text-gray-800">
+                                                            {{ $sharing->formatted_amount }}&nbsp;{{ $currencySymbol }}
+                                                        </p>
+                                                        <div class="flex items-center gap-2">
+                                                            <div class="w-12 h-1 bg-gray-100 rounded-full">
+                                                                <div class="h-1 rounded-full {{ $isPayer ? 'bg-indigo-400' : 'bg-gray-400' }}"
+                                                                     style="width: {{ min($sharing->share_percentage, 100) }}%"></div>
                                                             </div>
-
-                                                            <div class="flex items-center gap-3">
-                                                                <span class="text-xs-medium text-teal-800 bg-zinc-100 px-1.5 py-0.5 rounded">
-                                                                    {{ $member['formattedPercentage'] }}%
-                                                                </span>
-                                                                <span class="text-sm-medium text-zinc-700 min-w-16 text-right">
-                                                                    {{ $member['formattedAmount'] }}&nbsp;{{ $currencySymbol }}
-                                                                </span>
-                                                            </div>
+                                                            <span class="text-xs text-gray-500 ml-1">{{ $sharing->formatted_percentage }}%</span>
                                                         </div>
                                                     </li>
                                                 @endforeach

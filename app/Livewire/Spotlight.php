@@ -70,37 +70,21 @@ class Spotlight extends Component
         $this->calculateTotalResults($value, $currentUser, $family);
     }
 
-    protected function calculateTotalResults(string $value, $currentUser, $family = null): void
+    protected function calculateTotalResults(string $value, $currentUser, $family): void
     {
-        $count = 0;
+        $familyMemberIds = $family->users()->pluck('users.id')->toArray();
 
-        if ($family) {
-            $familyMemberIds = $family->users()->pluck('users.id')->toArray();
+        // Utiliser une seule requête pour compter
+        $userCount = User::whereIn('id', $familyMemberIds)
+            ->search($value)
+            ->count();
 
-            // Compter les utilisateurs
-            $userCount = User::search($value)
-                ->get()
-                ->filter(fn ($user) => $user->families()->where('family_id', $family->id)->exists())
-                ->count();
+        // Compter les factures
+        $invoiceCount = Invoice::whereIn('user_id', $familyMemberIds)
+            ->search($value)
+            ->count();
 
-            // Compter les factures
-            $invoiceCount = Invoice::whereIn('user_id', $familyMemberIds)
-                ->search($value)
-                ->count();
-
-            $count = $userCount + $invoiceCount;
-        } else {
-            // Compter les factures de l'utilisateur
-            $invoiceCount = $currentUser->invoices()
-                ->search($value)
-                ->count();
-
-            // Vérifier si l'utilisateur correspond à la recherche
-            $userMatches = str_contains(strtolower($currentUser->name), strtolower($value)) ||
-                str_contains(strtolower($currentUser->email), strtolower($value));
-
-            $count = $invoiceCount + ($userMatches ? 1 : 0);
-        }
+        $count = $userCount + $invoiceCount;
 
         $this->totalResultsCount = $count;
         $this->hasMoreResults = $count > self::STANDARD_LIMIT && ! $this->showAdvancedSearch;
@@ -111,15 +95,16 @@ class Spotlight extends Component
         // Get family member IDs
         $familyMemberIds = $family->users()->pluck('users.id')->toArray();
 
-        // Search users in family
+        // Search users in family with eager loading
         $userResults = User::search($value)
             ->get()
             ->filter(fn ($user) => $user->families()->where('family_id', $family->id)->exists())
             ->take($limit);
 
-        // Search invoices for all family members
+        // Search invoices for all family members with eager loading
         $invoiceResults = Invoice::whereIn('user_id', $familyMemberIds)
             ->search($value)
+            ->with(['file', 'family'])
             ->take($limit)
             ->get();
 

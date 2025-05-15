@@ -2,15 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\InvoiceFile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class InvoiceFileFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = InvoiceFile::class;
+
     public function definition(): array
     {
         $extension = $this->faker->randomElement(['jpg', 'jpeg', 'png', 'pdf', 'docx']);

@@ -12,9 +12,6 @@ use App\Models\Invoice;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends Factory<Invoice>
- */
 class InvoiceFactory extends Factory
 {
     protected $model = Invoice::class;

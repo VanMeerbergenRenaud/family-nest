@@ -29,7 +29,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        if ($user->families()->where('family_id', $invoice->family_id)->doesntExist()) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -42,7 +42,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        if ($user->families()->where('family_id', $invoice->family_id)->doesntExist()) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -66,7 +66,7 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        if ($user->families()->where('family_id', $invoice->family_id)->doesntExist()) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -79,23 +79,10 @@ class InvoicePolicy
             return $user->id === $invoice->user_id;
         }
 
-        if ($user->families()->where('family_id', $invoice->family_id)->doesntExist()) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
         return $this->familyRoleService->isAdmin($user, $invoice->family);
-    }
-
-    public function share(User $user, Invoice $invoice): bool
-    {
-        if (! $invoice->family_id) {
-            return $user->id === $invoice->user_id;
-        }
-
-        if ($user->families()->where('family_id', $invoice->family_id)->doesntExist()) {
-            return false;
-        }
-
-        return $this->familyRoleService->isEditorOrAbove($user, $invoice->family);
     }
 }

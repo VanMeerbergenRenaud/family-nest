@@ -3,8 +3,6 @@
 namespace App\Traits\Invoice;
 
 use App\Enums\CurrencyEnum;
-use App\Models\User;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
 
 trait ShareCalculationTrait
@@ -20,7 +18,7 @@ trait ShareCalculationTrait
      */
     public function calculateRemainingShares(): void
     {
-        $invoiceAmount = floatval($this->form->amount);
+        $invoiceAmount = floatval($this->form->amount ?? 0);
 
         $this->remainingAmount = $invoiceAmount;
         $this->remainingPercentage = 100;
@@ -92,8 +90,8 @@ trait ShareCalculationTrait
     {
         $newShare = [
             'id' => $userId,
-            'amount',
-            'percentage',
+            'amount' => 0,
+            'percentage' => 0,
         ];
 
         if ($type === 'percentage') {
@@ -262,7 +260,7 @@ trait ShareCalculationTrait
     }
 
     /**
-     * Obtient un résumé des parts pour l'interface utilisateur
+     * Obtient un résumé des parts pour l'interface utilisateur lors de l'édition
      */
     public function getShareSummary(): array
     {
@@ -308,107 +306,6 @@ trait ShareCalculationTrait
     }
 
     /**
-     * Obtient un résumé détaillé des parts pour l'affichage
-     */
-    public function getShareDetailSummary(Collection $familyMembers): array
-    {
-        $invoiceAmount = floatval($this->form->amount ?? 0);
-
-        if ($invoiceAmount <= 0) {
-            return $this->getEmptyShareSummary(false);
-        }
-
-        $userShares = $this->form->user_shares ?? [];
-
-        if (empty($userShares) || ! $this->hasActiveShares($userShares)) {
-            return $this->getEmptyShareSummary(true, $invoiceAmount);
-        }
-
-        return $this->buildShareDetailSummary($userShares, $familyMembers, $invoiceAmount);
-    }
-
-    /**
-     * Retourne un résumé vide des parts
-     */
-    private function getEmptyShareSummary(bool $hasAmount, float $amount = 0): array
-    {
-        return [
-            'hasAmount' => $hasAmount,
-            'hasDetails' => false,
-            'formattedShared' => $hasAmount ? number_format($amount, 2, ',', ' ') : 0,
-            'totalPercentage' => 0,
-            'memberDetails' => [],
-        ];
-    }
-
-    /**
-     * Vérifie si au moins une part est active (montant ou pourcentage > 0)
-     */
-    private function hasActiveShares(array $shares): bool
-    {
-        foreach ($shares as $share) {
-            if ((isset($share['amount']) && floatval($share['amount']) > 0) ||
-                (isset($share['percentage']) && floatval($share['percentage']) > 0)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Construit le résumé détaillé des parts
-     */
-    private function buildShareDetailSummary(array $userShares, Collection $familyMembers, float $invoiceAmount): array
-    {
-        $memberDetails = [];
-        $totalPercentage = 0;
-
-        foreach ($userShares as $share) {
-            if (! isset($share['id'])) {
-                continue;
-            }
-
-            $member = $this->findMember($familyMembers, $share['id']);
-
-            if (! $member) {
-                continue;
-            }
-
-            $percentage = floatval($share['percentage'] ?? 0);
-            $amount = floatval($share['amount'] ?? 0);
-            $totalPercentage += $percentage;
-
-            $memberDetails[] = [
-                'id' => $member->id,
-                'name' => $member->name,
-                'avatar' => $member->avatar_url ?? asset('img/img_placeholder.jpg'),
-                'formattedAmount' => number_format($amount, 2, ',', ' '),
-                'sharePercentage' => $percentage,
-                'formattedPercentage' => number_format($percentage, 0),
-                'isPayer' => $member->id == $this->form->paid_by_user_id,
-            ];
-        }
-
-        return [
-            'hasAmount' => true,
-            'hasDetails' => ! empty($memberDetails),
-            'formattedShared' => number_format($invoiceAmount, 2, ',', ' '),
-            'totalPercentage' => $totalPercentage,
-            'memberDetails' => $memberDetails,
-        ];
-    }
-
-    /**
-     * Trouve un membre dans la collection de membres
-     */
-    private function findMember(Collection $familyMembers, int $userId): ?User
-    {
-        return $familyMembers->firstWhere('id', $userId)
-            ?? ($userId === auth()->id() ? auth()->user() : User::find($userId));
-    }
-
-    /**
      * Obtient le symbole de la devise actuelle
      */
     public function getCurrencySymbol(): string
@@ -434,5 +331,23 @@ trait ShareCalculationTrait
         }
 
         $this->calculateRemainingShares();
+    }
+
+    /**
+     * Charge les parts depuis une facture existante dans le formulaire d'édition
+     */
+    protected function loadSharesFromInvoice(): void
+    {
+        if (! isset($this->invoice) || $this->invoice->sharings->isEmpty()) {
+            return;
+        }
+
+        foreach ($this->invoice->sharings as $sharing) {
+            $this->form->user_shares[] = [
+                'id' => $sharing->user_id,
+                'amount' => floatval($sharing->share_amount ?? 0),
+                'percentage' => floatval($sharing->share_percentage ?? 0),
+            ];
+        }
     }
 }
