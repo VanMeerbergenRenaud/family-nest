@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Goal extends Model
 {
@@ -43,7 +42,6 @@ class Goal extends Model
         'completion_percentage' => 'decimal:2',
     ];
 
-    // Relations
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
@@ -52,12 +50,5 @@ class Goal extends Model
     public function family(): BelongsTo
     {
         return $this->belongsTo(Family::class);
-    }
-
-    public function members(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class)
-            ->withPivot('is_admin')
-            ->withTimestamps();
     }
 }

@@ -1,11 +1,7 @@
 <?php
 
-namespace App\Livewire\Pages;
+namespace App\Livewire\Pages\Goals;
 
-use App\Livewire\Pages\Goals\GoalOwnerEnum;
-use App\Livewire\Pages\Goals\GoalPeriodEnum;
-use App\Livewire\Pages\Goals\GoalStatusEnum;
-use App\Livewire\Pages\Goals\GoalTypeEnum;
 use App\Models\Goal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -16,7 +12,7 @@ use Livewire\WithPagination;
 use Masmerise\Toaster\Toaster;
 
 #[Title('Objectifs')]
-class Goals extends Component
+class Index extends Component
 {
     use AuthorizesRequests, WithPagination;
 
@@ -126,7 +122,7 @@ class Goals extends Component
 
     public function render()
     {
-        return view('livewire.pages.goals', [
+        return view('livewire.pages.goals.index', [
             'hasFamily' => auth()->user()->hasFamily(),
             'goals' => $this->getFilteredQuery()->latest()->paginate(9),
             'periods' => GoalPeriodEnum::forFilter(),

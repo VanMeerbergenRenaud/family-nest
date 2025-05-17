@@ -5,7 +5,7 @@ use App\Http\Middleware\HasFamily;
 use App\Livewire\Pages\Calendar;
 use App\Livewire\Pages\Dashboard\Index as IndexDashboard;
 use App\Livewire\Pages\Family;
-use App\Livewire\Pages\Goals;
+use App\Livewire\Pages\Goals\Index as IndexGoals;
 use App\Livewire\Pages\HelpCenter;
 use App\Livewire\Pages\Invoices\Archived;
 use App\Livewire\Pages\Invoices\Create;
@@ -49,7 +49,7 @@ Route::middleware(['auth', 'verified', HasFamily::class])->group(function () {
 
         Route::get('/dashboard', IndexDashboard::class)->name('dashboard');
         Route::get('/calendar', Calendar::class)->name('calendar');
-        Route::get('/goals', Goals::class)->name('goals');
+        Route::get('/goals', IndexGoals::class)->name('goals');
 
         Route::prefix('invoices')->name('invoices.')->group(function () {
             Route::get('/', IndexInvoice::class)->name('index');

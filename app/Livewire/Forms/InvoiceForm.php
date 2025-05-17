@@ -12,7 +12,6 @@ use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Models\InvoiceSharing;
-use App\Notifications\InvoicePaymentReminder;
 use App\Services\FileStorageService;
 use App\Services\InvoiceReminderService;
 use App\Traits\FormatFileSizeTrait;
@@ -301,14 +300,6 @@ class InvoiceForm extends Form
         }
 
         return true;
-    }
-
-    // Create or update invoice
-    public function processAmount(): void
-    {
-        if (isset($this->amount)) {
-            $this->amount = $this->normalizeAmount($this->amount);
-        }
     }
 
     // Méthode générique pour la sauvegarde de la facture

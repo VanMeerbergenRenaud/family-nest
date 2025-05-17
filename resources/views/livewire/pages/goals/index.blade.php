@@ -161,10 +161,10 @@
                                             {{ __('Modifier') }}
                                         </x-menu.item>
                                         @can('delete', $goal)
-                                        <x-menu.item wire:click="openDeleteModal({{ $goal->id }})" class="group hover:text-red-500">
-                                            <x-svg.trash class="group-hover:text-red-500"/>
-                                            {{ __('Supprimer') }}
-                                        </x-menu.item>
+                                            <x-menu.item wire:click="openDeleteModal({{ $goal->id }})" class="group hover:text-red-500">
+                                                <x-svg.trash class="group-hover:text-red-500"/>
+                                                {{ __('Supprimer') }}
+                                            </x-menu.item>
                                         @endcan
                                     </x-menu.items>
                                 </x-menu>
