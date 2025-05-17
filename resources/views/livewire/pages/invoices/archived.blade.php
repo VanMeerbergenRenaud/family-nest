@@ -6,7 +6,7 @@
 
     <div class="px-4 flex flex-col md:flex-row gap-3 justify-between w-full my-4">
             @if($this->hasFamily())
-                <div class="p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
+                <div class="h-fit p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
                     @php
                         $types = [
                             'all' => 'Toutes',

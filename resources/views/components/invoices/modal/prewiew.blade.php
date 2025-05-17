@@ -8,7 +8,7 @@
 <div>
     @if($showInvoicePreviewModal)
         <x-modal wire:model="showInvoicePreviewModal">
-            <x-modal.panel class="max-w-4xl">
+            <x-modal.panel>
                 <p class="sticky top-0 p-5 px-8 max-w-full text-xl-bold bg-white dark:bg-gray-800 dark:border-gray-700 z-20">
                     {{ __('Aperçu de la facture') }}
                 </p>

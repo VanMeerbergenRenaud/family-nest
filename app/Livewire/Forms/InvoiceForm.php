@@ -268,6 +268,7 @@ class InvoiceForm extends Form
         // Si le montant total est nul, pas besoin de vérifier les répartitions
         if (floatval($this->amount ?? 0) <= 0) {
             $this->user_shares = [];
+
             return true;
         }
 
@@ -318,6 +319,7 @@ class InvoiceForm extends Form
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
             $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
+
             return false;
         }
 

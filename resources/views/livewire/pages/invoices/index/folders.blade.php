@@ -48,7 +48,7 @@
     {{-- Modales --}}
     @if($showFolderModal)
         <x-modal wire:model="showFolderModal">
-            <x-modal.panel class="max-w-5xl bg-white dark:bg-gray-900">
+            <x-modal.panel>
                 <!-- En-tête avec titre et compteur -->
                 <div class="sticky top-0 px-6 py-5 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 z-20">
                     <div class="flex flex-wrap items-center gap-3 pr-8">

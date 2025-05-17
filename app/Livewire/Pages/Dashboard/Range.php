@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 enum Range: string
 {

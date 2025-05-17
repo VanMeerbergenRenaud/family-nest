@@ -4,7 +4,7 @@ namespace App\Livewire\Pages\Dashboard;
 
 use App\Models\Invoice;
 use App\Models\User;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
