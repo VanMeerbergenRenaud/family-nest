@@ -36,7 +36,7 @@ class GoalForm extends Form
     public $is_recurring = false;
 
     #[Validate]
-    public $is_family_goal = false;
+    public $is_family_goal = true;
 
     #[Validate]
     public $target_amount;

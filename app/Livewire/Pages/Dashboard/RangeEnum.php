@@ -4,7 +4,7 @@ namespace App\Livewire\Pages\Dashboard;
 
 use Carbon\Carbon;
 
-enum Range: string
+enum RangeEnum: string
 {
     case All_Time = 'all';
     case Year = 'year';

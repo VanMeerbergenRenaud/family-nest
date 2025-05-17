@@ -21,7 +21,7 @@ class Filters extends Form
     public $family_member = 'all';
 
     #[Url]
-    public Range $range = Range::All_Time;
+    public RangeEnum $range = RangeEnum::All_Time;
 
     #[Url]
     public $start;
@@ -34,15 +34,15 @@ class Filters extends Form
         $this->user = $user;
     }
 
-    public function getStatusEnum(): FilterStatus
+    public function getStatusEnum(): FilterStatusEnum
     {
-        return FilterStatus::from($this->status);
+        return FilterStatusEnum::from($this->status);
     }
 
     #[Computed]
     public function statuses(): Collection
     {
-        return collect(FilterStatus::cases())->map(function ($status) {
+        return collect(FilterStatusEnum::cases())->map(function ($status) {
             $baseQuery = $this->getBaseQuery();
             $count = $this->applyRange(
                 $this->applyStatus($baseQuery, $status)
@@ -113,7 +113,7 @@ class Filters extends Form
     {
         $statusEnum = $status ?? $this->getStatusEnum();
 
-        return $statusEnum === FilterStatus::All
+        return $statusEnum === FilterStatusEnum::All
             ? $query
             : $query->where('payment_status', $statusEnum->value);
     }
@@ -133,18 +133,18 @@ class Filters extends Form
 
     public function applyRange($query)
     {
-        if ($this->range === Range::All_Time) {
+        if ($this->range === RangeEnum::All_Time) {
             return $query;
         }
 
-        if ($this->range === Range::Custom && $this->start && $this->end) {
+        if ($this->range === RangeEnum::Custom && $this->start && $this->end) {
             $start = Carbon::createFromFormat('Y-m-d', $this->start)->startOfDay();
             $end = Carbon::createFromFormat('Y-m-d', $this->end)->endOfDay();
 
             return $query->whereBetween('payment_due_date', [$start, $end]);
         }
 
-        return $this->range === Range::Custom
+        return $this->range === RangeEnum::Custom
             ? $query
             : $query->whereBetween('payment_due_date', $this->range->dates());
     }
@@ -178,7 +178,7 @@ class Filters extends Form
     {
         $this->status = 'all';
         $this->family_member = 'all';
-        $this->range = Range::All_Time;
+        $this->range = RangeEnum::All_Time;
         $this->start = null;
         $this->end = null;
     }

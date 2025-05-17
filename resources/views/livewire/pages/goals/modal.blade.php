@@ -242,7 +242,7 @@
                     <!-- Option familial -->
                     <label
                         wire:click="$set('form.is_family_goal', true)"
-                        class="group bg-gray-50 cursor-pointer rounded-lg border border-gray-50 px-4 py-3 flex gap-3 transition-all
+                        class="group px-4 py-3 flex gap-3 bg-gray-50 cursor-pointer rounded-lg border border-gray-50 transition-all
                         {{ $form->is_family_goal ? 'bg-indigo-50 border-indigo-300' : 'hover:bg-gray-100' }}"
                     >
                         <x-svg.user-group class="min-w-4 mt-0.5 {{ $form->is_family_goal ? 'text-indigo-600' : 'text-gray-700' }}" />
@@ -255,7 +255,7 @@
                     <!-- Option privé -->
                     <label
                         wire:click="$set('form.is_family_goal', false)"
-                        class="group bg-gray-50 cursor-pointer rounded-lg border border-gray-50 px-4 py-3 flex gap-3 transition-all
+                        class="group px-4 py-3 flex gap-3 bg-gray-50 cursor-pointer rounded-lg border border-gray-50 transition-all
                         {{ !$form->is_family_goal ? 'bg-indigo-50 border-indigo-300' : 'hover:bg-gray-100' }}"
                     >
                         <x-svg.lock-closed class="min-w-4 mt-0.5 {{ !$form->is_family_goal ? 'text-indigo-600' : 'text-gray-700' }}" />
@@ -267,7 +267,7 @@
 
                     {{-- Affichage des erreurs juste ici --}}
                     @if($errors->any())
-                        <div class="mb-4 col-span-2">
+                        <div class="col-span-2">
                             <div class="p-2 bg-red-100 border border-red-300 text-red-600 rounded-lg">
                                 <p class="p-2 pt-0 text-sm-medium text-red-600">Liste des erreurs :</p>
                                 <ul class="pl-5 pb-2 space-y-2 list-disc">
