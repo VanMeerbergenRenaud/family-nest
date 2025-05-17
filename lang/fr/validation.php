@@ -228,5 +228,14 @@ return [
         'memberPermission' => 'des permissions du membre',
         'memberRelation' => 'de la relation du membre',
         'members.*.email' => 'de l’adresse mail du membre',
+        // goals
+        'goal_type' => 'du type d\'objectif',
+        'period_type' => 'du type de période',
+        'start_date' => 'commencer à la date',
+        'end_date' => 'terminer à la date',
+        'is_recurring' => 'de récurrence',
+        'is_family_goal' => 'de l\'objectif familial',
+        'target_amount' => 'du montant cible',
+        'categories' => 'des catégories',
     ],
 ];
