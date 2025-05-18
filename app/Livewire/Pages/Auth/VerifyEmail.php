@@ -22,40 +22,9 @@ class VerifyEmail extends Component
 
             if (! Auth::user()->family()) {
                 $this->redirectRoute('onboarding.family');
-
-                return;
             }
 
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-
-            return;
-        }
-
-        try {
-            Auth::user()->sendEmailVerificationNotification();
-            Session::flash('status', 'verification-link-sent');
-        } catch (Exception $e) {
-            // Check if the error is related to MailerSend limits
-            if (str_contains($e->getMessage(), 'reached trial account unique recipients limit') ||
-                str_contains($e->getMessage(), '#MS42225') ||
-                str_contains($e->getMessage(), '#MS42222') ||
-                str_contains($e->getMessage(), 'email quota limit')) {
-
-                Log::warning('MailerSend limit reached. Auto-verifying user: '.Auth::user()->email);
-
-                // Automatically verify the user as a temporary solution
-                DB::table('users')
-                    ->where('id', Auth::user()->id)
-                    ->update(['email_verified_at' => now()]);
-
-                if (! Auth::user()->family()) {
-                    $this->redirectRoute('onboarding.family');
-                } else {
-                    $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
-                }
-            } else {
-                Log::error('Email verification error: '.$e->getMessage());
-            }
         }
     }
 

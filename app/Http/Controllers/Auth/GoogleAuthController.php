@@ -59,14 +59,7 @@ class GoogleAuthController extends Controller
                         ]);
                     }
                 }
-
-                event(new Registered($user));
             } else {
-                Log::channel('google_auth')->info('Utilisateur existant trouvé', [
-                    'user_id' => $user->id,
-                    'email' => $user->email,
-                ]);
-
                 if (! $user->avatar && $avatarUrl) {
                     try {
                         $avatarDir = 'avatars/user_'.$user->id;
