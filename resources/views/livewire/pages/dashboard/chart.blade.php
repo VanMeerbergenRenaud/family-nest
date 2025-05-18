@@ -1,14 +1,14 @@
 <div>
     <div
-        x-data="chart"
-        x-init="init($wire.dataset)"
-        wire:ignore
-        wire:loading.class="opacity-50"
-        class="relative min-h-[10rem] sm:h-[22rem] max-sm:pb-2 w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
+            x-data="chart"
+            x-init="init($wire.dataset)"
+            wire:ignore
+            wire:loading.class="opacity-50"
+            class="relative min-h-[10rem] sm:h-[22rem] max-sm:pb-2 w-full overflow-hidden bg-white rounded-xl p-6 border border-slate-200"
     >
         <h3 role="heading" aria-level="3" class="absolute top-4 left-5.5 text-lg-medium text-gray-800">
             Montant des factures par type
-            @if($filters->range !== \App\Livewire\Pages\Dashboard\Range::All_Time)
+            @if($filters->range !== \App\Livewire\Pages\Dashboard\RangeEnum::All_Time)
                 <span class="text-sm-regular text-gray-500 ml-2">
                     ({{ $filters->range->label($filters->start, $filters->end) }})
                 </span>

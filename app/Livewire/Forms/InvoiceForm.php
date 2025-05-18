@@ -12,7 +12,6 @@ use App\Enums\TypeEnum;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use App\Models\InvoiceSharing;
-use App\Notifications\InvoicePaymentReminder;
 use App\Services\FileStorageService;
 use App\Services\InvoiceReminderService;
 use App\Traits\FormatFileSizeTrait;
@@ -268,6 +267,7 @@ class InvoiceForm extends Form
         // Si le montant total est nul, pas besoin de vérifier les répartitions
         if (floatval($this->amount ?? 0) <= 0) {
             $this->user_shares = [];
+
             return true;
         }
 
@@ -302,14 +302,6 @@ class InvoiceForm extends Form
         return true;
     }
 
-    // Create or update invoice
-    public function processAmount(): void
-    {
-        if (isset($this->amount)) {
-            $this->amount = $this->normalizeAmount($this->amount);
-        }
-    }
-
     // Méthode générique pour la sauvegarde de la facture
     public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
@@ -318,6 +310,7 @@ class InvoiceForm extends Form
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
             $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
+
             return false;
         }
 

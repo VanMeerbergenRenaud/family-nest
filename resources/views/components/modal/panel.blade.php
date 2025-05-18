@@ -3,18 +3,17 @@
     'size' => 'default',    // Options: 'default', 'sm', 'lg', 'xl', 'full'
     'width' => null,        // Largeur personnalisée (ex: '500px', '50%')
     'height' => null,       // Hauteur personnalisée (ex: '600px', '80%')
-    'maxHeight' => '100%'   // Hauteur maximale par défaut
 ])
 
 @php
     // Définir les classes de positionnement
     $positionClasses = [
         'center' => 'items-center justify-center',
-        'top' => 'items-start justify-center pt-16',
-        'bottom' => 'items-end justify-center pb-16',
-        'top-right' => 'items-start justify-end pt-16 pr-4',
+        'top' => 'items-start justify-center pt-4',
+        'bottom' => 'items-end justify-center pb-4',
+        'top-right' => 'items-start justify-end pt-4 pr-4',
         'center-right' => 'items-center justify-end pr-3',
-        'bottom-right' => 'items-end justify-end pb-16 pr-4',
+        'bottom-right' => 'items-end justify-end pb-4 pr-4',
     ];
 
     // Définir les classes de taille
@@ -67,7 +66,7 @@
             </div>
 
             <!-- Panel content -->
-            <div class="overflow-y-scroll scrollbar-hidden" style="max-height: {{ $maxHeight }}">
+            <div class="overflow-y-scroll scrollbar-hidden max-h-[96vh]">
                 {{ $slot }}
             </div>
         </div>

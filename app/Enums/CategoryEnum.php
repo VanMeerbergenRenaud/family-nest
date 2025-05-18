@@ -11,7 +11,7 @@ enum CategoryEnum: string
     // Abonnements
     case ABO_ALIMENTAIRE = 'Abonnement alimentaire';
     case ABO_INTERNET_TELECOM = 'Abonnement internet & télécommunications';
-    case ABO_JEUX_VIDEO = 'Abonnement jeux Vidéo en ligne';
+    case ABO_JEUX_VIDEO = 'Abonnement jeux vidéo en ligne';
     case ABO_LOGICIELS_PRO = 'Abonnement logiciels professionnels';
     case ABO_MAGAZINES = 'Abonnement magazines/revues';
     case ABO_MOBILITE = 'Abonnement services de mobilité';

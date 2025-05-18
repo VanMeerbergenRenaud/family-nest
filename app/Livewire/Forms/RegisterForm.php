@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -43,6 +44,8 @@ class RegisterForm extends Form
         $validated['password'] = Hash::make($validated['password']);
 
         $user = User::create($validated);
+
+        $user->sendEmailVerificationNotification();
 
         Auth::login($user);
 

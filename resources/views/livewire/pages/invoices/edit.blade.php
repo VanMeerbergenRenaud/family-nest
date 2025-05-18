@@ -123,7 +123,7 @@
                                 :initialValue="$form->amount"
                                 defaultCurrency="{{ $form->currency }}"
                                 placeholder="0,00"
-                                asterix="true"
+                                :asterix="true"
                             />
 
                             <x-form.select name="form.paid_by_user_id" model="form.paid_by_user_id" label="Qui paie cette facture" asterix="true">

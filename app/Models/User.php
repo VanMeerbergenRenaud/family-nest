@@ -121,7 +121,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new CustomVerifyEmail);
+        if ($this->email_verified_at === null) {
+            $this->notify(new CustomVerifyEmail);
+        }
     }
 
     /**
@@ -143,16 +145,6 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Relation avec les factures partagées avec cet utilisateur
-     */
-    public function sharedInvoices()
-    {
-        return $this->belongsToMany(Invoice::class, 'invoice_sharings')
-            ->withPivot('share_amount', 'share_percentage')
-            ->withTimestamps();
-    }
-
-    /**
      * Vérifie si l'utilisateur appartient à la famille spécifiée
      */
     public function belongsToFamily(?int $familyId): bool
@@ -169,14 +161,6 @@ class User extends Authenticatable implements MustVerifyEmail
         }
 
         return $this->familyMembership[$familyId];
-    }
-
-    /**
-     * Les parts de factures associées à cet utilisateur
-     */
-    public function invoiceShares(): HasMany
-    {
-        return $this->hasMany(InvoiceSharing::class);
     }
 
     /**

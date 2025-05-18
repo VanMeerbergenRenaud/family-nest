@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-5 lg:p-4">
-    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-4 lg:gap-6">
+    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-4">
 
-        <h2 role="heading" aria-level="2" class="display-xs-medium max-w-xs">
+        <h2 role="heading" aria-level="2" class="display-xs-medium max-w-xs truncate">
             Facture&nbsp;:&nbsp;{{ $invoice->name }}
         </h2>
 
@@ -228,7 +228,7 @@
 
                             <div class="bg-white rounded-lg border border-slate-200">
                                 <div class="grid grid-cols-2 md:grid-cols-4">
-                                    <div class="px-4 py-3 flex flex-col gap-2.5 md:border-r border-slate-200">
+                                    <div class="pl-4 pr-2 py-3 flex flex-col gap-2.5 md:border-r border-slate-200">
                                         <span class="text-xs text-gray-500">Émission</span>
                                         <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                             <span class="bg-blue-50 {{ $iconClass }} text-blue-600">
@@ -239,7 +239,7 @@
                                     </div>
 
                                     @if($invoice->payment_reminder)
-                                        <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200 border-t md:border-t-0">
+                                        <div class="pl-4 pr-2 py-3 flex flex-col gap-2 md:border-r border-slate-200 border-t md:border-t-0">
                                             <span class="text-xs text-gray-500">Rappel</span>
                                             <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                                 <span class="bg-rose-50 {{ $iconClass }} text-rose-600">
@@ -250,7 +250,7 @@
                                         </div>
                                     @endif
 
-                                    <div class="px-4 py-3 flex flex-col gap-2 md:border-r border-slate-200">
+                                    <div class="pl-4 pr-2 py-3 flex flex-col gap-2 md:border-r border-slate-200">
                                         <span class="text-xs text-gray-500">Échéance</span>
                                         <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                             <span class="bg-amber-50 {{ $iconClass }} text-amber-600">
@@ -261,7 +261,7 @@
                                     </div>
 
                                     @if($frequencyEnum)
-                                        <div class="px-4 py-3 flex flex-col gap-2 border-t border-slate-200 md:border-t-0">
+                                        <div class="pl-4 pr-2 py-3 flex flex-col gap-2 border-t border-slate-200 md:border-t-0">
                                             <span class="text-xs text-gray-500">Fréquence</span>
                                             <span class="text-sm-medium text-gray-900 flex flex-wrap items-center gap-2">
                                                 <span class="bg-indigo-50 {{ $iconClass }} text-indigo-600">

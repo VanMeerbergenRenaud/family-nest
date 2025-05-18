@@ -10,5 +10,6 @@ Vérifier mon adresse email
 Si vous n'avez pas créé de compte, aucune action supplémentaire n'est requise.
 
 Cordialement,<br>
+
 {{ config('app.name') }}
 @endcomponent

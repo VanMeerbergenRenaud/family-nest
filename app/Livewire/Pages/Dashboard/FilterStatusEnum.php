@@ -4,7 +4,7 @@ namespace App\Livewire\Pages\Dashboard;
 
 use App\Enums\PaymentStatusEnum;
 
-enum FilterStatus: string
+enum FilterStatusEnum: string
 {
     case All = 'all';
     case Paid = PaymentStatusEnum::Paid->value;
