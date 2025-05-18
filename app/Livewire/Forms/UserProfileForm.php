@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\User;
+use App\Services\EmailVerificationService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -65,8 +66,12 @@ class UserProfileForm extends Form
             $user->fill([
                 'name' => $this->name,
                 'email' => $this->email,
-                'email_verified_at' => $emailChanged ? null : $user->email_verified_at,
             ]);
+
+            // Si l'email a changé, on met explicitement email_verified_at à null
+            if ($emailChanged) {
+                $user->email_verified_at = null;
+            }
 
             if ($this->avatar) {
                 $this->uploadAvatar($user);
@@ -77,9 +82,10 @@ class UserProfileForm extends Form
 
             DB::commit();
 
+            // Utiliser le service de vérification d'email si l'email a changé
             if ($emailChanged && $user instanceof MustVerifyEmail) {
-                $user->sendEmailVerificationNotification();
-                Toaster::success('Profil mis à jour !::Un e-mail de vérification a été envoyé à votre nouvelle adresse.');
+                $emailVerificationService = app(EmailVerificationService::class);
+                $emailVerificationService->sendVerificationEmail($user, true, true);
             } else {
                 Toaster::success('Profil mis à jour !');
             }
@@ -148,15 +154,7 @@ class UserProfileForm extends Form
 
     public function sendVerification(): void
     {
-        $user = auth()->user();
-
-        if ($user->hasVerifiedEmail()) {
-            Toaster::info('Votre adresse e-mail est déjà vérifiée.');
-
-            return;
-        }
-
-        $user->sendEmailVerificationNotification();
-        Toaster::success('Un e-mail de vérification a été envoyé à votre adresse e-mail.');
+        $emailVerificationService = app(EmailVerificationService::class);
+        $emailVerificationService->sendVerificationEmail(auth()->user());
     }
 }

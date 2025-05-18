@@ -133,7 +133,7 @@
 
                 {{-- Email verification alert --}}
                 @if (!$hasVerifiedEmail)
-                    <div class="p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg lg:-mb-6">
+                    <div class="px-4 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg lg:-mb-6">
                         <div class="flex items-center justify-between flex-wrap gap-3">
                             <p class="flex items-center gap-3 text-sm-medium text-indigo-700">
                                 <x-svg.info class="text-indigo-700" />

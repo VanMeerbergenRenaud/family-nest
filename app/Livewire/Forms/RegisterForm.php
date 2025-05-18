@@ -3,7 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use App\Services\EmailVerificationService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -45,7 +45,9 @@ class RegisterForm extends Form
 
         $user = User::create($validated);
 
-        $user->sendEmailVerificationNotification();
+        // Utiliser le service de vérification email
+        $emailVerificationService = app(EmailVerificationService::class);
+        $emailVerificationService->sendVerificationEmail($user, false);
 
         Auth::login($user);
 

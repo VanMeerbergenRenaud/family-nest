@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
+use App\Services\EmailVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -30,13 +30,16 @@ class GoogleAuthController extends Controller
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
+            $isNewUser = false;
+
             if (! $user) {
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'password' => bcrypt(Str::random(24)),
-                    'email_verified_at' => now(),
                 ]);
+
+                $isNewUser = true;
 
                 if ($avatarUrl) {
                     try {
@@ -59,6 +62,10 @@ class GoogleAuthController extends Controller
                         ]);
                     }
                 }
+
+                // Pour un nouvel utilisateur, marquer l'e-mail comme vérifié
+                $emailVerificationService = app(EmailVerificationService::class);
+                $emailVerificationService->markEmailAsVerified($user);
             } else {
                 if (! $user->avatar && $avatarUrl) {
                     try {
