@@ -77,7 +77,7 @@
                                     type="text"
                                     placeholder="Rechercher une catégorie..."
                                     wire:model.live.debounce.200ms="categorySearch"
-                                    class="w-full min-w-[22.5rem] pl-10 pr-3 py-2 placeholder:text-[0.9375rem] text-[0.9375rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
+                                    class="w-full  min-w-[18.5rem] md:min-w-[22.5rem] pl-10 pr-3 py-2 placeholder:text-[0.9375rem] text-[0.9375rem] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200"
                                 >
 
                                 @if($categorySearch)
@@ -103,11 +103,13 @@
 
                                     <x-menu.items class="w-max max-h-[20rem] overflow-y-auto">
                                         @foreach(\App\Enums\TypeEnum::cases() as $type)
-                                            <x-menu.item
-                                                wire:click="filterByType('{{ $type->value }}')"
-                                            >
-                                                {{ $type->emoji() }}&nbsp;&nbsp;{{ $type->label() }}
-                                            </x-menu.item>
+                                            <x-menu.close>
+                                                <x-menu.item
+                                                    wire:click="filterByType('{{ $type->value }}')"
+                                                >
+                                                    {{ $type->emoji() }}&nbsp;&nbsp;{{ $type->label() }}
+                                                </x-menu.item>
+                                            </x-menu.close>
                                         @endforeach
                                     </x-menu.items>
                                 </x-menu>

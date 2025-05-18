@@ -14,9 +14,19 @@ class Danger extends Component
 
     public $showModal = false;
 
-    protected $rules = [
-        'password' => ['required', 'string', 'current_password'],
-    ];
+    protected function rules()
+    {
+        if (Auth::user()->auth_provider === 'google') {
+            return [
+                'password' => ['nullable', 'string'],
+            ];
+        }
+
+        return [
+            'password' => ['required', 'string', 'current_password'],
+        ];
+    }
+
 
     public function openModal()
     {

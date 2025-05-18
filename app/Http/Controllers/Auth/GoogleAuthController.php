@@ -37,6 +37,7 @@ class GoogleAuthController extends Controller
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'password' => bcrypt(Str::random(24)),
+                    'auth_provider' => 'google',
                 ]);
 
                 $isNewUser = true;

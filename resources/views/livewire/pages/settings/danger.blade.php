@@ -20,18 +20,23 @@
                         </h3>
 
                         <p class="mb-2 text-sm text-gray-600 dark:text-gray-400">
-                            {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente. Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
+                            {{ __('Une fois votre compte supprimé, toutes les données et ressources associées seront supprimées de manière permanente.') }}
+                            @if(auth()->user()->auth_provider !== 'google')
+                                {{ __('Veuillez saisir votre mot de passe pour confirmer que vous souhaitez supprimer votre compte de manière permanente.') }}
+                            @endif
                         </p>
 
-                        <x-form.field-password
-                            label="Mot de passe"
-                            name="password"
-                            type="password"
-                            placeholder="Inscrivez votre mot de passe"
-                            model="password"
-                            autofocus
-                            required
-                        />
+                        @if(auth()->user()->auth_provider !== 'google')
+                            <x-form.field-password
+                                label="Mot de passe"
+                                name="password"
+                                type="password"
+                                placeholder="Inscrivez votre mot de passe"
+                                model="password"
+                                autofocus
+                                required
+                            />
+                        @endif
                     </div>
 
                     <x-modal.footer>

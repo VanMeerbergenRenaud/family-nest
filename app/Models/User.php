@@ -23,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'avatar',
+        'auth_provider'
     ];
 
     protected $familyRelation = null;
