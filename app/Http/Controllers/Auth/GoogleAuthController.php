@@ -106,7 +106,7 @@ class GoogleAuthController extends Controller
 
             Session::regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('onboarding.family'));
 
         } catch (\Exception) {
             Toaster::error('Erreur lors de l\'authentification avec Google::Veuillez réessayer à nouveau.');
