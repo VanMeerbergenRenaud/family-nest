@@ -50,7 +50,7 @@
         {{-- Cas 4: La famille a des factures actives --}}
     @else
         <div class="w-full flex flex-col gap-4">
-            <div class="w-full flex flex-wrap items-center md:justify-between gap-8">
+            <div class="w-full flex flex-wrap items-center md:justify-between gap-4 lg:gap-8">
                 <div class="lg:pl-4">
                     <h2 role="heading" aria-level="2" class="text-sm text-gray-500 mb-1">
                         {{ __('Famille ') . $family->name }}

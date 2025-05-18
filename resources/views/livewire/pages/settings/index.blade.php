@@ -1,5 +1,5 @@
 <div>
-    <header class="px-4">
+    <header class="px-2 md:px-4">
         <h2 role="heading" aria-level="2" class="text-xl-semibold" role="heading" aria-level="2">
             {{ __('Paramètres généraux') }}
         </h2>

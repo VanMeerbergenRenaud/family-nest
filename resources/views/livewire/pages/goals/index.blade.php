@@ -5,7 +5,7 @@
     />
 
     {{-- Filtres et bouton d'ajout --}}
-    <div class="px-4 flex flex-col md:flex-row gap-3 justify-between w-full my-4">
+    <div class="md:px-4 flex flex-col md:flex-row gap-3 justify-between w-full my-4">
         {{-- Filtre personnel/famille (style similaire aux archives) --}}
         @if($hasFamily)
             <div class="h-fit p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
@@ -138,7 +138,7 @@
         </div>
     @else
         {{-- Liste des objectifs --}}
-        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:px-4">
             @foreach($goals as $goal)
                 <li class="bg-white rounded-xl border border-slate-200 overflow-hidden flex flex-col h-full">
                     {{-- En-tête --}}

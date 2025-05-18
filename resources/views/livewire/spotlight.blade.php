@@ -20,7 +20,7 @@
 
                 {{-- Content --}}
                 <div class="absolute top-18 md:top-[20vh] max-sm:w-[calc(100vw-2rem)] transform transition-all">
-                    <div class="bg-gray-100 dark:bg-gray-900 rounded-lg md:rounded-xl md:max-w-[40rem] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
+                    <div class="bg-gray-100 dark:bg-gray-900 rounded-xl md:max-w-[40rem] max-sm:max-h-[85vh] max-h-[40rem] border border-gray-300 dark:border-gray-700 overflow-hidden">
                         {{-- Search bar --}}
                         <div class="relative bg-white dark:bg-gray-800">
                             <label for="search">

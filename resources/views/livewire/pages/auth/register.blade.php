@@ -39,7 +39,7 @@
         </div>
 
         {{-- General conditions --}}
-        <div class="mt-6 md:px-2 flex items-center justify-between gap-3">
+        <div class="mt-6 px-2 grid grid-cols-[1fr_auto] items-center justify-between gap-3">
             <x-form.checkbox-input
                 label="Accepter les conditions"
                 name="general_conditions"
@@ -48,7 +48,8 @@
             />
 
             <button type="button" wire:click="showConditions" class="min-w-fit text-sm-medium text-gray-700 underline" title="Voir les conditions d'utilisation">
-                {{ __("Conditions d'utilisation") }}
+                {{ __("Conditions") }}
+                <span class="max-sm:hidden text-sm-medium text-gray-700 underline">{{ __('d\'utilisation') }}</span>
             </button>
         </div>
 
@@ -86,21 +87,20 @@
     @if($showGeneralCondition)
         <x-modal wire:model="showGeneralCondition">
             <x-modal.panel>
-                <div class="p-6">
-                    <!-- Structure avec grid -->
+                <div class="p-4 md:p-6">
                     <div class="grid grid-cols-[auto_1fr] gap-4">
-                        <!-- Première ligne: icône et titre -->
-                        <div class="p-3 w-fit h-fit rounded-full bg-gray-100">
+
+                        <div class="max-sm:hidden ml-2 p-3 w-fit h-fit rounded-full bg-gray-100">
                             <x-svg.conditions />
                         </div>
 
-                        <h2 role="heading" aria-level="2" role="heading" aria-level="3" class="pr-3 text-xl-semibold self-center">
+                        <h2 role="heading" aria-level="2" role="heading" aria-level="3" class="pr-8 pl-2 text-lg-semibold md:text-xl-semibold self-center">
                             {{ __('Conditions générales d\'utilisation') }}
                         </h2>
 
-                        <!-- Deuxième ligne: contenu sur 2 colonnes -->
-                        <div class="col-span-2 mt-4 text-md-regular text-gray-500">
-                            <div class="pl-2 pr-4 lg:pr-6 overflow-y-auto max-h-96">
+                        <!-- Contenu sur 2 colonnes -->
+                        <div class="col-span-2 pt-4 text-md-regular text-gray-500 overflow-y-auto">
+                            <div class="pl-2 pr-4 lg:pr-6 max-h-96">
                                 <h3 role="heading" aria-level="3" class="font-semibold mb-2">1. Introduction</h3>
                                 <p class="mb-3">
                                     Bienvenue sur notre plateforme. Les présentes conditions générales d'utilisation régissent votre utilisation de notre service et constituent un accord légal entre vous et notre entreprise.

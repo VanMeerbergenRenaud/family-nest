@@ -98,6 +98,8 @@ class Show extends Component
         $hasShares = $this->invoice->has_shares;
         $isFullyShared = $this->invoice->is_fully_shared;
 
+        $payer = $this->invoice->paidByUser;
+
         return view('livewire.pages.invoices.show', compact(
             'paymentStatusEnum',
             'paymentMethodEnum',
@@ -108,6 +110,7 @@ class Show extends Component
             'totalSharedAmount',
             'hasShares',
             'isFullyShared',
+            'payer',
         ))->layout('layouts.app-sidebar');
     }
 }

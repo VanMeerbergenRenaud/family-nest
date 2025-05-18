@@ -425,7 +425,7 @@
 
                     @if($invoices->count() <= 5)
                         <tr>
-                            <td colspan="100%" class="h-56">
+                            <td colspan="100%" class="h-90">
                                 @if($invoices->count() < 5 && $invoices->count() > 0)
                                     <div class="h-[15rem]"></div>
                                 @elseif($invoices->isEmpty())

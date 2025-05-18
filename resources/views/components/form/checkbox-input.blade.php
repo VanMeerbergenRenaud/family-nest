@@ -4,7 +4,7 @@
     'checked' => false,
 ])
 
-<label for="{{ $name }}" class="relative w-full flex items-center gap-2 cursor-pointer">
+<label for="{{ $name }}" class="relative w-full flex items-center gap-3 cursor-pointer">
     <input id="{{ $name }}"
            type="checkbox"
            class="min-w-4 h-4 cursor-pointer transition-all pointer-events-none appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"

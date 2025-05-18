@@ -9,7 +9,7 @@
 
             {{ $banner ?? null }}
 
-            <div class="relative flex-center px-4 pb-1 pt-2">
+            <div class="relative flex-center pb-1 pt-2">
                 <a href="{{ url()->previous() }}" class="max-md:hidden absolute top-auto left-4 button-classic w-fit text-sm-semibold">
                     <x-svg.arrows.left class="text-gray-900" />
                     Retour

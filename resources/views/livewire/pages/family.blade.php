@@ -43,7 +43,7 @@
 
         {{-- Section des invitations en attente --}}
         @if($pendingInvitations->count() > 0 && $canEdit)
-            <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
+            <section class="mt-4 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 border-b border-gray-200 dark:border-gray-700">
                     <h3 role="heading" aria-level="3" class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">
                         Invitations en attente
@@ -139,7 +139,7 @@
             </section>
         @endif
 
-        <section class="mt-6 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
+        <section class="mt-4 w-full overflow-hidden bg-white dark:bg-gray-800 rounded-2xl border border-slate-200">
             {{-- En-tête --}}
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 pl-6 border-b border-gray-200 dark:border-gray-700">
                 <h3 role="heading" aria-level="3" class="pl-1 text-lg-semibold mb-3 sm:mb-0 dark:text-white">

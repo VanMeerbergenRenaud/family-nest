@@ -4,7 +4,7 @@
         description="Les factures archivées n'apparaissent plus dans la liste des factures de votre tableau de bord."
     />
 
-    <div class="px-4 flex flex-col md:flex-row gap-3 justify-between w-full my-4">
+    <div class="md:px-4 flex flex-col md:flex-row gap-3 justify-between w-full mt-4 mb-6 lg:mb-4">
             @if($this->hasFamily())
                 <div class="h-fit p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
                     @php

@@ -4,7 +4,7 @@
     'showSocialLogin' => false
 ])
 
-<div class="relative min-h-screen flex-center bg-gray-100 lg:py-4">
+<div class="lg:py-4 relative min-h-screen flex-center bg-white md:bg-gray-100">
     {{-- Arrow go back --}}
     <div class="absolute top-4 left-4 max-sm:hidden">
         <a href="{{ route('welcome') }}"
@@ -17,7 +17,7 @@
         </a>
     </div>
 
-    <div class="bg-white p-1.5 rounded-2xl shadow-md">
+    <div class="bg-white p-1.5 md:rounded-2xl md:shadow-md">
         <div class="relative flex-center flex-col rounded-xl w-full h-fit overflow-hidden bg-gradient-to-t from-[#FFFFFF] via-[#F7F9FF] via-35% to-[#EBF1FF]">
             {{-- Background en grille --}}
             <div class="absolute pointer-events-none inset-0 bg-[url('/public/img/bg-pattern.svg')] bg-cover bg-[50%_calc(50%_-_0.75rem)] bg-no-repeat">
@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <div class="container rounded-2xl py-8 px-5 md:px-7 max-sm:max-w-[25rem] max-w-[32rem] md:max-h-fit space-y-4">
+        <div class="container rounded-2xl py-8 px-5 md:px-7 max-w-[34rem] md:max-h-fit space-y-4 max-sm:shadow-sm">
 
             @if (session('google_auth_error'))
                 <p class="mt-4 mb-5 bg-red-50 border border-red-200 py-2 px-4 gap-4 rounded-md text-sm text-red-700 dark:bg-red-100 dark:border-red-300 dark:text-red-600 flex items-center">
@@ -56,6 +56,7 @@
                 <div x-data="{ showTooltip: false }"
                      class="space-y-3 md:space-y-0 md:flex md:space-x-4 min-w-[20rem]"
                 >
+
                     <a href="{{ route('google.redirect') }}"  class="w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200">
                         <x-svg.google class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Google
@@ -64,6 +65,7 @@
                         <x-svg.apple class="mr-3"/>
                         Continuer&nbsp;avec&nbsp;Apple
                     </a>--}}
+
                     <button class="relative cursor-not-allowed w-full flex-center py-2.5 px-4 text-sm-semibold rounded-xl transition-colors bg-gray-100 text-dark hover:bg-gray-200"
                             @mouseenter="showTooltip = true"
                             @mouseleave="showTooltip = false"

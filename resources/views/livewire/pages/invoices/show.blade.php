@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-5 lg:p-4">
-    <div class="px-4 flex flex-col lg:flex-row justify-between items-start gap-4">
+    <div class="md:px-4 flex flex-col lg:flex-row justify-between items-start gap-4">
 
         <h2 role="heading" aria-level="2" class="display-xs-medium max-w-xs truncate">
             Facture&nbsp;:&nbsp;{{ $invoice->name }}
@@ -8,7 +8,7 @@
         <x-loader.spinner target="downloadInvoice, toggleFavorite, copyInvoice, restoreInvoice, archiveInvoice" position="fixed" />
 
         <!-- Actions -->
-        <div class="flex flex-wrap md:justify-end gap-2">
+        <div class="flex flex-wrap lg:justify-end gap-2">
             <button
                 type="button"
                 class="button-primary"

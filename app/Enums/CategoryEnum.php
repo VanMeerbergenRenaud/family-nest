@@ -72,8 +72,8 @@ enum CategoryEnum: string
 
     // Finances
     case CREDIT_PERSONNEL = 'Crédit personnel';
-    case FRAIS_BANCAIRES = 'Frais bancaires, cartes de crédit';
-    case FRAIS_NOTAIRE = 'Frais de notaire ou de contrat';
+    case FRAIS_BANCAIRES = 'Frais bancaires';
+    case FRAIS_NOTAIRE = 'Frais de notaire';
     case PRETS_PERSONNELS = 'Prêts personnels';
     case REVENU_RETRAITE = 'Revenu de Retraite';
 
