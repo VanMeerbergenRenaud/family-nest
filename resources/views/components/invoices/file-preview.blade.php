@@ -26,21 +26,18 @@
                  wire:ignore
                  loading="lazy"
             />
-        {{-- Les autres types de fichiers inchangés... --}}
         @elseif ($fileInfo['isPdf'] ?? false)
-            {{-- Code existant inchangé --}}
             @if($temporaryUrl || $storagePath)
                 <div wire:ignore class="w-full h-full overflow-hidden rounded-lg">
-                    <object
+                    <embed
                         id="pdf-viewer"
                         width="100%"
                         height="100%"
                         class="inline-block w-full h-full min-h-[60vh]"
                         type="application/pdf"
-                        data="{{ $temporaryUrl ?? $storagePath }}"
-                        sandbox="allow-same-origin"
+                        src="{{ $temporaryUrl ?? $storagePath }}"
                         loading="lazy"
-                    ></object>
+                    >
                 </div>
             @else
                 <div class="w-full min-h-[60vh] flex-center flex-col gap-4">
