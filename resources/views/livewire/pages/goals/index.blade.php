@@ -100,16 +100,14 @@
             @endif
 
             {{-- Bouton d'ajout --}}
-            @can('create', App\Models\Goal::class)
-                <button
-                    type="button"
-                    class="button-tertiary"
-                    wire:click="openCreateModal"
-                >
-                    <x-svg.target class="text-white"/>
-                    {{ __('Se fixer un objectif') }}
-                </button>
-            @endcan
+            <button
+                type="button"
+                class="button-tertiary"
+                wire:click="openCreateModal"
+            >
+                <x-svg.target class="text-white"/>
+                {{ __('Se fixer un objectif') }}
+            </button>
         </div>
     </div>
 
@@ -246,7 +244,7 @@
                         {{-- Partage avec la famille --}}
                         <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap justify-between items-center gap-2">
                             {{-- Type d'objectif --}}
-                            @if($goal->family_id)
+                            @if($goal->is_family_goal)
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 text-sm bg-rose-50 text-rose-500 rounded-full">
                                     <x-svg.user-group class="w-3.5 h-3.5 text-rose-500" />
                                     Objectif familial

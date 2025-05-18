@@ -36,6 +36,12 @@ class Modal extends Component
         }
     }
 
+    public function hydrate(): void
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
     protected function configureForEdit($goalId): void
     {
         $this->isEditMode = true;
@@ -48,19 +54,6 @@ class Modal extends Component
     {
         $this->form->start_date = now()->format('Y-m-d');
         $this->form->end_date = now()->addMonth()->format('Y-m-d');
-    }
-
-    public function hydrate(): void
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
-    }
-
-    public function updatedShowModal($value): void
-    {
-        if (! $value) {
-            $this->dispatch('refreshGoals');
-        }
     }
 
     public function saveGoal(): void
@@ -76,7 +69,6 @@ class Modal extends Component
 
             $this->showModal = false;
             $this->dispatch('refreshGoals');
-            $this->redirectRoute('goals');
         } catch (\Exception $e) {
             \Log::error('Une erreur est survenue : '.$e->getMessage());
         }
@@ -100,12 +92,17 @@ class Modal extends Component
         }));
     }
 
+    /* Fonctionnalité de recherche */
     public function filterByType($typeValue): void
     {
         $this->categorySearch = $typeValue;
     }
 
-    // Catégories groupées par type et filtrées par recherche
+    public function toggleCategoryView(): void
+    {
+        $this->categoryView = $this->categoryView === 'list' ? 'grid' : 'list';
+    }
+
     public function getCategoriesByTypeProperty(): array
     {
         $result = [];
@@ -139,11 +136,6 @@ class Modal extends Component
         }
 
         return $result;
-    }
-
-    public function toggleCategoryView(): void
-    {
-        $this->categoryView = $this->categoryView === 'list' ? 'grid' : 'list';
     }
 
     public function render()

@@ -5,6 +5,7 @@ namespace App\Livewire\Pages\Goals;
 use App\Models\Goal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -32,6 +33,10 @@ class Index extends Component
         'type' => 'all',
         'owner' => 'all',
     ];
+
+    #[On('refreshGoals')]
+    #[On('deleteAGoal')]
+    public function refreshIndex(): void {}
 
     public function openCreateModal(): void
     {
@@ -70,6 +75,7 @@ class Index extends Component
 
         Toaster::success('Objectif supprimé avec succès !');
         $this->reset(['showDeleteModal', 'selectedGoal']);
+        $this->dispatch('deleteAGoal');
     }
 
     public function applyFilter(string $filter, string $value): void
@@ -92,19 +98,12 @@ class Index extends Component
     protected function getFilteredQuery(): Builder
     {
         $user = auth()->user();
-        $hasFamily = $user->hasFamily();
-        $familyId = $hasFamily ? $user->family()->id : null;
+        $familyId = $user->family()->first()->id;
 
-        // On s'assure que l'utilisateur ne peut voir que les objectifs auxquels il a accès
         $query = Goal::query();
 
-        // Application de la policy viewAny implicitement via le filtre d'accès
-        if ($hasFamily) {
-            $ownerEnum = GoalOwnerEnum::tryFrom($this->filters['owner']) ?? GoalOwnerEnum::All;
-            $ownerEnum->applyQuery($query, $user->id, $familyId);
-        } else {
-            $query->where('user_id', $user->id);
-        }
+        $ownerEnum = GoalOwnerEnum::tryFrom($this->filters['owner']) ?? GoalOwnerEnum::All;
+        $ownerEnum->applyQuery($query, $user->id, $familyId);
 
         // Application des filtres
         collect([

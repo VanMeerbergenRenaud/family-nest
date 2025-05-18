@@ -26,8 +26,8 @@ enum GoalOwnerEnum: string
     public function applyQuery($query, $userId, $familyId): void
     {
         match ($this) {
-            self::All => $query->where('family_id', $familyId),
-            self::Personal => $query->where('user_id', $userId),
+            self::All => $query->where('family_id', $familyId)->where('is_family_goal', true),
+            self::Personal => $query->where('user_id', $userId)->where('family_id', $familyId)->where('is_family_goal', false),
         };
     }
 }

@@ -71,7 +71,7 @@ class GoalForm extends Form
         $this->start_date = $goal->start_date->format('Y-m-d');
         $this->end_date = $goal->end_date->format('Y-m-d');
         $this->is_recurring = $goal->is_recurring;
-        $this->is_family_goal = $goal->family_id;
+        $this->is_family_goal = $goal->is_family_goal;
         $this->target_amount = $goal->target_amount;
         $this->categories = $goal->categories;
     }
@@ -82,7 +82,7 @@ class GoalForm extends Form
 
         try {
             $user = auth()->user();
-            $familyId = $this->is_family_goal && $user->hasFamily() ? $user->family()->id : null;
+            $familyId = $user->family()->first()->id;
 
             $data = [
                 'name' => $this->name,
@@ -92,6 +92,7 @@ class GoalForm extends Form
                 'start_date' => $this->start_date,
                 'end_date' => $this->end_date,
                 'is_recurring' => $this->is_recurring,
+                'is_family_goal' => $this->is_family_goal,
                 'target_amount' => $this->target_amount,
                 'categories' => $this->categories,
                 'user_id' => $user->id,
