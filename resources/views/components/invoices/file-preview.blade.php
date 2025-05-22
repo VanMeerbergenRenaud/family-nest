@@ -29,15 +29,16 @@
         @elseif ($fileInfo['isPdf'] ?? false)
             @if($temporaryUrl || $storagePath)
                 <div wire:ignore class="w-full h-full overflow-hidden rounded-lg">
-                    <embed
+                    <object
                         id="pdf-viewer"
                         width="100%"
                         height="100%"
                         class="inline-block w-full h-full min-h-[60vh]"
                         type="application/pdf"
-                        src="{{ $temporaryUrl ?? $storagePath }}"
+                        data="{{ $temporaryUrl ?? $storagePath }}"
+                        sandbox="allow-same-origin"
                         loading="lazy"
-                    >
+                    ></object>
                 </div>
             @else
                 <div class="w-full min-h-[60vh] flex-center flex-col gap-4">
