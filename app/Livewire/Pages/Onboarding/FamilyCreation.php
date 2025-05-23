@@ -33,7 +33,7 @@ class FamilyCreation extends Component
     {
         // Rediriger si l'utilisateur a déjà une famille
         if (Auth::user()->family()) {
-            return $this->redirectRoute('dashboard');
+            $this->redirectRoute('dashboard');
         }
 
         $this->addMember();

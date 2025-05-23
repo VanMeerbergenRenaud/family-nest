@@ -174,7 +174,7 @@
                                 <h3 role="heading" aria-level="3" class="pl-3 text-xs-medium uppercase text-gray-500 mb-2">Type et catégorie</h3>
                                 <div class="px-4 py-3 flex items-center bg-teal-50 rounded-lg border border-slate-200">
                                     <span class="{{ $iconClass }} bg-teal-100 text-teal-700">
-                                        <x-rectangle-stack />
+                                        <x-svg.rectangle-stack />
                                     </span>
                                     <p class="text-sm-medium text-gray-800">
                                         {{ $invoice->type->value ?? 'Non spécifié' }} - {{ $invoice->category->value ?? 'Non spécifiée' }}
