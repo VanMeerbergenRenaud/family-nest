@@ -28,9 +28,9 @@ return [
     /**
      * The on-screen duration of each toast.
      *
-     * Minimum: 3000 (in milliseconds)
+     * Minimum: 3000 (in milliseconds) -> change to 5s
      */
-    'duration' => 3000,
+    'duration' => 5000,
 
     /**
      * The horizontal position of each toast.
