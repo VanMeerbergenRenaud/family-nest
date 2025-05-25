@@ -78,11 +78,15 @@
                                 @endforeach
                             </x-form.select>
 
-                            <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
-                                <option value="" selected>Sélectionner une catégorie</option>
-                                @foreach($form->availableCategories as $categoryValue => $categoryLabel)
-                                    <option value="{{ $categoryValue }}">{!! $categoryLabel !!}</option>
-                                @endforeach
+                            <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie" :disabled="!$form->type">
+                                @if(!$form->type)
+                                    <option value="" selected>Veuillez d'abord sélectionner un type</option>
+                                @else
+                                    <option value="" selected>Sélectionner une catégorie</option>
+                                    @foreach($form->availableCategories as $categoryValue => $categoryLabel)
+                                        <option value="{{ $categoryValue }}">{!! $categoryLabel !!}</option>
+                                    @endforeach
+                                @endif
                             </x-form.select>
 
                             <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name" model="form.issuer_name" placeholder="Nom du fournisseur"/>

@@ -67,12 +67,12 @@
                             <p class="max-sm:mt-1.5 text-sm-regular">
                                 Payeur :
                                 <span class="text-sm-medium">
-                            <img src="{{ $invoice->paidByUser->avatar_url ?? asset('img/img_placeholder.jpg') }}"
-                                 class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1"
-                                 alt="" loading="lazy"
-                            >
-                            {{ $invoice->paidByUser->name }}
-                        </span>
+                                    <img src="{{ $invoice->paidByUser->avatar_url ?? asset('img/img_placeholder.jpg') }}"
+                                         class="w-6 h-6 object-cover rounded-full inline-block ml-2 mr-1"
+                                         alt="" loading="lazy"
+                                    >
+                                    {{ $invoice->paidByUser->name }}
+                                </span>
                             </p>
                         @endif
                     </div>
@@ -250,6 +250,8 @@
                         </p>
                     @endif
                 </div>
+            @else
+                <p class="text-sm-medium">{{ __('Non définie') }}</p>
             @endif
         </x-invoices.form.summary-item>
 

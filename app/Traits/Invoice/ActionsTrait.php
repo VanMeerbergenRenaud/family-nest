@@ -81,8 +81,12 @@ trait ActionsTrait
 
             $newInvoice = $originalInvoice->replicate();
 
-            $newInvoice->name = $originalInvoice->name.' (version copiée)';
             $newInvoice->user_id = $user->id; // making sure the new invoice is owned by the current user
+            $newInvoice->name = $originalInvoice->name.' (copie)';
+            $newInvoice->reference = '';
+            $newInvoice->issued_date = null;
+            $newInvoice->payment_due_date = null;
+            $newInvoice->payment_reminder = null;
 
             if ($originalInvoice->tags) {
                 $newInvoice->tags = $originalInvoice->tags;
@@ -154,7 +158,10 @@ trait ActionsTrait
     public function toggleFavorite($invoiceId): void
     {
         $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $invoice->update(['is_favorite' => ! $invoice->is_favorite]);
+        $invoice->update([
+            'is_favorite' => ! $invoice->is_favorite,
+            'is_archived' => false,
+        ]);
 
         // Fermer la modale du dossier s'il est ouvert
         if (property_exists($this, 'showFolderModal')) {

@@ -33,7 +33,7 @@ trait ComponentTrait
     {
         // Normaliser le montant
         if (isset($this->form->amount)) {
-            $this->form->amount = is_object($this->form) && method_exists($this->form, 'normalizeAmount')
+            $this->form->amount = method_exists($this->form, 'normalizeAmount')
                 ? $this->form->normalizeAmount($this->form->amount)
                 : $this->normalizeNumber($this->form->amount);
         }
@@ -59,11 +59,25 @@ trait ComponentTrait
     }
 
     /**
+     * Calcule le montant à partir d'un pourcentage
+     */
+    protected function calculateAmountFromPercentage(float $percentage): float
+    {
+        $invoiceAmount = floatval($this->form->amount ?? 0);
+
+        if ($invoiceAmount <= 0 || $percentage <= 0) {
+            return 0;
+        }
+
+        return $this->normalizeNumber(($percentage / 100) * $invoiceAmount);
+    }
+
+    /**
      * Met à jour les catégories disponibles lorsque le type change
      */
     public function updatedFormType(): void
     {
-        if (is_object($this->form) && method_exists($this->form, 'updateAvailableCategories')) {
+        if (method_exists($this->form, 'updateAvailableCategories')) {
             $this->form->updateAvailableCategories();
             $this->form->category = null;
         }
@@ -74,7 +88,7 @@ trait ComponentTrait
      */
     public function removeUploadedFile(): void
     {
-        if (is_object($this->form) && method_exists($this->form, 'removeFile')) {
+        if (method_exists($this->form, 'removeFile')) {
             $this->form->removeFile();
             $this->form->resetErrorBag('uploadedFile');
         }

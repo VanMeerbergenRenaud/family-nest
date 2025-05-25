@@ -3,15 +3,17 @@
 namespace App\Services;
 
 use Aws\Textract\TextractClient;
+use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class TextractService
 {
     protected ?TextractClient $textractClient = null;
+
     protected string $ocrSpaceApiKey;
+
     protected int $timeout = 60;
 
     // Patterns pour identifier les montants totaux
@@ -31,7 +33,7 @@ class TextractService
             '/total[^0-9€]*([0-9\s.,]+)\s*€?/i',
             '/à\s+payer[^0-9€]*([0-9\s.,]+)\s*€?/i',
             '/montant[^0-9€]*([0-9\s.,]+)\s*€?/i',
-        ]
+        ],
     ];
 
     // Patterns pour exclure les faux positifs
@@ -71,7 +73,7 @@ class TextractService
     {
         $startTime = time();
 
-        if (!$this->hasEnabledService()) {
+        if (! $this->hasEnabledService()) {
             return $this->errorResponse('Aucun service OCR n\'est activé');
         }
 
@@ -93,6 +95,7 @@ class TextractService
 
         } catch (Exception $e) {
             Log::error('Erreur OCR générale', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage());
         }
     }
@@ -109,10 +112,11 @@ class TextractService
             $result = $this->textractClient->analyzeDocument([
                 'Document' => ['Bytes' => $fileContent],
                 'FeatureTypes' => ['FORMS', 'TABLES'],
-                '@http' => ['timeout' => $this->getRemainingTimeout($startTime)]
+                '@http' => ['timeout' => $this->getRemainingTimeout($startTime)],
             ]);
 
             $extractedText = $this->extractTextFromTextract($result);
+
             return $this->successResponse(
                 $this->extractInvoiceData($extractedText),
                 'textract',
@@ -121,6 +125,7 @@ class TextractService
 
         } catch (Exception $e) {
             Log::warning('Textract failed', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 'textract');
         }
     }
@@ -141,8 +146,8 @@ class TextractService
                     'OCREngine' => '2',
                 ]);
 
-            if (!$response->successful()) {
-                throw new Exception('OCR.space request failed: ' . $response->status());
+            if (! $response->successful()) {
+                throw new Exception('OCR.space request failed: '.$response->status());
             }
 
             $ocrResult = $response->json();
@@ -152,6 +157,7 @@ class TextractService
             }
 
             $extractedText = $this->extractTextFromOcrSpace($ocrResult);
+
             return $this->successResponse(
                 $this->extractInvoiceData($extractedText),
                 'ocr.space',
@@ -160,6 +166,7 @@ class TextractService
 
         } catch (Exception $e) {
             Log::error('OCR.space failed', ['error' => $e->getMessage()]);
+
             return $this->errorResponse($e->getMessage(), 'ocr.space');
         }
     }
@@ -251,11 +258,11 @@ class TextractService
         }
 
         // Privilégier les montants dans le dernier tiers du document
-        $lastThird = array_filter($amounts, fn($a) => $a['position'] > 0.67);
+        $lastThird = array_filter($amounts, fn ($a) => $a['position'] > 0.67);
 
-        if (!empty($lastThird)) {
+        if (! empty($lastThird)) {
             // Prendre le plus gros montant du dernier tiers
-            usort($lastThird, fn($a, $b) => $b['float'] <=> $a['float']);
+            usort($lastThird, fn ($a, $b) => $b['float'] <=> $a['float']);
 
             // Vérifier si c'est vraiment un total
             $candidate = $lastThird[0];
@@ -265,7 +272,8 @@ class TextractService
         }
 
         // Sinon, prendre le plus gros montant global
-        usort($amounts, fn($a, $b) => $b['float'] <=> $a['float']);
+        usort($amounts, fn ($a, $b) => $b['float'] <=> $a['float']);
+
         return $amounts[0]['value'];
     }
 
@@ -290,6 +298,7 @@ class TextractService
                 return true;
             }
         }
+
         return false;
     }
 
@@ -321,11 +330,12 @@ class TextractService
         }
 
         // Privilégier les montants en fin de document
-        usort($candidates, function($a, $b) {
+        usort($candidates, function ($a, $b) {
             // D'abord par position (plus tard = mieux)
             if (abs($a['position'] - $b['position']) > 0.1) {
                 return $b['position'] <=> $a['position'];
             }
+
             // Ensuite par valeur (plus gros = mieux)
             return $b['float'] <=> $a['float'];
         });
@@ -341,7 +351,7 @@ class TextractService
 
         // S'assurer du format décimal correct
         if (preg_match('/^(\d+)\.(\d{2})$/', $amount, $matches)) {
-            return $matches[1] . '.' . $matches[2];
+            return $matches[1].'.'.$matches[2];
         }
 
         return $amount;
@@ -352,10 +362,11 @@ class TextractService
         // Chercher dans les 5 premières lignes non vides
         foreach (array_slice($lines, 0, 5) as $line) {
             if (strlen($line) > 2 && strlen($line) < 60 &&
-                !preg_match('/(facture|invoice|devis|reçu|document)/i', $line)) {
+                ! preg_match('/(facture|invoice|devis|reçu|document)/i', $line)) {
                 return $line;
             }
         }
+
         return null;
     }
 
@@ -380,14 +391,16 @@ class TextractService
     {
         if (preg_match('/https?:\/\/\S+|www\.\S+\.[a-z]{2,}/i', $text, $matches)) {
             $url = $matches[0];
-            return str_starts_with($url, 'http') ? $url : 'http://' . $url;
+
+            return str_starts_with($url, 'http') ? $url : 'http://'.$url;
         }
+
         return null;
     }
 
     protected function extractDate(string $text, string $type): ?string
     {
-        $patterns = match($type) {
+        $patterns = match ($type) {
             'issued' => [
                 '/date\s+(?:de\s+)?facture\s*:?\s*(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})/i',
                 '/date\s*:?\s*(\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4})/i',
@@ -423,23 +436,23 @@ class TextractService
 
     protected function generateInvoiceName(?string $issuerName, ?string $issuedDate): ?string
     {
-        if (!$issuerName) {
+        if (! $issuerName) {
             return null;
         }
 
         $cleanName = preg_replace('/[^\p{L}\p{N}\s]/u', '', $issuerName);
         $cleanName = substr($cleanName, 0, 30);
 
-        $name = 'Facture ' . trim($cleanName);
+        $name = 'Facture '.trim($cleanName);
 
         if ($issuedDate && $date = \DateTime::createFromFormat('Y-m-d', $issuedDate)) {
             $months = [
                 1 => 'Janvier', 2 => 'Février', 3 => 'Mars', 4 => 'Avril',
                 5 => 'Mai', 6 => 'Juin', 7 => 'Juillet', 8 => 'Août',
-                9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre'
+                9 => 'Septembre', 10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
             ];
 
-            $name .= ' ' . $months[(int)$date->format('n')] . ' ' . $date->format('Y');
+            $name .= ' '.$months[(int) $date->format('n')].' '.$date->format('Y');
         }
 
         return $name;
@@ -476,6 +489,7 @@ class TextractService
                 $lines[] = $block['Text'];
             }
         }
+
         return implode("\n", $lines);
     }
 
@@ -483,8 +497,9 @@ class TextractService
     {
         $text = '';
         foreach ($result['ParsedResults'] ?? [] as $parsed) {
-            $text .= $parsed['ParsedText'] . "\n";
+            $text .= $parsed['ParsedText']."\n";
         }
+
         return $text;
     }
 
@@ -495,7 +510,7 @@ class TextractService
             'success' => true,
             'data' => $data,
             'service' => $service,
-            'duration' => $duration
+            'duration' => $duration,
         ];
     }
 
@@ -504,7 +519,7 @@ class TextractService
         return [
             'success' => false,
             'message' => $message,
-            'service' => $service
+            'service' => $service,
         ];
     }
 
@@ -512,9 +527,9 @@ class TextractService
     {
         return [
             'success' => false,
-            'message' => 'Timeout après ' . $this->timeout . ' secondes',
+            'message' => 'Timeout après '.$this->timeout.' secondes',
             'timeout' => true,
-            'duration' => time() - $startTime
+            'duration' => time() - $startTime,
         ];
     }
 

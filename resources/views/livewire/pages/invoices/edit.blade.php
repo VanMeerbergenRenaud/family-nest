@@ -35,9 +35,10 @@
                     @if ($form->existingFilePath && !$form->uploadedFile)
                         {{-- Affichage du fichier existant --}}
                         <div class="relative w-full h-full">
-                            <div class="absolute top-2.5 right-2.5 z-2">
-                                <button type="button" wire:click="removeUploadedFile" class="p-1">
-                                    <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
+
+                            <div class="absolute top-0 right-0 z-2">
+                                <button type="button" wire:click="removeUploadedFile" class="p-2.5 group">
+                                    <x-svg.cross class="text-red-600 group-hover:text-black bg-red-300 group-hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
                                 </button>
                             </div>
 
@@ -98,10 +99,14 @@
 
                             {{-- Section pour la catégorie --}}
                             <x-form.select label="Catégorie*" name="form.category" model="form.category" label="Catégorie">
-                                <option value="" selected>Sélectionner une catégorie</option>
-                                @foreach($form->availableCategories as $categoryValue => $categoryLabel)
-                                    <option value="{{ $categoryValue }}">{!! $categoryLabel !!}</option>
-                                @endforeach
+                                @if(!$form->type)
+                                    <option value="" selected class="">Veuillez d'abord sélectionner un type</option>
+                                @else
+                                    <option value="" selected>Sélectionner une catégorie</option>
+                                    @foreach($form->availableCategories as $categoryValue => $categoryLabel)
+                                        <option value="{{ $categoryValue }}">{!! $categoryLabel !!}</option>
+                                    @endforeach
+                                @endif
                             </x-form.select>
 
                             <x-form.field label="Fournisseur / émetteur de la facture" name="form.issuer_name" model="form.issuer_name" placeholder="Nom du fournisseur"/>

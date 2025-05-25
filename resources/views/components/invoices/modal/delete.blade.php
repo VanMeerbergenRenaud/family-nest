@@ -6,7 +6,7 @@
 ])
 
 <div>
-    <x-loader.spinner target="deleteDefinitelyInvoice" />
+    <x-loader.spinner target="deleteDefinitelyInvoice" position="fixed" />
 
     @if($showDeleteFormModal)
         <x-modal wire:model="showDeleteFormModal">

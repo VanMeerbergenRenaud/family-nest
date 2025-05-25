@@ -18,7 +18,6 @@ use App\Traits\FormatFileSizeTrait;
 use App\Traits\HumanDateTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Masmerise\Toaster\Toaster;
@@ -232,76 +231,6 @@ class InvoiceForm extends Form
         $this->is_primary = true;
     }
 
-    public function updateAvailableCategories(): void
-    {
-        if (empty($this->type)) {
-            $this->availableCategories = [];
-
-            return;
-        }
-
-        try {
-            $typeEnum = $this->type instanceof TypeEnum
-                ? $this->type
-                : TypeEnum::tryFrom($this->type);
-
-            if (! $typeEnum) {
-                return;
-            }
-
-            $this->availableCategories = [];
-
-            foreach ($typeEnum->categoryEnums() as $category) {
-                $this->availableCategories[$category->value] = $category->labelWithEmoji();
-            }
-        } catch (\Throwable $e) {
-            $this->availableCategories = [];
-            Toaster::error('Erreur lors de la récupération des catégories.');
-            Log::error('Erreur lors de la récupération des catégories: '.$e->getMessage());
-        }
-    }
-
-    // Calculer le montant restant à répartir
-    public function validateAndAdjustShares(): bool
-    {
-        // Si le montant total est nul, pas besoin de vérifier les répartitions
-        if (floatval($this->amount ?? 0) <= 0) {
-            $this->user_shares = [];
-
-            return true;
-        }
-
-        // Filtrer pour ne garder que les parts actives (avec montant ou pourcentage > 0)
-        $activeShares = array_filter($this->user_shares ?? [], function ($share) {
-            return (isset($share['amount']) && floatval($share['amount']) > 0) ||
-                (isset($share['percentage']) && floatval($share['percentage']) > 0);
-        });
-
-        // Si le mode de répartition est activé, mais qu'il y a moins de 2 membres actifs, la validation échoue
-        if (! empty($this->user_shares) && count($activeShares) < 2) {
-            return false;
-        }
-
-        // Vérifier si le total des pourcentages ne dépasse pas 100%
-        $totalPercentage = 0;
-        foreach ($activeShares as $share) {
-            if (isset($share['percentage']) && floatval($share['percentage']) > 0) {
-                $totalPercentage += floatval($share['percentage']);
-            }
-        }
-
-        if ($totalPercentage > 100) {
-            return false;
-        }
-
-        // Si pas de répartition active, réinitialiser complètement les parts
-        if (empty($activeShares)) {
-            $this->user_shares = [];
-        }
-
-        return true;
-    }
-
     // Méthode générique pour la sauvegarde de la facture
     public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
@@ -415,86 +344,7 @@ class InvoiceForm extends Form
         ];
     }
 
-    public function archive(): bool
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            $this->invoice->update([
-                'is_archived' => true,
-                'is_favorite' => false,
-            ]);
-
-            $this->is_archived = true;
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'archivage de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    public function restore(): bool
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            $this->invoice->update([
-                'is_archived' => false,
-            ]);
-
-            $this->is_archived = false;
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la restauration de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
-    public function delete(): bool
-    {
-        if (! $this->invoice) {
-            return false;
-        }
-
-        try {
-            DB::beginTransaction();
-
-            // Supprimer les fichiers associés
-            $files = InvoiceFile::where('invoice_id', $this->invoice->id)->get();
-
-            foreach ($files as $file) {
-                $filePath = $file->getRawOriginal('file_path');
-                if (Storage::disk('s3')->exists($filePath)) {
-                    Storage::disk('s3')->delete($filePath);
-                }
-                $file->delete();
-            }
-
-            // Supprimer les parts associées
-            $this->invoice->sharings()->delete();
-
-            // Supprimer la facture
-            $this->invoice->delete();
-
-            DB::commit();
-
-            return true;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Erreur lors de la suppression définitive de la facture: '.$e->getMessage());
-
-            return false;
-        }
-    }
-
+    // Rempli les données de la facture
     public function setFromInvoice(Invoice $invoice): static
     {
         $this->invoice = $invoice;
@@ -574,6 +424,7 @@ class InvoiceForm extends Form
         return $this;
     }
 
+    // Rempli le fichier de la facture
     public function setFromInvoiceFile(InvoiceFile $invoiceFile): static
     {
         $this->invoiceFile = $invoiceFile;
@@ -587,24 +438,89 @@ class InvoiceForm extends Form
         return $this;
     }
 
-    public function normalizeAmount($amount): ?float
+    // Met à jour les catégories en fonction du type choisi
+    public function updateAvailableCategories(): void
     {
-        if ($amount === null || $amount === '') {
-            return null;
+        if (empty($this->type)) {
+            $this->type = null;
+            $this->category = null;
+            $this->availableCategories = [];
+
+            return;
         }
 
-        $amount = (string) $amount;
+        try {
+            $typeEnum = $this->type instanceof TypeEnum
+                ? $this->type
+                : TypeEnum::tryFrom($this->type);
 
-        $amount = str_replace(' ', '', $amount);
+            if (! $typeEnum) {
+                $this->type = null;
+                $this->category = null;
+                $this->availableCategories = [];
 
-        $amount = str_replace(',', '.', $amount);
+                return;
+            }
 
-        return (float) number_format((float) $amount, 2, '.', '');
+            $this->availableCategories = [];
+
+            foreach ($typeEnum->categoryEnums() as $category) {
+                $this->availableCategories[$category->value] = $category->labelWithEmoji();
+            }
+
+            if (! empty($this->category) && ! isset($this->availableCategories[$this->category])) {
+                $this->category = null;
+            }
+        } catch (\Throwable $e) {
+            $this->type = null;
+            $this->category = null;
+            $this->availableCategories = [];
+            Toaster::error('Erreur lors de la récupération des catégories.');
+            Log::error('Erreur lors de la récupération des catégories: '.$e->getMessage());
+        }
     }
 
-    /**
-     * Traite les parts d'utilisateurs avant de les sauvegarder
-     */
+    // Calculer le montant restant à répartir
+    public function validateAndAdjustShares(): bool
+    {
+        // Si le montant total est nul, pas besoin de vérifier les répartitions
+        if (floatval($this->amount ?? 0) <= 0) {
+            $this->user_shares = [];
+
+            return true;
+        }
+
+        // Filtrer pour ne garder que les parts actives (avec montant ou pourcentage > 0)
+        $activeShares = array_filter($this->user_shares ?? [], function ($share) {
+            return (isset($share['amount']) && floatval($share['amount']) > 0) ||
+                (isset($share['percentage']) && floatval($share['percentage']) > 0);
+        });
+
+        // Si le mode de répartition est activé, mais qu'il y a moins de 2 membres actifs, la validation échoue
+        if (! empty($this->user_shares) && count($activeShares) < 2) {
+            return false;
+        }
+
+        // Vérifier si le total des pourcentages ne dépasse pas 100%
+        $totalPercentage = 0;
+        foreach ($activeShares as $share) {
+            if (isset($share['percentage']) && floatval($share['percentage']) > 0) {
+                $totalPercentage += floatval($share['percentage']);
+            }
+        }
+
+        if ($totalPercentage > 100) {
+            return false;
+        }
+
+        // Si pas de répartition active, réinitialiser complètement les parts
+        if (empty($activeShares)) {
+            $this->user_shares = [];
+        }
+
+        return true;
+    }
+
     // Méthode pour traiter les parts d'utilisateurs
     private function processInvoiceShares(Invoice $invoice): void
     {
@@ -624,5 +540,20 @@ class InvoiceForm extends Form
                 }
             }
         }
+    }
+
+    public function normalizeAmount($amount): ?float
+    {
+        if ($amount === null || $amount === '') {
+            return null;
+        }
+
+        $amount = (string) $amount;
+
+        $amount = str_replace(' ', '', $amount);
+
+        $amount = str_replace(',', '.', $amount);
+
+        return (float) number_format((float) $amount, 2, '.', '');
     }
 }

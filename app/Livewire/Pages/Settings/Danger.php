@@ -5,7 +5,6 @@ namespace App\Livewire\Pages\Settings;
 use App\Enums\FamilyPermissionEnum;
 use App\Livewire\Actions\Logout;
 use App\Services\FamilyRoleService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
@@ -63,7 +62,7 @@ class Danger extends Component
             $this->redirectRoute('welcome');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur lors de la suppression du compte utilisateur: ' . $e->getMessage());
+            Log::error('Erreur lors de la suppression du compte utilisateur: '.$e->getMessage());
         }
     }
 
@@ -103,7 +102,7 @@ class Danger extends Component
                         ->first();
 
                     // S'il n'y a pas d'éditeur, chercher un lecteur
-                    if (!$nextAdmin) {
+                    if (! $nextAdmin) {
                         $nextAdmin = DB::table('family_user')
                             ->where('family_id', $familyId)
                             ->where('user_id', '!=', $user->id)
@@ -122,5 +121,4 @@ class Danger extends Component
             }
         }
     }
-
 }
