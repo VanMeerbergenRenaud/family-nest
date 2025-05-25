@@ -91,44 +91,60 @@ trait TagManagement
     private function searchTagsInDatabase(string $query): array
     {
         try {
-            // Rechercher les tags qui correspondent à la requête
+            // 1. Rechercher les tags qui correspondent à la requête
             $invoices = DB::table('invoices')
-                ->where('user_id', auth()->id())
-                ->whereJsonLength('tags', '>', 0)
-                ->select('tags')
+                ->where('user_id', auth()->id()) // chaque utilisateur ne voit que ses tags
+                ->whereJsonLength('tags', '>', 0) // évite de traiter les factures sans tags
+                ->select('tags') // récupère que la colonne nécessaire, pour gagner du temps
                 ->get();
 
             if ($invoices->isEmpty()) {
                 return [];
             }
 
-            // Extraire tous les tags correspondants
+            // 2. Extraire tous les tags correspondants
             $allTags = [];
             $userTags = array_map('strtolower', $this->form->tags ?? []);
 
             foreach ($invoices as $invoice) {
                 try {
+                    // Protéger contre les données corrompues ou malformées
+                    // qui pourraient exister dans la base de données
                     $tags = json_decode($invoice->tags, true);
 
                     if (! is_array($tags)) {
                         continue;
                     }
 
+                    /* 3. Filtrer les tags qui contiennent la requête et qui ne sont pas déjà sélectionnés
+                       Condition :
+                        a) évite les erreurs si des données qui ne sont pas des chaînes sont stockées
+                        b) trouve le tag en fonction des premières lettres saisies
+                        c) respecte la règle d'avoir des lettres uniquement
+                        d) ne dépasse pas 15 caractères
+                        e) exclut les tags déjà sélectionnés
+                    */
                     foreach ($tags as $tag) {
-                        // Filtrer les tags valides qui contiennent la requête et qui ne sont pas déjà sélectionnés
-                        if (is_string($tag) &&
+                        if (
+                            is_string($tag) &&
                             stripos($tag, $query) !== false &&
                             preg_match('/^[a-zA-Z]+$/', $tag) &&
-                            strlen($tag) <= 15 &&  // S'assurer que le tag ne dépasse pas 15 caractères
-                            ! in_array(strtolower($tag), $userTags)) {
+                            strlen($tag) <= 15 &&
+                            ! in_array(strtolower($tag), $userTags)
+                        ) {
                             $allTags[] = $tag;
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     continue;
                 }
             }
 
+            /*
+             * 4. Transformer tous les tags sélectionnés en un tableau ne contenant pas de doublon.
+             * array_unique() supprime les doublons et garantit que le tag est unique.
+             * array_values() réindexe le tableau numériquement, évitant les problèmes d'index.
+            */
             return array_values(array_unique($allTags));
         } catch (\Exception $e) {
             Log::error('Erreur lors de la recherche de tags : '.$e->getMessage());
