@@ -10,9 +10,9 @@
 
 <div class="relative w-full h-full flex flex-col">
     @if(isset($onRemove) && $onRemove)
-        <div class="absolute top-2.5 right-2.5 z-2">
-            <button type="button" wire:click="{{ $onRemove }}" class="p-1">
-                <x-svg.cross class="text-red-600 hover:text-black bg-red-300 hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
+        <div class="absolute top-0 right-0 z-2">
+            <button type="button" wire:click="{{ $onRemove }}" class="p-2.5 group">
+                <x-svg.cross class="text-red-600 group-hover:text-black bg-red-300 group-hover:bg-red-400 rounded-full w-6 h-6 p-1 transition-colors duration-200" />
             </button>
         </div>
     @endif
@@ -22,7 +22,7 @@
         @if ($fileInfo['isImage'] ?? false)
             <img src="{{ $temporaryUrl ?? $storagePath ?? '' }}"
                  alt="Aperçu de la facture"
-                 class="bg-gray-100 rounded-lg min-h-[60vh]"
+                 class="bg-gray-100 rounded-lg min-h-[60vh] object-contain"
                  wire:ignore
                  loading="lazy"
             />

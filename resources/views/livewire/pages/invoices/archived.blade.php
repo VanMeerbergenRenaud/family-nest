@@ -175,7 +175,7 @@
                                                             @endcan
 
                                                             @can('delete', $invoice)
-                                                                <x-menu.item wire:click="showDeleteInvoiceForm({{ $invoice->id }})" class="group hover:text-red-500">
+                                                                <x-menu.item wire:click="showDeleteForm({{ $invoice->id }})" class="group hover:text-red-500">
                                                                     <x-svg.trash class="w-4 h-4 group-hover:text-red-500"/>
                                                                     {{ __('Supprimer définitivement') }}
                                                                 </x-menu.item>

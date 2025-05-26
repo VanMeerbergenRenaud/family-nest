@@ -26,8 +26,6 @@ class Archived extends Component
 
     public string $filterType = 'all';
 
-    public bool $showDeleteFormModal = false;
-
     public bool $showDeleteAllFormModal = false;
 
     public bool $showDownloadSelectionModal = false;
@@ -40,29 +38,6 @@ class Archived extends Component
     {
         $this->filterType = $type;
         $this->resetPage();
-    }
-
-    public function showDeleteInvoiceForm($id): void
-    {
-        $invoice = Invoice::findOrFail($id);
-
-        if (! auth()->user()->can('delete', $invoice)) {
-            return;
-        }
-
-        $this->form->setFromInvoice($invoice);
-        $this->showDeleteFormModal = true;
-    }
-
-    public function deleteDefinitelyInvoice(): void
-    {
-        if ($this->form->delete()) {
-            $this->showDeleteFormModal = false;
-            Toaster::success('Facture supprimée définitivement !');
-            $this->redirectRoute('invoices.archived');
-        } else {
-            Toaster::error('Erreur lors de la suppression de la facture.');
-        }
     }
 
     public function showDeleteAllInvoicesForm(): void
@@ -93,8 +68,6 @@ class Archived extends Component
             $this->showDeleteAllFormModal = false;
 
             DB::commit();
-
-            $this->redirectRoute('invoices.archived');
         } catch (\Exception $e) {
             DB::rollBack();
             Toaster::error('Une erreur est survenue lors de la suppression des factures.');
@@ -125,10 +98,9 @@ class Archived extends Component
         $count = 0;
         foreach ($invoices as $invoice) {
             if (auth()->user()->can('delete', $invoice)) {
-                $this->form->setFromInvoice($invoice);
-                if ($this->form->delete()) {
-                    $count++;
-                }
+                $this->invoice = $invoice;
+                $this->invoice->delete();
+                $count++;
             }
         }
 

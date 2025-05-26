@@ -17,6 +17,7 @@
         x-on:livewire-upload-progress="progress = $event.detail.progress"
         class="@error($name) input-invalid @enderror relative border-2 border-dashed rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600 mx-1 border-gray-300"
     >
+        <!-- Informations de présentation -->
         <div class="flex-center flex-col p-10 min-h-[25rem]">
             <x-svg.download class="w-5 h-5 mb-5"/>
 
@@ -46,6 +47,7 @@
             ></div>
         </div>
 
+        <!-- Input -->
         <input
             id="{{ $name }}"
             name="{{ $name }}"
@@ -94,11 +96,13 @@
 @script
 <script>
     Alpine.data('fileUploader', (model, maxSizeMB) => ({
-        uploading: false,
-        progress: 0,
-        fileError: null,
-        fileName: null,
+        uploading: false,   // État de téléchargement en cours
+        progress: 0,        // Progression du téléchargement (0-100)
+        fileError: null,    // Message d'erreur éventuel
+        fileName: null,     // Nom du fichier en cours de téléchargement
 
+        // Gère la sélection d'un fichier et lance le téléchargement
+        // Effectue plusieurs validations avant d'envoyer le fichier
         handleFile(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -106,14 +110,14 @@
             this.fileError = null;
             this.fileName = file.name;
 
-            // Validation de la taille
+            // Validation de la taille du fichier
             if (file.size > maxSizeMB * 1024 * 1024) {
                 this.fileError = `Fichier trop volumineux (${(file.size / (1024 * 1024)).toFixed(2)} Mo). Maximum ${maxSizeMB} Mo.`;
                 this.$refs.fileInput.value = '';
                 return;
             }
 
-            // Validation de l'extension
+            // Validation de l'extension du fichier
             const ext = '.' + file.name.split('.').pop().toLowerCase();
             if (!['.pdf', '.docx', '.jpeg', '.jpg', '.png'].includes(ext)) {
                 this.fileError = 'Format non accepté. Utilisez PDF, DOCX, JPG ou PNG.';
@@ -121,25 +125,25 @@
                 return;
             }
 
-            // Upload via Livewire
+            // Démarrage du téléchargement via Livewire avec gestion des callbacks
             this.uploading = true;
 
             this.$wire.upload(model, file,
-                () => { this.uploading = false; }, // Succès
-                () => { // Erreur
+                () => { this.uploading = false; }, // Callback de succès
+                () => { // Callback d'erreur
                     this.uploading = false;
                     this.fileError = "Une erreur s'est produite lors du téléchargement.";
                 },
-                (event) => { this.progress = event.detail.progress; } // Progression
+                (event) => { this.progress = event.detail.progress; } // Callback de progression
             );
         },
 
+        // Formate le nom du fichier pour l'affichage en le tronquant au delà de 50 caractères
         formatFileName(name) {
-            return name?.length > 50
-                ? name.substring(0, 47) + '...'
-                : name;
+            return name?.length > 50 ? name.substring(0, 47) + '...' : name;
         },
 
+        // Annule le téléchargement en cours et réinitialise toutes les propriétés
         cancelUpload() {
             this.$refs.fileInput.value = '';
             this.fileName = null;

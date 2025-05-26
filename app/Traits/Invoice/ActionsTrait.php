@@ -2,6 +2,7 @@
 
 namespace App\Traits\Invoice;
 
+use App\Livewire\Pages\Invoices\Show;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
 use Illuminate\Support\Facades\Storage;
@@ -229,14 +230,15 @@ trait ActionsTrait
                 $this->showFolderModal = false;
             }
 
-            if ($this instanceof \App\Livewire\Pages\Invoices\Show) {
+            if ($this instanceof Show) {
                 $this->redirectRoute('dashboard');
             } else {
                 $this->dispatch('invoice-deleted', $this->invoice->id);
                 Toaster::success('Facture supprimée définitivement !');
             }
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors de la suppression: '.$e->getMessage());
+            Toaster::error('Erreur lors de la suppression de la facture');
+            \Log::error('Erreur lors de la suppression de la facture'.$e->getMessage());
         }
     }
 

@@ -30,17 +30,15 @@ class GoogleAuthController extends Controller
 
             $user = User::where('email', $googleUser->getEmail())->first();
 
-            $isNewUser = false;
-
             if (! $user) {
+                
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
                     'password' => bcrypt(Str::random(24)),
                     'auth_provider' => 'google',
+                    'email_verified_at' => now(),
                 ]);
-
-                $isNewUser = true;
 
                 if ($avatarUrl) {
                     try {

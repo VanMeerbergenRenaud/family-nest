@@ -187,15 +187,15 @@
                         <label for="direct-file-upload" class="button-classic gap-2 text-red-600 pr-3.5 py-1.5 hover:bg-red-100 cursor-pointer">
                             Importer ici
                             <x-svg.download class="text-red-600" />
-                            <input
-                                id="direct-file-upload"
-                                name="uploadedFile"
-                                type="file"
-                                wire:model="form.uploadedFile"
-                                accept=".pdf,.docx,.jpeg,.jpg,.png"
-                                class="hidden"
-                            />
                         </label>
+                        <input
+                            id="direct-file-upload"
+                            name="uploadedFile"
+                            type="file"
+                            wire:model="form.uploadedFile"
+                            accept=".pdf,.docx,.jpeg,.jpg,.png"
+                            class="hidden"
+                        />
                     </div>
                     <ul class="pl-5 space-y-2 list-disc">
                         @foreach($fileErrors as $error)
