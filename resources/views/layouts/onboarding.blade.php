@@ -4,6 +4,8 @@
         @include('partials.head')
     </head>
     <body>
+        @include('partials.no-js')
+
         <x-toaster-hub />
 
         <main class="flex-1 flex-center flex-col">

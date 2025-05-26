@@ -4,6 +4,8 @@
         @include('partials.head')
     </head>
     <body>
+        @include('partials.no-js')
+
         <header>
             <h1 role="heading" aria-level="1" class="sr-only">{{ $title ?? 'Titre par défaut' }}</h1>
 

@@ -30,6 +30,20 @@
     @endif
 @endif
 
+<!-- JavaScript required -->
+<noscript>
+    <style>
+        .js-required {
+            display: none !important;
+        }
+
+        .js-disabled-message {
+            display: block !important;
+        }
+    </style>
+</noscript>
+
+
 <!-- Title -->
 @if (Route::currentRouteName() === 'welcome')
     <title>{{ config('app.name', 'FamilyNest') }}</title>
@@ -37,6 +51,6 @@
     <title>{{ $title ?? 'Titre de la page' }} | FamilyNest</title>
 @endif
 
-<!-- Scripts -->
+<!-- Styles -->
 @livewireStyles
 @vite(['resources/css/app.css', 'resources/js/app.js'])
