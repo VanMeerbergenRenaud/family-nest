@@ -35,7 +35,6 @@ class GoogleAuthController extends Controller
                     'email' => $googleUser->getEmail(),
                     'password' => bcrypt(Str::random(32)),
                     'auth_provider' => 'google',
-                    'email_verified_at' => now(),
                 ]);
                 $isNewUser = true;
             }
@@ -44,6 +43,10 @@ class GoogleAuthController extends Controller
             if (($isNewUser || ! $user->avatar) && $avatarUrl) {
                 $this->updateUserAvatar($user, $avatarUrl);
             }
+
+            $user->update([
+                'email_verified_at' => now(),
+            ]);
 
             Auth::login($user);
 
