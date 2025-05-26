@@ -5,6 +5,7 @@ namespace App\Traits\Invoice;
 use App\Livewire\Pages\Invoices\Show;
 use App\Models\Invoice;
 use App\Models\InvoiceFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Masmerise\Toaster\Toaster;
 
@@ -49,37 +50,46 @@ trait ActionsTrait
 
     public function restoreInvoice($invoiceId): void
     {
+
         $invoice = Invoice::findOrFail($invoiceId);
 
         $this->invoice = $invoice;
 
         if (! auth()->user()->can('update', $invoice)) {
+            Toaster::error('Vous n\'avez pas la permission de restaurer cette facture.');
+
             return;
         }
 
-        $this->invoice->update([
-            'is_archived' => false,
-            'is_favorite' => false,
-        ]);
+        try {
+            $this->invoice->update([
+                'is_archived' => false,
+                'is_favorite' => false,
+            ]);
 
-        $this->dispatch('invoice-restore', $invoiceId);
-        Toaster::success('Facture restaurée avec succès !');
+            $this->dispatch('invoice-restore', $invoiceId);
+            Toaster::success('Facture restaurée avec succès !');
+        } catch (\Exception $e) {
+            Toaster::error('Erreur lors de la restauration');
+            Log::error('Erreur lors de la restauration : '.$e->getMessage());
+        }
     }
 
     public function copyInvoice($invoiceId): void
     {
+
+        $user = auth()->user();
+
+        $originalInvoice = $user->accessibleInvoices()
+            ->findOrFail($invoiceId);
+
+        if (! $user->can('update', $originalInvoice)) {
+            Toaster::error('Vous n\'avez pas la permission de copier cette facture.');
+
+            return;
+        }
+
         try {
-            $user = auth()->user();
-
-            $originalInvoice = $user->accessibleInvoices()
-                ->findOrFail($invoiceId);
-
-            if (! $user->can('update', $originalInvoice)) {
-                Toaster::error('Vous n\'avez pas la permission de copier cette facture.');
-
-                return;
-            }
-
             $newInvoice = $originalInvoice->replicate();
 
             $newInvoice->user_id = $user->id; // making sure the new invoice is owned by the current user
@@ -101,7 +111,8 @@ trait ActionsTrait
 
             $this->redirectRoute('invoices.edit', $newInvoice->id);
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors de la copie de la facture: '.$e->getMessage());
+            Toaster::error('Erreur lors de la copie de la facture.');
+            Log::error('Erreur lors de la copie de la facture : '.$e->getMessage());
         }
     }
 
@@ -122,7 +133,7 @@ trait ActionsTrait
             $s3FilePath = $invoiceFile->getRawOriginal('file_path');
 
             if (! Storage::disk('s3')->exists($s3FilePath)) {
-                Toaster::error('Fichier introuvable ou mal enregistré : Veuillez modifier votre facture et importer à nouveau le fichier.');
+                Toaster::error('Fichier introuvable ou mal enregistré::Veuillez modifier votre facture et importer à nouveau le fichier.');
 
                 return false;
             }
@@ -150,7 +161,8 @@ trait ActionsTrait
             // Rediriger vers l'URL présignée qui forcera le téléchargement
             return redirect()->away($presignedUrl);
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors du téléchargement: '.$e->getMessage());
+            Toaster::error('Erreur lors du téléchargement');
+            Log::error('Erreur lors du téléchargement : '.$e->getMessage());
 
             return false;
         }
@@ -158,32 +170,41 @@ trait ActionsTrait
 
     public function toggleFavorite($invoiceId): void
     {
-        $invoice = auth()->user()->invoices()->findOrFail($invoiceId);
-        $invoice->update([
-            'is_favorite' => ! $invoice->is_favorite,
-            'is_archived' => false,
-        ]);
+        $invoice = Invoice::findOrFail($invoiceId);
 
-        // Fermer la modale du dossier s'il est ouvert
-        if (property_exists($this, 'showFolderModal')) {
-            $this->showFolderModal = false;
+        $this->invoice = $invoice;
+
+        try {
+            $invoice->update([
+                'is_favorite' => ! $invoice->is_favorite,
+                'is_archived' => false,
+            ]);
+
+            // Fermer la modale du dossier s'il est ouvert
+            if (property_exists($this, 'showFolderModal')) {
+                $this->showFolderModal = false;
+            }
+
+            $this->dispatch('invoice-favorite', $invoiceId);
+        } catch (\Exception $e) {
+            Toaster::error('Erreur lors de l\'archivage');
+            Log::error('Erreur lors de l\'archivage : '.$e->getMessage());
         }
-
-        $this->dispatch('invoice-favorite', $invoiceId);
     }
 
     public function archiveInvoice($invoiceId): void
     {
+        $invoice = Invoice::findOrFail($invoiceId);
+
+        $this->invoice = $invoice;
+
+        if (! auth()->user()->can('delete', $invoice)) {
+            Toaster::error('Vous n\'avez pas la permission d\'archiver cette facture.');
+
+            return;
+        }
+
         try {
-            $invoice = Invoice::findOrFail($invoiceId);
-
-            if (! auth()->user()->can('delete', $invoice)) {
-                Toaster::error('Vous n\'avez pas la permission d\'archiver cette facture.');
-
-                return;
-            }
-
-            $this->invoice = $invoice;
             $this->invoice->update([
                 'is_archived' => true,
                 'is_favorite' => false,
@@ -196,7 +217,8 @@ trait ActionsTrait
             $this->dispatch('invoice-archived', $invoiceId);
             Toaster::success('Facture archivée avec succès !');
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors de l\'archivage: '.$e->getMessage());
+            Toaster::error('Erreur lors de l\'archivage');
+            Log::error('Erreur lors de l\'archivage : '.$e->getMessage());
         }
     }
 
@@ -204,26 +226,28 @@ trait ActionsTrait
     {
         $invoice = Invoice::findOrFail($invoiceId);
 
+        $this->invoice = $invoice;
+
         if (! auth()->user()->can('delete', $invoice)) {
             Toaster::error('Vous n\'avez pas la permission de supprimer cette facture.');
 
             return;
         }
 
-        $this->invoice = $invoice;
         $this->showDeleteFormModal = true;
     }
 
     public function deleteDefinitelyInvoice(): void
     {
+        if (! auth()->user()->can('delete', $this->invoice)) {
+            Toaster::error('Vous n\'avez pas la permission de supprimer cette facture.');
+
+            return;
+        }
+
         try {
-            if (! auth()->user()->can('delete', $this->invoice)) {
-                Toaster::error('Vous n\'avez pas la permission de supprimer cette facture.');
-
-                return;
-            }
-
             $this->invoice->delete();
+
             $this->showDeleteFormModal = false;
 
             if (property_exists($this, 'showFolderModal')) {
@@ -238,7 +262,7 @@ trait ActionsTrait
             }
         } catch (\Exception $e) {
             Toaster::error('Erreur lors de la suppression de la facture');
-            \Log::error('Erreur lors de la suppression de la facture'.$e->getMessage());
+            Log::error('Erreur lors de la suppression de la facture'.$e->getMessage());
         }
     }
 

@@ -109,12 +109,15 @@ class UserProfileForm extends Form
             DB::beginTransaction();
 
             $user = auth()->user();
+
             $this->deleteOldAvatar($user);
 
             $user->update(['avatar' => null]);
+
             $this->avatarUrl = null;
 
             DB::commit();
+
             Toaster::success('Avatar supprimé.');
 
             return true;

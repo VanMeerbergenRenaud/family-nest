@@ -36,7 +36,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-x-0"
              x-transition:leave-end="opacity-0 translate-x-full"
-             class="fixed top-15 right-0 h-screen w-screen bg-white dark:bg-gray-800 z-40 overflow-y-auto"
+             class="fixed inset-0 top-15 h-screen w-screen bg-white dark:bg-gray-800 z-40 overflow-y-auto"
         >
             <x-divider/>
 

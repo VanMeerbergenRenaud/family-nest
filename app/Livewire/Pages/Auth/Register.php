@@ -15,6 +15,12 @@ class Register extends Component
 
     public bool $showGeneralCondition = false;
 
+    public function hydrate(): void
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
     public function register(): void
     {
         $this->validate();

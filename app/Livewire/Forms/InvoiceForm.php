@@ -284,7 +284,7 @@ class InvoiceForm extends Form
             // Gérer le rappel de paiement
             if ($invoice && $this->payment_reminder) {
                 app(InvoiceReminderService::class)->scheduleReminder($invoice);
-                // auth()->user()->notify(new InvoicePaymentReminder($invoice));
+                // Tester directement : auth()->user()->notify(new InvoicePaymentReminder($invoice));
             }
 
             return $invoice;

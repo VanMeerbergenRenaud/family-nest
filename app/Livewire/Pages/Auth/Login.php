@@ -14,6 +14,12 @@ class Login extends Component
 {
     public LoginForm $form;
 
+    public function hydrate(): void
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }
+
     public function login(): void
     {
         $this->validate();
