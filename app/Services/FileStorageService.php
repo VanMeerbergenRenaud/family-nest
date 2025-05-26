@@ -13,30 +13,27 @@ class FileStorageService
 {
     use FormatFileSizeTrait;
 
-    /**
-     * Process uploaded invoice file
-     */
     public function processInvoiceFile(Invoice $invoice, ?UploadedFile $uploadedFile, ?InvoiceFile $oldFile = null): ?InvoiceFile
     {
         if (! $uploadedFile) {
             return null;
         }
 
-        // Get file info
+        // Récupère les informations du fichier (nom, extension, taille)
         $fileName = $uploadedFile->getClientOriginalName();
         $fileExtension = strtolower($uploadedFile->getClientOriginalExtension());
         $fileSize = $uploadedFile->getSize();
 
-        // Store file on S3
+        // Enregistre le fichier sur S3 avec un chemin spécifique à l'utilisateur
         $userPath = 'invoices/user_'.auth()->id();
         $filePath = $uploadedFile->store($userPath, 's3');
 
-        // Delete old file if exists
+        // Supprime l'ancien fichier si il a été modifié
         if ($oldFile && Storage::disk('s3')->exists($oldFile->getRawOriginal('file_path'))) {
             Storage::disk('s3')->delete($oldFile->getRawOriginal('file_path'));
         }
 
-        // Prepare file data
+        // Prepare les données du fichier
         $fileData = [
             'file_path' => $filePath,
             'file_name' => $fileName,
@@ -46,7 +43,7 @@ class FileStorageService
             'compression_status' => null,
         ];
 
-        // Update or create file record
+        // Crée ou met à jour l'enregistrement du fichier InvoiceFile dans la db
         if ($oldFile) {
             $oldFile->update($fileData);
             $invoiceFile = $oldFile;
@@ -55,7 +52,7 @@ class FileStorageService
             $invoiceFile = InvoiceFile::create($fileData);
         }
 
-        // Queue PDF compression if needed
+        // Si le fichier est un PDF (compression via l’API ILovePdf)
         if ($fileExtension === 'pdf') {
             $invoiceFile->update([
                 'compression_status' => 'pending',
@@ -72,9 +69,6 @@ class FileStorageService
         return $invoiceFile;
     }
 
-    /**
-     * Get file information
-     */
     public function getFileInfo(?UploadedFile $file, ?string $fileName = null, ?string $fileExtension = null, ?int $fileSize = null): ?array
     {
         if (! $file && ! $fileName) {
@@ -85,6 +79,7 @@ class FileStorageService
         $extension = $fileExtension ?? strtolower($file->getClientOriginalExtension());
         $size = $fileSize ?? $file->getSize();
 
+        // Renvoie un tableau contenant (nom, extension, taille et type du fichier)
         return [
             'name' => $name,
             'extension' => $extension,
