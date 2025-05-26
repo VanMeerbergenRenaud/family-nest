@@ -44,9 +44,7 @@ class GoogleAuthController extends Controller
                 $this->updateUserAvatar($user, $avatarUrl);
             }
 
-            $user->update([
-                'email_verified_at' => now(),
-            ]);
+            $user->markEmailAsVerified();
 
             Auth::login($user);
 
