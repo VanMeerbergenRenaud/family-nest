@@ -31,11 +31,11 @@ class GoogleAuthController extends Controller
             $user = User::where('email', $googleUser->getEmail())->first();
 
             if (! $user) {
-                
+
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
-                    'password' => bcrypt(Str::random(24)),
+                    'password' => bcrypt(Str::random(32)),
                     'auth_provider' => 'google',
                     'email_verified_at' => now(),
                 ]);
@@ -61,10 +61,6 @@ class GoogleAuthController extends Controller
                         ]);
                     }
                 }
-
-                // Pour un nouvel utilisateur, marquer l'e-mail comme vérifié
-                $emailVerificationService = app(EmailVerificationService::class);
-                $emailVerificationService->markEmailAsVerified($user);
             } else {
                 if (! $user->avatar && $avatarUrl) {
                     try {

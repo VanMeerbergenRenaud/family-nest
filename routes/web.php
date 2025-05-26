@@ -27,16 +27,14 @@ Route::view('/', 'welcome')
     ->middleware(['guest'])
     ->name('welcome');
 
-// Route for the onboarding process
-Route::middleware(['auth', 'verified'])
-    ->prefix('onboarding')
-    ->name('onboarding.')
-    ->group(function () {
+// Routes pour les utilisateurs authentifiés sans famille
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Route d'onboarding
+    Route::prefix('onboarding')->name('onboarding.')->group(function () {
         Route::get('/family', FamilyCreation::class)->name('family');
     });
 
-// Routes accessible to all authenticated users who do not have a family
-Route::middleware(['auth', 'verified'])->group(function () {
+    // Routes de base
     Route::get('/family', Family::class)->name('family');
     Route::get('/help-center', HelpCenter::class)->name('help-center');
 });
