@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\EmailVerificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -25,13 +24,12 @@ class GoogleAuthController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-
             $avatarUrl = $googleUser->getAvatar();
-
             $user = User::where('email', $googleUser->getEmail())->first();
+            $isNewUser = false;
 
+            // Création d'un nouvel utilisateur
             if (! $user) {
-
                 $user = User::create([
                     'name' => $googleUser->getName(),
                     'email' => $googleUser->getEmail(),
@@ -39,62 +37,12 @@ class GoogleAuthController extends Controller
                     'auth_provider' => 'google',
                     'email_verified_at' => now(),
                 ]);
+                $isNewUser = true;
+            }
 
-                if ($avatarUrl) {
-                    try {
-                        $avatarDir = 'avatars/user_'.$user->id;
-
-                        $filename = Str::random(40).'.jpeg';
-
-                        $avatarPath = $avatarDir.'/'.$filename;
-
-                        $avatarContent = file_get_contents($avatarUrl);
-
-                        if ($avatarContent) {
-                            Storage::disk('s3')->put($avatarPath, $avatarContent);
-
-                            $user->update(['avatar' => $avatarPath]);
-                        }
-                    } catch (\Exception $e) {
-                        Log::channel('google_auth')->error('Erreur lors du téléchargement de l\'avatar', [
-                            'message' => $e->getMessage(),
-                        ]);
-                    }
-                }
-            } else {
-                if (! $user->avatar && $avatarUrl) {
-                    try {
-                        $avatarDir = 'avatars/user_'.$user->id;
-
-                        $filename = Str::random(40).'.jpeg';
-
-                        $avatarPath = $avatarDir.'/'.$filename;
-
-                        $avatarContent = file_get_contents($avatarUrl);
-
-                        if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
-                            try {
-                                Storage::disk('s3')->delete($user->avatar);
-                            } catch (\Exception $e) {
-                                Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
-                                    'message' => $e->getMessage(),
-                                    'user_id' => $user->id,
-                                ]);
-                            }
-                        }
-
-                        if ($avatarContent) {
-                            Storage::disk('s3')->put($avatarPath, $avatarContent);
-
-                            $user->update(['avatar' => $avatarPath]);
-                        }
-                    } catch (\Exception $e) {
-                        Log::channel('google_auth')->error('Erreur lors de la mise à jour de l\'avatar', [
-                            'message' => $e->getMessage(),
-                            'user_id' => $user->id,
-                        ]);
-                    }
-                }
+            // Pour les nouveaux utilisateurs ou ceux sans avatar, on récupère l'avatar Google
+            if (($isNewUser || ! $user->avatar) && $avatarUrl) {
+                $this->updateUserAvatar($user, $avatarUrl);
             }
 
             Auth::login($user);
@@ -107,6 +55,38 @@ class GoogleAuthController extends Controller
             Toaster::error('Erreur lors de l\'authentification avec Google::Veuillez réessayer à nouveau.');
 
             return redirect()->route('login');
+        }
+    }
+
+    private function updateUserAvatar(User $user, string $avatarUrl): void
+    {
+        try {
+            $avatarDir = 'avatars/user_'.$user->id;
+            $filename = Str::random(40).'.jpeg';
+            $avatarPath = $avatarDir.'/'.$filename;
+            $avatarContent = file_get_contents($avatarUrl);
+
+            // Suppression de l'ancien avatar si existant
+            if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
+                try {
+                    Storage::disk('s3')->delete($user->avatar);
+                } catch (\Exception $e) {
+                    Log::channel('google_auth')->error('Erreur lors de la suppression de l\'ancien avatar', [
+                        'message' => $e->getMessage(),
+                        'user_id' => $user->id,
+                    ]);
+                }
+            }
+
+            if ($avatarContent) {
+                Storage::disk('s3')->put($avatarPath, $avatarContent);
+                $user->update(['avatar' => $avatarPath]);
+            }
+        } catch (\Exception $e) {
+            Log::channel('google_auth')->error('Erreur lors de la gestion de l\'avatar', [
+                'message' => $e->getMessage(),
+                'user_id' => $user->id,
+            ]);
         }
     }
 }
