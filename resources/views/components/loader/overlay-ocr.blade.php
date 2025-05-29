@@ -10,8 +10,8 @@
 >
     <div class="relative mx-4 overflow-hidden bg-white rounded-xl max-w-md w-full">
         <div class="p-6">
-            <div class="flex items-center mb-6">
-                <div class="relative mr-4">
+            <div class="flex items-start mb-6">
+                <div class="relative pt-1 mr-4">
                     <svg class="w-6 h-6 text-indigo-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>

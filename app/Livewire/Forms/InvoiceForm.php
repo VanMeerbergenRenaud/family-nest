@@ -18,6 +18,7 @@ use App\Traits\FormatFileSizeTrait;
 use App\Traits\HumanDateTrait;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 use Masmerise\Toaster\Toaster;
@@ -127,7 +128,12 @@ class InvoiceForm extends Form
             'type' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, TypeEnum::cases())),
             'category' => 'nullable|string|in:'.implode(',', array_map(fn ($case) => $case->value, CategoryEnum::cases())),
             'issuer_name' => 'nullable|string|max:255',
-            'issuer_website' => 'nullable|url|max:255',
+            'issuer_website' => [
+                'nullable',
+                'string',
+                'max:255',
+                'regex:/^(https?:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,}(:[0-9]{1,5})?(\/.*)?$/i',
+            ],
 
             // Étape 2 - Détails financiers
             'amount' => 'required|numeric|min:0|max:999999999.99',
@@ -195,7 +201,7 @@ class InvoiceForm extends Form
 
             // Messages d'erreur pour les informations facture
             'name.required' => 'Le nom de la facture est obligatoire.',
-            'issuer_website.url' => "L'URL du site web du fournisseur n'est pas valide.",
+            'issuer_website.regex' => "Le format de l'URL n'est pas valide. Assurez-vous qu'elle termine par un nom de domaine existant (.be, .com, etc.).",
             'amount.required' => 'Le montant est obligatoire.',
             'amount.numeric' => 'Le montant doit être un nombre.',
             'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
@@ -235,6 +241,8 @@ class InvoiceForm extends Form
     public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
         $this->family_id = auth()->user()->family()->id;
+
+        $this->normalizeUrl();
 
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
@@ -555,5 +563,15 @@ class InvoiceForm extends Form
         $amount = str_replace(',', '.', $amount);
 
         return (float) number_format((float) $amount, 2, '.', '');
+    }
+
+    // Normalise l'URL du site web du fournisseur en ajoutant 'https://' si nécessaire
+    public function normalizeUrl(): void
+    {
+        if (! empty($this->issuer_website)) {
+            $this->issuer_website = Str::startsWith($this->issuer_website, ['http://', 'https://'])
+                ? $this->issuer_website
+                : 'https://'.$this->issuer_website;
+        }
     }
 }

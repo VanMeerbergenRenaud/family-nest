@@ -83,7 +83,7 @@
         @endif
 
         {{-- Bouton OCR intégré --}}
-        @if($showOcrButton && !$isOcrProcessing && isset($onOcrProcess) && $onOcrProcess)
+        @if($showOcrButton && !$isOcrProcessing && isset($onOcrProcess) && $onOcrProcess && !$fileInfo['isDocx'] && !$fileInfo['isCsv'])
             <button
                 type="button"
                 wire:click="{{ $onOcrProcess }}"
