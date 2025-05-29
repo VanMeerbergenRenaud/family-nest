@@ -13,8 +13,11 @@ use Illuminate\Support\Facades\Log;
 class TextractService
 {
     protected ?TextractClient $textractClient = null;
+
     protected string $ocrSpaceApiKey;
+
     protected int $timeout = 60;
+
     protected int $maxFileSize = 10 * 1024 * 1024;
 
     private const SUPPORTED_FORMATS = ['pdf', 'jpg', 'jpeg', 'png'];
@@ -84,13 +87,14 @@ class TextractService
         Log::info('Début analyse OCR', [
             'session_id' => $sessionId,
             'file_name' => $this->getFileName($file),
-            'file_size' => $this->getFileSize($file)
+            'file_size' => $this->getFileSize($file),
         ]);
 
         // Validation
         $preCheck = $this->performPreChecks($file);
-        if (!$preCheck['success']) {
+        if (! $preCheck['success']) {
             Log::error('Validation échouée', ['session_id' => $sessionId, 'error' => $preCheck['message']]);
+
             return $preCheck;
         }
 
@@ -113,16 +117,17 @@ class TextractService
             try {
                 $result = $this->{$service['method']}($file, $startTime);
 
-                if ($result['success'] && !empty($result['data']['amount'])) {
+                if ($result['success'] && ! empty($result['data']['amount'])) {
                     Log::info('OCR réussi', [
                         'service' => $service['name'],
                         'session_id' => $sessionId,
                         'duration' => time() - $startTime,
-                        'amount' => $result['data']['amount']
+                        'amount' => $result['data']['amount'],
                     ]);
 
                     $result['duration'] = time() - $startTime;
                     $result['session_id'] = $sessionId;
+
                     return $result;
                 }
 
@@ -130,35 +135,40 @@ class TextractService
                 Log::warning('Service OCR échoué', [
                     'service' => $service['name'],
                     'session_id' => $sessionId,
-                    'error' => $result['message'] ?? 'Aucun montant trouvé'
+                    'error' => $result['message'] ?? 'Aucun montant trouvé',
                 ]);
 
             } catch (Exception $e) {
-                $lastError = $this->errorResponse("Erreur {$service['name']}: " . $e->getMessage(), $service['name']);
+                $lastError = $this->errorResponse("Erreur {$service['name']}: ".$e->getMessage(), $service['name']);
                 Log::error('Service OCR échoué', [
                     'service' => $service['name'],
                     'session_id' => $sessionId,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
 
         Log::error('Tous les services OCR ont échoué', ['session_id' => $sessionId]);
+
         return $lastError ?: $this->errorResponse('Aucun service OCR activé ou tous ont échoué');
     }
 
     protected function performPreChecks(string|UploadedFile $file): array
     {
-        if (!config('services.textract.enabled') && !config('services.ocr_space.enabled')) {
+        if (! config('services.textract.enabled') && ! config('services.ocr_space.enabled')) {
             return $this->errorResponse('Aucun service OCR activé');
         }
 
         $fileSize = $this->getFileSize($file);
-        if ($fileSize === 0) return $this->errorResponse('Fichier vide ou inexistant');
-        if ($fileSize > $this->maxFileSize) return $this->errorResponse('Fichier trop volumineux');
+        if ($fileSize === 0) {
+            return $this->errorResponse('Fichier vide ou inexistant');
+        }
+        if ($fileSize > $this->maxFileSize) {
+            return $this->errorResponse('Fichier trop volumineux');
+        }
 
         $extension = $this->getFileExtension($file);
-        if (!in_array($extension, self::SUPPORTED_FORMATS)) {
+        if (! in_array($extension, self::SUPPORTED_FORMATS)) {
             return $this->errorResponse('Format non supporté');
         }
 
@@ -175,12 +185,14 @@ class TextractService
             ]);
 
             $extractedData = $this->extractDataFromAnalyzeExpenseResult($result);
+
             return $this->successResponse($extractedData, 'textract_analyze_expense');
 
         } catch (TextractException $e) {
             $message = $e->getAwsErrorCode() === 'UnsupportedDocumentException'
                 ? 'Format de document non supporté par AWS Textract'
-                : 'Erreur AWS Textract: ' . $e->getAwsErrorCode();
+                : 'Erreur AWS Textract: '.$e->getAwsErrorCode();
+
             return $this->errorResponse($message, 'textract_analyze_expense');
         }
     }
@@ -190,11 +202,11 @@ class TextractService
         $data = [
             'name' => null, 'reference' => null, 'issuer_name' => null,
             'issuer_website' => null, 'amount' => null, 'issued_date' => null,
-            'payment_due_date' => null, 'raw_fields' => []
+            'payment_due_date' => null, 'raw_fields' => [],
         ];
 
         $expenseDocuments = $textractResult->get('ExpenseDocuments');
-        if (empty($expenseDocuments) || !isset($expenseDocuments[0]['SummaryFields'])) {
+        if (empty($expenseDocuments) || ! isset($expenseDocuments[0]['SummaryFields'])) {
             return $data;
         }
 
@@ -237,7 +249,9 @@ class TextractService
         foreach ($potentialFields as $field) {
             if (isset($fieldsMap[$field])) {
                 $amount = $this->normalizeAmountForTextract($fieldsMap[$field]);
-                if ($amount !== null) return $amount;
+                if ($amount !== null) {
+                    return $amount;
+                }
             }
         }
 
@@ -246,28 +260,30 @@ class TextractService
 
     protected function normalizeAmountForTextract(?string $amountString): ?string
     {
-        if (empty($amountString)) return null;
+        if (empty($amountString)) {
+            return null;
+        }
 
         $cleanAmount = preg_replace('/[€$£¥]/u', '', $amountString);
 
         // Cas spéciaux
         if (preg_match('/^(\d{1,3})\s+(\d{2})$/', $cleanAmount, $matches)) {
-            return $matches[1] . '.' . $matches[2];
+            return $matches[1].'.'.$matches[2];
         }
 
         if (preg_match('/^(\d{1,3}(?:\s+\d{3})+)\s+(\d{2})$/', $cleanAmount, $matches)) {
-            return str_replace(' ', '', $matches[1]) . '.' . $matches[2];
+            return str_replace(' ', '', $matches[1]).'.'.$matches[2];
         }
 
         $result = str_replace(' ', '', $cleanAmount);
 
         // Format européen
-        if (str_contains($result, ',') && (!str_contains($result, '.') || strrpos($result, ',') > strrpos($result, '.'))) {
+        if (str_contains($result, ',') && (! str_contains($result, '.') || strrpos($result, ',') > strrpos($result, '.'))) {
             $result = str_replace('.', '', $result);
             $result = str_replace(',', '.', $result);
         }
 
-        if (!is_numeric($result)) {
+        if (! is_numeric($result)) {
             $result = preg_replace('/[^\d.]/', '', $result);
         }
 
@@ -286,8 +302,8 @@ class TextractService
                     'OCREngine' => '2',
                 ]);
 
-            if (!$response->successful()) {
-                throw new Exception('Requête OCR.space échouée: ' . $response->status());
+            if (! $response->successful()) {
+                throw new Exception('Requête OCR.space échouée: '.$response->status());
             }
 
             $ocrResult = $response->json();
@@ -296,10 +312,11 @@ class TextractService
                 $errorMessage = $this->parseOcrSpaceError($ocrResult);
 
                 // Cas limite avec résultats partiels
-                if (str_contains($errorMessage, 'maximum page limit') && !empty($ocrResult['ParsedResults'])) {
+                if (str_contains($errorMessage, 'maximum page limit') && ! empty($ocrResult['ParsedResults'])) {
                     $extractedText = $this->extractTextFromOcrSpace($ocrResult);
                     $data = $this->extractInvoiceDataFromText($extractedText);
                     $data['page_limit_warning'] = true;
+
                     return $this->successResponse($data, 'ocr.space');
                 }
 
@@ -312,10 +329,11 @@ class TextractService
             }
 
             $data = $this->extractInvoiceDataFromText($extractedText);
+
             return $this->successResponse($data, 'ocr.space');
 
         } catch (Exception $e) {
-            return $this->errorResponse('Erreur OCR.space: ' . $e->getMessage(), 'ocr.space');
+            return $this->errorResponse('Erreur OCR.space: '.$e->getMessage(), 'ocr.space');
         }
     }
 
@@ -327,6 +345,7 @@ class TextractService
             if (isset($errorMessage[0])) {
                 return str_contains($errorMessage[0], 'maximum page limit') ? 'maximum page limit' : $errorMessage[0];
             }
+
             return json_encode($errorMessage);
         }
 
@@ -337,8 +356,9 @@ class TextractService
     {
         $text = '';
         foreach ($result['ParsedResults'] ?? [] as $parsed) {
-            $text .= ($parsed['ParsedText'] ?? '') . "\n";
+            $text .= ($parsed['ParsedText'] ?? '')."\n";
         }
+
         return $text;
     }
 
@@ -401,6 +421,7 @@ class TextractService
                 ];
             }
         }
+
         return $candidates;
     }
 
@@ -410,7 +431,9 @@ class TextractService
         $pattern = '/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]{1,2})?|[0-9]+,[0-9]{1,2})\s*€?/';
 
         foreach ($lines as $index => $line) {
-            if ($this->shouldExcludeLineWithRegex($line)) continue;
+            if ($this->shouldExcludeLineWithRegex($line)) {
+                continue;
+            }
 
             if (preg_match_all($pattern, $line, $matches)) {
                 foreach ($matches[1] as $match) {
@@ -421,18 +444,21 @@ class TextractService
                             'float' => floatval($cleanAmount),
                             'line' => $line,
                             'index' => $index,
-                            'position' => $index / max(1, count($lines))
+                            'position' => $index / max(1, count($lines)),
                         ];
                     }
                 }
             }
         }
+
         return $amounts;
     }
 
     protected function selectBestAmountFromAllCandidatesWithRegex(array $candidates): ?string
     {
-        if (empty($candidates)) return null;
+        if (empty($candidates)) {
+            return null;
+        }
 
         usort($candidates, function ($a, $b) {
             $priorityOrder = ['very_high' => 3, 'high' => 2, 'medium' => 1, 'low' => 0, 'very_low' => -1];
@@ -452,8 +478,11 @@ class TextractService
     protected function shouldExcludeLineWithRegex(string $line): bool
     {
         foreach (self::EXCLUDE_PATTERNS as $pattern) {
-            if (preg_match($pattern, $line)) return true;
+            if (preg_match($pattern, $line)) {
+                return true;
+            }
         }
+
         return false;
     }
 
@@ -461,7 +490,7 @@ class TextractService
     {
         $amount = preg_replace('/\s+/', '', $amount);
 
-        if (str_contains($amount, ',') && (!str_contains($amount, '.') || strrpos($amount, ',') > strrpos($amount, '.'))) {
+        if (str_contains($amount, ',') && (! str_contains($amount, '.') || strrpos($amount, ',') > strrpos($amount, '.'))) {
             $amount = str_replace('.', '', $amount);
             $amount = str_replace(',', '.', $amount);
         } else {
@@ -476,11 +505,12 @@ class TextractService
         foreach (array_slice($lines, 0, 5) as $line) {
             $line = trim($line);
             if (strlen($line) > 2 && strlen($line) < 60 &&
-                !preg_match('/\d{2,}/', $line) &&
-                !preg_match('/(facture|reçu|date|total)/i', $line)) {
+                ! preg_match('/\d{2,}/', $line) &&
+                ! preg_match('/(facture|reçu|date|total)/i', $line)) {
                 return $line;
             }
         }
+
         return null;
     }
 
@@ -496,6 +526,7 @@ class TextractService
                 return $matches[count($matches) - 1];
             }
         }
+
         return null;
     }
 
@@ -505,9 +536,10 @@ class TextractService
 
         if (preg_match($pattern, $text, $matches)) {
             $url = rtrim($matches[0], '.,;:!?');
-            if (!preg_match('/^https?:\/\//i', $url) && stripos($url, 'www.') === 0) {
-                return 'https://' . $url;
+            if (! preg_match('/^https?:\/\//i', $url) && stripos($url, 'www.') === 0) {
+                return 'https://'.$url;
             }
+
             return $url;
         }
 
@@ -515,10 +547,11 @@ class TextractService
         if (preg_match($simpleDomainPattern, $text, $matches)) {
             $domain = $matches[0];
             if (preg_match('/^(?:rue|avenue|boulevard|place|mail|email)\b/i', $domain) ||
-                preg_match('/\d{2,}/', $domain) && !str_contains($domain, '.')) {
+                preg_match('/\d{2,}/', $domain) && ! str_contains($domain, '.')) {
                 return null;
             }
-            return 'https://' . $domain;
+
+            return 'https://'.$domain;
         }
 
         return null;
@@ -542,18 +575,21 @@ class TextractService
                 return $this->parseAndFormatDate($matches[1]);
             }
         }
+
         return null;
     }
 
     protected function parseAndFormatDate(?string $dateString): ?string
     {
-        if (empty($dateString)) return null;
+        if (empty($dateString)) {
+            return null;
+        }
 
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $dateString)) {
             try {
                 return (new \DateTime($dateString))->format('Y-m-d');
             } catch (Exception $e) {
-                Log::error('Date format error: ' . $e->getMessage());
+                Log::error('Date format error: '.$e->getMessage());
             }
         }
 
@@ -570,15 +606,15 @@ class TextractService
     protected function generateInvoiceName(?string $issuerName, ?string $issuedDate): ?string
     {
         if (empty($issuerName)) {
-            return $issuedDate ? 'Facture ' . $this->formatDateForName($issuedDate) : 'Facture Inconnue';
+            return $issuedDate ? 'Facture '.$this->formatDateForName($issuedDate) : 'Facture Inconnue';
         }
 
         $cleanName = preg_replace('/[^\p{L}\p{N}\s_.-]/u', '', $issuerName);
         $cleanName = substr(trim($cleanName), 0, 50);
-        $name = 'Facture ' . $cleanName;
+        $name = 'Facture '.$cleanName;
 
         if ($issuedDate) {
-            $name .= ' ' . $this->formatDateForName($issuedDate);
+            $name .= ' '.$this->formatDateForName($issuedDate);
         }
 
         return trim($name);
@@ -591,11 +627,13 @@ class TextractService
             if ($date) {
                 $months = [1 => 'Jan', 2 => 'Fév', 3 => 'Mar', 4 => 'Avr', 5 => 'Mai', 6 => 'Juin',
                     7 => 'Juil', 8 => 'Août', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc'];
-                return $months[(int) $date->format('n')] . ' ' . $date->format('Y');
+
+                return $months[(int) $date->format('n')].' '.$date->format('Y');
             }
         } catch (Exception $e) {
-            Log::error('Date format error: ' . $e->getMessage());
+            Log::error('Date format error: '.$e->getMessage());
         }
+
         return '';
     }
 
@@ -650,11 +688,12 @@ class TextractService
     protected function timeoutResponse(int $startTime, string $sessionId): array
     {
         Log::error('Timeout OCR', ['session_id' => $sessionId, 'duration' => $this->timeout]);
+
         return [
             'success' => false,
-            'message' => 'Timeout après ' . $this->timeout . ' secondes',
+            'message' => 'Timeout après '.$this->timeout.' secondes',
             'timeout' => true,
-            'duration' => time() - $startTime
+            'duration' => time() - $startTime,
         ];
     }
 }
