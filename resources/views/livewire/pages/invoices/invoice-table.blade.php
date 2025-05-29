@@ -111,10 +111,12 @@
                             <x-menu.divider/>
 
                             <div>
-                                <x-menu.item wire:click="resetSort" class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
-                                    <x-svg.reset/>
-                                    Réinitialiser
-                                </x-menu.item>
+                                <x-menu.close>
+                                    <x-menu.item wire:click="resetSort" class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                                        <x-svg.reset/>
+                                        Réinitialiser
+                                    </x-menu.item>
+                                </x-menu.close>
                             </div>
                         @endif
                     </x-menu.items>
@@ -150,24 +152,33 @@
                         @endphp
 
                         @foreach($columnLabels as $columnKey => $columnLabel)
-                            <x-menu.item>
-                                <x-form.checkbox-input
-                                    label="{{ $columnLabel }}"
-                                    name="column_name_{{ $columnKey }}"
-                                    wire:model.live="visibleColumns.{{ $columnKey }}"
-                                    checked="{{ $this->isColumnVisible($columnKey) ? 'checked' : '' }}"
-                                />
+                           <x-menu.item class="!p-0" wire:key="column-{{ $columnKey }}">
+                                <label for="column_{{ $columnKey }}" class="w-full py-2 px-4 flex items-center gap-3 cursor-pointer">
+                                    <div class="relative">
+                                        <input
+                                            id="column_{{ $columnKey }}"
+                                            type="checkbox"
+                                            wire:model.live="visibleColumns.{{ $columnKey }}"
+                                            class="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"
+                                        />
+                                        <svg class="h-3 w-3 absolute text-white opacity-0 peer-checked:opacity-100 top-2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm-medium">{{ $columnLabel }}</span>
+                                </label>
                             </x-menu.item>
                         @endforeach
 
                         <x-menu.divider/>
 
                         <div>
-                            <x-menu.item wire:click="resetColumns"
-                                         class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
-                                <x-svg.reset/>
-                                Réinitialiser
-                            </x-menu.item>
+                            <x-menu.close>
+                                <x-menu.item wire:click="resetColumns" class="flex items-center text-sm-medium text-slate-800 hover:bg-slate-100 transition-colors rounded">
+                                    <x-svg.reset/>
+                                    Réinitialiser
+                                </x-menu.item>
+                            </x-menu.close>
                         </div>
                     </x-menu.items>
                 </x-menu>
@@ -353,9 +364,12 @@
                                         $statusText = $statusEnum?->label() ?? 'Non spécifié';
                                         $statusEmoji = $statusEnum?->emoji() ?? '';
                                     @endphp
-                                    <span class="px-3 py-1 {{ $statusClass }} rounded-full text-xs-medium">
-                                    {{ $statusEmoji }}&nbsp;&nbsp;{{ $statusText }}
-                                </span>
+                                    <span class="px-3 py-1 {{ $statusClass }} flex gap-2 rounded-full w-fit">
+                                        @if($statusEmoji)
+                                            <span class="text-xs-medium">{{ $statusEmoji }}</span>
+                                        @endif
+                                        <span class="text-xs-medium">{{ $statusText }}</span>
+                                    </span>
                                 </td>
                             @endif
 

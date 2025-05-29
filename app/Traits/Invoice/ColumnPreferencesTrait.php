@@ -19,31 +19,55 @@ trait ColumnPreferencesTrait
 
     public bool $isMobile = false;
 
-    public bool $hasInitializedMobileColumns = false;
+    public bool $isTablet = false;
 
-    public function initializeColumnPreferencesTrait()
+    public bool $isDesktop = true;
+
+    public bool $hasInitializedDeviceColumns = false;
+
+    public function initializeColumnPreferencesTrait(): void
     {
-        // Détecte si l'appareil est mobile
         $this->detectDevice();
     }
 
-    public function detectDevice()
+    public function detectDevice(): void
     {
         $userAgent = request()->header('User-Agent');
-        $this->isMobile = preg_match('/(android|iphone|ipod|mobile|phone)/i', $userAgent);
 
-        // N'initialise les colonnes mobile que si ça n'a pas déjà été fait
-        if ($this->isMobile && ! $this->hasInitializedMobileColumns) {
-            $this->setMobileColumns();
-            $this->hasInitializedMobileColumns = true;
+        $this->isTablet = preg_match('/(ipad|tablet|playbook|silk)/i', $userAgent);
+        $this->isMobile = ! $this->isTablet && preg_match('/(android|iphone|ipod|mobile|phone)/i', $userAgent);
+        $this->isDesktop = ! $this->isMobile && ! $this->isTablet;
+
+        if (! $this->hasInitializedDeviceColumns) {
+            if ($this->isMobile) {
+                $this->setMobileColumns();
+            } elseif ($this->isTablet) {
+                $this->setTabletColumns();
+            } else {
+                $this->setDesktopColumns();
+            }
+            $this->hasInitializedDeviceColumns = true;
         }
     }
 
-    public function setMobileColumns()
+    public function setMobileColumns(): void
     {
-        // Sur mobile, n'affiche que la colonne nom par défaut
         foreach ($this->visibleColumns as $column => $value) {
             $this->visibleColumns[$column] = ($column === 'name');
+        }
+    }
+
+    public function setTabletColumns(): void
+    {
+        foreach ($this->visibleColumns as $column => $value) {
+            $this->visibleColumns[$column] = in_array($column, ['name', 'issuer_name', 'amount']);
+        }
+    }
+
+    public function setDesktopColumns(): void
+    {
+        foreach ($this->visibleColumns as $column => $value) {
+            $this->visibleColumns[$column] = in_array($column, ['name', 'issuer_name', 'amount', 'tags']);
         }
     }
 
@@ -58,19 +82,10 @@ trait ColumnPreferencesTrait
     {
         if ($this->isMobile) {
             $this->setMobileColumns();
+        } elseif ($this->isTablet) {
+            $this->setTabletColumns();
         } else {
-            $this->visibleColumns = [
-                'name' => true,
-                'reference' => false,
-                'type' => false,
-                'category' => false,
-                'issuer_name' => true,
-                'amount' => true,
-                'issued_date' => false,
-                'payment_status' => false,
-                'payment_due_date' => false,
-                'tags' => true,
-            ];
+            $this->setDesktopColumns();
         }
     }
 
