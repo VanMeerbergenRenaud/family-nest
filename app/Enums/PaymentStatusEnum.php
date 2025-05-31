@@ -39,7 +39,6 @@ enum PaymentStatusEnum: string
             self::Cancelled => '❌',
             self::Refunded => '️🏦',
             self::Disputed => '⚖️',
-
         };
     }
 

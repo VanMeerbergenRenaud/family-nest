@@ -2,67 +2,54 @@
 
 namespace App\Policies;
 
-use App\Enums\FamilyPermissionEnum;
 use App\Models\Family;
 use App\Models\User;
+use App\Services\FamilyRoleService;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FamilyPolicy
 {
     use HandlesAuthorization;
 
+    protected FamilyRoleService $familyRoleService;
+
+    public function __construct(FamilyRoleService $familyRoleService)
+    {
+        $this->familyRoleService = $familyRoleService;
+    }
+
     public function viewAny(User $user): bool
     {
-        return $user->families()->exists();
+        return true;
     }
 
     public function view(User $user, Family $family): bool
     {
-        return $family->users()
-            ->where('user_id', $user->id)
-            ->exists();
+        return $this->familyRoleService->isViewer($user, $family);
     }
 
     public function create(User $user): bool
     {
-        return $user->families()->exists();
+        return true;
     }
 
     public function update(User $user, Family $family): bool
     {
-        return $family->users()
-            ->where('user_id', $user->id)
-            ->whereIn('permission', [
-                FamilyPermissionEnum::Admin->value,
-                FamilyPermissionEnum::Editor->value,
-            ])
-            ->exists();
+        return $this->familyRoleService->isEditorOrAbove($user, $family);
     }
 
     public function delete(User $user, Family $family): bool
     {
-        return $family->users()
-            ->where('user_id', $user->id)
-            ->where('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
+        return $this->familyRoleService->isAdmin($user, $family);
     }
 
     public function inviteMembers(User $user, Family $family): bool
     {
-        return $family->users()
-            ->where('user_id', $user->id)
-            ->whereIn('permission', [
-                FamilyPermissionEnum::Admin->value,
-                FamilyPermissionEnum::Editor->value,
-            ])
-            ->exists();
+        return $this->familyRoleService->isEditorOrAbove($user, $family);
     }
 
     public function manageMembers(User $user, Family $family): bool
     {
-        return $family->users()
-            ->where('user_id', $user->id)
-            ->where('permission', FamilyPermissionEnum::Admin->value)
-            ->exists();
+        return $this->familyRoleService->isAdmin($user, $family);
     }
 }
