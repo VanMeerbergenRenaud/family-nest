@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Pages\Family;
 
 use App\Enums\FamilyPermissionEnum;
 use App\Enums\FamilyRelationEnum;
@@ -16,15 +16,18 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
-class FamilyInvitationHandler extends Component
+class InvitationHandler extends Component
 {
     public ?FamilyInvitation $invitation = null;
 
     public RegisterForm $form;
 
     public string $token = '';
+
     public string $password = '';
+
     public bool $remember = false;
+
     public bool $userExists = false;
 
     protected FamilyService $familyService;
@@ -39,7 +42,7 @@ class FamilyInvitationHandler extends Component
         $this->token = $token;
         $this->invitation = FamilyInvitation::where('token', $token)->first();
 
-        if (!$this->invitation || $this->invitation->isExpired()) {
+        if (! $this->invitation || $this->invitation->isExpired()) {
             $this->redirectRoute('welcome');
         }
 
@@ -55,7 +58,7 @@ class FamilyInvitationHandler extends Component
 
     public function acceptInvitation(): void
     {
-        if (!$this->validateInvitation()) {
+        if (! $this->validateInvitation()) {
             $this->redirectRoute('welcome', ['error' => 'Cette invitation n\'est plus valable.']);
         }
 
@@ -77,8 +80,9 @@ class FamilyInvitationHandler extends Component
         try {
             $user = User::where('email', $this->invitation->email)->first();
 
-            if (!$user || !Hash::check($this->password, $user->password)) {
+            if (! $user || ! Hash::check($this->password, $user->password)) {
                 $this->addError('password', 'Mot de passe incorrect');
+
                 return;
             }
 
@@ -88,7 +92,7 @@ class FamilyInvitationHandler extends Component
             // Traiter l'invitation après la connexion
             $this->processInvitation();
 
-            Toaster::success('Vous avez été ajouté(e) à la famille ' . $this->invitation->family->name);
+            Toaster::success('Vous avez été ajouté(e) à la famille '.$this->invitation->family->name);
             $this->redirectRoute('family');
 
         } catch (\Exception $e) {
@@ -99,7 +103,7 @@ class FamilyInvitationHandler extends Component
 
     public function register(): void
     {
-        if (!$this->validateInvitation()) {
+        if (! $this->validateInvitation()) {
             return;
         }
 
@@ -109,18 +113,17 @@ class FamilyInvitationHandler extends Component
             if (User::where('email', $this->invitation->email)->exists()) {
                 $this->userExists = true;
                 Toaster::info('Un compte existe déjà avec cette adresse email. Veuillez vous connecter.');
+
                 return;
             }
 
             $this->form->redirect_to_onboarding = false;
+
             $this->form->register();
+
             $this->processInvitation();
 
-            $route = config('app.email_verification_enabled', true)
-                ? 'verification.notice'
-                : 'family';
-
-            $this->redirectRoute($route);
+            $this->redirectRoute('verification.notice');
         } catch (\Exception $e) {
             Log::error('Error creating account', ['error' => $e->getMessage()]);
             Toaster::error('Une erreur s\'est produite::Le compte n\'a pas pu être créé.');
@@ -178,20 +181,20 @@ class FamilyInvitationHandler extends Component
 
     public function render()
     {
-        if (!$this->invitation || $this->invitation->isExpired()) {
-            return view('livewire.family-invitation.expired')
+        if (! $this->invitation || $this->invitation->isExpired()) {
+            return view('livewire.pages.family.invitation-handler.expired')
                 ->layout('layouts.guest');
         }
 
         if (Auth::check()) {
             if (Auth::user()->email === $this->invitation->email) {
-                return view('livewire.family-invitation.accept', [
+                return view('livewire.pages.family.invitation-handler.accept', [
                     'invitation' => $this->invitation,
                     'user' => Auth::user(),
                 ])->layout('layouts.guest');
             }
 
-            return view('livewire.family-invitation.wrong-account', [
+            return view('livewire.pages.family.invitation-handler.wrong-account', [
                 'invitation' => $this->invitation,
             ])->layout('layouts.guest');
         }
@@ -199,13 +202,13 @@ class FamilyInvitationHandler extends Component
         // Si l'utilisateur existe déjà mais n'est pas connecté,
         // afficher une vue spécifique pour la connexion
         if ($this->userExists) {
-            return view('livewire.family-invitation.login', [
+            return view('livewire.pages.family.invitation-handler.login', [
                 'invitation' => $this->invitation,
                 'email' => $this->invitation->email,
             ])->layout('layouts.guest');
         }
 
-        return view('livewire.family-invitation.register', [
+        return view('livewire.pages.family.invitation-handler.register', [
             'invitation' => $this->invitation,
             'email' => $this->invitation->email,
         ])->layout('layouts.guest');

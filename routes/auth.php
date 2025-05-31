@@ -4,13 +4,13 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Middleware\GoogleAuthLogMiddleware;
 use App\Livewire\Actions\Logout;
-use App\Livewire\FamilyInvitationHandler;
 use App\Livewire\Pages\Auth\ConfirmPassword;
 use App\Livewire\Pages\Auth\ForgotPassword;
 use App\Livewire\Pages\Auth\Login;
 use App\Livewire\Pages\Auth\Register;
 use App\Livewire\Pages\Auth\ResetPassword;
 use App\Livewire\Pages\Auth\VerifyEmail;
+use App\Livewire\Pages\Family\InvitationHandler;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -45,5 +45,5 @@ Route::middleware([GoogleAuthLogMiddleware::class])->group(function () {
 });
 
 // Invite user route
-Route::get('/invitation/{token}', FamilyInvitationHandler::class)
+Route::get('/invitation/{token}', InvitationHandler::class)
     ->name('family.invitation');

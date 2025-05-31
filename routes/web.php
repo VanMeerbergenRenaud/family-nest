@@ -4,7 +4,7 @@ use App\Http\Middleware\CheckFamilyRole;
 use App\Http\Middleware\HasFamily;
 use App\Livewire\Pages\Calendar;
 use App\Livewire\Pages\Dashboard\Index as IndexDashboard;
-use App\Livewire\Pages\Family;
+use App\Livewire\Pages\Family\Index as IndexFamily;
 use App\Livewire\Pages\Goals\Index as IndexGoals;
 use App\Livewire\Pages\HelpCenter;
 use App\Livewire\Pages\Invoices\Archived;
@@ -35,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Routes de base
-    Route::get('/family', Family::class)->name('family');
+    Route::get('/family', IndexFamily::class)->name('family');
     Route::get('/help-center', HelpCenter::class)->name('help-center');
 });
 
