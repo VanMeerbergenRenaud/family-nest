@@ -45,5 +45,5 @@ Route::middleware([GoogleAuthLogMiddleware::class])->group(function () {
 });
 
 // Invite user route
-Route::get('/invitation/{token}', InvitationHandler::class)
+Route::get('/family/invitation/{token}', InvitationHandler::class)
     ->name('family.invitation');

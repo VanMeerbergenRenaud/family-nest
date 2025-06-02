@@ -28,6 +28,7 @@
                                 placeholder="Exemple: Janssens"
                                 :asterix="true"
                                 autofocus
+                                class="capitalize"
                             />
                         </div>
                     </div>

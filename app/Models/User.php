@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Enums\FamilyPermissionEnum;
-use App\Mail\CustomVerifyEmail;
+use App\Mail\AuthVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 use Masmerise\Toaster\Toaster;
@@ -123,7 +124,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         if ($this->email_verified_at === null) {
-            $this->notify(new CustomVerifyEmail);
+            Mail::to($this->email)->send(new AuthVerifyEmail($this));
         }
     }
 

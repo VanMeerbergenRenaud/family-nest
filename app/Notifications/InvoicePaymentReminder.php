@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
+use App\Jobs\SendPaymentReminder;
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class InvoicePaymentReminder extends Notification implements ShouldQueue
@@ -19,23 +19,17 @@ class InvoicePaymentReminder extends Notification implements ShouldQueue
         $this->invoice = $invoice;
     }
 
-    public function via(): array
+    public function via($notifiable): array
     {
         return ['mail', 'database'];
     }
 
-    public function toMail($notifiable): MailMessage
+    public function toMail($notifiable): void
     {
-        return (new MailMessage)
-            ->subject('Rappel de paiement : '.$this->invoice->name)
-            ->view(
-                'emails.invoices.payment-reminder',
-                [
-                    'invoice' => $this->invoice,
-                    'userName' => $notifiable->name,
-                    'appName' => config('app.name'),
-                ]
-            );
+        SendPaymentReminder::dispatch(
+            $this->invoice,
+            $notifiable
+        );
     }
 
     public function toArray(): array

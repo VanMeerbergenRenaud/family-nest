@@ -141,7 +141,7 @@
                             </p>
 
                             <button type="button" wire:click="sendVerification" class="button-tertiary">
-                                {{ __('Envoyer le lien de vérification') }}
+                                {{ __('Renvoyer un lien de vérification') }}
                             </button>
                         </div>
                     </div>

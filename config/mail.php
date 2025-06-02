@@ -136,4 +136,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'support' => [
+        'address' => env('MAIL_SUPPORT_EMAIL', 'test@gmail.com'),
+    ],
 ];
