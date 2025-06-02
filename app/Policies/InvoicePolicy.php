@@ -25,11 +25,11 @@ class InvoicePolicy
 
     public function view(User $user, Invoice $invoice): bool
     {
-        if (!$invoice->family_id) {
+        if (! $invoice->family_id) {
             return $user->id === $invoice->user_id;
         }
 
-        if (!$user->belongsToFamily($invoice->family_id)) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -38,11 +38,11 @@ class InvoicePolicy
 
     public function addToFavorite(User $user, Invoice $invoice): bool
     {
-        if (!$invoice->family_id) {
+        if (! $invoice->family_id) {
             return $user->id === $invoice->user_id;
         }
 
-        if (!$user->belongsToFamily($invoice->family_id)) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -53,7 +53,7 @@ class InvoicePolicy
     {
         $family = $user->family();
 
-        if (!$family) {
+        if (! $family) {
             return false;
         }
 
@@ -62,11 +62,11 @@ class InvoicePolicy
 
     public function update(User $user, Invoice $invoice): bool
     {
-        if (!$invoice->family_id) {
+        if (! $invoice->family_id) {
             return $user->id === $invoice->user_id;
         }
 
-        if (!$user->belongsToFamily($invoice->family_id)) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 
@@ -75,11 +75,11 @@ class InvoicePolicy
 
     public function delete(User $user, Invoice $invoice): bool
     {
-        if (!$invoice->family_id) {
+        if (! $invoice->family_id) {
             return $user->id === $invoice->user_id;
         }
 
-        if (!$user->belongsToFamily($invoice->family_id)) {
+        if (! $user->belongsToFamily($invoice->family_id)) {
             return false;
         }
 

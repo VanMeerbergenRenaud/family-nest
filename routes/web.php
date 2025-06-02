@@ -13,6 +13,7 @@ use App\Livewire\Pages\Invoices\Edit;
 use App\Livewire\Pages\Invoices\Index\Page as IndexInvoice;
 use App\Livewire\Pages\Invoices\Show;
 use App\Livewire\Pages\Onboarding\FamilyCreation;
+use App\Livewire\Pages\PrivacyPolicy;
 use App\Livewire\Pages\Settings\Apparence;
 use App\Livewire\Pages\Settings\Billing;
 use App\Livewire\Pages\Settings\Danger;
@@ -22,10 +23,13 @@ use App\Livewire\Pages\Settings\Profile;
 use App\Livewire\Pages\Settings\Storage;
 use Illuminate\Support\Facades\Route;
 
-// Route for the welcome page
-Route::view('/', 'welcome')
-    ->middleware(['guest'])
-    ->name('welcome');
+// Routes pour tous les utilisateurs
+Route::get('/privacy-policy', PrivacyPolicy::class)->name('privacy-policy');
+
+// Routes pour les utilisateurs invités
+Route::middleware(['guest'])->group(function () {
+    Route::view('/', 'livewire.pages.welcome')->name('welcome');
+});
 
 // Routes pour les utilisateurs authentifiés sans famille
 Route::middleware(['auth', 'verified'])->group(function () {
