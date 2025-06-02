@@ -50,7 +50,6 @@ class Index extends Component
         $this->form->setFamily(auth()->user()->family());
     }
 
-    // Computed properties
     #[Computed]
     public function members()
     {

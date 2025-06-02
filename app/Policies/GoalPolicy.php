@@ -42,7 +42,7 @@ class GoalPolicy
     {
         $family = $user->family();
 
-        if (!$family) {
+        if (! $family) {
             return false;
         }
 

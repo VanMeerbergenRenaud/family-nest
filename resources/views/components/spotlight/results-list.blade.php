@@ -15,7 +15,7 @@
                             <x-spotlight.result-item
                                 :id="$result->id"
                                 type="user"
-                                :href="route('settings.profile')"
+                                :href="$result->id === auth()->id() ? route('settings.profile') : route('family')"
                                 :text="$result->name"
                                 :description="$result->email"
                                 :state="$result->getFamilyPermissionAttribute()->label()"

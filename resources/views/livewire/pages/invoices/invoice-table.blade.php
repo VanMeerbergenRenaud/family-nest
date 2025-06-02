@@ -476,7 +476,7 @@
             </div>
         @endif
 
-        <x-loader.spinner target="sortBy, search, previousPage, nextPage" />
+        <x-loader.spinner target="sortBy, search, previousPage, nextPage, gotoPage" />
     </section>
 
    {{-- Espace qui apparait lors d'un bulk-actions --}}

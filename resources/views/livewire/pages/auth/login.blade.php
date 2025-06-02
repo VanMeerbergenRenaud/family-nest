@@ -3,7 +3,7 @@
     <!-- Session Status -->
     @if (session('status'))
         <p class="mt-4 mb-6 bg-green-50 border border-green-200 py-2 px-4 gap-4 rounded-md text-sm text-green-700 dark:bg-green-100 dark:border-green-300 dark:text-green-600 flex items-center">
-            <x-svg.success class="h-4 w-4" />
+            <x-svg.success class="text-green-700" />
             {{ session('status') }}
         </p>
     @endif

@@ -35,8 +35,6 @@ class InvoiceTable extends Component
 
     public int $perPage = 8;
 
-    public $perPageOptions = [8, 15, 25, 50, 100];
-
     public bool $withFilters = true;
 
     public function mount()
