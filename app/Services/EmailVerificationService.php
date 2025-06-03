@@ -53,30 +53,4 @@ class EmailVerificationService
             return false;
         }
     }
-
-    /**
-     * Marque l'email de l'utilisateur comme vérifié
-     *
-     * @param  User  $user  L'utilisateur dont l'email doit être marqué comme vérifié
-     * @return bool Si l'opération a réussi
-     */
-    public function markEmailAsVerified(User $user): bool
-    {
-        if ($user->hasVerifiedEmail()) {
-            return true;
-        }
-
-        try {
-            $user->markEmailAsVerified();
-
-            return true;
-        } catch (\Exception $e) {
-            \Log::error('Erreur lors de la vérification de l\'email', [
-                'user_id' => $user->id,
-                'error' => $e->getMessage(),
-            ]);
-
-            return false;
-        }
-    }
 }
