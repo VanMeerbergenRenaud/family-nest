@@ -59,6 +59,7 @@ class TextractService
         '/frais\s+d[\'e]\s*inscription/i',
     ];
 
+    /* Configuration et initialisation */
     public function __construct()
     {
         $this->initializeServices();
@@ -79,6 +80,7 @@ class TextractService
         $this->ocrSpaceApiKey = config('services.ocr_space.key', 'helloworld');
     }
 
+    /* Méthodes principales */
     public function analyzeInvoice(string|UploadedFile $file): array
     {
         $startTime = time();
@@ -175,6 +177,9 @@ class TextractService
         return ['success' => true];
     }
 
+    /*----------------------------
+        ÉTAPE 1 : AWS Textract
+     ----------------------------*/
     protected function tryTextractAnalyzeExpense(string|UploadedFile $file, int $startTime): array
     {
         try {
@@ -290,6 +295,9 @@ class TextractService
         return is_numeric($result) ? number_format((float) $result, 2, '.', '') : null;
     }
 
+    /*----------------------------
+        ÉTAPE 2 : OCR SPACE
+     ----------------------------*/
     protected function tryOcrSpace(string|UploadedFile $file, int $startTime): array
     {
         try {
@@ -380,6 +388,7 @@ class TextractService
         ];
     }
 
+    /* Extraction de montants (par regex) */
     protected function extractTotalAmountWithRegex(string $text, array $lines): ?string
     {
         $allCandidates = [];
@@ -388,13 +397,14 @@ class TextractService
         foreach (self::TOTAL_PATTERNS as $priority => $patterns) {
             foreach ($patterns as $pattern) {
                 if (preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE)) {
+                    // Évalue chaque montant trouvé avec ce pattern
                     $candidates = $this->evaluateAmountCandidatesWithRegex($matches[1], $text, $priority);
                     $allCandidates = array_merge($allCandidates, $candidates);
                 }
             }
         }
 
-        // Fallback: chercher tous les montants
+        // Solution de dernier recours : recherche tous les montants
         if (empty($allCandidates)) {
             $allAmounts = $this->findAllAmountsWithRegex($lines);
             foreach ($allAmounts as &$amount) {
@@ -462,16 +472,22 @@ class TextractService
 
         usort($candidates, function ($a, $b) {
             $priorityOrder = ['very_high' => 3, 'high' => 2, 'medium' => 1, 'low' => 0, 'very_low' => -1];
+
             $priorityA = $priorityOrder[$a['priority']] ?? 0;
             $priorityB = $priorityOrder[$b['priority']] ?? 0;
 
+            // Si les priorités sont différentes, on les compare
             if ($priorityA !== $priorityB) {
+                /* Le sens de la comparaison est inversé (B <=> A au lieu de A <=> B), donc le code
+                   trie les éléments par priorité décroissante ('very_high', 'high', etc.) */
                 return $priorityB <=> $priorityA;
             }
 
+            // Si les priorités sont égales, on compare les valeurs flottantes
             return ($b['float'] ?? 0) <=> ($a['float'] ?? 0);
         });
 
+        // Retourne la valeur du premier candidat, ou null si aucun candidat n'est trouvé
         return $candidates[0]['value'] ?? null;
     }
 
@@ -500,10 +516,16 @@ class TextractService
         return preg_match('/^\d+(\.\d{1,2})?$/', $amount) ? $amount : preg_replace('/[^\d.]/', '', $amount);
     }
 
+    /*  Extraction d'informations Nom, Référence, Site, Date */
     protected function extractIssuerNameWithRegex(array $lines): ?string
     {
+        // Analyse les 5 premières lignes pour trouver un nom de fournisseur
         foreach (array_slice($lines, 0, 5) as $line) {
             $line = trim($line);
+
+            /* Cherche une ligne qui a plus de 2 et moins de 60 caractères
+             - Pas de chiffres consécutifs de 2 ou plus
+             - Pas de mots comme "facture", "reçu", "date" ou "total" */
             if (strlen($line) > 2 && strlen($line) < 60 &&
                 ! preg_match('/\d{2,}/', $line) &&
                 ! preg_match('/(facture|reçu|date|total)/i', $line)) {
@@ -511,18 +533,22 @@ class TextractService
             }
         }
 
+        // Si aucune ligne n'est trouvée, on retourne null
         return null;
     }
 
     protected function extractReferenceWithRegex(string $text): ?string
     {
+        // Les patterns recherchent "facture n°" ou "document n°" suivi d'un identifiant.
         $patterns = [
             '/(facture|document)\s*n°\s*:?\s*([A-Z0-9\-\/]+)/i',
             '/n°\s*(?:de\s*)?(?:facture|reference|document)\s*:?\s*([A-Z0-9\-\/]+)/i',
         ];
 
+        // Cette boucle examine chaque pattern et essaye de trouver une correspondance
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $text, $matches)) {
+                // Retourne le dernier texte qui contient l'identifiant de la facture sans les textes comme "facture n°".
                 return $matches[count($matches) - 1];
             }
         }
@@ -579,6 +605,35 @@ class TextractService
         return null;
     }
 
+    /* Formatage de donnée */
+    protected function generateInvoiceName(?string $issuerName, ?string $issuedDate): ?string
+    {
+        // Si le nom du fournisseur est vide, on utilise la date d'émission
+        if (empty($issuerName)) {
+            return $issuedDate
+                ? 'Facture '.$this->formatDateForName($issuedDate)
+                : 'Nom de facture inconnu';
+        }
+
+        // Je récupère grâce à une expression régulière le nom du fournisseur
+        $cleanName = preg_replace('/[^\p{L}\p{N}\s_.-]/u', '', $issuerName);
+        $cleanName = substr(trim($cleanName), 0, 30);
+
+        $name = 'Facture '.$cleanName;
+
+        // Si la date d'émission est fournie, on l'ajoute au nom
+        if ($issuedDate) {
+            $name .= ' '.$this->formatDateForName($issuedDate);
+        }
+
+        return trim($name);
+    }
+
+    protected function getTextLines(string $text): array
+    {
+        return array_values(array_filter(array_map('trim', explode("\n", $text)), 'strlen'));
+    }
+
     protected function parseAndFormatDate(?string $dateString): ?string
     {
         if (empty($dateString)) {
@@ -603,23 +658,6 @@ class TextractService
         return null;
     }
 
-    protected function generateInvoiceName(?string $issuerName, ?string $issuedDate): ?string
-    {
-        if (empty($issuerName)) {
-            return $issuedDate ? 'Facture '.$this->formatDateForName($issuedDate) : 'Facture Inconnue';
-        }
-
-        $cleanName = preg_replace('/[^\p{L}\p{N}\s_.-]/u', '', $issuerName);
-        $cleanName = substr(trim($cleanName), 0, 50);
-        $name = 'Facture '.$cleanName;
-
-        if ($issuedDate) {
-            $name .= ' '.$this->formatDateForName($issuedDate);
-        }
-
-        return trim($name);
-    }
-
     private function formatDateForName(string $isoDate): string
     {
         try {
@@ -637,7 +675,7 @@ class TextractService
         return '';
     }
 
-    // Méthodes utilitaires
+    /*  Utilitaires de fichiers */
     protected function getFileContent(string|UploadedFile $file): string
     {
         return $file instanceof UploadedFile ? file_get_contents($file->getRealPath()) : file_get_contents($file);
@@ -660,11 +698,7 @@ class TextractService
             : pathinfo($file, PATHINFO_EXTENSION));
     }
 
-    protected function getTextLines(string $text): array
-    {
-        return array_values(array_filter(array_map('trim', explode("\n", $text)), 'strlen'));
-    }
-
+    /*  Gestion du timeout */
     protected function getRemainingTimeout(int $startTime): int
     {
         return max(1, $this->timeout - (time() - $startTime));
@@ -675,6 +709,7 @@ class TextractService
         return (time() - $startTime) >= $this->timeout;
     }
 
+    /* Construction de réponses */
     protected function successResponse(array $data, string $service): array
     {
         return ['success' => true, 'data' => $data, 'service' => $service];
