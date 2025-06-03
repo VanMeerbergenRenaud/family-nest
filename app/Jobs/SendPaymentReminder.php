@@ -11,8 +11,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Masmerise\Toaster\Toaster;
-use Throwable;
 
 class SendPaymentReminder implements ShouldQueue
 {
@@ -22,10 +20,7 @@ class SendPaymentReminder implements ShouldQueue
 
     public int $timeout = 120;
 
-    public function __construct(
-        public Invoice $invoice,
-        public User $user
-    ) {}
+    public function __construct(public Invoice $invoice, public User $user) {}
 
     public function handle(): void
     {
@@ -39,6 +34,7 @@ class SendPaymentReminder implements ShouldQueue
                 return;
             }
 
+            // Envoyer l'email
             Mail::to($this->user->email)
                 ->send(new PaymentReminder(
                     $this->invoice,
@@ -52,29 +48,13 @@ class SendPaymentReminder implements ShouldQueue
                 'invoice_name' => $this->invoice->name,
                 'due_date' => $this->invoice->payment_due_date,
             ]);
-
         } catch (\Exception $e) {
-            Toaster::error('Erreur lors de l\'envoi du rappel de paiement::Veuillez réessayer plus tard ou changer la date de rappel.');
             Log::error('Erreur lors de l\'envoi du rappel : '.$e->getMessage());
         }
-    }
-
-    public function failed(Throwable $e): void
-    {
-        Log::error('Payment reminder job failed after all attempts', [
-            'invoice_id' => $this->invoice->id,
-            'email' => $this->user->email,
-            'error' => $e->getMessage(),
-        ]);
     }
 
     private function invoiceStillExists(): bool
     {
         return Invoice::where('id', $this->invoice->id)->exists();
-    }
-
-    public function backoff(): array
-    {
-        return [10, 30, 60];
     }
 }

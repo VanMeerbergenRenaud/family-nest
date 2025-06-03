@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Jobs\SendPaymentReminder;
 use App\Models\Invoice;
-use App\Notifications\InvoicePaymentReminder;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +28,9 @@ class InvoiceReminderService
 
             if ($invoice->user) {
                 $delay = Carbon::parse($invoice->payment_reminder)->startOfDay();
-                $invoice->user->notify((new InvoicePaymentReminder($invoice))->delay($delay));
+
+                SendPaymentReminder::dispatch($invoice, $invoice->user)
+                    ->delay($delay);
 
                 Log::info("Rappel de paiement programmé pour la facture #{$invoice->id} le {$delay->format('Y-m-d')}");
 
