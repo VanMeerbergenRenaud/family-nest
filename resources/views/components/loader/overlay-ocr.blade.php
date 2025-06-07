@@ -30,7 +30,7 @@
             </div>
 
             <div class="mt-6 text-center text-xs text-slate-500 dark:text-slate-400">
-                Ceci peut prendre quelques secondes...
+                Ceci peut prendre jusqu'à 60 secondes maximum...
             </div>
         </div>
     </div>

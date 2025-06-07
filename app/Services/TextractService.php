@@ -301,14 +301,32 @@ class TextractService
     protected function tryOcrSpace(string|UploadedFile $file, int $startTime): array
     {
         try {
+            $fileContent = $this->getFileContent($file);
+            $fileName = $this->getFileName($file);
+            $extension = $this->getFileExtension($file);
+
+            // Configuration optimisée pour la vitesse
+            $params = [
+                'apikey' => $this->ocrSpaceApiKey,
+                'language' => 'fre',
+                'OCREngine' => '1', // Moteur plus rapide
+                'scale' => 'true',
+                'isOverlayRequired' => 'false',
+                'isCreateSearchablePdf' => 'false',
+                'isSearchablePdfHideTextLayer' => 'false',
+            ];
+
+            if (in_array($extension, ['jpg', 'jpeg', 'png'])) {
+                $params['isTable'] = 'true';
+            }
+
+            if ($extension === 'pdf') {
+                $params['filetype'] = 'pdf';
+            }
+
             $response = Http::timeout($this->getRemainingTimeout($startTime))
-                ->attach('file', $this->getFileContent($file), $this->getFileName($file))
-                ->post('https://api.ocr.space/parse/image', [
-                    'apikey' => $this->ocrSpaceApiKey,
-                    'language' => 'fre',
-                    'isTable' => 'true',
-                    'OCREngine' => '2',
-                ]);
+                ->attach('file', $fileContent, $fileName)
+                ->post('https://api.ocr.space/parse/image', $params);
 
             if (! $response->successful()) {
                 throw new Exception('Requête OCR.space échouée: '.$response->status());
@@ -319,7 +337,6 @@ class TextractService
             if ($ocrResult['IsErroredOnProcessing'] ?? false) {
                 $errorMessage = $this->parseOcrSpaceError($ocrResult);
 
-                // Cas limite avec résultats partiels
                 if (str_contains($errorMessage, 'maximum page limit') && ! empty($ocrResult['ParsedResults'])) {
                     $extractedText = $this->extractTextFromOcrSpace($ocrResult);
                     $data = $this->extractInvoiceDataFromText($extractedText);
