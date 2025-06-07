@@ -134,6 +134,7 @@ enum TypeEnum: string
                 CategoryEnum::ALLOCATIONS_FAMILIALES,
                 CategoryEnum::COTISATIONS_SOCIALES,
                 CategoryEnum::IMPOTS_REVENU,
+                CategoryEnum::TAXE_AUTOMOBILE,
             ],
             self::LOGEMENT => [
                 CategoryEnum::CHARGES_LOCATIVES,

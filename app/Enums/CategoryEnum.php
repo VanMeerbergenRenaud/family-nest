@@ -81,6 +81,7 @@ enum CategoryEnum: string
     case ALLOCATIONS_FAMILIALES = 'Allocations familiales';
     case COTISATIONS_SOCIALES = 'Cotisations sociales';
     case IMPOTS_REVENU = 'Impôts sur le revenu';
+    case TAXE_AUTOMOBILE = 'Taxe automobile';
 
     // Logement
     case CHARGES_LOCATIVES = 'Charges locatives';
@@ -207,6 +208,7 @@ enum CategoryEnum: string
             self::ALLOCATIONS_FAMILIALES => '👨‍👩‍👧‍👦',
             self::COTISATIONS_SOCIALES => '👥',
             self::IMPOTS_REVENU => '📜',
+            self::TAXE_AUTOMOBILE => '🚗',
 
             // Logement
             self::CHARGES_LOCATIVES => '🏢',

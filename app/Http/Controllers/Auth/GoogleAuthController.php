@@ -50,7 +50,7 @@ class GoogleAuthController extends Controller
 
             Session::regenerate();
 
-            if (!$user->family()) {
+            if (! $user->family()) {
                 return redirect()->route('onboarding.family');
             }
 

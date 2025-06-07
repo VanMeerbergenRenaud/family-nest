@@ -29,7 +29,7 @@ trait TagManagement
 
         // Vérifier que le tag contient uniquement des lettres
         if (! preg_match('/^[a-zA-Z]+$/', $tag)) {
-            Toaster::error('Le tag ne peut contenir que des lettres.');
+            Toaster::error('Le tag ne peut contenir que des lettres (sans accent).');
 
             return;
         }

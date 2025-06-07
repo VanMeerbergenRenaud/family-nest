@@ -70,9 +70,9 @@
                         </p>
                         <div class="mt-3 flex items-center gap-2">
                             <div class="h-1.5 flex-1 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                <div class="bg-sky-500 dark:bg-sky-400 h-full rounded-full" style="width: 35%"></div>
+                                <div class="bg-sky-500 dark:bg-sky-400 h-full rounded-full" style="width: 0"></div>
                             </div>
-                            <span class="text-xs text-gray-600 dark:text-gray-400">35%</span>
+                            <span class="text-xs text-gray-600 dark:text-gray-400">0%</span>
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,7 @@
 
     <x-loader.overlay-ocr
         title="Analyse OCR en cours..."
-        description="Nous utilisons un logiciel de reconnaissance OCR pour extraire les informations de votre facture. Cela peut prendre quelques secondes..."
+        description="Nous utilisons un logiciel de reconnaissance OCR pour extraire les informations de votre facture. Veuillez patienter quelques instants..."
     />
 
     {{-- Formulaire pour créer une facture : multi step  --}}
