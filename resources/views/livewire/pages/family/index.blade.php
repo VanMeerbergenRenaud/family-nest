@@ -7,8 +7,8 @@
         >
             {{-- Si le user n'a pas de famille mais déjà des factures associées --}}
             @if(auth()->user()->invoices()->exists())
-                <p class="flex gap-3 p-2 items-start text-sm text-blue-600 bg-blue-50 rounded-lg border border-blue-400">
-                    <x-svg.info class="min-w-4 h-4 text-blue-400 mt-1"/>
+                <p class="mb-2 flex gap-3 p-2 items-start text-sm text-blue-600 bg-blue-50 rounded-lg border border-blue-400">
+                    <x-svg.info class="min-w-4 h-4 text-blue-500 mt-1"/>
                     Il semblerait que vous ayez déjà des factures associées à votre compte. Pour les gérer, vous devez
                     créer une nouvelle famille.
                 </p>

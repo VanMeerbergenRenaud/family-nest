@@ -17,19 +17,38 @@
 
         {{-- Cas 2: La famille n'a aucune facture (ni active ni archivée) --}}
     @elseif($dashboardState === 'no_invoices')
-        <x-empty-state
-            title="Aucune facture trouvée dans votre famille"
-            description="Votre famille est prête ! Ajoutez votre première facture pour commencer à gérer vos dépenses ensemble."
-        >
-            <a href="{{ route('invoices.create') }}" class="button-tertiary">
-                <x-svg.add2 class="text-white"/>
-                Ajouter ma première facture
-            </a>
-            <button type="button" wire:click="showInvoiceExemple" class="button-primary">
-                <x-svg.help class="text-gray-900"/>
-                Voir un exemple
-            </button>
-        </x-empty-state>
+        <div class="relative isolate overflow-hidden rounded-xl border border-slate-200 bg-white px-4 lg:px-10">
+            <div class="mx-auto grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-2 lg:items-center">
+
+                <div class="mt-6 lg:mt-10">
+                    <div class="mb-5 ml-2 inline-flex items-center gap-x-2 rounded-full bg-slate-100 px-3 py-1 text-sm-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                        <x-svg.changelog class="text-slate-500"/>
+                        Gestion de factures
+                    </div>
+                    <h2 class="pl-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
+                        Aucune facture trouvée dans votre famille
+                    </h2>
+                    <p class="mt-4 pl-2  text-slate-600">
+                        Votre famille est prête ! Ajoutez votre première facture pour commencer à gérer vos dépenses ensemble.
+                    </p>
+                    <div class="mt-8 flex items-center flex-wrap gap-2">
+                        <a href="{{ route('invoices.create') }}" class="button-primary">
+                            <x-svg.add2 class="text-slate-900"/>
+                            Ajouter ma première facture
+                        </a>
+                        <button type="button" wire:click="showInvoiceExemple" class="button-classic px-3 py-2 text-slate-700 hover:text-slate-900 transition-colors">
+                            Voir un exemple <span aria-hidden="true"> → </span>
+                        </button>
+                    </div>
+                </div>
+
+
+                <img src="{{ asset('img/dashboard-state-2.png') }}"
+                     alt="Exemple d'une facture de l'application"
+                     class="relative top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
+                </div>
+            </div>
+        </div>
 
         {{-- Cas 3: La famille a uniquement des factures archivées --}}
     @elseif($dashboardState === 'only_archived_invoices')
