@@ -20,6 +20,8 @@ class FamilyCreation extends Component
 
     public int $step = 1;
 
+    public bool $showWelcome = true;
+
     public array $members = [];
 
     protected FamilyService $familyService;
@@ -100,6 +102,13 @@ class FamilyCreation extends Component
         }
     }
 
+    // Navigate to the first step
+    public function firstStep(): void
+    {
+        $this->showWelcome = false;
+        $this->step = 1;
+    }
+
     public function nextStep(): void
     {
         if ($this->step === 1) {
@@ -138,7 +147,9 @@ class FamilyCreation extends Component
     public function submitForm(): void
     {
         try {
-            // Créer la famille en utilisant le formulaire
+            // Ajouter une majuscule au nom de la famille
+            $this->form->familyName = ucfirst($this->form->familyName);
+
             $family = $this->form->create();
 
             if (! $family) {

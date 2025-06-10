@@ -32,7 +32,7 @@
                         Votre famille est prête ! Ajoutez votre première facture pour commencer à gérer vos dépenses ensemble.
                     </p>
                     <div class="mt-8 flex items-center flex-wrap gap-2">
-                        <a href="{{ route('invoices.create') }}" class="button-primary">
+                        <a href="{{ route('invoices.create') }}" class="button-primary" title="Vers la page de création de facture">
                             <x-svg.add2 class="text-slate-900"/>
                             Ajouter ma première facture
                         </a>
@@ -42,10 +42,9 @@
                     </div>
                 </div>
 
-
                 <img src="{{ asset('img/dashboard-state-2.png') }}"
                      alt="Exemple d'une facture de l'application"
-                     class="relative top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
+                     class="relative top-0 lg:top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
                 </div>
             </div>
         </div>

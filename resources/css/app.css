@@ -455,6 +455,26 @@
     }
 }
 
+/* Aurora animation */
+@utility animate-aurora {
+    animation: aurora 20s linear infinite;
+}
+
+@keyframes aurora {
+    0% {
+        transform: scale(1) translate(0px, 0px) rotate(0deg);
+    }
+    33% {
+        transform: scale(1.1) translate(40px, -60px) rotate(120deg);
+    }
+    66% {
+        transform: scale(0.9) translate(-90px, 30px) rotate(240deg);
+    }
+    100% {
+        transform: scale(1) translate(0px, 0px) rotate(360deg);
+    }
+}
+
 /* Sidebar exception for small height devices */
 @media (min-height: 765px) {
     .custom-mt-auto {
