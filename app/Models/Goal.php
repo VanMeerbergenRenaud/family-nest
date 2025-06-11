@@ -51,4 +51,37 @@ class Goal extends Model
     {
         return $this->belongsTo(Family::class);
     }
+
+    /* Pourcentage */
+    public function getCurrentAmountAttribute()
+    {
+        $query = Invoice::query()
+            ->whereBetween('issued_date', [$this->start_date, $this->end_date])
+            ->whereIn('category', $this->categories);
+
+        if ($this->is_family_goal) {
+            if ($this->family_id) {
+                $query->whereHas('user', fn ($q) => $q->where('family_id', $this->family_id));
+            } else {
+                return 0;
+            }
+        } else {
+            if ($this->user_id) {
+                $query->where('user_id', $this->user_id);
+            } else {
+                return 0;
+            }
+        }
+
+        return $query->sum('amount');
+    }
+
+    public function getCompletionPercentageAttribute()
+    {
+        if ($this->target_amount <= 0) {
+            return 0;
+        }
+
+        return min(100, round(($this->current_amount / $this->target_amount) * 100));
+    }
 }

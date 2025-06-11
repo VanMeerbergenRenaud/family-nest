@@ -67,10 +67,25 @@ class Modal extends Component
                 ? 'Objectif mis à jour avec succès !'
                 : 'Objectif créé avec succès !');
 
-            $this->showModal = false;
+            // Fermer la modale et notifier le parent
+            $this->closeModal();
             $this->dispatch('refreshGoals');
         } catch (\Exception $e) {
             \Log::error('Une erreur est survenue : '.$e->getMessage());
+        }
+    }
+
+    public function closeModal(): void
+    {
+        $this->showModal = false;
+        $this->dispatch('modalClosed')->to('pages.goals.index');
+    }
+
+    // Méthode appelée quand la modale se ferme (via wire:model)
+    public function updatedShowModal($value): void
+    {
+        if (! $value) {
+            $this->closeModal();
         }
     }
 

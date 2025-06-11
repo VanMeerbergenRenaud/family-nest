@@ -19,10 +19,7 @@ class Index extends Component
 
     public ?Goal $selectedGoal = null;
 
-    // États des modales
-    public bool $showCreateModal = false;
-
-    public bool $showEditModal = false;
+    public bool $showModal = false;
 
     public bool $showDeleteModal = false;
 
@@ -34,15 +31,36 @@ class Index extends Component
         'owner' => 'all',
     ];
 
+    public function mount()
+    {
+        $this->resetModalState();
+    }
+
     #[On('refreshGoals')]
     #[On('deleteAGoal')]
-    public function refreshIndex(): void {}
+    public function refreshIndex(): void
+    {
+        $this->resetModalState();
+    }
+
+    #[On('modalClosed')]
+    public function handleModalClosed(): void
+    {
+        $this->resetModalState();
+    }
+
+    private function resetModalState(): void
+    {
+        $this->selectedGoal = null;
+        $this->showModal = false;
+        $this->showDeleteModal = false;
+    }
 
     public function openCreateModal(): void
     {
         $this->authorize('create', Goal::class);
-        $this->reset(['selectedGoal', 'showEditModal']);
-        $this->showCreateModal = true;
+        $this->resetModalState();
+        $this->showModal = true;
     }
 
     public function openEditModal(int $goalId): void
@@ -50,9 +68,9 @@ class Index extends Component
         $goal = Goal::findOrFail($goalId);
         $this->authorize('update', $goal);
 
+        $this->resetModalState();
         $this->selectedGoal = $goal;
-        $this->showEditModal = true;
-        $this->showCreateModal = false;
+        $this->showModal = true;
     }
 
     public function openDeleteModal(int $goalId): void
@@ -74,7 +92,7 @@ class Index extends Component
         $this->selectedGoal->delete();
 
         Toaster::success('Objectif supprimé avec succès !');
-        $this->reset(['showDeleteModal', 'selectedGoal']);
+        $this->resetModalState();
         $this->dispatch('deleteAGoal');
     }
 

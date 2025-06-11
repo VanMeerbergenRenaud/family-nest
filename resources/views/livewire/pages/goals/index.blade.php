@@ -81,7 +81,7 @@
                             class="{{ $filters['type'] === $value ? 'bg-teal-100 text-teal-900 font-medium' : '' }}"
                         >
                             {{ $label }}
-                        </x-menu.item>
+                            </x-method>
                     @endforeach
                 </x-menu.items>
             </x-menu>
@@ -104,6 +104,8 @@
                 type="button"
                 class="button-tertiary"
                 wire:click="openCreateModal"
+                wire:loading.attr="disabled"
+                wire:target="openCreateModal"
             >
                 <x-svg.target class="text-white"/>
                 {{ __('Se fixer un objectif') }}
@@ -274,13 +276,13 @@
         </div>
     @endif
 
-    {{-- Modales --}}
-    @if($showCreateModal)
-        <livewire:pages.goals.modal :showModal="true" />
-    @endif
-
-    @if($showEditModal && $selectedGoal)
-        <livewire:pages.goals.modal :goalId="$selectedGoal->id" :showModal="true" />
+    {{-- Modale unifiée --}}
+    @if($showModal)
+        <livewire:pages.goals.modal
+            :goalId="$selectedGoal?->id"
+            :showModal="true"
+            :key="'goal-modal-' . ($selectedGoal?->id ?? 'create') . '-' . now()->timestamp"
+        />
     @endif
 
     {{-- Modal de suppression --}}
