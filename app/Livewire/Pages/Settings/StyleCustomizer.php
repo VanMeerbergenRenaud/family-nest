@@ -70,13 +70,21 @@ class StyleCustomizer extends Component
         CSS;
     }
 
-    private function getFontFamily()
+    private function getFontFamily(): string
     {
         $fonts = [
             'sans' => 'ui-sans-serif, system-ui, sans-serif',
             'serif' => 'ui-serif, Georgia, Cambria, serif',
             'comic' => '"Comic Sans MS", cursive',
             'apple' => '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+            'arial' => 'Arial, Helvetica, sans-serif',
+            'verdana' => 'Verdana, Geneva, sans-serif',
+            'courier' => '"Courier New", Courier, monospace',
+            'monospace' => 'monospace, "Liberation Mono", Courier',
+            'garamond' => 'Garamond, serif',
+            'tahoma' => 'Tahoma, Geneva, sans-serif',
+            'trebuchet' => '"Trebuchet MS", Helvetica, sans-serif',
+            'lucida' => '"Lucida Sans Unicode", "Lucida Grande", sans-serif',
         ];
 
         return $fonts[$this->fontFamily] ?? $fonts['sans'];

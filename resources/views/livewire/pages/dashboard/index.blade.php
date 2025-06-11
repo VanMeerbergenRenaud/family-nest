@@ -20,16 +20,16 @@
         <div class="relative isolate overflow-hidden rounded-xl border border-slate-200 bg-white px-4 lg:px-10">
             <div class="mx-auto grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-2 lg:items-center">
 
-                <div class="mt-6 lg:mt-10">
-                    <div class="mb-5 ml-2 inline-flex items-center gap-x-2 rounded-full bg-slate-100 px-3 py-1 text-sm-medium text-slate-600 ring-1 ring-inset ring-slate-200">
-                        <x-svg.changelog class="text-slate-500"/>
+                <div class="mt-6">
+                    <div class="mb-5 ml-2 inline-flex items-center gap-x-2 rounded-full bg-slate-100 px-3 py-1 text-xs-medium text-slate-600 ring-1 ring-inset ring-slate-200">
+                        <x-svg.changelog class="w-3.5 h-3.5 text-slate-500"/>
                         Gestion de factures
                     </div>
-                    <h2 class="pl-2 text-3xl font-semibold text-slate-900 sm:text-4xl">
+                    <h2 class="pl-2 text-3xl font-semibold text-slate-900 leading-tight">
                         Aucune facture trouvée dans votre famille
                     </h2>
                     <p class="mt-4 pl-2  text-slate-600">
-                        Votre famille est prête ! Ajoutez votre première facture pour commencer à gérer vos dépenses ensemble.
+                        Votre famille a été créée ! Ajoutez maintenant votre première facture pour commencer à gérer vos dépenses, seul ou ensemble.
                     </p>
                     <div class="mt-8 flex items-center flex-wrap gap-2">
                         <a href="{{ route('invoices.create') }}" class="button-primary" title="Vers la page de création de facture">
@@ -42,10 +42,11 @@
                     </div>
                 </div>
 
-                <img src="{{ asset('img/dashboard-state-2.png') }}"
-                     alt="Exemple d'une facture de l'application"
-                     class="relative top-0 lg:top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
-                </div>
+                <img
+                    src="{{ asset('img/dashboard-state-2.png') }}"
+                    alt="Exemple d'une facture de l'application"
+                    class="relative top-0 lg:top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
+                >
             </div>
         </div>
 
@@ -120,7 +121,7 @@
         </div>
     @endif
 
-    {{-- Modal d'exemple de facture (placé en dehors des conditions pour être toujours disponible) --}}
+    {{-- Modal d'exemple de facture --}}
     @if($showInvoiceExempleModal)
         <x-modal wire:model="showInvoiceExempleModal">
             <x-modal.panel>

@@ -81,7 +81,7 @@
                             class="{{ $filters['type'] === $value ? 'bg-teal-100 text-teal-900 font-medium' : '' }}"
                         >
                             {{ $label }}
-                            </x-method>
+                        </x-menu.item>
                     @endforeach
                 </x-menu.items>
             </x-menu>
