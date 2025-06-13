@@ -14,7 +14,7 @@
         <div class="flex flex-col gap-4">
             <!-- Email -->
              <x-form.field
-                label="Adresse e-mail"
+                label="Adresse mail"
                 name="email"
                 type="email"
                 model="form.email"
@@ -51,7 +51,7 @@
         </div>
 
         <div class="mt-8 mb-5">
-            <button type="submit" class="w-full py-3.5 px-10 rounded-lg text-sm-medium md:text-[15px] bg-[#292A2B] text-white hover:bg-black">
+            <button type="submit" class="w-full py-3.5 px-10 rounded-[10px] text-sm-medium md:text-[15px] bg-[#292A2B] text-white hover:bg-black">
                 {{ __("Se connecter") }}
             </button>
         </div>

@@ -2,7 +2,7 @@
     <div class="text-md-regular text-gray-700 px-4 mt-[-1rem]">
 
         <p>
-            {{ __('Vous avez oublié votre mot de passe ? Aucun problème. Communiquez-nous simplement votre adresse e-mail et nous vous enverrons par e-mail un lien de réinitialisation de mot de passe qui vous permettra d’en choisir un nouveau.') }}
+            {{ __('Vous avez oublié votre mot de passe ? Aucun problème. Communiquez-nous simplement votre adresse mail et nous vous enverrons par mail un lien de réinitialisation de mot de passe qui vous permettra d’en choisir un nouveau.') }}
         </p>
 
         <!-- Session status -->
@@ -18,7 +18,7 @@
 
             <div class="flex flex-col gap-4">
                 <x-form.field
-                    label="Adresse e-mail"
+                    label="Adresse mail"
                     name="email"
                     type="email"
                     model="email"

@@ -77,7 +77,7 @@
                                     <div class="flex items-start flex-wrap gap-4">
                                         <div class="w-full">
                                             <x-form.field
-                                                label="Adresse e-mail"
+                                                label="Adresse mail"
                                                 type="email"
                                                 name="members.{{ $index }}.email"
                                                 model="members.{{ $index }}.email"

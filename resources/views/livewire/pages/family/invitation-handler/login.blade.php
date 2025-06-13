@@ -27,7 +27,7 @@
                 @csrf
 
                 <x-form.field
-                    label="Adresse e-mail"
+                    label="Adresse mail"
                     name="email"
                     type="email"
                     value="{{ $email }}"

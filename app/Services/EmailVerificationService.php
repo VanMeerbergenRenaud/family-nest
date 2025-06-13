@@ -20,7 +20,7 @@ class EmailVerificationService
         // Vérifie si l'utilisateur a déjà vérifié son email
         if ($user->hasVerifiedEmail()) {
             if ($showToasterNotification) {
-                Toaster::info('Votre adresse e-mail est déjà vérifiée.');
+                Toaster::info('Votre adresse mail est déjà vérifiée.');
             }
 
             return false;
@@ -33,9 +33,9 @@ class EmailVerificationService
             // Affiche une notification si demandé
             if ($showToasterNotification) {
                 if ($emailChanged) {
-                    Toaster::success('Profil mis à jour !::Un e-mail de vérification a été envoyé à votre nouvelle adresse.');
+                    Toaster::success('Profil mis à jour !::Un mail de vérification a été envoyé à votre nouvelle adresse.');
                 } else {
-                    Toaster::success('Un e-mail de vérification a été envoyé à votre adresse e-mail.');
+                    Toaster::success('Un mail de vérification a été envoyé à votre adresse mail.');
                 }
             }
 

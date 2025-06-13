@@ -73,7 +73,6 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             @foreach($folderInvoices as $invoice)
                                 <div wire:key="folder-invoice-{{ $invoice->id }}" class="bg-white dark:bg-gray-900 rounded-xl border border-slate-200 dark:border-gray-800 hover:shadow-xs transition-shadow duration-200 overflow-hidden">
-                                    <!-- ... (Reste du contenu des cartes de factures) ... -->
                                     <!-- En-tête de la carte -->
                                     <div class="px-4 py-3 dark:border-gray-800 flex justify-between items-center">
                                         @php

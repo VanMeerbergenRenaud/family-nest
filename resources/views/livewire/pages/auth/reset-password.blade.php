@@ -7,7 +7,7 @@
 
             <!-- Email -->
             <x-form.field
-                label="Adresse e-mail"
+                label="Adresse mail"
                 name="email"
                 type="email"
                 model="email"

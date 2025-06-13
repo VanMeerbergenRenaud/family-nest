@@ -18,11 +18,11 @@
                 <x-menu>
                     <x-menu.button class="button-primary flex items-center">
                         <x-svg.filter/>
-                        {{ $activeFilter ? $availableFilters[$activeFilter] : 'Filtres' }}
+                        {{ $activeFilter ? $availableFilters[$activeFilter] : 'Trier' }}
                     </x-menu.button>
 
                     <x-menu.items class="mt-2 w-68">
-                        <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">Filtres</p>
+                        <p class="px-2.5 py-2 text-sm-medium text-gray-700 dark:text-gray-400">Trier par ordre</p>
 
                         <x-menu.divider/>
 

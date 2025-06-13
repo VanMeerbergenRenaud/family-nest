@@ -32,7 +32,7 @@ class FamilyService
             ->exists();
 
         if ($hasInvitation) {
-            Toaster::error('Une invitation a déjà été envoyée à cet e-mail.');
+            Toaster::error('Une invitation a déjà été envoyée à cette adresse mail.');
 
             return true;
         }

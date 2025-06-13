@@ -10,14 +10,14 @@
         <a href="{{ route('welcome') }}"
            title="Retour à l'accueil"
            wire:navigate
-           class="button-classic"
+           class="homepage-link text-sm"
         >
-            <x-svg.arrows.left class="w-4 h-4 text-gray-700" />
-            Retour
+            <x-svg.arrows.left class="w-3.5 h-3.5 text-gray-700" />
+            {{ __('Retour') }}
         </a>
     </div>
 
-    <div class="bg-white p-1.5 md:rounded-2xl md:shadow-md">
+    <div class="bg-white max-w-lg mx-auto p-1.5 md:rounded-2xl md:shadow-md">
         <div class="relative flex-center flex-col rounded-xl w-full h-fit overflow-hidden bg-gradient-to-t from-[#FFFFFF] via-[#F7F9FF] via-35% to-[#EBF1FF]">
             {{-- Background en grille --}}
             <div class="absolute pointer-events-none inset-0 bg-[url('/public/img/bg-pattern.svg')] bg-cover bg-[50%_calc(50%_-_0.75rem)] bg-no-repeat">
