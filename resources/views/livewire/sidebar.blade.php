@@ -60,7 +60,7 @@
                 <x-divider/>
 
                 <!-- User profile dropdown -->
-                <x-sidebar-menu.user-dropdown :$user />
+                <x-sidebar-menu.user-dropdown :$user :$showShortcutsModal />
             </div>
         </div>
     </aside>
@@ -147,7 +147,40 @@
             <x-divider/>
 
             <!-- User profile dropdown -->
-            <x-sidebar-menu.user-dropdown :$user :expanded="$expanded" />
+            <x-sidebar-menu.user-dropdown :$user :expanded="$expanded" :$showShortcutsModal />
         </div>
     </aside>
+
+    @if($showShortcutsModal)
+        <x-modal wire:model="showShortcutsModal">
+            <x-modal.panel>
+                 <div class="p-5 rounded-lg bg-gray-50">
+                        <h2 class="text-lg font-medium text-gray-900 mb-5 flex items-center gap-2.5">
+                            {{ __('Raccourcis clavier') }}
+                            <span class="mt-0.75">⌨️</span>
+                        </h2>
+
+                        <ul>
+                            <li class="px-1 flex items-center justify-between py-3">
+                                <span class="text-sm-medium text-gray-700">Ouvrir la barre de recherche</span>
+                                <x-app.shortcut key="⌘ + K" />
+                            </li>
+                            <x-divider />
+                            <li class="px-1 flex items-center justify-between py-3">
+                                <span class="text-sm-medium text-gray-700">Créer une nouvelle facture</span>
+                                <x-app.shortcut key="⌘ + X" />
+                            </li>
+                        </ul>
+                    </div>
+
+                <x-modal.footer>
+                    <x-modal.close>
+                        <button type="button" class="button-secondary">
+                            {{ __('Fermer') }}
+                        </button>
+                    </x-modal.close>
+                </x-modal.footer>
+            </x-modal.panel>
+        </x-modal>
+    @endif
 </div>

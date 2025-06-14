@@ -1,6 +1,7 @@
 @props([
     'user',
     'expanded' => true,
+    'showShortcutsModal'
 ])
 
 <div class="relative" x-data="{ showTooltip: false }">
@@ -52,24 +53,14 @@
                 {{ __('Modifier mon profil') }}
             </x-menu.item>
 
-            <x-menu.item wire:click="inviteMember">
-                <x-svg.user-plus class="w-4.5 h-4.5 group-hover:text-gray-900 stroke-2"/>
-                {{ __('Inviter un membre') }}
-            </x-menu.item>
-
             <x-menu.divider/>
-
-            <x-menu.item wire:click="seeUpdates">
-                <x-svg.changelog class="group-hover:text-gray-900"/>
-                {{ __('Mise à jour') }}
-            </x-menu.item>
 
             <x-menu.item wire:click="seeShortcut">
                 <x-svg.lightning class="group-hover:text-gray-900"/>
                 {{ __('Raccourcis clavier') }}
             </x-menu.item>
 
-            <x-menu.item wire:click="seeSupport">
+            <x-menu.item type="link" href="mailto:familynest.officiel@gmail.com" target="_blank">
                 <x-svg.help class="group-hover:text-gray-900"/>
                 {{ __('Question au support') }}
             </x-menu.item>

@@ -12,6 +12,9 @@ class Sidebar extends Component
 
     public bool $expanded = true;
 
+    // Modal states
+    public bool $showShortcutsModal = false;
+
     protected $listeners = [
         'user-profile-updated' => 'refreshUserData',
     ];
@@ -41,24 +44,9 @@ class Sidebar extends Component
         $this->redirectRoute('settings.profile');
     }
 
-    public function inviteMember()
+    public function seeShortcut(): void
     {
-        dd('Inviter un membre');
-    }
-
-    public function seeShortcut()
-    {
-        dd('Voir les raccourcis');
-    }
-
-    public function seeUpdates()
-    {
-        dd('Voir les mises à jour');
-    }
-
-    public function seeSupport()
-    {
-        dd('Voir le support');
+        $this->showShortcutsModal = true;
     }
 
     public function suppressAccount(): void
