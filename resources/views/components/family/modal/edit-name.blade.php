@@ -25,7 +25,7 @@
                                 label="Nouveau nom de la famille"
                                 name="newFamilyName"
                                 model="form.newFamilyName"
-                                placeholder="Exemple: Janssens"
+                                placeholder="Exemple: Van Meerbergen"
                                 :asterix="true"
                                 autofocus
                                 class="capitalize"

@@ -23,7 +23,7 @@
             </div>
             <div class="relative flex-center lg:col-span-4">
                 <img
-                    src="{{ asset('img/onboarding-state.png') }}"
+                    src="{{ asset('img/onboarding/welcome.png') }}"
                     alt="Illustration avec un message de bienvenue"
                     class="w-[90%] rounded-tl-xl relative lg:absolute bottom-0 right-0 border-t border-l border-slate-200"
                 >
@@ -43,7 +43,7 @@
                             label="Nom de votre nouvelle famille"
                             name="form.familyName"
                             model="form.familyName"
-                            placeholder="Exemple: Famille Janssens"
+                            placeholder="Exemple: Van Meerbergen"
                             :asterix="true"
                             autofocus
                             required

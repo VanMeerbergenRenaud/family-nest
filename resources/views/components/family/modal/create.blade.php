@@ -24,7 +24,7 @@
                                 label="Nom de la famille"
                                 name="familyName"
                                 model="form.familyName"
-                                placeholder="Exemple: Janssens"
+                                placeholder="Exemple: Van Meerbergen"
                                 :asterix="true"
                                 autofocus
                                 required
