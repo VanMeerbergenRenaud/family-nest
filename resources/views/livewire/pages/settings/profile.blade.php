@@ -119,7 +119,7 @@
                         name="email"
                         model="form.email"
                         type="email"
-                        placeholder="votre-email@gmail.com"
+                        placeholder="votre-mail@gmail.com"
                         class="lowercase"
                     />
                 </div>

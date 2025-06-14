@@ -18,7 +18,7 @@
                 name="email"
                 type="email"
                 model="form.email"
-                placeholder="votre-email@gmail.com"
+                placeholder="votre-mail@gmail.com"
                 autocomplete="email"
                 autofocus
                 required

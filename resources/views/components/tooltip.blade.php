@@ -28,7 +28,7 @@
 
 <div x-show="{{ $show }}"
      x-cloak
-     class="absolute z-40 px-3 py-2 text-sm-medium shadow-md rounded-lg whitespace-nowrap {{ $active ? $activeState : $colorClass }} {{ $positionStyles[$position] }}"
+     class="absolute z-40 homepage-link whitespace-nowrap {{ $active ? $activeState : $colorClass }} {{ $positionStyles[$position] }}"
      {{ $attributes }}
 >
     {{ $text }}

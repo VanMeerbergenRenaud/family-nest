@@ -22,7 +22,7 @@
                 name="email"
                 type="email"
                 model="form.email"
-                placeholder="votre-email@gmail.com"
+                placeholder="votre-mail@gmail.com"
                 autocomplete="email"
                 required
                 class="lowercase"
@@ -40,17 +40,25 @@
 
         {{-- General conditions --}}
         <div class="mt-6 px-2 grid grid-cols-[1fr_auto] items-center justify-between gap-3">
-            <x-form.checkbox-input
-                label="Accepter les conditions"
-                name="general_conditions"
-                wire:model.blur="form.general_conditions"
-                checked
-            />
-
-            <button type="button" wire:click="showConditions" class="min-w-fit text-sm-medium text-gray-700 underline" title="Voir les conditions d'utilisation">
-                {{ __("Conditions") }}
-                <span class="max-sm:hidden text-sm-medium text-gray-700 underline">{{ __('d\'utilisation') }}</span>
-            </button>
+            <label for="general_conditions" class="relative w-full flex items-center gap-2.5 cursor-pointer">
+                <input id="general_conditions"
+                       type="checkbox"
+                       wire:model.blur="form.general_conditions"
+                       class="min-w-4 h-4 cursor-pointer transition-all pointer-events-none appearance-none rounded bg-white border border-slate-400 checked:bg-slate-500 checked:border-slate-500 dark:checked:bg-gray-300 dark:border-slate-400"
+                       checked
+                />
+                <span class="absolute text-white peer-checked:opacity-100 top-1/2 left-2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                    <svg class="h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                </span>
+                <span class="text-sm-medium">
+                    Accepter les
+                    <a href="{{ route('privacy') }}" class="min-w-fit text-sm-medium text-gray-900 underline" title="Voir les conditions d'utilisation">
+                        {{ __('conditions générales') }}
+                    </a>
+                </span>
+            </label>
         </div>
 
         {{-- Error message --}}

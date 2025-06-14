@@ -59,7 +59,7 @@
                         <div style="margin-top: 10px;">
                             <a href="{{ route('help-center') }}" style="color: #667eea; text-decoration: none; font-size: 13px; font-weight: 500;">Centre d'aide</a>
                             &nbsp;|&nbsp;
-                            <a href="{{ route('privacy-policy') }}" style="color: #667eea; text-decoration: none; font-size: 13px; font-weight: 500;">Politique de confidentialité</a>
+                            <a href="{{ route('privacy') }}" style="color: #667eea; text-decoration: none; font-size: 13px; font-weight: 500;">Politique de confidentialité</a>
                         </div>
                     </td>
                 </tr>

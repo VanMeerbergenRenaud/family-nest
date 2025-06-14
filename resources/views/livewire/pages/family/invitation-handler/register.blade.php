@@ -40,7 +40,7 @@
                     type="email"
                     model="form.email"
                     value="{{ $email }}"
-                    placeholder="votre-email@gmail.com"
+                    placeholder="votre-mail@gmail.com"
                     class="lowercase"
                 />
 

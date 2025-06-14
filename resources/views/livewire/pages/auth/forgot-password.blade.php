@@ -22,7 +22,7 @@
                     name="email"
                     type="email"
                     model="email"
-                    placeholder="votre-email@gmail.com"
+                    placeholder="votre-mail@gmail.com"
                     autofocus
                     required
                     class="lowercase"

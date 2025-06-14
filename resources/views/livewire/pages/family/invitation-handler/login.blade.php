@@ -31,7 +31,7 @@
                     name="email"
                     type="email"
                     value="{{ $email }}"
-                    placeholder="votre-email@gmail.com"
+                    placeholder="votre-mail@gmail.com"
                     readonly
                     disabled
                     class="lowercase bg-gray-50"
