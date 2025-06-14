@@ -27,8 +27,6 @@ class Index extends Component
 
     public Filters $filters;
 
-    public bool $showInvoiceExempleModal = false;
-
     public function mount()
     {
         $user = auth()->user();
@@ -66,11 +64,6 @@ class Index extends Component
         }
 
         return $query;
-    }
-
-    public function showInvoiceExemple(): void
-    {
-        $this->showInvoiceExempleModal = true;
     }
 
     public function resetFilters(): void

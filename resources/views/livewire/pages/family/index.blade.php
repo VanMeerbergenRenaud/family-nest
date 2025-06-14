@@ -13,26 +13,21 @@
                     créer une nouvelle famille.
                 </p>
             @endif
+
             <button wire:click="openCreateFamilyModal" class="button-tertiary">
                 <x-svg.add2 class="text-white"/>
                 Créer votre famille
             </button>
-            <button wire:click="showFamilyExemple" class="button-primary">
-                <x-svg.help class="text-gray-900"/>
-                Voir un exemple
-            </button>
-        </x-empty-state>
 
-        @if($showFamilyExempleModal)
-            <x-modal wire:model="showFamilyExempleModal">
-                <x-modal.panel>
-                    <video controls class="w-full h-full rounded-lg" autoplay muted>
-                        <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
-                        Votre navigateur ne supporte pas la vidéo prévue.
-                    </video>
-                </x-modal.panel>
-            </x-modal>
-        @endif
+            <a href="{{ asset('video/tutorials/create_family.mp4') }}"
+               target="_blank"
+               title="Regarder le tutoriel"
+               class="button-primary"
+            >
+                <x-svg.help class="text-gray-900"/>
+                Voir le tutoriel
+            </a>
+        </x-empty-state>
     @endif
 
     {{-- Table of family members --}}

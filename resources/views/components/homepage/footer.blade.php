@@ -64,7 +64,7 @@
                         <ul role="list" class="flex flex-col gap-y-4">
                             @foreach ($column['links'] as $link)
                                 <li>
-                                    <a href="{{ $link['is_disabled'] ?? false ? '#' : $link['url'] }}"
+                                    <a href="{{ $link['url'] }}"
                                        title="Voir la page {{ $link['name'] }}"
 
                                        @if(!($link['is_external'] ?? false) && !($link['is_disabled'] ?? false))

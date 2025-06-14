@@ -28,8 +28,6 @@ class Index extends Component
 
     public bool $showCreateFamilyModal = false;
 
-    public bool $showFamilyExempleModal = false;
-
     public bool $showDeleteFamilyModal = false;
 
     public bool $showUserProfil = false;
@@ -106,11 +104,6 @@ class Index extends Component
     }
 
     // Modal actions
-    public function showFamilyExemple(): void
-    {
-        $this->showFamilyExempleModal = true;
-    }
-
     public function openCreateFamilyModal(): void
     {
         $this->form->familyName = '';

@@ -36,9 +36,14 @@
                             <x-svg.add2 class="text-slate-900"/>
                             Ajouter ma première facture
                         </a>
-                        <button type="button" wire:click="showInvoiceExemple" class="button-classic px-3 py-2 text-slate-700 hover:text-slate-900 transition-colors">
-                            Voir un exemple <span aria-hidden="true"> → </span>
-                        </button>
+
+                        <a href="{{ asset('video/tutorials/create_invoice.mp4') }}"
+                           target="_blank"
+                           title="Regarder le tutoriel"
+                           class="button-classic px-3 py-2 text-slate-700 hover:text-slate-900 transition-colors"
+                        >
+                            Voir le tutoriel <span aria-hidden="true"> → </span>
+                        </a>
                     </div>
                 </div>
 
@@ -119,17 +124,5 @@
             {{-- Table de factures --}}
             <livewire:pages.invoices.invoice-table :$filters :withFilters="true"/>
         </div>
-    @endif
-
-    {{-- Modal d'exemple de facture --}}
-    @if($showInvoiceExempleModal)
-        <x-modal wire:model="showInvoiceExempleModal">
-            <x-modal.panel>
-                <video controls class="w-full h-full rounded-lg" autoplay muted>
-                    <source src="{{ asset('video/exemple-archive.mp4') }}" type="video/mp4">
-                    Votre navigateur ne supporte pas la vidéo prévue.
-                </video>
-            </x-modal.panel>
-        </x-modal>
     @endif
 </div>
