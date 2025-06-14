@@ -62,12 +62,11 @@
                     <div class="flex flex-col gap-y-6">
                         <h3 role="heading" aria-level="3" class="text-md-semibold text-gray-900">{{ $column['title'] }}</h3>
                         <ul role="list" class="flex flex-col gap-y-4">
-                            {{-- On utilise notre nouveau composant, c'est bien plus propre ! --}}
                             @foreach ($column['links'] as $link)
                                 <li>
                                     <a href="{{ $link['is_disabled'] ?? false ? '#' : $link['url'] }}"
                                        title="Voir la page {{ $link['name'] }}"
-                                       
+
                                        @if(!($link['is_external'] ?? false) && !($link['is_disabled'] ?? false))
                                            wire:navigate
                                        @endif
