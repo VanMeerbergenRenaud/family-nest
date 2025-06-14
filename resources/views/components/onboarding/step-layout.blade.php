@@ -38,7 +38,7 @@
     {{-- Colonne de droite : Image (uniquement pour le layout 'split') --}}
     @if($layout === 'split')
         <div class="relative flex-center lg:col-span-4">
-            <img src="{{ asset('img/onboarding-state.png') }}"
+            <img src="{{ asset('img/onboarding/welcome.png') }}"
                  alt="Illustration avec un message de bienvenue"
                  class="w-[90%] rounded-tl-xl relative lg:absolute bottom-0 right-0 border-t border-l border-slate-200"
             >

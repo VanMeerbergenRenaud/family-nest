@@ -43,7 +43,7 @@
                 </div>
 
                 <img
-                    src="{{ asset('img/dashboard-state-2.png') }}"
+                    src="{{ asset('img/onboarding/basics.png') }}"
                     alt="Exemple d'une facture de l'application"
                     class="relative top-0 lg:top-8 bottom-0 -right-12 object-contain rounded-l-xl border-t border-l border-slate-200"
                 >

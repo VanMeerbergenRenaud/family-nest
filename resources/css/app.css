@@ -7,7 +7,6 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-    --font-opensans: "Open Sans", sans-serif;
     /*--font-clashgrotesk: "Clash Grotesk", sans-serif;
     --font-instrumentsans: "Instrument Sans", sans-serif;*/
 
@@ -32,7 +31,7 @@
     }
 
     a, button {
-        @apply text-base font-normal leading-6 cursor-pointer;
+        @apply text-base font-normal leading-6 cursor-pointer transition-colors ease-in-out duration-400 hover:duration-150 active:duration-50;
     }
 
     img, video {
@@ -157,6 +156,19 @@
         @apply opacity-50 cursor-not-allowed;
     }
 
+    /*------------ Homepage ------------*/
+    .homepage-title {
+        @apply text-4xl leading-tight font-semibold text-gray-900 max-w-xl;
+    }
+
+    .homepage-text {
+        @apply text-lg leading-relaxed text-gray-600;
+    }
+
+    .homepage-link {
+        @apply flex items-center gap-1.5 py-2 px-3 text-[15px] h-9 rounded-[10px] font-medium text-[#2E3238] hover:bg-gray-200/50 hover:text-slate-900 border border-transparent;
+    }
+
     /* Buttons
         0. Classic => transparent/gray
         1. Primary => white
@@ -168,27 +180,27 @@
     */
 
     .button-classic {
-        @apply flex items-center gap-1.5 px-2 py-1.5 text-sm font-medium rounded-lg text-gray-700 border border-transparent hover:bg-zinc-200/50 hover:text-gray-800 transition-colors;
+        @apply flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium rounded-[10px] text-gray-700 border border-transparent hover:bg-zinc-200/50 hover:text-gray-800 transition-colors;
     }
 
     .button-primary {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-gray-700 border border-gray-200 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-gray-700 border border-gray-200 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600;
     }
 
     .button-secondary {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-transparent bg-gray-800 hover:bg-gray-700 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-transparent bg-gray-800 hover:bg-gray-700 transition-colors;
     }
 
     .button-tertiary {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors;
     }
 
     .button-danger {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-transparent bg-red-500 hover:bg-red-600 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-transparent bg-red-500 hover:bg-red-600 transition-colors;
     }
 
     .button-success {
-        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg text-white border border-green-600 bg-green-600 transition-colors;
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-green-600 bg-green-600 transition-colors;
     }
 
     .button-rounded {
@@ -428,6 +440,33 @@
     }
 }
 
+@layer utilities {
+    .container {
+        width: 100%;
+        max-width: 100%;
+        margin-inline: auto;
+    }
+
+    @media (min-width: 375px) {
+        .container {
+            padding-inline: 1rem;
+            max-width: 448px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 624px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .container {
+            @apply max-w-7xl;
+        }
+    }
+}
+
 @utility flex-center {
     @apply flex justify-center items-center;
 }
@@ -472,6 +511,17 @@
     }
     100% {
         transform: scale(1) translate(0px, 0px) rotate(360deg);
+    }
+}
+
+@layer utilities {
+    @keyframes marquee {
+        from { transform: translateX(0%); }
+        to { transform: translateX(-50%); }
+    }
+
+    .animate-marquee {
+        animation: marquee 20s linear infinite;
     }
 }
 
