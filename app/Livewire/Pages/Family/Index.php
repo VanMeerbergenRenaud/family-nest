@@ -38,7 +38,11 @@ class Index extends Component
 
     public bool $showModifyFamilyNameModal = false;
 
+    public bool $showChangeRelationModal = false;
+
     // Selected user
+    public ?int $relationMemberId = null;
+
     public ?User $selectedUser = null;
 
     public array $selectedUserInvoiceCounts = [];
@@ -189,6 +193,18 @@ class Index extends Component
     {
         $this->form->updateName();
         $this->showModifyFamilyNameModal = false;
+    }
+
+    public function openChangeRelationModal(int $userId): void
+    {
+        $this->relationMemberId = $userId;
+        $this->showChangeRelationModal = true;
+    }
+
+    public function changeMemberRelation(int $userId, string $newRelation): void
+    {
+        $this->form->changeRelation($userId, $newRelation);
+        $this->showChangeRelationModal = false;
     }
 
     public function showUserProfile(int $userId): void

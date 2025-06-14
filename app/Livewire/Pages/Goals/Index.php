@@ -26,7 +26,6 @@ class Index extends Component
     #[Url]
     public array $filters = [
         'period' => 'all',
-        'status' => 'all',
         'type' => 'all',
         'owner' => 'all',
     ];
@@ -127,7 +126,6 @@ class Index extends Component
         collect([
             'type' => fn (string $value) => $query->where('goal_type', $value),
             'period' => fn (string $value) => $query->where('period_type', $value),
-            'status' => fn (string $value) => GoalStatusEnum::tryFrom($value)?->applyQuery($query),
         ])->each(function ($callback, $filterName) {
             if ($this->filters[$filterName] !== 'all') {
                 $callback($this->filters[$filterName]);
@@ -143,7 +141,6 @@ class Index extends Component
             'hasFamily' => auth()->user()->hasFamily(),
             'goals' => $this->getFilteredQuery()->latest()->paginate(9),
             'periods' => GoalPeriodEnum::forFilter(),
-            'statuses' => GoalStatusEnum::forFilter(),
             'types' => GoalTypeEnum::forFilter(),
             'owners' => GoalOwnerEnum::forFilter(),
         ])->layout('layouts.app-sidebar');

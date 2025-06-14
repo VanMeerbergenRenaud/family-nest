@@ -41,31 +41,33 @@
                 </x-menu.items>
             </x-menu>
 
-            {{-- Dropdown pour le statut --}}
-            <x-menu>
-                <x-menu.button class="min-w-44 button-primary justify-between">
-                    {{ $statuses[$filters['status']] ?? 'Tous statuts' }}
-                    <x-svg.chevron-down class="ml-1 text-gray-500" />
-                </x-menu.button>
+           {{-- Dropdown pour le statut --}}
+            {{--
+                <x-menu>
+                    <x-menu.button class="min-w-44 button-primary justify-between">
+                        {{ $statuses[$filters['status']] ?? 'Tous statuts' }}
+                        <x-svg.chevron-down class="ml-1 text-gray-500" />
+                    </x-menu.button>
 
-                <x-menu.items class="w-56">
-                    @foreach($statuses as $value => $label)
-                        @php
-                            // Compter le nombre d'objectifs par statut (à implémenter si nécessaire)
-                            $count = $value === 'all' ? $goals->total() : '-';
-                        @endphp
-                        <x-menu.item
-                            wire:click="applyFilter('status', '{{ $value }}')"
-                            class="{{ $filters['status'] === $value ? 'bg-teal-100 text-teal-900 font-medium' : '' }} flex justify-between"
-                        >
-                            {{ $label }}
-                            @if($value !== 'all')
-                                <span class="text-gray-500 text-xs">{{ $count }}</span>
-                            @endif
-                        </x-menu.item>
-                    @endforeach
-                </x-menu.items>
-            </x-menu>
+                    <x-menu.items class="w-56">
+                        @foreach($statuses as $value => $label)
+                            @php
+                                // Compter le nombre d'objectifs par statut (à implémenter si nécessaire)
+                                $count = $value === 'all' ? $goals->total() : '-';
+                            @endphp
+                            <x-menu.item
+                                wire:click="applyFilter('status', '{{ $value }}')"
+                                class="{{ $filters['status'] === $value ? 'bg-teal-100 text-teal-900 font-medium' : '' }} flex justify-between"
+                            >
+                                {{ $label }}
+                                @if($value !== 'all')
+                                    <span class="text-gray-500 text-xs">{{ $count }}</span>
+                                @endif
+                            </x-menu.item>
+                        @endforeach
+                    </x-menu.items>
+                </x-menu>
+            --}}
 
             {{-- Dropdown pour le type d'objectif --}}
             <x-menu>
@@ -87,7 +89,7 @@
             </x-menu>
 
             {{-- Si les 3 filtres sont différents du statut 'all' alors on affiche le reset --}}
-            @if($filters['period'] !== 'all' || $filters['status'] !== 'all' || $filters['type'] !== 'all')
+            @if($filters['period'] !== 'all' || $filters['type'] !== 'all')
                 <button
                     type="button"
                     wire:click="resetFilters"
@@ -180,21 +182,29 @@
                                 @php
                                     $goalTypeEnum = App\Livewire\Pages\Goals\GoalTypeEnum::tryFrom($goal->goal_type);
                                 @endphp
-                                <p class="text-sm text-gray-500">{{ $goalTypeEnum ? $goalTypeEnum->label() : 'Type inconnu' }}</p>
+                                <p class="text-sm uppercase text-gray-700">{{ $goalTypeEnum ? $goalTypeEnum->label() : 'Type inconnu' }}</p>
                                 <p class="text-lg-semibold text-gray-900">{{ number_format($goal->target_amount, 2, ',', ' ') }} €</p>
                             </div>
 
+                            {{-- Description--}}
+                            @if($goal->description)
+                                <p class="mt-2.5 mb-4 text-sm text-gray-500" title="{{ $goal->description }}">
+                                    {{ Str::limit($goal->description, 165) }}
+                                </p>
+                            @endif
+
                             {{-- Période --}}
                             <div class="flex justify-between mt-3">
-                            <span class="text-sm text-gray-500">
-                                {{ $goal->start_date->format('d/m/Y') }} - {{ $goal->end_date->format('d/m/Y') }}
-                            </span>
+                                <span class="flex items-center gap-1.5 text-sm text-gray-600">
+                                    <x-svg.calendar class="text-gray-600" />
+                                    {{ $goal->start_date->format('d/m/Y') }} - {{ $goal->end_date->format('d/m/Y') }}
+                                </span>
                                 @php
                                     $periodEnum = App\Livewire\Pages\Goals\GoalPeriodEnum::tryFrom($goal->period_type);
                                 @endphp
-                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                                {{ $periodEnum ? $periodEnum->label() : 'Personnalisé' }}
-                            </span>
+                                <span class="text-xs-medium px-2 py-1 rounded-full bg-gray-100 text-gray-700">
+                                    {{ $periodEnum ? $periodEnum->label() : 'Personnalisé' }}
+                                </span>
                             </div>
 
                             {{-- Barre de progression --}}

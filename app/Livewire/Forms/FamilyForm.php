@@ -331,6 +331,37 @@ class FamilyForm extends Form
         }
     }
 
+    public function changeRelation(int $userId, string $newRelation): bool
+    {
+        if (! $this->family || ! $this->isAdmin) {
+            Toaster::error('Vous n\'avez pas les permissions pour modifier les relations.');
+
+            return false;
+        }
+
+        $relation = FamilyRelationEnum::tryFrom($newRelation);
+        if (! $relation) {
+            Toaster::error('Relation invalide.');
+
+            return false;
+        }
+
+        try {
+            $this->family->users()->updateExistingPivot($userId, [
+                'relation' => $newRelation,
+            ]);
+
+            Toaster::success('Relation modifiée avec succès');
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Erreur modification relation: '.$e->getMessage());
+            Toaster::error('Erreur lors de la modification de la relation');
+
+            return false;
+        }
+    }
+
     public function deleteMember(int $userId): bool
     {
         if (! $this->family || ! $this->isAdmin) {

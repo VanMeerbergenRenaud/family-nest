@@ -125,14 +125,12 @@
                                             <x-svg.dots class="w-5 h-5 text-gray-500"/>
                                         </x-menu.button>
                                         <x-menu.items>
-                                            <x-menu.item wire:click="resendInvitation({{ $invitation->id }})"
-                                                         wire:loading.attr="disabled">
+                                            <x-menu.item wire:click="resendInvitation({{ $invitation->id }})" wire:loading.attr="disabled">
                                                 <x-svg.send class="group-hover:text-gray-900"/>
                                                 {{ __('Renvoyer l\'invitation') }}
                                             </x-menu.item>
                                             {{-- Supprimer l'invitation --}}
-                                            <x-menu.item wire:click="deleteInvitation({{ $invitation->id }})"
-                                                         class="group hover:text-red-500" wire:loading.attr="disabled">
+                                            <x-menu.item wire:click="deleteInvitation({{ $invitation->id }})" class="group hover:text-red-500" wire:loading.attr="disabled">
                                                 <x-svg.trash class="group-hover:text-red-500"/>
                                                 {{ __('Supprimer l\'invitation') }}
                                             </x-menu.item>
@@ -212,19 +210,18 @@
                                             >
                                         </div>
                                         <p class="flex flex-col">
-                                                   <span
-                                                       class="text-sm-medium text-gray-900 dark:text-gray-400 capitalize">
-                                                       {{ $member->name ?? 'Nom inconnu' }}
-                                                       @if($member->id === $currentUser)
-                                                           <span
-                                                               class="ml-2 text-xs-medium text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded-full">
-                                                               Vous
-                                                           </span>
-                                                       @endif
-                                                   </span>
+                                               <span class="text-sm-medium text-gray-900 dark:text-gray-400 capitalize">
+                                                   {{ $member->name ?? 'Nom inconnu' }}
+                                                   @if($member->id === $currentUser)
+                                                       <span
+                                                           class="ml-2 text-xs-medium text-rose-700 bg-rose-50 px-1.5 py-0.5 rounded-full">
+                                                           Vous
+                                                       </span>
+                                                   @endif
+                                               </span>
                                             <span class="text-sm-regular text-gray-500 dark:text-gray-400">
-                                                       {{ $member->email }}
-                                                   </span>
+                                                {{ $member->email }}
+                                            </span>
                                         </p>
                                     </div>
                                 </td>
@@ -235,10 +232,9 @@
                                         $permissionClass = $permission ? $permission->cssClasses() : 'bg-slate-50 text-slate-700 border-slate-100';
                                         $permissionLabel = $permission ? $permission->label() : 'Membre';
                                     @endphp
-                                    <span
-                                        class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $permissionClass }}">
-                                               {{ $permissionLabel }}
-                                           </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-md text-xs-medium border {{ $permissionClass }}">
+                                        {{ $permissionLabel }}
+                                    </span>
                                 </td>
                                 <td>
                                     @php
@@ -258,30 +254,26 @@
                                     @endphp
 
                                     <div class="flex flex-wrap gap-1">
-                                               <span
-                                                   class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-gray-100 text-gray-800">
-                                                   {{ $invoiceData['total'] }}
-                                               </span>
+                                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-gray-100 text-gray-800">
+                                           {{ $invoiceData['total'] }}
+                                       </span>
 
                                         @if($invoiceData['late'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-amber-100 text-amber-800">
-                                                       {{ $invoiceData['late'] }} urgent
-                                                   </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-amber-100 text-amber-800">
+                                               {{ $invoiceData['late'] }} urgent
+                                           </span>
                                         @endif
 
                                         @if($invoiceData['unpaid'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
-                                                       {{ $invoiceData['unpaid'] }} à venir
-                                                   </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-800">
+                                                {{ $invoiceData['unpaid'] }} à venir
+                                            </span>
                                         @endif
 
                                         @if($invoiceData['pending'] > 0)
-                                            <span
-                                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-green-100 text-green-800">
-                                                       {{ $invoiceData['pending'] }} en cours
-                                                   </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-green-100 text-green-800">
+                                                {{ $invoiceData['pending'] }} en cours
+                                            </span>
                                         @endif
                                     </div>
                                 </td>
@@ -310,8 +302,15 @@
                                                 </x-menu.item>
                                             @endif
 
-                                            {{-- Seul un admin peut changer les rôles --}}
+                                            {{-- Seul un admin peut changer les rôles et relation --}}
                                             @if($isAdmin && $member->id !== $currentUser)
+                                                <x-menu.divider/>
+
+                                                <x-menu.item wire:click="openChangeRelationModal({{ $member->id }})" class="group">
+                                                    <x-svg.change />
+                                                    Changer la relation
+                                                </x-menu.item>
+
                                                 <x-menu.divider/>
 
                                                 <p class="text-left text-xs-medium uppercase text-gray-500 pt-1 pb-2 px-2">
@@ -411,6 +410,9 @@
 
     {{-- Modal pour modifier le nom de la famille --}}
     <x-family.modal.edit-name :$showModifyFamilyNameModal :$isAdmin />
+
+    {{-- Modal pour changer la relation d'un membre de la famille --}}
+    <x-family.modal.edit-relation :$showChangeRelationModal :$relationMemberId :$familyRelationEnum />
 
     {{-- Modal to create a family --}}
     <x-family.modal.create :$showCreateFamilyModal />

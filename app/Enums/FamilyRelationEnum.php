@@ -16,8 +16,9 @@ enum FamilyRelationEnum: string
     case Brother = 'brother';
     case Sister = 'sister';
     case Friend = 'friend';
-    case Self = 'self';
+    case Roommate = 'roommate';
     case Coworker = 'coworker';
+    case Self = 'self';
     case Other = 'other';
 
     public function label(): string
@@ -31,8 +32,9 @@ enum FamilyRelationEnum: string
             self::Brother => 'Frère',
             self::Sister => 'Sœur',
             self::Friend => 'Ami(e)',
-            self::Self => 'Moi-même',
             self::Coworker => 'Collègue',
+            self::Roommate => 'Colocataire',
+            self::Self => 'Moi-même',
             self::Other => 'Autre',
         };
     }
