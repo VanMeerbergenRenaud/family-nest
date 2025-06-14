@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Mise à jour">
     <h1 role="heading" aria-level="1" class="sr-only">Nouveautés</h1>
 
     <!-- MENU -->

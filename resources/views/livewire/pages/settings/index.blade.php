@@ -19,7 +19,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-cyan-200/50 transition-colors duration-300">
                         <x-svg.user class="w-6 h-6 text-cyan-600" />
@@ -50,7 +50,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-sky-100 transition-colors duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-sky-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,7 +85,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-orange-100 transition-colors duration-300">
                         <x-svg.bell class="w-6 h-6 text-orange-600" />
@@ -118,7 +118,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-fuchsia-100 transition-colors duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-500/90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -155,7 +155,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-teal-100 transition-colors duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -187,7 +187,7 @@
                     <x-svg.arrow-up-hover />
                 </div>
             </div>
-            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300">
+            <div class="px-5 py-4 group-hover:bg-gray-50/75 transition-colors duration-300 h-full">
                 <div class="flex gap-4 items-start">
                     <div class="flex-shrink-0 p-3 h-fit bg-gray-100 rounded-lg group-hover:bg-red-100 transition-colors duration-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

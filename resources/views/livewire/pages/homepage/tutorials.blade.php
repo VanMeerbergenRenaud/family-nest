@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Tutoriels">
     <h1 role="heading" aria-level="1" class="sr-only">Tutoriels</h1>
 
     <!-- MENU -->

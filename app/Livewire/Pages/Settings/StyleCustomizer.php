@@ -21,7 +21,7 @@ class StyleCustomizer extends Component
 
     public function mount()
     {
-        if (Auth::check() && Auth::user()->email === 'dominique.vilain@gmail.com') {
+        if (Auth::check() && Auth::user()->email === 'dominique.vilain@hepl.be') {
             $this->showCustomizer = true;
 
             if (Storage::exists('user_styles/vip_user.css')) {

@@ -13,7 +13,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Masmerise\Toaster\Toaster;
 
-#[Title('Créer votre famille')]
+#[Title('Créer une famille')]
 class FamilyCreation extends Component
 {
     public FamilyForm $form;

@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Mentions légales">
     <x-homepage.menu />
 
     <main>

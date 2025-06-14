@@ -48,7 +48,7 @@ class LoginForm extends Form
         }
 
         // Vérifier si c'est notre utilisateur est spécial
-        if (Auth::user()->email === 'dominique.vilain@gmail.com') {
+        if (Auth::user()->email === 'dominique.vilain@hepl.be') {
             Session::put('special_user', true);
 
             if (! file_exists(storage_path('app/user_styles'))) {

@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Accueil">
     <h1 role="heading" aria-level="1" class="sr-only">FamilyNest : l'application qui simplifie la gestion de vos factures familiales</h1>
 
     <!-- MENU -->

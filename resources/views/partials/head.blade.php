@@ -22,7 +22,7 @@
 <link rel="icon" href="{{ asset('img/favicon.svg') }}">
 
 {{-- M.Vilain css styles --}}
-@if(auth()->check() && auth()->user()->email === 'dominique.vilain@gmail.com')
+@if(auth()->check() && auth()->user()->email === 'dominique.vilain@hepl.be')
     @if(\Illuminate\Support\Facades\Storage::exists('user_styles/vip_user.css'))
         <style>
             {!! \Illuminate\Support\Facades\Storage::get('user_styles/vip_user.css') !!}
@@ -45,11 +45,13 @@
 
 
 <!-- Title -->
-@if (Route::currentRouteName() === 'welcome')
-    <title>{{ config('app.name', 'FamilyNest') }}</title>
-@else
-    <title>{{ $title ?? 'Titre de la page' }} | FamilyNest</title>
-@endif
+<title>
+    @if ($title !== config('app.name', 'FamilyNest'))
+        {{ $title }} | {{ config('app.name', 'FamilyNest') }}
+    @else
+        {{ $title }}
+    @endif
+</title>
 
 <!-- Styles -->
 @livewireStyles

@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Politique de confidentialité">
     <x-homepage.menu/>
 
     <main>

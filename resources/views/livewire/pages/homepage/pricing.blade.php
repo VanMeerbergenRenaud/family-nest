@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout title="Prix">
     <h1 role="heading" aria-level="1" class="sr-only">Fonctionnalités</h1>
 
     <!-- MENU -->
