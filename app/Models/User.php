@@ -165,6 +165,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->familyMembership[$familyId];
     }
 
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
     /**
      * Configuration pour Algolia/Laravel Scout
      */

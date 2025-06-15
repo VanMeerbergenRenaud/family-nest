@@ -25,9 +25,9 @@ class Index extends Component
 
     #[Url]
     public array $filters = [
+        'owner' => 'family',
         'period' => 'all',
         'type' => 'all',
-        'owner' => 'all',
     ];
 
     public function mount()
@@ -64,7 +64,7 @@ class Index extends Component
 
     public function openEditModal(int $goalId): void
     {
-        $goal = Goal::findOrFail($goalId);
+        $goal = auth()->user()->goals()->findOrFail($goalId);
         $this->authorize('update', $goal);
 
         $this->resetModalState();
@@ -74,7 +74,7 @@ class Index extends Component
 
     public function openDeleteModal(int $goalId): void
     {
-        $goal = Goal::findOrFail($goalId);
+        $goal = auth()->user()->goals()->findOrFail($goalId);
         $this->authorize('delete', $goal);
 
         $this->selectedGoal = $goal;
@@ -115,30 +115,47 @@ class Index extends Component
     protected function getFilteredQuery(): Builder
     {
         $user = auth()->user();
+        $userFamilyIds = $user->families()->pluck('families.id')->toArray();
         $query = Goal::query();
 
-        // Récupérer la famille de l'utilisateur de manière sécurisée
-        $family = $user->family()->first();
-        $familyId = $family ? $family->id : null;
+        // Filtre par propriétaire (personnel/familial)
+        if ($this->filters['owner'] === GoalOwnerEnum::Personal->value) {
+            // Objectifs personnels uniquement
+            $query->where('user_id', $user->id)
+                  ->where('is_family_goal', false);
+        }
+        elseif ($this->filters['owner'] === GoalOwnerEnum::Family->value) {
+            // Objectifs familiaux uniquement
+            if (empty($userFamilyIds)) {
+                return Goal::query()->whereRaw('1 = 0'); // Aucun résultat
+            }
 
-        // Si le filtre est sur les objectifs familiaux mais que l'utilisateur n'a pas de famille
-        if ($this->filters['owner'] === 'family' && !$familyId) {
-            // Retourner une requête vide intentionnellement
-            return Goal::query()->whereRaw('1 = 0');
+            $query->whereIn('family_id', $userFamilyIds)
+                  ->where('is_family_goal', true);
+        }
+        else {
+            // Tous les objectifs (personnels + familiaux)
+            $query->where(function($q) use ($user, $userFamilyIds) {
+                $q->where('user_id', $user->id)
+                  ->where('is_family_goal', false);
+
+                if (!empty($userFamilyIds)) {
+                    $q->orWhere(function($subQ) use ($userFamilyIds) {
+                        $subQ->whereIn('family_id', $userFamilyIds)
+                             ->where('is_family_goal', true);
+                    });
+                }
+            });
         }
 
-        $ownerEnum = GoalOwnerEnum::tryFrom($this->filters['owner']) ?? GoalOwnerEnum::All;
-        $ownerEnum->applyQuery($query, $user->id, $familyId);
+        // Filtres additionnels
+        if ($this->filters['period'] !== 'all') {
+            $query->where('period_type', $this->filters['period']);
+        }
 
-        // Application des filtres
-        collect([
-            'type' => fn (string $value) => $query->where('goal_type', $value),
-            'period' => fn (string $value) => $query->where('period_type', $value),
-        ])->each(function ($callback, $filterName) {
-            if ($this->filters[$filterName] !== 'all') {
-                $callback($this->filters[$filterName]);
-            }
-        });
+        if ($this->filters['type'] !== 'all') {
+            $query->where('goal_type', $this->filters['type']);
+        }
 
         return $query;
     }

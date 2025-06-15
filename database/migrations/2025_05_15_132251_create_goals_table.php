@@ -34,17 +34,6 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('family_id')->references('id')->on('families')->onDelete('cascade');
         });
-
-        Schema::create('goal_user', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('goal_id');
-            $table->unsignedBigInteger('user_id');
-            $table->boolean('is_admin')->default(false);
-            $table->timestamps();
-
-            $table->foreign('goal_id')->references('id')->on('goals')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
     }
 
     /**
@@ -53,6 +42,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('goals');
-        Schema::dropIfExists('goal_user');
     }
 };
