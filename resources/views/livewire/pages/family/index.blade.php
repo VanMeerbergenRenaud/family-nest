@@ -197,9 +197,9 @@
                             <tr wire:key="member-{{ $member->id }}">
                                 <td>
                                     <div class="flex items-center">
-                                        <div class="mr-3 rounded">
+                                        <div class="mr-3.5 rounded">
                                             <img src="{{ $member->avatar_url ?? asset('img/img_placeholder.jpg') }}"
-                                                 class="h-10 min-w-10 rounded-full object-cover"
+                                                 class="h-10 w-10 min-w-10 rounded-full object-cover"
                                                  alt="{{ $member->name }}"
                                                  loading="lazy"
                                             >

@@ -28,45 +28,46 @@
                  loading="lazy"
             />
         @elseif ($fileInfo['isPdf'] ?? false)
-            <div
-                x-data="{
-                    isChromium: false,
-                    checkBrowser() {
-                        const userAgent = window.navigator.userAgent.toLowerCase();
-                        return userAgent.indexOf('chrome') > -1 || userAgent.indexOf('chromium') > -1 || userAgent.indexOf('arc') > -1;
-                    },
-                    init() {
-                        this.isChromium = this.checkBrowser();
-                    }
-                }"
-                class="w-full h-full"
-            >
-                {{-- Affichage pour les navigateurs autres que Chromium (Mozilla Firefox, Safari et Tor Browser) --}}
-                <template x-if="!isChromium && ('{{ $temporaryUrl }}' || '{{ $storagePath }}')">
-                    <div wire:ignore class="w-full h-full overflow-hidden rounded-lg">
-                        <object
-                            id="pdf-viewer"
-                            width="100%"
-                            height="100%"
-                            class="inline-block w-full h-full min-h-[60vh]"
-                            type="application/pdf"
-                            data="{{ $temporaryUrl ?? $storagePath }}"
-                            sandbox="allow-same-origin"
-                            loading="lazy"
-                        ></object>
-                    </div>
-                </template>
+            <div wire:ignore class="w-full h-full pdf-container">
+                <div
+                    x-data="{
+                        isChromium: false,
+                        checkBrowser() {
+                            const userAgent = window.navigator.userAgent.toLowerCase();
+                            return userAgent.indexOf('chrome') > -1 || userAgent.indexOf('chromium') > -1 || userAgent.indexOf('arc') > -1;
+                        },
+                        init() {
+                            this.isChromium = this.checkBrowser();
+                        }
+                    }"
+                    class="w-full h-full"
+                >
+                    {{-- Vos templates existants --}}
+                    <template x-if="!isChromium && ('{{ $temporaryUrl }}' || '{{ $storagePath }}')">
+                        <div class="w-full h-full overflow-hidden rounded-lg">
+                            <object
+                                id="pdf-viewer"
+                                width="100%"
+                                height="100%"
+                                class="inline-block w-full h-full min-h-[60vh]"
+                                type="application/pdf"
+                                data="{{ $temporaryUrl ?? $storagePath }}"
+                                sandbox="allow-same-origin"
+                                loading="lazy"
+                            ></object>
+                        </div>
+                    </template>
 
-                {{-- Affichage pour Chrome/Chromium (Google Chrome, Arc, Brave, Microsoft Edge) --}}
-                <template x-if="isChromium || (!('{{ $temporaryUrl }}' || '{{ $storagePath }}'))">
-                    <div class="w-full min-h-[60vh] flex-center flex-col gap-4">
-                        <x-svg.pdf class="w-12 h-12 text-gray-400"/>
-                        <p class="mt-4 flex flex-col gap-2 text-center text-sm text-gray-500 px-8 lg:px-12">
-                            <span x-if="isChromium">L'aperçu PDF n'est pas disponible sur le navigateur Google Chrome.</span>
-                            <span x-if="!isChromium">Le fichier PDF sera visible après l'enregistrement de la facture.</span>
-                        </p>
-                    </div>
-                </template>
+                    <template x-if="isChromium || (!('{{ $temporaryUrl }}' || '{{ $storagePath }}'))">
+                        <div class="w-full min-h-[60vh] flex-center flex-col gap-4">
+                            <x-svg.pdf class="w-12 h-12 text-gray-400"/>
+                            <p class="mt-4 flex flex-col gap-2 text-center text-sm text-gray-500 px-8 lg:px-12">
+                                <span x-show="isChromium">L'aperçu PDF n'est pas disponible sur le navigateur Google Chrome.</span>
+                                <span x-show="!isChromium">Le fichier PDF sera visible après l'enregistrement de la facture.</span>
+                            </p>
+                        </div>
+                    </template>
+                </div>
             </div>
         {{-- Aperçu pour les fichiers DOCX --}}
         @elseif ($fileInfo['isDocx'] ?? false)

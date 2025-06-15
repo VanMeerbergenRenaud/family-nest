@@ -27,16 +27,16 @@ trait TagManagement
             return;
         }
 
-        // Vérifier que le tag contient uniquement des lettres
-        if (! preg_match('/^[a-zA-Z]+$/', $tag)) {
-            Toaster::error('Le tag ne peut contenir que des lettres (sans accent).');
+        // Vérifier que le tag contient uniquement des lettres avec accents et des espaces
+        if (! preg_match('/^[\p{L}\s]+$/u', $tag)) {
+            Toaster::error('Le tag ne peut contenir que des lettres (avec ou sans accent) et des espaces.');
 
             return;
         }
 
-        // Vérifier la longueur maximale (15 caractères)
-        if (strlen($tag) > 15) {
-            Toaster::error('Le tag ne peut pas dépasser 15 caractères.');
+        // Vérifier la longueur maximale (20 caractères)
+        if (strlen($tag) > 20) {
+            Toaster::error('Le tag ne peut pas dépasser 20 caractères.');
 
             return;
         }

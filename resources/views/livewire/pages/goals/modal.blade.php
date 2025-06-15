@@ -121,11 +121,11 @@
                                     class="button-primary flex items-center gap-2"
                                 >
                                     @if($categoryView === 'list')
-                                        <x-svg.queue-list />
-                                        Mode liste
-                                    @else
                                         <x-svg.squares-2x2 />
                                         Mode grille
+                                    @else
+                                        <x-svg.queue-list />
+                                        Mode liste
                                     @endif
                                 </button>
                             </div>

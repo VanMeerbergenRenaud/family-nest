@@ -7,6 +7,11 @@
 
     <h2 role="heading" aria-level="2" class="sr-only">Modifier une facture</h2>
 
+    <x-loader.overlay-ocr
+        title="Analyse OCR en cours..."
+        description="Nous utilisons un logiciel de reconnaissance OCR pour extraire les informations de votre facture. Veuillez patienter quelques instants..."
+    />
+
     {{-- Formulaire pour modifier une facture : multi step  --}}
     <div x-data="{
         currentStep: 1,
@@ -62,6 +67,9 @@
                             :fileInfo="$fileInfo"
                             :temporaryUrl="$form->uploadedFile->temporaryUrl()"
                             :onRemove="'removeUploadedFile'"
+                            :$showOcrButton
+                            :$isOcrProcessing
+                            :onOcrProcess="'processOcr'"
                             class="w-full h-full"
                         />
                         {{-- Champ d'upload vide --}}

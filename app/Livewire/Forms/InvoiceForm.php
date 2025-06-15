@@ -181,8 +181,8 @@ class InvoiceForm extends Form
             // Étape 5 - Notes et tags
             'notes' => 'nullable|string|min:3|max:500',
             'tags' => 'nullable|array|max:10',
-            'tags.*' => 'alpha', // chaque tag ne contient que des lettres
-            'tagInput' => 'nullable|string|alpha|max:15', // tag en cours ne contient que des lettres
+            'tags.*' => 'regex:/^[\p{L}\s]+$/u',
+            'tagInput' => 'nullable|string|regex:/^[\p{L}\s]+$/u|max:20',
 
             // États
             'is_archived' => 'boolean',
@@ -325,8 +325,8 @@ class InvoiceForm extends Form
             // Informations générales
             'name' => $this->name,
             'reference' => $this->reference,
-            'type' => $this->type,
-            'category' => $this->category,
+            'type' => $this->normalizeEnumValue($this->type, TypeEnum::class),
+            'category' => $this->normalizeEnumValue($this->category, CategoryEnum::class),
             'issuer_name' => $this->issuer_name,
             'issuer_website' => $this->issuer_website,
             // Détails financiers
@@ -338,11 +338,11 @@ class InvoiceForm extends Form
             'issued_date' => $this->issued_date,
             'payment_due_date' => $this->payment_due_date,
             'payment_reminder' => $this->payment_reminder,
-            'payment_frequency' => $this->payment_frequency,
+            'payment_frequency' => $this->normalizeEnumValue($this->payment_frequency, PaymentFrequencyEnum::class),
             // Statut de paiement
-            'payment_status' => $this->payment_status,
-            'payment_method' => $this->payment_method,
-            'priority' => $this->priority,
+            'payment_status' => $this->normalizeEnumValue($this->payment_status, PaymentStatusEnum::class),
+            'payment_method' => $this->normalizeEnumValue($this->payment_method, PaymentMethodEnum::class),
+            'priority' => $this->normalizeEnumValue($this->priority, PriorityEnum::class),
             // Notes et tags
             'notes' => $this->notes,
             'tags' => $this->tags ?? [],
@@ -573,5 +573,17 @@ class InvoiceForm extends Form
                 ? $this->issuer_website
                 : 'https://'.$this->issuer_website;
         }
+    }
+
+    // Normalise la valeur d'un enum
+    private function normalizeEnumValue($value, $enumClass)
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        return $value instanceof \BackedEnum
+            ? $value
+            : $enumClass::tryFrom($value);
     }
 }

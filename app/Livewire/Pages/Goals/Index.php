@@ -108,7 +108,13 @@ class Index extends Component
 
     public function resetFilters(): void
     {
-        $this->filters = array_fill_keys(array_keys($this->filters), 'all');
+        $defaults = [
+            'owner' => 'family',
+            'period' => 'all',
+            'type' => 'all',
+        ];
+
+        $this->filters = $defaults;
         $this->resetPage();
     }
 
@@ -120,6 +126,7 @@ class Index extends Component
 
         // Filtre par propriétaire (personnel/familial)
         if ($this->filters['owner'] === GoalOwnerEnum::Personal->value) {
+
             // Objectifs personnels uniquement
             $query->where('user_id', $user->id)
                   ->where('is_family_goal', false);
@@ -127,7 +134,7 @@ class Index extends Component
         elseif ($this->filters['owner'] === GoalOwnerEnum::Family->value) {
             // Objectifs familiaux uniquement
             if (empty($userFamilyIds)) {
-                return Goal::query()->whereRaw('1 = 0'); // Aucun résultat
+                return Goal::query()->whereRaw('1 = 0');
             }
 
             $query->whereIn('family_id', $userFamilyIds)

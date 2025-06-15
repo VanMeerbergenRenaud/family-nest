@@ -46,10 +46,10 @@
 
 <!-- Title -->
 <title>
-    @if ($title !== config('app.name', 'FamilyNest'))
+    @if (!empty($title))
         {{ $title }} | {{ config('app.name', 'FamilyNest') }}
     @else
-        {{ $title }}
+        {{ config('app.name', 'FamilyNest') }}
     @endif
 </title>
 

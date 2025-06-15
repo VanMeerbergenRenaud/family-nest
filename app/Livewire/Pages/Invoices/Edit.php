@@ -12,6 +12,7 @@ use App\Models\Invoice;
 use App\Services\FileStorageService;
 use App\Traits\Invoice\ComponentTrait;
 use App\Traits\Invoice\FileUrlTrait;
+use App\Traits\Invoice\OcrProcessingTrait;
 use App\Traits\Invoice\ShareCalculationTrait;
 use App\Traits\Invoice\TagManagement;
 use Livewire\Attributes\Title;
@@ -26,6 +27,7 @@ class Edit extends Component
     use FileUrlTrait;
     use ShareCalculationTrait;
     use TagManagement;
+    use OcrProcessingTrait;
     use WithFileUploads;
 
     public InvoiceForm $form;
@@ -92,6 +94,11 @@ class Edit extends Component
     {
         $this->resetErrorBag();
         $this->resetValidation();
+    }
+
+    public function updatedFormUploadedFile(): void
+    {
+        $this->showOcrButton = true;
     }
 
     public function updateInvoice(FileStorageService $fileStorageService): void

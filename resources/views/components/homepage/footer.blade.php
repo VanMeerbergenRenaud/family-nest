@@ -30,8 +30,8 @@
         [
             'title' => 'Support',
             'links' => [
-                ['name' => 'Contacter l\'équipe', 'url' => 'mailto:familynest.officiel@gmail.com'],
-                ['name' => 'Signaler un bug', 'url' => 'mailto:familynest.officiel@gmail.com'],
+                ['name' => 'Contacter l\'équipe', 'url' => 'mailto:familynest.officiel@gmail.com', 'is_external' => true],
+                ['name' => 'Signaler un bug', 'url' => 'mailto:familynest.officiel@gmail.com', 'is_external' => true],
             ],
         ],
     ];
@@ -65,7 +65,7 @@
                             @foreach ($column['links'] as $link)
                                 <li>
                                     <a href="{{ $link['url'] }}"
-                                       title="Voir la page {{ $link['name'] }}"
+                                       title="Vers {{ $link['name'] }}"
 
                                        @if(!($link['is_external'] ?? false) && !($link['is_disabled'] ?? false))
                                            wire:navigate

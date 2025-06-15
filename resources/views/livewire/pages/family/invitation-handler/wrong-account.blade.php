@@ -12,8 +12,8 @@
 
             <x-flash-messages/>
 
-            <div class="flex items-center p-4 mb-6 rounded-xl bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800">
-                <x-svg.warning class="w-5 h-5 text-amber-500 dark:text-amber-400 mr-3 flex-shrink-0"/>
+            <div class="flex items-start p-4 mb-6 rounded-xl bg-amber-50 dark:bg-amber-900/30 border border-amber-100 dark:border-amber-800">
+                <x-svg.warning class="mt-0.5 w-5 h-5 text-amber-500 dark:text-amber-400 mr-3 flex-shrink-0"/>
                 <div class="text-sm-regular text-amber-700 dark:text-amber-300">
                     <p>
                         Cette invitation a été envoyée à l'adresse email
