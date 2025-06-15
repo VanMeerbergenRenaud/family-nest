@@ -8,10 +8,10 @@
                     Bienvenue sur FamilyNest
                 </h2>
                 <p class="mt-6 text-gray-600 leading-relaxed">
-                    Nous sommes ravis de vous compter parmi nous pour construire tout ce que vous voulez en utilisant des factures.
+                    Nous sommes ravis de vous compter parmi nous ! Construisons ensemble votre espace familial de gestion de factures.
                 </p>
                 <p class="mt-6 text-gray-600 leading-relaxed">
-                    C'est l'idée qui a surgit de mon esprit et ce n'est qu'un début. Nous partagerons davantage avec vous au fil du temps. À bientôt !
+                    Vous allez pouvoir créer votre famille, inviter des membres et commencer à gérer vos dépenses communes.
                 </p>
                 <div class="mt-6 flex gap-1.5 items-center">
                     <p class="text-sm-medium text-gray-700">Équipe FamilyNest</p>
@@ -35,7 +35,7 @@
             @case(1)
                 <x-onboarding.step-layout
                     step="1" title="Créez votre famille"
-                    description="Commençez par créer votre espace famille. C'est là que vous pourrez gérer vos dépenses communes."
+                    description="Commençez par donner un nom à votre famille. Vous pourrez toujours le modifier par suite."
                     layout="split"
                 >
                     <div class="flex flex-col gap-2">
@@ -49,7 +49,7 @@
                             required
                             class="capitalize"
                         />
-                        <p class="mt-4 text-sm text-slate-500 pl-1">
+                        <p class="mt-2.5 text-sm text-slate-500 pl-1">
                             Ce nom sera visible par tous les membres que vous inviterez.
                         </p>
                     </div>

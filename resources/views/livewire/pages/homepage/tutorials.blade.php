@@ -20,7 +20,7 @@
                         </h2>
 
                         <p class="mx-auto max-w-2xl lg:text-lg-medium">
-                            Découvrez nos tutoriels vidéo et guides détaillés pour vous accompagner dans l'utilisation de l'application. Que vous soyez un utilisateur novice du web ou bien un expert, nous avons des ressources pour vous aider à tirer le meilleur parti de notre application.
+                            Découvrez nos tutoriels vidéo et guides détaillés pour vous accompagner dans l'utilisation de l'application. Que vous soyez un utilisateur novice du web ou un expert, nous avons des ressources pour vous aider à tirer le meilleur parti de notre application.
                         </p>
                     </div>
                 </div>
@@ -31,21 +31,21 @@
         @php
             $tutorials = [
                 [
-                    'title' => 'Créer votre compte en 2 minute',
+                    'title' => 'Créez votre compte en 2 minutes',
                     'description' => 'Découvrez comment vous inscrire et configurer votre espace FamilyNest. Le premier pas vers une gestion simplifiée.',
                     'videoSrc' => asset('video/tutorials/register.mp4'),
                     'imageSrc' => asset('img/homepage/tutorials/register.png'),
                     'duration' => '2:21',
                 ],
                 [
-                    'title' => 'Ajouter votre première facture',
+                    'title' => 'Ajoutez votre première facture',
                     'description' => 'Manuellement ou via notre scanner intelligent (OCR), ajouter une facture n\'a jamais été aussi simple.',
                     'videoSrc' => asset('video/tutorials/create_invoice.mp4'),
                     'imageSrc' => asset('img/homepage/tutorials/create_invoice.png'),
                     'duration' => '3:25',
                 ],
                 [
-                    'title' => 'Créer votre famille',
+                    'title' => 'Créez votre famille',
                     'description' => 'Invitez vos proches et définissez les rôles de chacun pour une gestion collaborative et transparente.',
                     'videoSrc' => asset('video/tutorials/create_family.mp4'),
                     'imageSrc' => asset('img/homepage/tutorials/create_family.png'),
@@ -59,7 +59,7 @@
                     'duration' => '3:27',
                 ],
                 [
-                    'title' => 'Explorer les fonctions avancées',
+                    'title' => 'Explorez les fonctions avancées',
                     'description' => 'Tirez le meilleur de l\'application en maîtrisant les filtres et la personnalisation.',
                     'videoSrc' => asset('video/tutorials/advance_features.mp4'),
                     'imageSrc' => asset('img/homepage/tutorials/advance_features.png'),

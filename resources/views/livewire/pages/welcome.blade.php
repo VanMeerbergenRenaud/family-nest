@@ -29,8 +29,8 @@
         ];
 
         $features = [
-            ['title' => '1. Créer votre compte', 'description' => 'En seulement quelques clics, enregistrez-vous et accédez à l\'application. Vérifiez vos mails et puis le tour est joué. Il ne vous reste plus qu\'à créer votre nouvelle famille.', 'image' => asset('img/homepage/features/step_1.png')],
-            ['title' => '2. Ajouter votre première facture', 'description' => 'Importez vos factures depuis vos mails ou votre ordinateur. FamilyNest les organise pour vous, prêtes à être consultées à tout moment.', 'image' => asset('img/homepage/features/step_2.png')],
+            ['title' => '1. Créez votre compte', 'description' => 'En seulement quelques clics, enregistrez-vous et accédez à l\'application. Vérifiez vos mails et le tour est joué. Il ne vous reste plus qu\'à créer votre nouvelle famille.', 'image' => asset('img/homepage/features/step_1.png')],
+            ['title' => '2. Ajoutez votre première facture', 'description' => 'Importez vos factures depuis vos mails ou votre ordinateur. FamilyNest organise vos factures qui sont prêtes à être consultées à tout moment.', 'image' => asset('img/homepage/features/step_2.png')],
             ['title' => '3. Fixez-vous un objectif', 'description' => 'Grâce à la fonctionnalité d\'objectifs, vous pouvez définir des budgets mensuels ou annuels pour mieux gérer vos finances familiales.', 'image' => asset('img/homepage/features/step_3.png')],
         ];
 
@@ -39,7 +39,7 @@
             ['title' => 'Reconnaissance automatique', 'description' => 'Notre technologie OCR vous permet d\'extraire automatiquement les informations importantes de vos factures, pour une gestion encore plus rapide.', 'imageSrc' => asset('img/homepage/tools/ocr.png'), 'columnSpan' => 1],
             ['title' => 'Accès rapide', 'description' => 'Ajoutez une nouvelle facture ou consultez un document important en un clin d\'œil, où que vous soyez.', 'imageSrc' => asset('img/homepage/tools/barre_recherche.png'), 'columnSpan' => 1],
             ['title' => 'Centralisation intelligente', 'description' => 'Importez facilement vos factures depuis vos mails ou votre ordinateur. Tout est centralisé, classé et prêt à être consulté.', 'imageSrc' => asset('img/homepage/tools/integrations.png'), 'columnSpan' => 1],
-            ['title' => 'Vue d\'ensemble', 'description' => 'Suivez vos prochaines échéances et le total de vos dépenses d\'un seul coup d\'œil depuis votre tableau de bord.', 'imageSrc' => asset('img/homepage/tools/widgets.png'), 'columnSpan' => 1],
+            ['title' => 'Vue d\'ensemble', 'description' => 'Suivez vos prochaines échéances et le total de vos dépenses d\'un coup d\'œil depuis votre tableau de bord.', 'imageSrc' => asset('img/homepage/tools/widgets.png'), 'columnSpan' => 1],
         ];
 
         $testimonials = [
@@ -55,11 +55,11 @@
         ];
 
         $faqs = [
-            ['question' => 'Qui se cache derrière ce projet ?', 'answer' => 'FamilyNest est un projet développé avec passion par le développeur Renaud Van Meerbergen, pour son travail de fin d\'études, avec l\'ambition d\'en faire un outil réellement utile pour les familles. Chaque retour et chaque suggestion comptent énormément pour l\'améliorer !'],
+            ['question' => 'Qui se cache derrière ce projet ?', 'answer' => 'FamilyNest est un projet du développeur Renaud Van Meerbergen, concçu au départ pour son travail de fin d\'études, avec  par la suite l\'ambition d\'en faire un outil pour les familles dans la vie réelle. Chaque retour et chaque suggestion comptent donc énormément pour l\'amélioration et le développement ultérieur de ce projet.'],
             ['question' => 'Mes données personnelles sont-elles en sécurité ?', 'answer' => 'Oui, la sécurité et la confidentialité de vos données sont notre priorité absolue. Nous utilisons des protocoles de chiffrement et les meilleures pratiques du secteur pour garantir que vos informations restent protégées et ne sont jamais partagées.'],
             ['question' => 'Quel type d\'aide proposez-vous en cas de problème ?', 'answer' => 'Nous sommes là pour vous aider. Si vous avez une question ou une suggestion, vous pouvez nous contacter par mail. Étant une petite structure, nous nous engageons à vous répondre personnellement dans les meilleurs délais.'],
-            ['question' => 'Comment fonctionne la tarification de FamilyNest ?', 'answer' => 'FamilyNest est actuellement en version bêta, et son utilisation est entièrement gratuite. Nous prévoyons d\'introduire des offres payantes à l\'avenir pour couvrir les frais de serveur, mais il y aura toujours une offre gratuite généreuse.'],
-            ['question' => 'Pourrai-je annuler un abonnement facilement ?', 'answer' => 'Absolument. Le jour où nous proposerons des abonnements, vous pourrez les gérer et les annuler à tout moment depuis votre tableau de bord, sans frais cachés ni engagement à long terme. La transparence est essentielle pour nous.'],
+            ['question' => 'Comment fonctionne la tarification de FamilyNest ?', 'answer' => 'FamilyNest est actuellement en version bêta. Son utilisation est entièrement gratuite pour l\'instant. Nous prévoyons d\'introduire des offres payantes à l\'avenir pour couvrir les frais des différents services. Vous pourrez néanmoins bénéficier d\'une version gratuite simplifiée.'],
+            ['question' => 'Pourrais-je annuler mon abonnement facilement ?', 'answer' => 'Absolument. Le jour où nous proposerons des abonnements, vous pourrez les gérer et les annuler à tout moment depuis votre tableau de bord, sans frais cachés ni engagement à long terme. La transparence est essentielle pour nous.'],
         ];
 
         $faqCount = count($faqs);
@@ -178,7 +178,7 @@
             <div class="mx-auto max-w-5xl p-8">
                 <div class="flex flex-col items-center gap-y-12">
                     <h2 role="heading" aria-level="2" class="text-center text-2xl font-semibold leading-tight text-gray-900">
-                        Réaliser avec des technologies fiables
+                        Réalisé avec des technologies fiables
                     </h2>
                     <div class="group relative w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_10%,white_90%,transparent)]">
                         <div class="flex gap-8 animate-marquee group-hover:[animation-play-state:paused]">
@@ -243,8 +243,8 @@
                     badge-icon="📑"
                     badge-text="Tableau des factures"
                     badge-classes="bg-sky-200/75 text-slate-600/90"
-                    title="Toutes vos factures, parfaitement organisées"
-                    description="Organiser, triez et visualisez vos factures à votre bon vouloir. Payées, en attente, par date ou par montant : retrouvez l'information dont vous avez besoin en un seul coup d'œil, sans vous perdre dans les détails."
+                    title="Toutes vos factures parfaitement organisées"
+                    description="Organisez, triez et visualisez vos factures comme bon vous semble. Payées, en attente, par date ou par montant : retrouvez l'information dont vous avez besoin en un coup d'œil, sans vous perdre dans les détails."
                     :image-src="asset('img/homepage/prototype/table.png')"
                     url="{{ route('changelog') }}"
                 />
@@ -255,8 +255,8 @@
                     badge-icon="🔎"
                     badge-text="Recherche puissante"
                     badge-classes="bg-rose-100 text-rose-700/80"
-                    title="Retrouvez n'importe quoi, instantanément"
-                    description="Notre barre de recherche vous permet de trouver une facture, un document ou un membre de la famille en quelques touches. C'est rapide, intelligent et super efficace."
+                    title="Retrouvez n'importe quel document instantanément"
+                    description="Notre barre de recherche vous permet de trouver une facture, un document ou un membre de la famille en quelques clics. C'est rapide, intelligent et efficace."
                     :image-src="asset('img/homepage/prototype/search.png')"
                     url="{{ route('changelog') }}"
                 />
@@ -375,7 +375,7 @@
                         badge-text="FAQ"
                         badge-classes="bg-purple-100 text-purple-700"
                         title="Vos questions, nos réponses"
-                        description="Vous avez des interrogations ? Nous avons les réponses. Si vous ne trouvez pas votre bonheur, n'hésitez pas à nous écrire."
+                        description="Vous avez des interrogations ? Nous avons les réponses. Si vous ne trouvez pas la solution ci-dessous, n'hésitez pas à nous écrire."
                     >
                         <a href="mailto:familynest.officiel@gmail.com" class="button-primary w-fit" title="Vers votre gestionnaire de mail">
                             Poser une question

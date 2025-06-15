@@ -22,7 +22,7 @@
                     <path d="M12.3334 1.66663V2.59996C12.3334 4.84017 12.3334 5.96027 11.8974 6.81592C11.5139 7.56857 10.902 8.18049 10.1493 8.56398C9.29367 8.99996 8.17356 8.99996 5.93335 8.99996H1.66669M1.66669 8.99996L5.00002 5.66663M1.66669 8.99996L5.00002 12.3333" stroke="currentColor" stroke-width="1.67" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
-            <span class="text-sm-medium text-gray-500 dark:text-gray-400">sélectionné</span>
+            <span class="text-sm-medium text-gray-500 dark:text-gray-400">sélectionner</span>
         </div>
 
         {{-- Key escape --}}

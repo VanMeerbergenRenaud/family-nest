@@ -19,7 +19,7 @@
                         </h2>
 
                         <p class="mx-auto max-w-2xl lg:text-lg-medium">
-                            Vous trouverez ici les dernières modifications apportées à FamilyNest, ainsi que les fonctionnalités à venir. Votre retour est essentiel pour nous aider à améliorer l'application.
+                            Vous trouverez ici les dernières modifications apportées à FamilyNest ainsi que les fonctionnalités à venir. Votre retour est essentiel pour nous aider à améliorer l'application.
                         </p>
                     </div>
                 </div>
@@ -40,7 +40,7 @@
                     'changes' => [
                         [
                             'title' => 'Scannez vos factures, gagnez du temps !',
-                            'description' => 'Prenez une photo ou importez un PDF, et laissez FamilyNest remplir les champs importants pour vous (fournisseur, montant, dates...). Un gain de temps considérable pour vous concentrer sur l\'essentiel.',
+                            'description' => 'Prenez une photo ou importez un PDF et laissez FamilyNest remplir les champs importants pour vous (fournisseur, montant, dates...). Un gain de temps considérable pour vous concentrer sur l\'essentiel.',
                             'imageSrc' => asset('img/homepage/changelog/scanner-ocr.png'),
                             'tags' => ['new'],
                         ],
@@ -58,13 +58,13 @@
                     'changes' => [
                         [
                             'title' => 'Gérez votre budget en famille, plus simplement',
-                            'description' => 'Vous pouvez désormais inviter votre conjoint(e) ou d\'autres membres dans votre espace FamilyNest, en leur attribuant des rôles (Lecteur, Éditeur) pour une gestion collaborative et sécurisée.',
+                            'description' => 'Vous pouvez désormais inviter votre conjoint(e) ou d\'autres membres dans votre espace FamilyNest en leur attribuant des rôles (lecteur, éditeur) pour une gestion collaborative et sécurisée.',
                             'imageSrc' => asset('img/homepage/changelog/invite-member.png'),
                             'tags' => ['new'],
                         ],
                         [
                             'title' => 'Organisez vos factures à votre façon avec les tags',
-                            'description' => 'En plus des catégories, vous pouvez maintenant ajouter des tags personnalisés à vos factures (ex: "Luminus", "Vacances2025"). Cela vous permet de retrouver et de filtrer vos dépenses selon vos propres critères, pour une organisation plus personnelle.',
+                            'description' => 'En plus des catégories, vous pouvez maintenant ajouter des tags personnalisés à vos factures (ex: "Luminus", "Vacances 2025"). Cela vous permet de retrouver et de filtrer vos dépenses selon vos propres critères, pour une organisation plus personnelle.',
                             'imageSrc' => asset('img/homepage/changelog/tag.png'),
                             'tags' => ['improvement'],
                         ],
@@ -76,7 +76,7 @@
                     'changes' => [
                         [
                             'title' => 'Bienvenue sur FamilyNest ! Lancement de la version 1',
-                            'description' => 'La première version de FamilyNest est disponible. Notre mission : offrir un outil simple, beau et efficace pour que la gestion des factures ne soit plus une corvée. Nous sommes impatients de lire vos retours pour construire la suite avec vous.',
+                            'description' => 'La première version de FamilyNest est disponible. Notre mission : offrir un outil simple et efficace pour que la gestion des factures ne soit plus une corvée. Nous sommes impatients de lire vos retours pour construire la suite avec vous.',
                             'imageSrc' => asset('img/homepage/changelog/launch.png'),
                             'tags' => ['new'],
                         ],

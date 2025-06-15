@@ -115,9 +115,17 @@ class Index extends Component
     protected function getFilteredQuery(): Builder
     {
         $user = auth()->user();
-        $familyId = $user->family()->first()->id;
-
         $query = Goal::query();
+
+        // Récupérer la famille de l'utilisateur de manière sécurisée
+        $family = $user->family()->first();
+        $familyId = $family ? $family->id : null;
+
+        // Si le filtre est sur les objectifs familiaux mais que l'utilisateur n'a pas de famille
+        if ($this->filters['owner'] === 'family' && !$familyId) {
+            // Retourner une requête vide intentionnellement
+            return Goal::query()->whereRaw('1 = 0');
+        }
 
         $ownerEnum = GoalOwnerEnum::tryFrom($this->filters['owner']) ?? GoalOwnerEnum::All;
         $ownerEnum->applyQuery($query, $user->id, $familyId);

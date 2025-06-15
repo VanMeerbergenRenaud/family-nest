@@ -15,11 +15,11 @@
                         </span>
 
                         <h2 class="homepage-title lg:text-6xl">
-                            À propos du mystérieux créateur
+                            À propos de FamilyNest
                         </h2>
 
                         <p class="mx-auto max-w-2xl lg:text-lg-medium">
-                            La gestion des factures familiales est devenue un vrai casse-tête. FamilyNest a été créé pour y mettre fin et j'ai l'ambition de vous offrir un outil simple, intuitif et efficace.
+                            FamilyNest a été créé par Renaud Van Meerbergen pour permettre aux familles de centraliser leurs factures en un seul endroit et de mieux contrôler leur budget.
                         </p>
                     </div>
                 </div>
@@ -35,15 +35,15 @@
                     <div class="flex flex-col gap-y-8">
 
                         <div class="space-y-6 text-lg leading-8 text-gray-600">
-                            <h2 class="homepage-title text-balance">Petit mot du créateur</h2>
+                            <h2 class="homepage-title text-balance">Mot du créateur</h2>
                             <p>
-                                FamilyNest n'est pas né dans une salle de réunion, mais d'une simple conversation avec ma maman. Elle me confiait à quel point il était devenu compliqué de s'y retrouver entre les factures papier, les mails et les différentes applications. J'ai alors compris qu'il y avait un réel besoin de simplifier la gestion des factures familiales, un besoin que beaucoup d'entre nous ressentent au quotidien.
+                                FamilyNest n'est pas né dans une salle de réunion mais d'une simple conversation avec ma maman. Elle me confiait à quel point il était devenu compliqué pour elle de s'y retrouver dans la gestion de ses dépenses entre les factures reçues par courrier et celles reçues par mail ou via diverses applications. J'ai alors compris qu'il y avait un réel besoin de simplifier la gestion des factures familiales, un besoin que beaucoup d'entre nous ressentent au quotidien.
                             </p>
                             <p>
-                                Ce projet, commencé dans le cadre de mes études, est rapidement devenu une véritable aventure. Mon objectif était de créer une application moderne, intuitive et simple d'utilisation, pensée pour des familles comme la mienne et non pour des experts-comptables. Un outil qui apporte de la sérénité dans la gestion quotidienne des factures familiales.
+                                L'objectif est de créer une application moderne, intuitive et simple d'utilisation, pensée pour des familles comme la mienne et non pour des experts-comptables. Ce projet entrepris dans le cadre de mes études s'est transformé en véritable aventure. Les retours positifs que je reçois de mes proches me motivent à poursuivre le développement de cette application dans le but de la rendre accessible à tous.
                             </p>
                             <p>
-                                Chaque suggestion et chaque retour que je reçois durant cette phase bêta est incroyablement précieux. Merci de faire partie de cette aventure et de m'aider à construire un outil qui, je l'espère, vous sera réellement utile au quotidien.
+                                Les suggestions et retours que je reçois durant cette phase bêta sont donc très précieux. Merci de faire partie de cette aventure et de m'aider à construire cet outil qui, je l'espère, simplifiera la gestion de vos factures et vos dépenses au quotidien.
                             </p>
                         </div>
 
