@@ -34,7 +34,7 @@ enum FamilyRelationEnum: string
             self::Friend => 'Ami(e)',
             self::Coworker => 'Collègue',
             self::Roommate => 'Colocataire',
-            self::Self => 'Moi-même',
+            self::Self => 'Créateur',
             self::Other => 'Autre',
         };
     }

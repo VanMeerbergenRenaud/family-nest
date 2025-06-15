@@ -46,8 +46,10 @@ class RegisterForm extends Form
         $user = User::create($validated);
 
         // Utiliser le service de vérification email
-        $emailVerificationService = app(EmailVerificationService::class);
-        $emailVerificationService->sendVerificationEmail($user, false);
+        if (config('app.email_verification_enabled', true)) {
+            $emailVerificationService = app(EmailVerificationService::class);
+            $emailVerificationService->sendVerificationEmail($user, false);
+        }
 
         Auth::login($user);
 
