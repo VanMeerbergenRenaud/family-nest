@@ -82,7 +82,19 @@ class GoalForm extends Form
 
         try {
             $user = auth()->user();
-            $familyId = $user->family()->first()->id;
+            $family = $user->family();
+
+            // Vérifier si l'utilisateur a une famille
+            if (!$family) {
+                // Si c'est un objectif familial mais que l'utilisateur n'a pas de famille
+                if ($this->is_family_goal) {
+                    Toaster::error('Vous devez appartenir à une famille pour créer un objectif familial');
+                    return null;
+                }
+                $familyId = null;
+            } else {
+                $familyId = $family->id;
+            }
 
             $data = [
                 'name' => $this->name,
