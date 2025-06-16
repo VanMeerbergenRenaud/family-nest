@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>@yield('title')</title>
+    <title>@yield('title')</title>
 
-        <!-- Scripts -->
-        @livewireStyles
-        @vite(['resources/css/app.scss', 'resources/js/app.js'])
-    </head>
-    <body>
-        <div class="error__page">
-            <div class="error__page__container">
-                <div class="error__page__container__content">
-                    <div class="error__page__container__content__icon">
-                        @yield('icon')
-                    </div>
+    <!-- Scripts -->
+    @livewireStyles
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body class="bg-gray-200">
+<div class="flex-center flex-col min-h-screen px-8 py-16 bg-gray-200">
+    @yield('icon')
 
-                    <div class="error__page__container__content__code">
-                        @yield('code')
-                    </div>
+    <h1 class="my-8 text-[#CD475E] display-3xl-semibold tracking-[-0.0625rem]">
+        @yield('code')
+    </h1>
 
-                    <div class="error__page__container__content__message">
-                        @yield('message')
-                    </div>
-                </div>
-                <div class="error__page__container__content__links">
-                    <a href="{{ url()->previous() }}" class="link-secondary">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M15 8H1M1 8L8 15M1 8L8 1" stroke="#344054" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        {{ __('Retour') }}
-                    </a>
-                    <a href="{{ route('dashboard') }}" class="link-primary">
-                        {{ __('Retourner à l’accueil') }}
-                    </a>
-                </div>
-            </div>
-        </div>
-    </body>
+    <p class="mb-8 max-w-[40rem] text-center display-md-medium tracking-[-0.0625rem] text-gray-900">
+        @yield('description')
+    </p>
+
+    <p class="max-w-[40rem] text-center text-md-regular text-gray-500">
+        @yield('message')
+    </p>
+
+    <div class="mt-12 flex-center flex-col gap-4 md:flex-row">
+        <a href="{{ url()->previous() }}"
+           class="flex-center py-3 px-8 gap-2 text-md-medium rounded-lg bg-gray-100 text-dark hover:bg-gray-50">
+            <x-svg.arrow-left/>
+            Retour en arrière
+        </a>
+        <a href="{{ route('dashboard') }}"
+           class="flex-center py-3 px-8 gap-2 text-md-medium rounded-lg bg-gray-800 text-white hover:bg-gray-900">
+            Aller à l'accueil
+        </a>
+    </div>
+</div>
+</body>
 </html>

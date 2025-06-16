@@ -5,21 +5,32 @@ namespace App\Livewire\Forms;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
 class LoginForm extends Form
 {
-    #[Validate('required|string|lowercase|email|max:255')]
+    #[Validate]
     public string $email = '';
 
-    #[Validate('required|string|min:8|max:255')]
+    #[Validate]
     public string $password = '';
 
-    #[Validate('boolean')]
-    public bool $remember = false;
+    #[Validate]
+    public bool $remember = true;
+
+    public function rules(): array
+    {
+        return [
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
+            'password' => ['required', 'string', Rules\Password::defaults()],
+            'remember' => ['boolean'],
+        ];
+    }
 
     /**
      * Authenticate the user with the application.
@@ -34,6 +45,15 @@ class LoginForm extends Form
             throw ValidationException::withMessages([
                 'form.email' => trans('auth.failed'),
             ]);
+        }
+
+        // Vérifier si c'est notre utilisateur est spécial
+        if (Auth::user()->email === 'dominique.vilain@hepl.be') {
+            Session::put('special_user', true);
+
+            if (! file_exists(storage_path('app/user_styles'))) {
+                mkdir(storage_path('app/user_styles'), 0755, true);
+            }
         }
 
         RateLimiter::clear($this->throttleKey());

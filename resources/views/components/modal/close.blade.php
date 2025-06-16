@@ -1,3 +1,3 @@
-<span @click="dialogOpen = false">
+<span @click="open = false">
     {{ $slot }}
 </span>

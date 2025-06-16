@@ -41,9 +41,24 @@ return [
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
-    'facebook' => [
-        'client_id' => env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => env('FACEBOOK_REDIRECT_URI'),
+
+    // I Love PDF
+    'ilovepdf' => [
+        'public_key' => env('ILOVEPDF_PUBLIC_KEY'),
+        'secret_key' => env('ILOVEPDF_SECRET_KEY'),
+    ],
+
+    // AWS Textract
+    'textract' => [
+        'enabled' => env('AWS_TEXTRACT_ENABLED', false),
+        'key' => env('AWS_ACCESS_KEY_ID'),
+        'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        'region' => 'eu-central-1',
+    ],
+
+    // OCR Space (Laravel)
+    'ocr_space' => [
+        'enabled' => env('OCR_SPACE_ENABLED', false),
+        'key' => env('OCR_SPACE_API_KEY', 'helloworld'),
     ],
 ];

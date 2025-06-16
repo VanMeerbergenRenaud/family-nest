@@ -1,6 +1,6 @@
 <div
-    x-data="{ dialogOpen: false }"
-    x-modelable="dialogOpen"
+    x-data="{ open: false }"
+    x-modelable="open"
     {{ $attributes }}
     tabindex="-1"
 >

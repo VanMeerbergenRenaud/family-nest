@@ -2,6 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Enums\FamilyPermissionEnum;
+use App\Enums\FamilyRelationEnum;
+use App\Models\Family;
+use App\Models\Invoice;
+use App\Models\InvoiceFile;
+use App\Models\InvoiceSharing;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -12,53 +18,83 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
+        /* Main user */
+        $renaud = User::factory()->create([
             'name' => 'Renaud Vmb',
             'email' => 'renaud.vmb@gmail.com',
             'password' => bcrypt('password'),
         ]);
 
-        /* Teachers users */
-        User::factory()->create([
-            'name' => 'Toon Van Den Bos',
-            'email' => 'toon.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/toon_van_den_bos.jpeg'),
+        $france = User::factory()->create([
+            'name' => 'France Mélon',
+            'email' => 'france.test@gmail.com',
+            'password' => bcrypt('password'),
         ]);
 
-        User::factory()->create([
-            'name' => 'Dominique Vilain',
-            'email' => 'dominique.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/dominique_vilain.jpeg'),
+        $martin = User::factory()->create([
+            'name' => 'Martin Van Meerbergen',
+            'email' => 'martin.test@gmail.com',
+            'password' => bcrypt('password'),
         ]);
 
-        User::factory()->create([
-            'name' => 'Myriam Dupont',
-            'email' => 'myriam.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/myriam_dupont.jpeg'),
+        $mamy = User::factory()->create([
+            'name' => 'Mamy',
+            'email' => 'mamy.test@gmail.com',
+            'password' => bcrypt('password'),
         ]);
 
-        User::factory()->create([
-            'name' => 'Daniel Schreurs',
-            'email' => 'daniel.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/daniel_schreurs.jpeg'),
+        // Create a family for the main user
+        $renaudFamily = Family::factory()->create([
+            'name' => 'Van Meerbergen',
         ]);
 
-        User::factory()->create([
-            'name' => 'François Parmentier',
-            'email' => 'francois.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/users/francois_parmentier.jpeg'),
+        // Attach other users to the family of the main user
+        $renaudFamily->users()->attach($renaud->id, [
+            'permission' => FamilyPermissionEnum::Admin->value,
+            'relation' => FamilyRelationEnum::Self->value,
+            'is_admin' => true,
         ]);
 
-        User::factory()->create([
-            'name' => 'Cédric Muller',
-            'email' => 'cedric.test@gmail.com',
-            'password' => bcrypt('password_1'),
-            'avatar' => asset('img/avatar_placeholder.png'),
+        // Add relationships for the main user
+        $renaudFamily->users()->attach([
+            $france->id => [
+                'permission' => FamilyPermissionEnum::Editor->value,
+                'relation' => FamilyRelationEnum::Parent->value,
+            ],
+            $martin->id => [
+                'permission' => FamilyPermissionEnum::Viewer->value,
+                'relation' => FamilyRelationEnum::Brother->value,
+            ],
+            $mamy->id => [
+                'permission' => FamilyPermissionEnum::Viewer->value,
+                'relation' => FamilyRelationEnum::Grandparent->value,
+            ],
         ]);
+
+        // Create invoices for users
+        $invoiceRenaud = Invoice::factory(20)->create([
+            'user_id' => $renaud->id,
+        ]);
+
+        $invoiceFrance = Invoice::factory(5)->create([
+            'user_id' => $france->id,
+        ]);
+
+        // Create invoice files for users
+        foreach ($invoiceRenaud as $invoice) {
+            InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+            InvoiceSharing::factory()->create([
+                'user_id' => $renaud->id,
+                'invoice_id' => $invoice->id,
+            ]);
+        }
+
+        foreach ($invoiceFrance as $invoice) {
+            InvoiceFile::factory()->create([
+                'invoice_id' => $invoice->id,
+            ]);
+        }
     }
 }

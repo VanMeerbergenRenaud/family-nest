@@ -37,6 +37,30 @@ return [
 
     'mailers' => [
 
+        'mailgun' => [
+            'transport' => 'mailgun',
+        ],
+
+        'mailersend' => [
+            'transport' => 'mailersend',
+        ],
+
+        'mailtrap' => [
+            'transport' => 'mailtrap',
+            'api_key' => env('MAILTRAP_API_KEY'),
+            'host' => env('MAILTRAP_HOST'),
+        ],
+
+        // mailpit (local)
+        'mailpit' => [
+            'transport' => 'smtp',
+            'host' => env('MAILPIT_HOST', '127.0.0.1'),
+            'port' => env('MAILPIT_PORT', 1025),
+            'encryption' => null,
+            'username' => null,
+            'password' => null,
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'url' => env('MAIL_URL'),
@@ -94,7 +118,6 @@ return [
                 'postmark',
             ],
         ],
-
     ],
 
     /*
@@ -113,4 +136,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'support' => [
+        'address' => env('MAIL_SUPPORT_EMAIL', 'test@gmail.com'),
+    ],
 ];

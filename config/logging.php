@@ -51,6 +51,12 @@ return [
     */
 
     'channels' => [
+        'google_auth' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/google-auth.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
 
         'stack' => [
             'driver' => 'stack',
@@ -126,7 +132,5 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
-
     ],
-
 ];

@@ -1,0 +1,539 @@
+@import "tailwindcss";
+/*@import "../../public/fonts/clash-grotesk/clash-grotesk.css";
+@import "../../public/fonts/instrument-sans/instrument-sans.css";*/
+
+@source "../views";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    /*--font-clashgrotesk: "Clash Grotesk", sans-serif;
+    --font-instrumentsans: "Instrument Sans", sans-serif;*/
+
+    --color-dark: #334054;
+}
+
+@layer base {
+    body {
+        @apply mx-auto p-0 relative flex flex-col h-screen min-h-screen max-w-[160rem] text-base font-normal scroll-smooth antialiased bg-gray-50 dark:bg-gray-800 text-black dark:text-white;
+    }
+
+    main {
+        @apply m-0 p-0 bg-gray-50 dark:bg-gray-800;
+    }
+
+    h1, h2, h3, h4, h5, h6 {/*font-clashgrotesk*/
+        @apply font-medium;
+    }
+
+    p, span {/*font-instrumentsans*/
+        @apply text-base font-normal;
+    }
+
+    a, button {
+        @apply text-base font-normal leading-6 cursor-pointer transition-colors ease-in-out duration-400 hover:duration-150 active:duration-50;
+    }
+
+    img, video {
+        @apply flex-center w-full max-w-full h-auto object-cover bg-gray-300 overflow-hidden;
+    }
+
+    svg {
+        @apply w-4 h-4 text-gray-600 dark:text-gray-400;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+        @apply outline-2 outline-gray-800 dark:outline-gray-400 outline-offset-2 rounded-md;
+    }
+
+    button:disabled,
+    input:disabled,
+    textarea:disabled {
+        @apply opacity-50 cursor-not-allowed;
+    }
+
+    /* Styles de base pour les tableaux */
+    table {
+        @apply min-w-full border-collapse divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800;
+    }
+
+    thead, thead tr, thead tr span {
+        @apply bg-gray-50 dark:bg-cyan-950 hover:text-gray-900 dark:hover:text-gray-300;
+    }
+
+    thead th, thead th span {
+        @apply text-xs font-semibold text-gray-700 dark:text-gray-400;
+    }
+
+    tbody {
+        @apply bg-white dark:bg-gray-800;
+    }
+
+    tbody tr {
+        @apply bg-white dark:bg-gray-800 transition-colors;
+    }
+
+    tbody td, tbody td p {
+        @apply text-sm font-normal text-gray-700 dark:text-gray-400;
+    }
+
+    tr {
+        @apply border-b border-gray-200 dark:border-gray-700;
+    }
+
+    th {
+        @apply px-6 py-3 text-left;
+    }
+
+    td {
+        @apply px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-400;
+    }
+
+    tbody tr:last-of-type {
+        @apply border-b-0;
+    }
+}
+
+@layer components {
+    .test {
+        @apply block bg-black text-white;
+
+        @variant dark {
+            @variant hover {
+                @apply bg-blue-500 text-black;
+            }
+        }
+    }
+
+    /* Invalid state */
+    .input-invalid {
+        @apply outline-2 outline-red-600 dark:outline-red-400 outline-offset-2 rounded-md;
+    }
+
+    /* Links
+        1. Custom underline link
+        2. Disabled state
+    */
+
+    .link-underline {
+        @apply relative transition-all ease-in-out rounded-md;
+
+        /* Styles 'before' (1ère partie du soulignement) */
+        @apply before:transition-[width]
+        before:ease-in-out
+        before:duration-400
+        before:absolute
+        before:bg-gray-600
+        before:origin-center
+        before:h-[0.1rem]
+        before:w-0
+        before:bottom-[-2px]
+        before:left-[50%]
+        before:rounded-r-lg;
+
+        /* Styles 'after' (2ème partie du soulignement) */
+        @apply after:rounded-l-lg
+        after:transition-[width]
+        after:ease-in-out
+        after:duration-400
+        after:absolute
+        after:bg-gray-600
+        after:origin-center
+        after:h-[0.1rem]
+        after:w-0
+        after:bottom-[-2px]
+        after:right-[50%];
+
+        /* Styles hover */
+        @apply hover:before:w-[50%] hover:after:w-[50%];
+    }
+
+    .link-disabled {
+        @apply opacity-50 cursor-not-allowed;
+    }
+
+    /*------------ Homepage ------------*/
+    .homepage-title {
+        @apply text-4xl leading-tight font-semibold text-gray-900 max-w-xl;
+    }
+
+    .homepage-text {
+        @apply text-lg leading-relaxed text-gray-600;
+    }
+
+    .homepage-link {
+        @apply flex items-center gap-1.5 py-2 px-3 text-[15px] h-9 rounded-[10px] font-medium text-[#2E3238] hover:bg-gray-200/50 hover:text-slate-900 border border-transparent;
+    }
+
+    /* Buttons
+        0. Classic => transparent/gray
+        1. Primary => white
+        2. Secondary => gray
+        3. Tertiary => indigo
+        4. Danger => red
+        5. Warning => yellow
+        6. Success => green
+    */
+
+    .button-classic {
+        @apply flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium rounded-[10px] text-gray-700 border border-transparent hover:bg-zinc-200/50 hover:text-gray-800 transition-colors;
+    }
+
+    .button-primary {
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-gray-700 border border-gray-200 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600;
+    }
+
+    .button-secondary {
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-transparent bg-gray-800 hover:bg-gray-700 transition-colors;
+    }
+
+    .button-tertiary {
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border-transparent bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 transition-colors;
+    }
+
+    .button-danger {
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-transparent bg-red-500 hover:bg-red-600 transition-colors;
+    }
+
+    .button-success {
+        @apply flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-[10px] text-white border border-green-600 bg-green-600 transition-colors;
+    }
+
+    .button-rounded {
+        @apply flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full text-gray-700 transition-colors;
+    }
+
+    /* Fonts
+        1. Display (3xl, 2xl, xl, lg, md, sm, xs)
+        2. Text (xl, lg, md, sm, xs)
+    */
+
+    /*---------- 1. Display ----------*/
+    .display-3xl-semibold {
+        @apply text-8xl leading-[5.75rem] tracking-[-0.02em] font-semibold;
+        /* 80px / 92px / -2% / Semibold */
+    }
+
+    .display-2xl-regular {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-normal;
+        /* 72px / 90px / -2% / Regular */
+    }
+
+    .display-2xl-medium {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-medium;
+        /* 72px / 90px / -2% / Medium */
+    }
+
+    .display-2xl-semibold {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-semibold;
+        /* 72px / 90px / -2% / Semibold */
+    }
+
+    .display-2xl-bold {
+        @apply text-7xl leading-[5.625rem] tracking-[-0.02em] font-bold;
+        /* 72px / 90px / -2% / Bold */
+    }
+
+    .display-xl-regular {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-normal;
+        /* 60px / 72px / -2% / Regular */
+    }
+
+    .display-xl-medium {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-medium;
+        /* 60px / 72px / -2% / Medium */
+    }
+
+    .display-xl-semibold {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-semibold;
+        /* 60px / 72px / -2% / Semibold */
+    }
+
+    .display-xl-bold {
+        @apply text-6xl leading-[4.5rem] tracking-[-0.02em] font-bold;
+        /* 60px / 72px / -2% / Bold */
+    }
+
+    .display-lg-regular {
+        @apply text-5xl leading-[4.25rem] tracking-[-0.02em] font-normal;
+        /* 48px / 60px / -2% / Regular */
+    }
+
+    .display-lg-medium {
+        @apply text-5xl leading-[4.25rem] tracking-[-0.02em] font-medium;
+        /* 48px / 60px / -2% / Medium */
+    }
+
+    .display-lg-semibold {
+        @apply text-5xl leading-[4.25rem] tracking-[-0.02em] font-semibold;
+        /* 48px / 60px / -2% / Semibold */
+    }
+
+    .display-lg-bold {
+        @apply text-5xl leading-[4.25rem] tracking-[-0.02em] font-bold;
+        /* 48px / 60px / -2% / Bold */
+    }
+
+    .display-md-regular {
+        @apply text-4xl leading-[4rem] tracking-[-0.02em] font-normal;
+        /* 36px / 44px / -2% / Regular */
+    }
+
+    .display-md-medium {
+        @apply text-4xl leading-[4rem] tracking-[-0.02em] font-medium;
+        /* 36px / 44px / -2% / Medium */
+    }
+
+    .display-md-semibold {
+        @apply text-4xl leading-[4rem] tracking-[-0.02em] font-semibold;
+        /* 36px / 44px / -2% / Semibold */
+    }
+
+    .display-md-bold {
+        @apply text-4xl leading-[4rem] tracking-[-0.02em] font-bold;
+        /* 36px / 44px / -2% / Bold */
+    }
+
+    .display-sm-regular {
+        @apply text-3xl leading-[3rem] font-normal;
+        /* 30px / 38px / Regular */
+    }
+
+    .display-sm-medium {
+        @apply text-3xl leading-[3rem] font-medium;
+        /* 30px / 38px / Medium */
+    }
+
+    .display-sm-semibold {
+        @apply text-3xl leading-[3rem] font-semibold;
+        /* 30px / 38px / Semibold */
+    }
+
+    .display-sm-bold {
+        @apply text-3xl leading-[3rem] font-bold;
+        /* 30px / 38px / Bold */
+    }
+
+    .display-xs-regular {
+        @apply text-2xl leading-[2rem] font-normal;
+        /* 24px / 32px / Regular */
+    }
+
+    .display-xs-medium {
+        @apply text-2xl leading-[2rem] font-medium;
+        /* 24px / 32px / Medium */
+    }
+
+    .display-xs-semibold {
+        @apply text-2xl leading-[2rem] font-semibold;
+        /* 24px / 32px / Semibold */
+    }
+
+    .display-xs-bold {
+        @apply text-2xl leading-[2rem] font-bold;
+        /* 24px / 32px / Bold */
+    }
+
+    /*---------- 2. Text ----------*/
+    .text-xl-regular {
+        @apply text-xl leading-normal font-normal;
+        /* 20px / 30px / Regular */
+    }
+
+    .text-xl-medium {
+        @apply text-xl leading-normal font-medium;
+        /* 20px / 30px / Medium */
+    }
+
+    .text-xl-semibold {
+        @apply text-xl leading-normal font-semibold;
+        /* 20px / 30px / Semibold */
+    }
+
+    .text-xl-bold {
+        @apply text-xl leading-normal font-bold;
+        /* 20px / 30px / Bold */
+    }
+
+    .text-lg-regular {
+        @apply text-lg leading-relaxed font-normal;
+        /* 18px / 28px / Regular */
+    }
+
+    .text-lg-medium {
+        @apply text-lg leading-relaxed font-medium;
+        /* 18px / 28px / Medium */
+    }
+
+    .text-lg-semibold {
+        @apply text-lg leading-relaxed font-semibold;
+        /* 18px / 28px / Semibold */
+    }
+
+    .text-lg-bold {
+        @apply text-lg leading-relaxed font-bold;
+        /* 18px / 28px / Bold */
+    }
+
+    .text-md-regular {
+        @apply text-base leading-normal font-normal;
+        /* 16px / 24px / Regular */
+    }
+
+    .text-md-medium {
+        @apply text-base leading-normal font-medium;
+        /* 16px / 24px / Medium */
+    }
+
+    .text-md-semibold {
+        @apply text-base leading-normal font-semibold;
+        /* 16px / 24px / Semibold */
+    }
+
+    .text-md-bold {
+        @apply text-base leading-normal font-bold;
+        /* 16px / 24px / Bold */
+    }
+
+    .text-sm-regular {
+        @apply text-sm leading-snug font-normal;
+        /* 14px / 20px / Regular (text-sm est 0.875rem = 14px) */
+    }
+
+    .text-sm-medium {
+        @apply text-sm leading-snug font-medium;
+        /* 14px / 20px / Medium */
+    }
+
+    .text-sm-semibold {
+        @apply text-sm leading-snug font-semibold;
+        /* 14px / 20px / Semibold */
+    }
+
+    .text-sm-bold {
+        @apply text-sm leading-snug font-bold;
+        /* 14px / 20px / Bold */
+    }
+
+    .text-xs-regular {
+        @apply text-xs leading-normal font-normal;
+        /* 12px / 18px / Regular (text-xs est 0.75rem = 12px) */
+    }
+
+    .text-xs-medium {
+        @apply text-xs leading-normal font-medium;
+        /* 12px / 18px / Medium */
+    }
+
+    .text-xs-semibold {
+        @apply text-xs leading-normal font-semibold;
+        /* 12px / 18px / Semibold */
+    }
+
+    .text-xs-bold {
+        @apply text-xs leading-normal font-bold;
+        /* 12px / 18px / Bold */
+    }
+}
+
+@layer utilities {
+    .container {
+        width: 100%;
+        max-width: 100%;
+        margin-inline: auto;
+    }
+
+    @media (min-width: 375px) {
+        .container {
+            padding-inline: 1rem;
+            max-width: 448px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 624px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .container {
+            @apply max-w-7xl;
+        }
+    }
+}
+
+@utility flex-center {
+    @apply flex justify-center items-center;
+}
+
+@utility scrollbar-hidden {
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Loader animation */
+@utility animate-rotate {
+    animation: rotate 5s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg) scale(10);
+    }
+    100% {
+        transform: rotate(-360deg) scale(10);
+    }
+}
+
+/* Aurora animation */
+@utility animate-aurora {
+    animation: aurora 20s linear infinite;
+}
+
+@keyframes aurora {
+    0% {
+        transform: scale(1) translate(0px, 0px) rotate(0deg);
+    }
+    33% {
+        transform: scale(1.1) translate(40px, -60px) rotate(120deg);
+    }
+    66% {
+        transform: scale(0.9) translate(-90px, 30px) rotate(240deg);
+    }
+    100% {
+        transform: scale(1) translate(0px, 0px) rotate(360deg);
+    }
+}
+
+@layer utilities {
+    @keyframes marquee {
+        from { transform: translateX(0%); }
+        to { transform: translateX(-50%); }
+    }
+
+    .animate-marquee {
+        animation: marquee 20s linear infinite;
+    }
+}
+
+/* Sidebar exception for small height devices */
+@media (min-height: 765px) {
+    .custom-mt-auto {
+        margin-top: auto;
+    }
+}
+
+@media (inverted-colors) {
+    img, video {
+        filter: invert(100%);
+    }
+}

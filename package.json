@@ -1,25 +1,32 @@
 {
-    "private": true,
+    "name": "family-nest",
     "type": "module",
+    "module": "index.ts",
+    "private": true,
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@alpinejs/focus": "^3.14.8",
+        "@alpinejs/mask": "^3.14.8",
+        "@alpinejs/ui": "^3.14.7",
+        "@tailwindcss/vite": "^4.0.7"
+    },
+    "devDependencies": {
+        "alpinejs": "^3.14.8",
+        "alpinejs-money": "^1.1.4",
+        "autoprefixer": "^10.4.20",
+        "axios": "^1.7.4",
+        "bun-types": "latest",
+        "laravel-vite-plugin": "^1.0",
+        "sass-embedded": "^1.83.0",
+        "tailwindcss": "^4.0.7",
+        "vite": "^5.0"
+    },
     "scripts": {
         "dev": "bunx --bun vite",
         "build": "vite build",
         "serve": "vite preview",
         "start": "bun run index.ts"
-    },
-    "devDependencies": {
-        "alpinejs": "^3.4.2",
-        "autoprefixer": "^10.4.2",
-        "axios": "^1.7.4",
-        "bun-types": "latest",
-        "laravel-vite-plugin": "^0.8.0",
-        "postcss": "^8.4.31",
-        "sass": "^1.69.5",
-        "vite": "^4.5.3"
-    },
-    "name": "family-nest",
-    "module": "index.ts",
-    "peerDependencies": {
-        "typescript": "^5.0.0"
     }
 }
