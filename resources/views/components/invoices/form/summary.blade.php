@@ -26,7 +26,7 @@
                     ({{ $form->issuer_website }})
                 </a>
             @else
-                <span class="text-sm-medium">{{ __('Non spécifié') }}</span>
+                <span class="text-sm-medium">{{ __('- Site web non spécifié') }}</span>
             @endif
         </x-invoices.form.summary-item>
 

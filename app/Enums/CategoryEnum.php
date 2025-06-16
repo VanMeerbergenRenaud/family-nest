@@ -26,8 +26,8 @@ enum CategoryEnum: string
     case AMENAGEMENT = 'Aménagement intérieur';
     case DECORATION = 'Décoration';
     case GROS_ELECTROMENAGER = 'Gros électroménager';
-    case MEUBLES = 'Meubles';
     case PETIT_ELECTROMENAGER = 'Petit électroménager';
+    case MEUBLES = 'Meubles';
     case SECURITE = 'Sécurité';
 
     // Alimentation et Courses
@@ -153,8 +153,8 @@ enum CategoryEnum: string
             self::AMENAGEMENT => '🏗️',
             self::DECORATION => '🎨',
             self::GROS_ELECTROMENAGER => '🧊',
-            self::MEUBLES => '🪑',
             self::PETIT_ELECTROMENAGER => '🔌',
+            self::MEUBLES => '🪑',
             self::SECURITE => '🔒',
 
             // Alimentation et Courses

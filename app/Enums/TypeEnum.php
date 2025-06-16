@@ -10,18 +10,18 @@ enum TypeEnum: string
 
     case ABONNEMENTS = 'Abonnements';
     case ACHATS_MAISON = 'Achats de la maison';
-    case ALIMENTATION_COURSES = 'Alimentation et Courses';
+    case ALIMENTATION_COURSES = 'Alimentation et courses';
     case ANIMAUX = 'Animaux';
     case ASSURANCES = 'Assurances';
     case DIVERS = 'Divers';
-    case DIVERTISSEMENTS_LOISIRS = 'Divertissements et Loisirs';
-    case DONS_CONTRIBUTIONS = 'Dons et Contributions';
+    case DIVERTISSEMENTS_LOISIRS = 'Divertissements et loisirs';
+    case DONS_CONTRIBUTIONS = 'Dons et contributions';
     case EDUCATION = 'Éducation';
     case ENFANTS = 'Enfants';
     case FINANCES = 'Finances';
-    case IMPOTS_CONTRIBUTIONS = 'Impôts et Contributions Sociales';
+    case IMPOTS_CONTRIBUTIONS = 'Impôts et contributions Sociales';
     case LOGEMENT = 'Logement';
-    case SANTE_BIEN_ETRE = 'Santé et Bien-être';
+    case SANTE_BIEN_ETRE = 'Santé et bien-être';
     case SERVICES_DOMICILE = 'Services à domicile';
     case TECHNOLOGIE = 'Technologie';
     case TRANSPORT = 'Transport';

@@ -177,7 +177,7 @@ trait OcrProcessingTrait
     // Gère les erreurs génériques non catégorisées
     private function handleGenericError(array $result): void
     {
-        Toaster::error('Impossible d\'analyser le document. Vérifiez sa qualité et réessayez.');
+        Toaster::error('Impossible d\'analyser le document::Vérifiez qu\'il ne soit pas plus long que 3 pages ou protégé par un mot de passe.');
         Log::error('Erreur OCR non catégorisée', [
             'message' => $result['message'] ?? 'Erreur inconnue',
             'service' => $result['service'] ?? 'unknown',
