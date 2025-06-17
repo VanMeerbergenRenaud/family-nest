@@ -12,3 +12,7 @@ Cela permettrait également de mieux gérer les imprévus financiers, qui sont l
 
 Développement :
 [![wakatime](https://wakatime.com/badge/github/VanMeerbergenRenaud/family-nest.svg)](https://wakatime.com/badge/github/VanMeerbergenRenaud/family-nest)
+
+## Structure de la base de données
+
+![Structure de la base de données](public/img/db.png)
