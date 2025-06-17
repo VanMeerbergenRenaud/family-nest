@@ -53,6 +53,14 @@ class Danger extends Component
 
             $this->promoteNewAdminIfNeeded($user);
 
+            // Soft delete des factures
+            $user->invoices()->delete();
+
+            // Soft delete du profil utilisateur (modification de l'email pour éviter les conflits)
+            $randomString = uniqid();
+            $user->email = $user->email . '_' . $randomString . '@deleted.account';
+            $user->save();
+
             $user->delete();
 
             DB::commit();
@@ -74,7 +82,7 @@ class Danger extends Component
 
     /**
      * Promeut un autre membre de la famille au rôle d'administrateur
-     * si l'utilisateur courant est le seul administrateur de la famille
+     * si l'utilisateur actuel est le seul administrateur de la famille
      */
     protected function promoteNewAdminIfNeeded($user): void
     {
@@ -82,6 +90,19 @@ class Danger extends Component
 
         foreach ($userFamilies as $family) {
             $familyId = $family->id;
+
+            // Compter le nombre total de membres dans cette famille
+            $memberCount = DB::table('family_user')
+                ->where('family_id', $familyId)
+                ->count();
+
+            // Si l'utilisateur est le seul membre, supprimer la famille
+            if ($memberCount === 1) {
+                // On supprime la famille et toutes ses données associées
+                $family->delete();
+                continue; // Passer à la famille suivante
+            }
+
             $userPermission = $family->pivot->permission;
 
             // Si l'utilisateur est administrateur de cette famille

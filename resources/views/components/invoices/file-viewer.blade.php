@@ -10,7 +10,7 @@
             <img
                 src="{{ $filePath }}"
                 alt="{{ $fileName ?? 'Aperçu du document' }}"
-                class="max-w-full max-h-full object-cover"
+                class="max-w-full max-h-[80vh] object-contain"
                 loading="lazy"
             >
         @elseif($fileExtension === 'pdf')

@@ -15,11 +15,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 class Invoice extends Model
 {
-    use HasFactory, HumanDateTrait, Searchable;
+    use HasFactory, HumanDateTrait, Searchable, SoftDeletes;
 
     protected $fillable = [
         'name', 'reference', 'type', 'category', 'issuer_name', 'issuer_website',

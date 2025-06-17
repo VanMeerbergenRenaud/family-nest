@@ -29,7 +29,7 @@
                                 {{ Str::limit($invoice->name, 16) }}
                             </p>
                             <p class="mt-1 w-max text-xs-regular text-gray-500 dark:text-gray-400">
-                                {{ $invoice->dateForHumans($invoice->created_at) }}
+                                {{ $invoice->dateForHumans($invoice->issued_date) }}
                                 • {{ $invoice->amount ?? 'Montant vide' }} {{ $this->getInvoiceCurrencySymbol($invoice) }}
                             </p>
                         </div>

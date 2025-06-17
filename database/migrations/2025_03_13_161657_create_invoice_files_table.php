@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_primary')->default(false);
             $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,5 +30,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('invoice_files');
+        Schema::table('invoice_files', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };
