@@ -51,7 +51,7 @@ class GoalForm extends Form
             'description' => 'nullable|string|max:500',
             'goal_type' => 'required|in:'.implode(',', array_map(fn ($type) => $type->value, GoalTypeEnum::cases())),
             'period_type' => 'required|in:'.implode(',', array_map(fn ($period) => $period->value, GoalPeriodEnum::cases())),
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date|after_or_equal:'.now()->startOfYear()->format('Y-m-d'),
             'end_date' => 'required|date|after:start_date',
             'is_recurring' => 'boolean|nullable',
             'is_family_goal' => 'boolean|nullable',
@@ -60,6 +60,54 @@ class GoalForm extends Form
             'categories.*' => 'string|in:'.implode(',', array_map(fn ($case) => $case->value, CategoryEnum::cases())),
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            // Nom de l'objectif
+            'name.required' => 'Le nom de l\'objectif est obligatoire.',
+            'name.string' => 'Le nom doit être une chaîne de caractères.',
+            'name.max' => 'Le nom ne peut pas dépasser 255 caractères.',
+
+            // Description
+            'description.string' => 'La description doit être une chaîne de caractères.',
+            'description.max' => 'La description ne peut pas dépasser 500 caractères.',
+
+            // Type d'objectif
+            'goal_type.required' => 'Le type d\'objectif est obligatoire.',
+            'goal_type.in' => 'Le type d\'objectif sélectionné n\'est pas valide.',
+
+            // Période
+            'period_type.required' => 'La période est obligatoire.',
+            'period_type.in' => 'La période sélectionnée n\'est pas valide.',
+
+            // Dates
+            'start_date.required' => 'La date de début est obligatoire.',
+            'start_date.date' => 'La date de début n\'est pas au format valide.',
+            'start_date.after_or_equal' => 'La date de début doit être égale ou postérieure au début de l\'année courante.',
+            'end_date.required' => 'La date de fin est obligatoire.',
+            'end_date.date' => 'La date de fin n\'est pas au format valide.',
+            'end_date.after' => 'La date de fin doit être postérieure à la date de début.',
+
+            // Options
+            'is_recurring.boolean' => 'L\'option de récurrence doit être oui ou non.',
+            'is_family_goal.boolean' => 'L\'option d\'objectif familial doit être oui ou non.',
+
+            // Montant
+            'target_amount.required' => 'Le montant cible est obligatoire.',
+            'target_amount.numeric' => 'Le montant cible doit être un nombre.',
+            'target_amount.min' => 'Le montant cible doit être supérieur ou égal à zéro.',
+            'target_amount.max' => 'Le montant cible doit être inférieur à 999 999 999,99.',
+
+            // Catégories
+            'categories.required' => 'Vous devez sélectionner au moins une catégorie.',
+            'categories.array' => 'Les catégories doivent former une liste.',
+            'categories.min' => 'Vous devez sélectionner au moins une catégorie.',
+            'categories.max' => 'Vous ne pouvez pas sélectionner plus de 10 catégories.',
+            'categories.*.in' => 'Une des catégories sélectionnées n\'est pas valide.',
+        ];
+    }
+
 
     public function setFromGoal(Goal $goal): void
     {

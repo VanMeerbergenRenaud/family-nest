@@ -65,6 +65,13 @@
                                 <span x-show="isChromium">L'aperçu PDF n'est pas disponible sur le navigateur Google Chrome.</span>
                                 <span x-show="!isChromium">Le fichier PDF sera visible après l'enregistrement de la facture.</span>
                             </p>
+                            <a href="{{ $temporaryUrl ?? $storagePath }}"
+                               class="mt-2 button-primary"
+                               target="_blank"
+                            >
+                                <x-svg.show class=" mr-1"/>
+                                Voir le PDF dans un nouvel onglet
+                            </a>
                         </div>
                     </template>
                 </div>

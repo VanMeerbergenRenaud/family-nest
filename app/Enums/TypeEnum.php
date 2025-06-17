@@ -19,7 +19,7 @@ enum TypeEnum: string
     case EDUCATION = 'Éducation';
     case ENFANTS = 'Enfants';
     case FINANCES = 'Finances';
-    case IMPOTS_CONTRIBUTIONS = 'Impôts et contributions Sociales';
+    case IMPOTS_CONTRIBUTIONS = 'Impôts et contributions sociales';
     case LOGEMENT = 'Logement';
     case SANTE_BIEN_ETRE = 'Santé et bien-être';
     case SERVICES_DOMICILE = 'Services à domicile';

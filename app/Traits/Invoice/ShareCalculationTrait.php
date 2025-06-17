@@ -18,6 +18,8 @@ trait ShareCalculationTrait
      */
     public function calculateRemainingShares(): void
     {
+        $this->normalizeUserShares();
+
         $invoiceAmount = floatval($this->form->amount ?? 0);
         $this->remainingAmount = $invoiceAmount;
         $this->remainingPercentage = 100;
@@ -42,6 +44,8 @@ trait ShareCalculationTrait
      */
     public function updateShare(int $userId, $value, string $type = 'percentage'): void
     {
+        $this->normalizeUserShares();
+
         $value = $this->normalizeNumber($value);
         $this->form->user_shares ??= [];
         $invoiceAmount = floatval($this->form->amount ?? 0);
@@ -185,6 +189,10 @@ trait ShareCalculationTrait
         }
 
         foreach ($this->form->user_shares as $index => $share) {
+            if (!isset($share['id'])) {
+                continue;
+            }
+
             if ((int) $share['id'] === $userId) {
                 return $index;
             }
@@ -203,6 +211,22 @@ trait ShareCalculationTrait
         }
 
         return round((float) $value, 2);
+    }
+
+    protected function normalizeUserShares(): void
+    {
+        if (empty($this->form->user_shares)) {
+            $this->form->user_shares = [];
+            return;
+        }
+
+        // Filtrer pour garder uniquement les entrées valides
+        $this->form->user_shares = array_filter($this->form->user_shares, function($share) {
+            return isset($share['id']) && is_numeric($share['id']);
+        });
+
+        // Réindexer le tableau pour éviter les indices non séquentiels
+        $this->form->user_shares = array_values($this->form->user_shares);
     }
 
     /**
