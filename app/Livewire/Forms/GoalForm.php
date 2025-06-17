@@ -108,7 +108,6 @@ class GoalForm extends Form
         ];
     }
 
-
     public function setFromGoal(Goal $goal): void
     {
         $this->goal = $goal;
@@ -133,10 +132,11 @@ class GoalForm extends Form
             $family = $user->family();
 
             // Vérifier si l'utilisateur a une famille
-            if (!$family) {
+            if (! $family) {
                 // Si c'est un objectif familial mais que l'utilisateur n'a pas de famille
                 if ($this->is_family_goal) {
                     Toaster::error('Vous devez appartenir à une famille pour créer un objectif familial');
+
                     return null;
                 }
                 $familyId = null;

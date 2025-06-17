@@ -189,7 +189,7 @@ trait ShareCalculationTrait
         }
 
         foreach ($this->form->user_shares as $index => $share) {
-            if (!isset($share['id'])) {
+            if (! isset($share['id'])) {
                 continue;
             }
 
@@ -217,11 +217,12 @@ trait ShareCalculationTrait
     {
         if (empty($this->form->user_shares)) {
             $this->form->user_shares = [];
+
             return;
         }
 
         // Filtrer pour garder uniquement les entrées valides
-        $this->form->user_shares = array_filter($this->form->user_shares, function($share) {
+        $this->form->user_shares = array_filter($this->form->user_shares, function ($share) {
             return isset($share['id']) && is_numeric($share['id']);
         });
 

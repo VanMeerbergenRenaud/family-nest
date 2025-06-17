@@ -58,7 +58,7 @@ class Danger extends Component
 
             // Soft delete du profil utilisateur (modification de l'email pour éviter les conflits)
             $randomString = uniqid();
-            $user->email = $user->email . '_' . $randomString . '@deleted.account';
+            $user->email = $user->email.'_'.$randomString.'@deleted.account';
             $user->save();
 
             $user->delete();
@@ -100,6 +100,7 @@ class Danger extends Component
             if ($memberCount === 1) {
                 // On supprime la famille et toutes ses données associées
                 $family->delete();
+
                 continue; // Passer à la famille suivante
             }
 

@@ -25,9 +25,9 @@ class Edit extends Component
 {
     use ComponentTrait;
     use FileUrlTrait;
+    use OcrProcessingTrait;
     use ShareCalculationTrait;
     use TagManagement;
-    use OcrProcessingTrait;
     use WithFileUploads;
 
     public InvoiceForm $form;
