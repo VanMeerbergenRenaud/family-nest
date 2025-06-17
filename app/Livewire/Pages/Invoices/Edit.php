@@ -90,12 +90,6 @@ class Edit extends Component
         $this->enableSharing = $this->invoice->sharings()->exists();
     }
 
-    public function hydrate(): void
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
-    }
-
     public function updatedFormUploadedFile(): void
     {
         $this->showOcrButton = true;

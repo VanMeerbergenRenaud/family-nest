@@ -36,12 +36,6 @@ class Modal extends Component
         }
     }
 
-    public function hydrate(): void
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
-    }
-
     protected function configureForEdit($goalId): void
     {
         $this->isEditMode = true;

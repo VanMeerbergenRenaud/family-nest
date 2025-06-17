@@ -201,7 +201,7 @@ class InvoiceForm extends Form
 
             // Messages d'erreur pour les informations facture
             'name.required' => 'Le nom de la facture est obligatoire.',
-            'issuer_website.regex' => "Le format de l'URL n'est pas valide. Assurez-vous qu'elle termine par un nom de domaine existant (.be, .com, etc.).",
+            'issuer_website.regex' => "Le format de l'URL du site n'est pas valide. Assurez-vous qu'elle termine par un nom de domaine existant (.be, .com, etc.).",
             'amount.required' => 'Le montant est obligatoire.',
             'amount.numeric' => 'Le montant doit être un nombre.',
             'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
@@ -237,6 +237,12 @@ class InvoiceForm extends Form
         $this->is_primary = true;
     }
 
+    /*public function hydrate(): void
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }*/
+
     // Méthode générique pour la sauvegarde de la facture
     public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
@@ -246,7 +252,7 @@ class InvoiceForm extends Form
 
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
-            $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
+            $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité et ne pas dépasser le montant de la facture (100%).');
 
             return false;
         }

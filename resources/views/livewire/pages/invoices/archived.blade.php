@@ -9,7 +9,7 @@
                 <div class="h-fit p-1 flex items-center gap-1 w-fit rounded-lg border border-slate-200">
                     @php
                         $types = [
-                            'all' => 'Toutes',
+                            'all' => 'Familiales',
                             'personal' => 'Personnelles'
                         ];
                     @endphp
