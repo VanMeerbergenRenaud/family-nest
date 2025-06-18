@@ -21,13 +21,7 @@
             <span>Aucune donnée disponible pour ce filtre</span>
         </div>
     </div>
-
-
 </div>
-
-@assets
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-@endassets
 
 @script
 <script>
