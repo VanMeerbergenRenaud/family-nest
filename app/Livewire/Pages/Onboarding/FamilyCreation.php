@@ -166,10 +166,12 @@ class FamilyCreation extends Component
 
             $this->step = 4;
 
-            if ($invitationsCount > 0) {
+            if ($invitationsCount > 1) {
                 Toaster::success("Votre famille a été créée et $invitationsCount invitation(s) ont été envoyées!");
+            } elseif ($invitationsCount === 1) {
+                Toaster::success("Votre famille a été créée et une invitation a été envoyée!");
             } else {
-                Toaster::success('Votre famille a été créée avec succès!');
+                Toaster::success("Votre famille a été créée sans invitations.");
             }
         } catch (\Exception $e) {
             Log::error('Erreur lors de la création de la famille: '.$e->getMessage());
