@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Pages\Goals;
 
+use App\Traits\EnumLabelTrait;
+
 enum GoalStatusEnum: string
 {
+    use EnumLabelTrait;
+
     case All = 'all';
     case Inactive = 'inactive';
     case Active = 'active';

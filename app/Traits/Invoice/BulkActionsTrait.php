@@ -126,8 +126,8 @@ trait BulkActionsTrait
                 $updatedIds[] = $invoice->id;
             }
 
-            $statusEnum = PaymentStatusEnum::from($this->selectedPaymentStatus);
-            $statusLabel = $statusEnum->label();
+            $statusEnum = PaymentStatusEnum::fromValue($this->selectedPaymentStatus);
+            $statusLabel = $statusEnum?->label() ?? 'Statut inconnu';
 
             if ($count > 1) {
                 Toaster::success("$count factures marquées comme \"$statusLabel\" avec succès.");

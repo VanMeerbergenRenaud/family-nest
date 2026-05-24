@@ -36,7 +36,7 @@ class Filters extends Form
 
     public function getStatusEnum(): FilterStatusEnum
     {
-        return FilterStatusEnum::from($this->status);
+        return FilterStatusEnum::fromValue($this->status) ?? FilterStatusEnum::All;
     }
 
     #[Computed]

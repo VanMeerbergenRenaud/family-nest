@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Enums\CategoryEnum;
+use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
-use App\Casts\PriorityEnumCast;
+use App\Casts\SmartEnumCast;
 use App\Traits\HumanDateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -34,16 +35,17 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'type' => TypeEnum::class,
-        'category' => CategoryEnum::class,
+        'type' => SmartEnumCast::class.':'.TypeEnum::class,
+        'category' => SmartEnumCast::class.':'.CategoryEnum::class,
         'amount' => 'decimal:2',
+        'currency' => SmartEnumCast::class.':'.CurrencyEnum::class,
         'issued_date' => 'date',
         'payment_due_date' => 'date',
         'payment_reminder' => 'date',
-        'payment_frequency' => PaymentFrequencyEnum::class,
-        'payment_status' => PaymentStatusEnum::class,
-        'payment_method' => PaymentMethodEnum::class,
-        'priority' => PriorityEnumCast::class,
+        'payment_frequency' => SmartEnumCast::class.':'.PaymentFrequencyEnum::class,
+        'payment_status' => SmartEnumCast::class.':'.PaymentStatusEnum::class,
+        'payment_method' => SmartEnumCast::class.':'.PaymentMethodEnum::class,
+        'priority' => SmartEnumCast::class.':'.PriorityEnum::class,
         'tags' => 'array',
         'is_archived' => 'boolean',
         'is_favorite' => 'boolean',

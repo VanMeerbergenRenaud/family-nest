@@ -92,10 +92,10 @@ class Folders extends Component
 
         return [
             'favorites' => $this->getFolderStats($invoices->where('is_favorite', true)),
-            'paid' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Paid->value)),
-            'unpaid' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Unpaid->value)),
-            'late' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Late->value)),
-            'high_priority' => $this->getFolderStats($invoices->where('priority', PriorityEnum::High->value)),
+            'paid' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Paid)),
+            'unpaid' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Unpaid)),
+            'late' => $this->getFolderStats($invoices->where('payment_status', PaymentStatusEnum::Late)),
+            'high_priority' => $this->getFolderStats($invoices->where('priority', PriorityEnum::High)),
             'last_week' => $this->getFolderStats($invoices->filter(function ($invoice) {
                 return $invoice->issued_date >= now()->subWeek();
             })),
@@ -125,22 +125,13 @@ class Folders extends Component
 
     public function formatAmount(float $amount, string $currency = 'EUR'): string
     {
-        try {
-            return CurrencyEnum::from($currency)->format($amount);
-        } catch (\ValueError $e) {
-            return number_format($amount, 2, ',', ' ').' €';
-        }
+        return CurrencyEnum::tryFromValue($currency)?->format($amount)
+            ?? number_format($amount, 2, ',', ' ').' €';
     }
 
     public function getInvoiceCurrencySymbol(Invoice $invoice): string
     {
-        $currency = $invoice->currency ?? 'EUR';
-
-        try {
-            return CurrencyEnum::from($currency)->symbol();
-        } catch (\ValueError $e) {
-            return '€';
-        }
+        return CurrencyEnum::tryFromValue($invoice->currency)?->symbol() ?? '€';
     }
 
     #[On('invoice-favorite')]

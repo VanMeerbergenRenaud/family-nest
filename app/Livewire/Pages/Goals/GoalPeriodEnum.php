@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Pages\Goals;
 
+use App\Traits\EnumLabelTrait;
+
 enum GoalPeriodEnum: string
 {
+    use EnumLabelTrait;
+
     case All = 'all';
     case Weekly = 'weekly';
     case Monthly = 'monthly';
