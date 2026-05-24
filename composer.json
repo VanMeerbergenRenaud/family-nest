@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.2",
         "ext-zip": "*",
-        "algolia/scout-extended": "^3.1",
+        "algolia/scout-extended": "^3.0",
         "aws/aws-sdk-php": "^3.342",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "cdsmths/laravel-ocr-space": "^1.0",
@@ -21,7 +21,6 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "livewire/livewire": "^3.4",
         "livewire/volt": "^1.0",
-        "mailersend/laravel-driver": "^2.8",
         "masmerise/livewire-toaster": "^2.7",
         "meilisearch/meilisearch-php": "^1.13",
         "opcodesio/log-viewer": "^3.15",
