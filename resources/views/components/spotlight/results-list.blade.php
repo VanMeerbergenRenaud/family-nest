@@ -35,7 +35,7 @@
                                 type="invoice"
                                 :href="route('invoices.show', $result)"
                                 :text="$result->name"
-                                :description="'('.$result->amount.' '.$result->currency.')'"
+                                :description="'('.$result->amount.' '.($result->currency instanceof \BackedEnum ? $result->currency->value : $result->currency).')'"
                                 :state="$result->is_archived ? '#archivée' : null"
                             >
                                 <x-svg.invoice class="h-5 w-5 group-hover:text-gray-800" />

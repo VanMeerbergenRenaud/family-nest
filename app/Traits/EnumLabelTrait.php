@@ -33,4 +33,36 @@ trait EnumLabelTrait
 
         return $options;
     }
+
+    /**
+     * Safely get enum case from value, returning null if value is empty or invalid.
+     */
+    public static function tryFromValue(mixed $value): ?static
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof static) {
+            return $value;
+        }
+
+        return static::tryFrom($value);
+    }
+
+    /**
+     * Safely get enum case from value, returning null if value is empty, but throwing if invalid.
+     */
+    public static function fromValue(mixed $value): ?static
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof static) {
+            return $value;
+        }
+
+        return static::from($value);
+    }
 }

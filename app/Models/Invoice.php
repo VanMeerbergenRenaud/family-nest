@@ -3,23 +3,28 @@
 namespace App\Models;
 
 use App\Enums\CategoryEnum;
+use App\Enums\CurrencyEnum;
 use App\Enums\PaymentFrequencyEnum;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Enums\PriorityEnum;
 use App\Enums\TypeEnum;
+use App\Casts\SmartEnumCast;
 use App\Traits\HumanDateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 class Invoice extends Model
 {
-    use HasFactory, HumanDateTrait, Searchable;
+    use HasFactory, HumanDateTrait, Searchable, SoftDeletes;
 
     protected $fillable = [
         'name', 'reference', 'type', 'category', 'issuer_name', 'issuer_website',
@@ -30,16 +35,17 @@ class Invoice extends Model
     ];
 
     protected $casts = [
-        'type' => TypeEnum::class,
-        'category' => CategoryEnum::class,
+        'type' => SmartEnumCast::class.':'.TypeEnum::class,
+        'category' => SmartEnumCast::class.':'.CategoryEnum::class,
         'amount' => 'decimal:2',
+        'currency' => SmartEnumCast::class.':'.CurrencyEnum::class,
         'issued_date' => 'date',
         'payment_due_date' => 'date',
         'payment_reminder' => 'date',
-        'payment_frequency' => PaymentFrequencyEnum::class,
-        'payment_status' => PaymentStatusEnum::class,
-        'payment_method' => PaymentMethodEnum::class,
-        'priority' => PriorityEnum::class,
+        'payment_frequency' => SmartEnumCast::class.':'.PaymentFrequencyEnum::class,
+        'payment_status' => SmartEnumCast::class.':'.PaymentStatusEnum::class,
+        'payment_method' => SmartEnumCast::class.':'.PaymentMethodEnum::class,
+        'priority' => SmartEnumCast::class.':'.PriorityEnum::class,
         'tags' => 'array',
         'is_archived' => 'boolean',
         'is_favorite' => 'boolean',
@@ -135,6 +141,13 @@ class Invoice extends Model
             (floatval($this->amount) > 0 && abs(floatval($this->amount) - $this->total_shared_amount) < 0.01);
     }
 
+    public function getSymbolAttribute(): string
+    {
+        return $this->currency?->symbol() ?? '€';
+    }
+
+
+
     /* Algolia */
     public function toSearchableArray(): array
     {
@@ -155,18 +168,28 @@ class Invoice extends Model
         ];
     }
 
-    public function scopeSearch($query, $searchTerm)
+    public function scopeSearch(Builder $query, $searchTerm)
     {
-        $searchTerm = strtolower($searchTerm);
+        $like = '%'.mb_strtolower($searchTerm).'%';
 
-        return $query->where(function ($query) use ($searchTerm) {
-            $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(reference) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(type) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(category) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(issuer_name) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(tags::text) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhere('amount', 'LIKE', "%{$searchTerm}%");
+        return $query->where(function (Builder $q) use ($like) {
+            $q->whereRaw('LOWER(name) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(reference) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(type) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(category) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(issuer_name) LIKE ?', [$like]);
+
+            // driver-specific handling for the `tags` column to avoid Postgres-only `::text` cast
+            if (DB::connection()->getDriverName() === 'pgsql') {
+                $q->orWhereRaw('LOWER(tags::text) LIKE ?', [$like]);
+            } else {
+                // MySQL: try JSON_UNQUOTE (for JSON column) and fall back to casting to CHAR
+                // COALESCE ensures non-json/text columns are still searchable
+                $q->orWhereRaw('LOWER(COALESCE(JSON_UNQUOTE(tags), CAST(tags AS CHAR))) LIKE ?', [$like]);
+            }
+
+            // ensure numeric `amount` is cast to string before LIKE comparison
+            $q->orWhereRaw('CAST(amount AS CHAR) LIKE ?', [$like]);
         });
     }
 }

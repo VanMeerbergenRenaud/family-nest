@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Pages\Goals;
 
+use App\Traits\EnumLabelTrait;
+
 enum GoalTypeEnum: string
 {
+    use EnumLabelTrait;
+
     case All = 'all';
     case Reach = 'reach';
     case NotExceed = 'not_exceed';

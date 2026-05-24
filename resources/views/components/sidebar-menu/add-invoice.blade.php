@@ -6,7 +6,7 @@
     <a href="{{ route('invoices.create') }}"
        id="add-invoice-link"
        wire:navigate
-       class="font-semibold rounded-lg text-sm p-2.5 text-center flex-center gap-3 text-white bg-purple-500 hover:bg-purple-600 dark:bg-gray-600 dark:hover:bg-gray-700"
+       class="font-semibold rounded-lg text-sm p-2.5 text-center flex-center gap-3 text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-gray-600 dark:hover:bg-gray-700"
        @mouseenter="showTooltip = true"
        @mouseleave="showTooltip = false"
     >

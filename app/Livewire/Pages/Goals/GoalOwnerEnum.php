@@ -2,8 +2,12 @@
 
 namespace App\Livewire\Pages\Goals;
 
+use App\Traits\EnumLabelTrait;
+
 enum GoalOwnerEnum: string
 {
+    use EnumLabelTrait;
+
     case Family = 'family';
     case Personal = 'personal';
 

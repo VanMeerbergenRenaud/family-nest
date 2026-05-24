@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\FamilyPermissionEnum;
+use App\Enums\FamilyRelationEnum;
+use App\Casts\SmartEnumCast;
 use App\Jobs\SendFamilyInvitation;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +29,8 @@ class FamilyInvitation extends Model implements ShouldQueue
         'is_admin' => 'boolean',
         'expires_at' => 'datetime',
         'send_failed' => 'boolean',
+        'permission' => SmartEnumCast::class.':'.FamilyPermissionEnum::class,
+        'relation' => SmartEnumCast::class.':'.FamilyRelationEnum::class,
     ];
 
     protected static function boot(): void

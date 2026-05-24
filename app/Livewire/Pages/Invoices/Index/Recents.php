@@ -16,13 +16,7 @@ class Recents extends Component
 
     public function getInvoiceCurrencySymbol(Invoice $invoice): string
     {
-        $currency = $invoice->currency ?? 'EUR';
-
-        try {
-            return CurrencyEnum::from($currency)->symbol();
-        } catch (\ValueError $e) {
-            return '€';
-        }
+        return CurrencyEnum::tryFromValue($invoice->currency)?->symbol() ?? '€';
     }
 
     #[Computed]

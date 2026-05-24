@@ -64,7 +64,10 @@ class Index extends Component
 
     public function openEditModal(int $goalId): void
     {
-        $goal = auth()->user()->goals()->findOrFail($goalId);
+        // Récupérer l'objectif sans restriction sur le créateur
+        $goal = Goal::findOrFail($goalId);
+
+        // La politique d'autorisation vérifiera si l'utilisateur est créateur ou admin
         $this->authorize('update', $goal);
 
         $this->resetModalState();
@@ -129,27 +132,25 @@ class Index extends Component
 
             // Objectifs personnels uniquement
             $query->where('user_id', $user->id)
-                  ->where('is_family_goal', false);
-        }
-        elseif ($this->filters['owner'] === GoalOwnerEnum::Family->value) {
+                ->where('is_family_goal', false);
+        } elseif ($this->filters['owner'] === GoalOwnerEnum::Family->value) {
             // Objectifs familiaux uniquement
             if (empty($userFamilyIds)) {
                 return Goal::query()->whereRaw('1 = 0');
             }
 
             $query->whereIn('family_id', $userFamilyIds)
-                  ->where('is_family_goal', true);
-        }
-        else {
+                ->where('is_family_goal', true);
+        } else {
             // Tous les objectifs (personnels + familiaux)
-            $query->where(function($q) use ($user, $userFamilyIds) {
+            $query->where(function ($q) use ($user, $userFamilyIds) {
                 $q->where('user_id', $user->id)
-                  ->where('is_family_goal', false);
+                    ->where('is_family_goal', false);
 
-                if (!empty($userFamilyIds)) {
-                    $q->orWhere(function($subQ) use ($userFamilyIds) {
+                if (! empty($userFamilyIds)) {
+                    $q->orWhere(function ($subQ) use ($userFamilyIds) {
                         $subQ->whereIn('family_id', $userFamilyIds)
-                             ->where('is_family_goal', true);
+                            ->where('is_family_goal', true);
                     });
                 }
             });

@@ -61,15 +61,7 @@ class Show extends Component
      */
     public function getCurrencySymbol(): string
     {
-        if (! isset($this->invoice->currency)) {
-            return '€';
-        }
-
-        try {
-            return CurrencyEnum::tryFrom($this->invoice->currency)?->symbol() ?? '€';
-        } catch (\Exception) {
-            return '€';
-        }
+        return CurrencyEnum::tryFromValue($this->invoice->currency)?->symbol() ?? '€';
     }
 
     #[On('invoice-favorite')]
@@ -79,17 +71,12 @@ class Show extends Component
     {
         $this->invoice->refresh();
     }
-
     public function render()
     {
-        $findEnum = fn ($value, $enumClass) => $value instanceof $enumClass
-            ? $value
-            : $enumClass::tryFrom($value ?? '');
-
-        $paymentStatusEnum = $findEnum($this->invoice->payment_status, PaymentStatusEnum::class);
-        $paymentMethodEnum = $findEnum($this->invoice->payment_method, PaymentMethodEnum::class);
-        $frequencyEnum = $findEnum($this->invoice->payment_frequency, PaymentFrequencyEnum::class);
-        $priorityEnum = $findEnum($this->invoice->priority, PriorityEnum::class);
+        $paymentStatusEnum = $this->invoice->payment_status;
+        $paymentMethodEnum = $this->invoice->payment_method;
+        $frequencyEnum = $this->invoice->payment_frequency;
+        $priorityEnum = $this->invoice->priority;
 
         $currencySymbol = $this->getCurrencySymbol();
 

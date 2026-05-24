@@ -99,8 +99,9 @@
 
         if ($hasErrors) {
             $fieldToStep = [
-                'uploadedFile' => 0, 'fichier' => 0, 'taille' => 0, 'format' => 0,
+                'uploadedFile' => 0, 'fichier' => 0, 'taille' => 0, 'format de fichier' => 0, 'mimes' => 0, 'max:10240' => 0,
                 'nom' => 1, 'référence' => 1, 'type' => 1, 'catégorie' => 1, 'fournisseur' => 1, 'site internet' => 1,
+                'regex' => 1, 'URL' => 1, 'site' => 1, 'issuer_website' => 1, 'format de l\'URL' => 1, 'format de l' => 1,
                 'montant' => 2, 'devise' => 2, 'payée par' => 2,
                 'date d\'émission' => 3, 'date d\'échéance' => 3, 'date de rappel' => 3, 'fréquence' => 3,
                 'statut' => 4, 'méthode de paiement' => 4, 'priorité' => 4,

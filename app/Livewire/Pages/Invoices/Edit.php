@@ -25,9 +25,9 @@ class Edit extends Component
 {
     use ComponentTrait;
     use FileUrlTrait;
+    use OcrProcessingTrait;
     use ShareCalculationTrait;
     use TagManagement;
-    use OcrProcessingTrait;
     use WithFileUploads;
 
     public InvoiceForm $form;
@@ -88,12 +88,6 @@ class Edit extends Component
         $this->loadFamilyMembers();
         $this->initializeShares();
         $this->enableSharing = $this->invoice->sharings()->exists();
-    }
-
-    public function hydrate(): void
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
     }
 
     public function updatedFormUploadedFile(): void

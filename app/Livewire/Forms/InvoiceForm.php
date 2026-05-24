@@ -201,7 +201,7 @@ class InvoiceForm extends Form
 
             // Messages d'erreur pour les informations facture
             'name.required' => 'Le nom de la facture est obligatoire.',
-            'issuer_website.regex' => "Le format de l'URL n'est pas valide. Assurez-vous qu'elle termine par un nom de domaine existant (.be, .com, etc.).",
+            'issuer_website.regex' => "Le format de l'URL du site n'est pas valide. Assurez-vous qu'elle termine par un nom de domaine existant (.be, .com, etc.).",
             'amount.required' => 'Le montant est obligatoire.',
             'amount.numeric' => 'Le montant doit être un nombre.',
             'amount.min' => 'Le montant doit être supérieur ou égal à zéro.',
@@ -237,6 +237,12 @@ class InvoiceForm extends Form
         $this->is_primary = true;
     }
 
+    /*public function hydrate(): void
+    {
+        $this->resetErrorBag();
+        $this->resetValidation();
+    }*/
+
     // Méthode générique pour la sauvegarde de la facture
     public function save(FileStorageService $fileStorageService, bool $enableSharing = false)
     {
@@ -246,7 +252,7 @@ class InvoiceForm extends Form
 
         // Ne vérifier les parts que si la répartition est activée
         if ($enableSharing && ! $this->validateAndAdjustShares()) {
-            $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité.');
+            $this->addError('user_shares', 'Vous devez avoir au moins 2 membres avec un montant de répartition pour utiliser cette fonctionnalité et ne pas dépasser le montant de la facture (100%).');
 
             return false;
         }
@@ -324,27 +330,27 @@ class InvoiceForm extends Form
         return [
             // Informations générales
             'name' => $this->name,
-            'reference' => $this->reference,
+            'reference' => $this->normalizeDate($this->reference),
             'type' => $this->normalizeEnumValue($this->type, TypeEnum::class),
             'category' => $this->normalizeEnumValue($this->category, CategoryEnum::class),
             'issuer_name' => $this->issuer_name,
             'issuer_website' => $this->issuer_website,
             // Détails financiers
             'amount' => $amount,
-            'currency' => $this->currency,
+            'currency' => $this->normalizeEnumValue($this->currency, CurrencyEnum::class),
             'paid_by_user_id' => $payerId,
             'family_id' => $this->family_id,
             // Dates
-            'issued_date' => $this->issued_date,
-            'payment_due_date' => $this->payment_due_date,
-            'payment_reminder' => $this->payment_reminder,
+            'issued_date' => $this->normalizeDate($this->issued_date),
+            'payment_due_date' => $this->normalizeDate($this->payment_due_date),
+            'payment_reminder' => $this->normalizeDate($this->payment_reminder),
             'payment_frequency' => $this->normalizeEnumValue($this->payment_frequency, PaymentFrequencyEnum::class),
             // Statut de paiement
             'payment_status' => $this->normalizeEnumValue($this->payment_status, PaymentStatusEnum::class),
             'payment_method' => $this->normalizeEnumValue($this->payment_method, PaymentMethodEnum::class),
             'priority' => $this->normalizeEnumValue($this->priority, PriorityEnum::class),
             // Notes et tags
-            'notes' => $this->notes,
+            'notes' => $this->normalizeDate($this->notes),
             'tags' => $this->tags ?? [],
             // Archives et favoris
             'is_archived' => $this->is_archived,
@@ -374,7 +380,9 @@ class InvoiceForm extends Form
             ? (float) $invoice->amount
             : null;
 
-        $this->currency = $invoice->currency ?? 'EUR';
+        $this->currency = $invoice->currency instanceof \BackedEnum
+            ? $invoice->currency->value
+            : ($invoice->currency ?? 'EUR');
         $this->paid_by_user_id = $invoice->paid_by_user_id;
         $this->family_id = $invoice->family_id;
 
@@ -585,5 +593,11 @@ class InvoiceForm extends Form
         return $value instanceof \BackedEnum
             ? $value
             : $enumClass::tryFrom($value);
+    }
+
+    // Normalise une date ou un champ texte pour retourner null si vide
+    private function normalizeDate($value)
+    {
+        return ($value === '' || $value === null) ? null : $value;
     }
 }

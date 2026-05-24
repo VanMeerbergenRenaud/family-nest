@@ -3,9 +3,12 @@
 namespace App\Livewire\Pages\Dashboard;
 
 use App\Enums\PaymentStatusEnum;
+use App\Traits\EnumLabelTrait;
 
 enum FilterStatusEnum: string
 {
+    use EnumLabelTrait;
+
     case All = 'all';
     case Paid = PaymentStatusEnum::Paid->value;
     case Unpaid = PaymentStatusEnum::Unpaid->value;

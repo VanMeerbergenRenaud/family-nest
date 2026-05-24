@@ -329,14 +329,14 @@
                             {{-- Type --}}
                             @if($visibleColumns['type'] ?? false)
                                 <td>
-                                    {{ $invoice->type ?? 'Non spécifié' }}
+                                    {{ $invoice->type?->label() ?? 'Non spécifié' }}
                                 </td>
                             @endif
 
                             {{-- Catégorie --}}
                             @if($visibleColumns['category'] ?? false)
                                 <td>
-                                    {{ $invoice->category ?? 'Non spécifiée' }}
+                                    {{ $invoice->category?->label() ?? 'Non spécifiée' }}
                                 </td>
                             @endif
 
@@ -350,7 +350,7 @@
                             {{-- Montant --}}
                             @if($visibleColumns['amount'] ?? false)
                                 <td>
-                                    {{ number_format($invoice->amount, 2, ',', ' ') ?? 'Non spécifié' }} {{ $invoice->symbol ?? '€' }}
+                                    {{ number_format($invoice->amount, 2, ',', ' ') ?? 'Non spécifié' }} {{ $invoice->symbol }}
                                 </td>
                             @endif
 

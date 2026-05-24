@@ -42,12 +42,6 @@ class Create extends Component
         $this->calculateRemainingShares();
     }
 
-    public function hydrate(): void
-    {
-        $this->resetErrorBag();
-        $this->resetValidation();
-    }
-
     public function updatedFormUploadedFile(): void
     {
         $this->showOcrButton = true;

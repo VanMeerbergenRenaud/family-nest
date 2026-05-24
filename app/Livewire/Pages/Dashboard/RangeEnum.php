@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Pages\Dashboard;
 
+use App\Traits\EnumLabelTrait;
 use Carbon\Carbon;
 
 enum RangeEnum: string
 {
+    use EnumLabelTrait;
+
     case All_Time = 'all';
     case Year = 'year';
     case This_Month = 'this_month';

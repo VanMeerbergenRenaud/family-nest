@@ -41,9 +41,6 @@ return [
             'transport' => 'mailgun',
         ],
 
-        'mailersend' => [
-            'transport' => 'mailersend',
-        ],
 
         'mailtrap' => [
             'transport' => 'mailtrap',
