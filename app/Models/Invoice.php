@@ -141,6 +141,11 @@ class Invoice extends Model
             (floatval($this->amount) > 0 && abs(floatval($this->amount) - $this->total_shared_amount) < 0.01);
     }
 
+    public function getSymbolAttribute(): string
+    {
+        return $this->currency?->symbol() ?? '€';
+    }
+
 
 
     /* Algolia */

@@ -138,7 +138,7 @@
 
                                             <td>{{ $invoice->issuer_name ?? 'Non défini' }}</td>
 
-                                            <td>{{ number_format($invoice->amount, 2, ',', ' ') ?? '00.0' }} {{ $invoice->currency ?? '€' }}</td>
+                                            <td>{{ number_format($invoice->amount, 2, ',', ' ') ?? '00.0' }} {{ $invoice->currency instanceof \BackedEnum ? $invoice->currency->value : ($invoice->currency ?? '€') }}</td>
 
                                             <td>{{ $invoice->updated_at ? $invoice->updated_at->locale('fr_FR')->isoFormat('D MMMM YYYY') : 'Non définie' }}</td>
 

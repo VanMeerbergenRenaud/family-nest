@@ -123,7 +123,7 @@ class Folders extends Component
         return $currencies->sortDesc()->keys()->first() ?? 'EUR';
     }
 
-    public function formatAmount(float $amount, string $currency = 'EUR'): string
+    public function formatAmount(float $amount, $currency = 'EUR'): string
     {
         return CurrencyEnum::tryFromValue($currency)?->format($amount)
             ?? number_format($amount, 2, ',', ' ').' €';
