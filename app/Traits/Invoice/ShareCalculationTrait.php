@@ -254,7 +254,11 @@ trait ShareCalculationTrait
             'totalAmount' => $totalAmount,
             'isComplete' => $isComplete,
             'formattedTotalPercent' => Number::format($totalPercent, 0, locale: 'fr_FR'),
-            'formattedTotalAmount' => Number::currency($totalAmount, $this->form->currency ?? 'EUR', locale: 'fr_FR'),
+            'formattedTotalAmount' => Number::currency(
+                $totalAmount,
+                CurrencyEnum::tryFromValue($this->form->currency ?? 'EUR')?->value ?? 'EUR',
+                locale: 'fr_FR'
+            ),
         ];
     }
 
@@ -285,7 +289,7 @@ trait ShareCalculationTrait
             return '€';
         }
 
-        return CurrencyEnum::tryFrom($this->form->currency)?->symbol() ?? '€';
+        return CurrencyEnum::tryFromValue($this->form->currency ?? 'EUR')?->symbol() ?? '€';
     }
 
     /**

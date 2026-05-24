@@ -330,27 +330,27 @@ class InvoiceForm extends Form
         return [
             // Informations générales
             'name' => $this->name,
-            'reference' => $this->reference,
+            'reference' => $this->normalizeDate($this->reference),
             'type' => $this->normalizeEnumValue($this->type, TypeEnum::class),
             'category' => $this->normalizeEnumValue($this->category, CategoryEnum::class),
             'issuer_name' => $this->issuer_name,
             'issuer_website' => $this->issuer_website,
             // Détails financiers
             'amount' => $amount,
-            'currency' => $this->currency,
+            'currency' => $this->normalizeEnumValue($this->currency, CurrencyEnum::class),
             'paid_by_user_id' => $payerId,
             'family_id' => $this->family_id,
             // Dates
-            'issued_date' => $this->issued_date,
-            'payment_due_date' => $this->payment_due_date,
-            'payment_reminder' => $this->payment_reminder,
+            'issued_date' => $this->normalizeDate($this->issued_date),
+            'payment_due_date' => $this->normalizeDate($this->payment_due_date),
+            'payment_reminder' => $this->normalizeDate($this->payment_reminder),
             'payment_frequency' => $this->normalizeEnumValue($this->payment_frequency, PaymentFrequencyEnum::class),
             // Statut de paiement
             'payment_status' => $this->normalizeEnumValue($this->payment_status, PaymentStatusEnum::class),
             'payment_method' => $this->normalizeEnumValue($this->payment_method, PaymentMethodEnum::class),
             'priority' => $this->normalizeEnumValue($this->priority, PriorityEnum::class),
             // Notes et tags
-            'notes' => $this->notes,
+            'notes' => $this->normalizeDate($this->notes),
             'tags' => $this->tags ?? [],
             // Archives et favoris
             'is_archived' => $this->is_archived,
@@ -380,7 +380,9 @@ class InvoiceForm extends Form
             ? (float) $invoice->amount
             : null;
 
-        $this->currency = $invoice->currency ?? 'EUR';
+        $this->currency = $invoice->currency instanceof \BackedEnum
+            ? $invoice->currency->value
+            : ($invoice->currency ?? 'EUR');
         $this->paid_by_user_id = $invoice->paid_by_user_id;
         $this->family_id = $invoice->family_id;
 
@@ -591,5 +593,11 @@ class InvoiceForm extends Form
         return $value instanceof \BackedEnum
             ? $value
             : $enumClass::tryFrom($value);
+    }
+
+    // Normalise une date ou un champ texte pour retourner null si vide
+    private function normalizeDate($value)
+    {
+        return ($value === '' || $value === null) ? null : $value;
     }
 }
