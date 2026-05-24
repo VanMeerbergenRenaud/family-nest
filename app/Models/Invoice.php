@@ -136,6 +136,43 @@ class Invoice extends Model
             (floatval($this->amount) > 0 && abs(floatval($this->amount) - $this->total_shared_amount) < 0.01);
     }
 
+    /**
+     * Accessor: normalize empty string values to null and return a PriorityEnum when possible.
+     * This prevents Laravel's enum cast pipeline from receiving an empty string which would
+     * cause PriorityEnum::from('') to throw.
+     */
+    public function getPriorityAttribute($value): ?PriorityEnum
+    {
+        if ($value === '' || $value === null) {
+            return null;
+        }
+
+        try {
+            return PriorityEnum::from($value);
+        } catch (\ValueError $e) {
+            // If value is invalid, treat as null to avoid breaking the page.
+            return null;
+        }
+    }
+
+    /**
+     * Mutator: ensure empty strings are stored as null and Enum instances are stored as their backing value.
+     */
+    public function setPriorityAttribute($value): void
+    {
+        if ($value === '') {
+            $this->attributes['priority'] = null;
+            return;
+        }
+
+        if ($value instanceof PriorityEnum) {
+            $this->attributes['priority'] = $value->value;
+            return;
+        }
+
+        $this->attributes['priority'] = $value;
+    }
+
     /* Algolia */
     public function toSearchableArray(): array
     {
