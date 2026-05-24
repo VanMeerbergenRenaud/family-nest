@@ -11,6 +11,8 @@ use App\Enums\TypeEnum;
 use App\Traits\HumanDateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -193,18 +195,28 @@ class Invoice extends Model
         ];
     }
 
-    public function scopeSearch($query, $searchTerm)
+    public function scopeSearch(Builder $query, $searchTerm)
     {
-        $searchTerm = strtolower($searchTerm);
+        $like = '%'.mb_strtolower($searchTerm).'%';
 
-        return $query->where(function ($query) use ($searchTerm) {
-            $query->whereRaw('LOWER(name) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(reference) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(type) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(category) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(issuer_name) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhereRaw('LOWER(tags::text) LIKE ?', ["%{$searchTerm}%"])
-                ->orWhere('amount', 'LIKE', "%{$searchTerm}%");
+        return $query->where(function (Builder $q) use ($like) {
+            $q->whereRaw('LOWER(name) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(reference) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(type) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(category) LIKE ?', [$like])
+                ->orWhereRaw('LOWER(issuer_name) LIKE ?', [$like]);
+
+            // driver-specific handling for the `tags` column to avoid Postgres-only `::text` cast
+            if (DB::connection()->getDriverName() === 'pgsql') {
+                $q->orWhereRaw('LOWER(tags::text) LIKE ?', [$like]);
+            } else {
+                // MySQL: try JSON_UNQUOTE (for JSON column) and fall back to casting to CHAR
+                // COALESCE ensures non-json/text columns are still searchable
+                $q->orWhereRaw('LOWER(COALESCE(JSON_UNQUOTE(tags), CAST(tags AS CHAR))) LIKE ?', [$like]);
+            }
+
+            // ensure numeric `amount` is cast to string before LIKE comparison
+            $q->orWhereRaw('CAST(amount AS CHAR) LIKE ?', [$like]);
         });
     }
 }
